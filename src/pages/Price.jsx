@@ -1,0 +1,481 @@
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Grest_Logo from "../assets/Grest_Logo.jpg";
+import axios from "axios";
+import User_Logo from "../assets/User_Logo.jpg";
+import { FaCamera } from "react-icons/fa";
+import { CgSpinner } from "react-icons/cg";
+const PricePage = ({ submitdata, userToken }) => {
+  const Device = sessionStorage.getItem("DeviceType");
+  const [file, setFile] = useState(null);
+  const [idProofBack, setIdProofBack] = useState(null);
+  const [phoneBill, setPhoneBill] = useState(null);
+  const [phoneFront, setPhoneFront] = useState(null);
+  const [phoneBack, setPhoneBack] = useState(null);
+  const [phoneLeft, setPhoneLeft] = useState(null);
+  const [phoneRight, setPhoneRight] = useState(null);
+  const [phoneTop, setPhoneTop] = useState(null);
+  const [phoneBottom, setPhoneBottom] = useState(null);
+  const [imeinumber, setImeiNumber] = useState("");
+  const userName = "";
+  const [userTokenValue, setUserTokenValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
+
+  const handleCameraButtonClick = (ref) => {
+    // Trigger the file input click when the camera button is clicked
+    if (!ref.current) return;
+    ref.current.click();
+  };
+
+  const handleChange = (setMEthod, e) => {
+    setMEthod(e.target.files[0]);
+    console.log("File selected: ", e.target.files[0]);
+  };
+  const fileInputRef = useRef(null); // Create a ref for the file input
+  const idproofBackRef = useRef(null);
+  const phoneBillRef = useRef(null);
+  const phoneFrontRef = useRef(null);
+  const phoneBackRef = useRef(null);
+  const phoneLeftRef = useRef(null);
+  const phoneRightRef = useRef(null);
+  const phoneTopRef = useRef(null);
+  const phoneBottomRef = useRef(null);
+  let savedOtpData = JSON.parse(localStorage.getItem("otpData"));
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("authToken");
+    setUserTokenValue(token);
+    console.log("token is", token);
+  }, []);
+
+  const uploadAllImages = async () => {
+    const formData = new FormData();
+
+    if (file) formData.append("adharFront", file);
+    if (idProofBack) formData.append("adharBack", idProofBack);
+    if (phoneBill) formData.append("phoneBill", phoneBill);
+    if (phoneFront) formData.append("phoneFront", phoneFront);
+    if (phoneBack) formData.append("phoneBack", phoneBack);
+    if (phoneTop) formData.append("phoneUp", phoneTop);
+    if (phoneLeft) formData.append("phoneLeft", phoneLeft);
+    if (phoneRight) formData.append("phoneRight", phoneRight);
+    if (phoneBottom) formData.append("phoneDown", phoneBottom);
+    formData.append("signature", phoneBottom);
+    formData.append("IMEI", imeinumber);
+    formData.append("leadId", leadsubmitDATA?.id);
+    formData.append("emailId", savedOtpData?.email);
+    formData.append("name", savedOtpData?.name);
+    formData.append("phoneNumber", savedOtpData?.phone);
+
+    console.log("file", file);
+    console.log("idproofback", idProofBack);
+
+    try {
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/questionnaires/upload-documents`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `${userTokenValue}`,
+          },
+        }
+      );
+      setIsLoading(false);
+      navigate("/specialoffers");
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    setIsLoading(true);
+    uploadAllImages();
+  };
+
+  return (
+    <div className="h-[100vh] max-h-[200vh] overflow-y-auto bg-white ">
+      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
+        <div className="flex items-center justify-between w-full ">
+          <div className="flex flex-row-reverse items-center gap-2 ml-4">
+            <p className="mr-4 text-base md:text-xl">{userName}</p>
+
+            <img className="w-[30px]" src={User_Logo} alt="" />
+          </div>
+
+          <img
+            onClick={() => navigate("/selectdevicetype")}
+            className="w-28 "
+            src={Grest_Logo}
+            alt="app logo"
+          />
+        </div>
+      </div>
+      <div className="w-[90%] md:w-[90%] mx-auto  h-[auto] mb-[93px]">
+        <div className="mt-3 text-center">
+          <h1 className="text-2xl font-semibold">Upload Documents</h1>
+          <p className="mt-4 text-gray-600">
+            Regulations require you to upload a national identity card. Don't
+            worry, your data will stay safe and private.
+          </p>
+        </div>
+
+        {/* //emi number  */}
+        <div className="flex flex-col">
+          <div className="flex flex-col eminumber mt-[4px]">
+            <div className="flex gap-1 two">
+              <p className="text-base font-medium">1.</p>
+              <p className="text-base font-medium three">
+                Enter your {Device === "Mobile" && "phone's IMEI No."}
+                {Device === "Watch" && "smartwatch's serial no."}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4 mt-2 ml-[19px]">
+              <input
+                type="text"
+                className="w-auto p-2 border-2 border-gray-300 rounded"
+                value={imeinumber}
+                placeholder={Device === "Mobile" ? "IMEI no." : "Serial no."}
+                onChange={(e) => setImeiNumber(e.target.value)}
+                maxLength={15}
+              />
+              <button className="px-4 py-2 font-bold text-white bg-[#f4486dd0] rounded hover:bg-[#ec2752]">
+                Verify
+              </button>
+            </div>
+          </div>
+
+          {/* //adharcard */}
+          <div className="flex flex-col adharcard mt-[10px]">
+            <div className="flex gap-1 two">
+              <p className="text-base font-medium">2.</p>
+              <p className="text-base font-medium three">
+                Upload your Aadhar Card
+              </p>
+            </div>
+
+            <div className="flex inputAADHAR justify-evenly">
+              {/* 1 */}
+              <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative flex flex-col border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+                <p className="font-semibold text-center">Adhaar(Front)</p>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange(setFile, e)}
+                  style={{ display: "none" }}
+                  ref={fileInputRef}
+                />
+                <button onClick={() => handleCameraButtonClick(fileInputRef)}>
+                  {!file ? (
+                    <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                      <FaCamera />
+                      <span className="block tracking-tighter">
+                        Select file
+                      </span>
+                    </i>
+                  ) : (
+                    <img
+                      className="w-full h-[60px]"
+                      src={URL.createObjectURL(file)}
+                      alt="Uploaded file"
+                    />
+                  )}
+                </button>
+              </div>
+
+              {/* 2 */}
+
+              <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+                <p className="font-semibold text-center">Adhaar(Back)</p>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange(setIdProofBack, e)}
+                  style={{ display: "none" }}
+                  ref={idproofBackRef}
+                />
+                <button onClick={() => handleCameraButtonClick(idproofBackRef)}>
+                  {!idProofBack ? (
+                    <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                      <FaCamera />
+                      <span className="block tracking-tighter">
+                        Select file
+                      </span>
+                    </i>
+                  ) : (
+                    <img
+                      className="w-full h-[60px]"
+                      src={URL.createObjectURL(idProofBack)}
+                      alt="Uploaded file"
+                    />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* //phoneBill */}
+          <div className="flex flex-col adharcard mt-[10px]">
+            <div className="flex gap-1 two">
+              <p className="text-base font-medium">2.</p>
+              <p className="text-base font-medium three">
+                Upload your {Device === "Mobile" && "phone's"}
+                {Device === "Watch" && "smartwatch's"} bill
+              </p>
+            </div>
+
+            <div className="flex justify-start ml-3 inputAADHAR">
+              {/* 1 */}
+              <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+                <p className="font-semibold text-center">
+                  {Device === "Mobile" && "Phone"}
+                  {Device === "Watch" && "Smartwatch"} Bill
+                </p>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange(setPhoneBill, e)}
+                  style={{ display: "none" }}
+                  ref={phoneBillRef}
+                />
+                <button onClick={() => handleCameraButtonClick(phoneBillRef)}>
+                  {!phoneBill ? (
+                    <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                      <FaCamera />
+                      <span className="block tracking-tighter">
+                        Select file
+                      </span>
+                    </i>
+                  ) : (
+                    <img
+                      className="w-full h-[60px]"
+                      src={URL.createObjectURL(phoneBill)}
+                      alt="Uploaded file"
+                    />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* //phones phtos */}
+
+          <div className="flex flex-col adharcard mt-[10px] ">
+            <div className="flex gap-1 two">
+              <p className="text-base font-medium">3.</p>
+              <p className="text-base font-medium three">
+                Upload your {Device === "Mobile" && "phone's"}
+                {Device === "Watch" && "smartwatch's"} images
+              </p>
+            </div>
+
+            <div className="flex flex-wrap inputAADHAR justify-evenly">
+              {/* 1 */}
+              <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+                <p className="font-semibold text-center">
+                  {Device === "Mobile" && "Phone"}
+                  {Device === "Watch" && "Watch"} Front
+                </p>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange(setPhoneFront, e)}
+                  style={{ display: "none" }}
+                  ref={phoneFrontRef}
+                />
+                <button onClick={() => handleCameraButtonClick(phoneFrontRef)}>
+                  {!phoneFront ? (
+                    <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                      <FaCamera />
+                      <span className="block tracking-tighter">
+                        Select file
+                      </span>
+                    </i>
+                  ) : (
+                    <img
+                      className="w-full h-[60px]"
+                      src={URL.createObjectURL(phoneFront)}
+                      alt="Uploaded file"
+                    />
+                  )}
+                </button>
+              </div>
+
+              {/* 2 */}
+              <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+                <p className="font-semibold text-center">
+                  {Device === "Mobile" && "Phone"}
+                  {Device === "Watch" && "Watch"} Back
+                </p>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange(setPhoneBack, e)}
+                  style={{ display: "none" }}
+                  ref={phoneBackRef}
+                />
+                <button onClick={() => handleCameraButtonClick(phoneBackRef)}>
+                  {!phoneBack ? (
+                    <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                      <FaCamera />
+                      <span className="block tracking-tighter">
+                        Select file
+                      </span>
+                    </i>
+                  ) : (
+                    <img
+                      className="w-full h-[60px]"
+                      src={URL.createObjectURL(phoneBack)}
+                      alt="Uploaded file"
+                    />
+                  )}
+                </button>
+              </div>
+
+              {/* 3 */}
+
+              <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
+                <p className="font-semibold tracking-tighter text-center">
+                  {Device === "Mobile" && "Phone"}
+                  {Device === "Watch" && "Watch"} Left Side
+                </p>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange(setPhoneLeft, e)}
+                  style={{ display: "none" }}
+                  ref={phoneLeftRef}
+                />
+                <button onClick={() => handleCameraButtonClick(phoneLeftRef)}>
+                  {!phoneLeft ? (
+                    <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                      <FaCamera />
+                      <span className="block tracking-tighter">
+                        Select file
+                      </span>
+                    </i>
+                  ) : (
+                    <img
+                      className="w-full h-[60px]"
+                      src={URL.createObjectURL(phoneLeft)}
+                      alt="Uploaded file"
+                    />
+                  )}
+                </button>
+              </div>
+
+              {/* 4 */}
+              <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+                <p className="font-semibold tracking-tighter text-center">
+                  {Device === "Mobile" && "Phone"}
+                  {Device === "Watch" && "Watch"} Right Side
+                </p>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange(setPhoneRight, e)}
+                  style={{ display: "none" }}
+                  ref={phoneRightRef}
+                />
+                <button onClick={() => handleCameraButtonClick(phoneRightRef)}>
+                  {!phoneRight ? (
+                    <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                      <FaCamera />
+                      <span className="block tracking-tighter">
+                        Select file
+                      </span>
+                    </i>
+                  ) : (
+                    <img
+                      className="w-full h-[60px]"
+                      src={URL.createObjectURL(phoneRight)}
+                      alt="Uploaded file"
+                    />
+                  )}
+                </button>
+              </div>
+
+              {/* 5 */}
+              <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+                <p className="font-semibold tracking-tighter text-center">
+                  {Device === "Mobile" && "Phone"}
+                  {Device === "Watch" && "Watch"} Top Side
+                </p>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange(setPhoneTop, e)}
+                  style={{ display: "none" }}
+                  ref={phoneTopRef}
+                />
+                <button onClick={() => handleCameraButtonClick(phoneTopRef)}>
+                  {!phoneTop ? (
+                    <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                      <FaCamera />
+                      <span className="block tracking-tighter">
+                        Select file
+                      </span>
+                    </i>
+                  ) : (
+                    <img
+                      className="w-full h-[60px]"
+                      src={URL.createObjectURL(phoneTop)}
+                      alt="Uploaded file"
+                    />
+                  )}
+                </button>
+              </div>
+
+              {/* 6 */}
+              <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+                <p className="font-semibold tracking-tighter text-center">
+                  {Device === "Mobile" && "Phone"}
+                  {Device === "Watch" && "Watch"} Bottom Side
+                </p>
+                <input
+                  type="file"
+                  onChange={(e) => handleChange(setPhoneBottom, e)}
+                  style={{ display: "none" }}
+                  ref={phoneBottomRef}
+                />
+                <button onClick={() => handleCameraButtonClick(phoneBottomRef)}>
+                  {!phoneBottom ? (
+                    <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                      <FaCamera />
+                      <span className="block tracking-tighter">
+                        Select file
+                      </span>
+                    </i>
+                  ) : (
+                    <img
+                      className="w-full h-[60px]"
+                      src={URL.createObjectURL(phoneBottom)}
+                      alt="Uploaded file"
+                    />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
+        <div
+          onClick={handleSubmit}
+          className="bg-[#EC2752] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
+        >
+          {isLoading && (
+            <CgSpinner
+              size={20}
+              className="absolute left-[28%] top-[8px] mt-1 animate-spin"
+            />
+          )}
+          <p className="w-full p-1 text-xl font-medium">
+            {isLoading ? "Submitting" : "Submit"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PricePage;
