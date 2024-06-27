@@ -9,7 +9,7 @@ import axios from "axios";
 import { BeatLoader } from "react-spinners";
 import { useQuestionContext } from "../../components/QuestionContext";
 
-const OrederQuoteCreated = ({ orderType, daysfilters, head }) => {
+const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
   const [data, setData] = useState([]);
   const [flag, setFlag] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -17,14 +17,8 @@ const OrederQuoteCreated = ({ orderType, daysfilters, head }) => {
   const { daysfilter } = useParams();
   const { fromDateDup, toDateDup } = useQuestionContext();
   const [serachval, setSerachval] = useState("");
-
   const deviceType = sessionStorage.getItem("DeviceType");
-  let valDays;
-  if (daysfilter === "") {
-    valDays = daysfilter;
-  } else {
-    valDays = daysfilter;
-  }
+  let valDays = daysfilter;
   const location = useLocation();
   console.log("loc", location);
   const handleSeachSubmit = () => {
@@ -46,19 +40,18 @@ const OrederQuoteCreated = ({ orderType, daysfilters, head }) => {
         }
       )
       .then((res) => {
-        const data = res.data?.data?.[orderType]?.data;
-        const modifiedDataArray = data.map((data) => {
-          const storageValue = data.lead?.storage;
-          const filteredConfig = data.lead?.model?.config.filter(
+        const modifiedDataArray = res.data?.data?.[orderType]?.data.map((leadSetItem) => {
+          const storageValue = leadSetItem.lead?.storage;
+          const filteredConfig = leadSetItem.lead?.model?.config.filter(
             (configItem) => configItem.storage === storageValue
           );
 
           return {
-            ...data,
+            ...leadSetItem,
             lead: {
-              ...data.lead,
+              ...leadSetItem.lead,
               model: {
-                ...data.lead.model,
+                ...leadSetItem.lead.model,
                 config: filteredConfig.length ? filteredConfig[0] : null,
               },
             },
@@ -169,4 +162,4 @@ const OrederQuoteCreated = ({ orderType, daysfilters, head }) => {
   );
 };
 
-export default OrederQuoteCreated;
+export default OrderQuoteCreated;

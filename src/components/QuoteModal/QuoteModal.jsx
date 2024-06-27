@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import styles from "./QuoteModal.module.css";
 import OtpInput from "otp-input-react";
-import { auth } from "../../firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { setOtpVerified } from "../../store/slices/otpSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { MdEdit } from "react-icons/md";
+const Failerr = "Failed To Save Quote" 
 
 const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
   const showHideClassName = show
@@ -18,7 +17,6 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
   const [showOtp, setShowOtp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [ph, setPh] = useState("");
-  const [firstTime, setFirstIme] = useState(true);
   const dispatch = useDispatch();
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
@@ -33,189 +31,9 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
     setShowOtp(false);
   }, [show]);
 
-  function onCaptchVerify() {
-    console.log(auth);
-
-    // For Firebase version 9 and above
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
-      size: "invisible",
-      callback: (response) => {
-        // reCAPTCHA solved, allow signInWithPhoneNumber.
-        // ...
-      },
-    });
-  }
-
   const handleNumberEdit = () => {
     setLoading(false);
     setShowOtp(false);
-  };
-
-  const validateForm = () => {
-    if (!name || !ph || !userEmail || !reason) {
-      toast.error("All fields are required");
-      return false;
-    }
-
-    if (ph.length !== 10) {
-      toast.error("Mobile number should be 10 digits");
-      return false;
-    }
-
-    return true;
-  };
-
-  function onSignup(event) {
-    if (validateForm()) {
-      setLoading(true);
-      const leadData = JSON.parse(sessionStorage.getItem("responsedatadata"));
-      const userToken = sessionStorage.getItem("authToken");
-      const ExactQuote = sessionStorage.getItem("ExactQuote");
-      const data = {
-        lead_id: leadData.id,
-        phoneNumber: ph,
-        name: name,
-        emailId: userEmail,
-        reason: reason,
-      };
-      setUserData(data);
-
-      console.log("data is ", data);
-
-      if (ExactQuote === "true") {
-        setShowOtp(!showOtp);
-        setLoading(true);
-        if (firstTime) {
-          onCaptchVerify();
-          setFirstIme(false);
-        }
-
-        const appVerifier = window.recaptchaVerifier;
-        const formatPh = "+91" + ph;
-        console.log(formatPh);
-
-        signInWithPhoneNumber(auth, formatPh, appVerifier)
-          .then((confirmationResult) => {
-            window.confirmationResult = confirmationResult;
-            setLoading(false);
-            console.log("OTP sent successfully!");
-          })
-          .catch((error) => {
-            console.log(error);
-            setLoading(false);
-          });
-      } else {
-        console.log(userData);
-
-        axios
-          .post(
-            `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/leadSet/quickQoute`,
-            data,
-            {
-              headers: {
-                authorization: `${userToken}`,
-              },
-            }
-          )
-          .then((res) => {
-            console.log(res);
-            toast.success(quoteText);
-            handleClose();
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error("Failed To Save Quote");
-            handleClose();
-          });
-
-        setLoading(false);
-        setQuoteSaved(true);
-      }
-    }
-  }
-
-  function onOTPVerify() {
-    setLoading(true);
-    const ExactQuote = sessionStorage.getItem("ExactQuote");
-    const userToken = sessionStorage.getItem("authToken");
-    window.confirmationResult
-      .confirm(otp)
-      .then(async (res) => {
-        setLoading(false);
-        if (ExactQuote === "true") {
-          axios
-            .post(
-              `${
-                import.meta.env.VITE_REACT_APP_ENDPOINT
-              }/api/leadSet/orderCreated`,
-              userData,
-              {
-                headers: {
-                  authorization: `${userToken}`,
-                },
-              }
-            )
-            .then((res) => {
-              console.log(res);
-              toast.success(quoteText);
-              handleClose();
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Failed To Save Quote");
-              handleClose();
-            });
-        } else {
-          axios
-            .post(
-              `${
-                import.meta.env.VITE_REACT_APP_ENDPOINT
-              }/api/leadSet/quickQoute`,
-              userData,
-              {
-                headers: {
-                  authorization: `${userToken}`,
-                },
-              }
-            )
-            .then((res) => {
-              console.log(res);
-              toast.success(quoteText);
-              handleClose();
-            })
-            .catch((err) => {
-              console.log(err);
-              toast.error("Failed To Save Quote");
-              handleClose();
-            });
-        }
-
-        setQuoteSaved(true);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-        toast.error("Failed To Save Quote");
-        handleClose();
-      });
-  }
-
-  const resendOTP = () => {
-    // Start the countdown timer
-    setDisableResend(true);
-
-    const appVerifier = window.recaptchaVerifier;
-    const formatPh = "+91" + ph;
-
-    // Resend the OTP without changing the loading state
-    signInWithPhoneNumber(auth, formatPh, appVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
-        console.log("OTP resent successfully!");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   useEffect(() => {
@@ -315,7 +133,7 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         })
         .catch((err) => {
           console.log(err);
-          toast.error("Failed To Save Quote");
+          toast.error(Failerr);
           handleClose();
         });
 
@@ -350,9 +168,11 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         )
         .then((res) => {
           console.log(res);
+          setLoading(false)
         })
         .catch((err) => {
           console.log(err);
+          setLoading(false)
         });
     } else {
       axios
@@ -367,9 +187,11 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         )
         .then((res) => {
           console.log(res);
+          setLoading(false)
         })
         .catch((err) => {
           console.log(err);
+          setLoading(false)
         });
     }
     toast.success(quoteText);
@@ -542,18 +364,9 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
                   {disableResend ? `Resend in ${timer}` : "Resend OTP"}
                 </button>
               </div>
-              {/* <div className="flex flex-row items-center justify-center text-sm font-medium">
-                <span className="opacity-60">Edit Phone Number?</span>
-                <button
-                  className="ml-2 text-[#EC2752]"
-                  onClick={handleNumberEdit}
-                >
-                  Edit Number
-                </button>
-              </div> */}
               <button
                 onClick={onOTPVerifyDup}
-                // onClick={onOTPVerify}
+                disabled={loading}
                 className="text-white mt-8 bg-[#EC2752] p-2 text-xl rounded-md"
               >
                 Submit Otp

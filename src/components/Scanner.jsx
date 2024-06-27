@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Quagga from "quagga";
-import { BiSolidTorch } from "react-icons/bi";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import styles from "../styles/Scanner.module.css";
 
@@ -51,25 +50,10 @@ const Scanner = (props) => {
     props.scanBoxSwitch();
   };
 
-  const onProcessed = (result) => {
-    if (result) {
+  const onProcessed = (result1) => {
+    if (result1) {
       setStatus("error");
     }
-  };
-
-  const toggleTorch = () => {
-    if (torchOn) {
-      Quagga.ImageDebug.drawPath({ x: 10, y: 20 }, { x: 30, y: 20 }, "canvas", {
-        color: "red",
-        lineWidth: 3,
-      });
-    } else {
-      Quagga.ImageDebug.drawPath({ x: 10, y: 20 }, { x: 30, y: 20 }, "canvas", {
-        color: "green",
-        lineWidth: 3,
-      });
-    }
-    setTorchOn(!torchOn);
   };
 
   return (

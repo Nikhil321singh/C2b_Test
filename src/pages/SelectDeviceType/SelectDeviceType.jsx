@@ -29,7 +29,7 @@ import how3 from "../../assets/how3.png";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { Link } from "react-router-dom";
 import { useQuestionContext } from "../../components/QuestionContext";
-import FromDatecom from "../../components/fromdate_todate_Com/FromDate";
+import FromDatecom from "../../components/fromdate_todate_Com/FromDatecom";
 import { toast } from "react-hot-toast";
 import { ImCancelCircle } from "react-icons/im";
 import Oppo from "../../assets/Oppo.png";

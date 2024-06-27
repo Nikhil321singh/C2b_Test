@@ -14,7 +14,7 @@ const QuestionSearch = ({ setIsSearchOpen, state }) => {
   const [filteredQuestions, setFilteredQuestions] = useState([]);
   const [answer, setAnswer] = useState("");
   const dispatch = useDispatch();
-  const qnaAnswer = useSelector((state) => state.qna);
+  const qnaAnswer = useSelector((AnsState) => AnsState.qna);
   console.log("qna", qnaAnswer);
   const handleSearch = () => {
     const filtered = Object.values(state).flatMap((group) =>

@@ -1,12 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
+
 const ShowReport = ({ id, setShowReportModel }) => {
-  const [userToken, setUserToken] = useState(
-    sessionStorage.getItem("authToken")
-  );
+  const userToken = sessionStorage.getItem("authToken");
   const [QNAData, setQNAData] = useState([]);
   const [data, setData] = useState([]);
+
   useEffect(() => {
     const payload = {
       id: id,

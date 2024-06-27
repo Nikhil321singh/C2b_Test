@@ -206,30 +206,35 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
 
   return (
     <>
-      {(sucBox || failBox) && (
+      {sucBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? successColorClass : errorColorClass
-            }`}
-          >
-            {sucBox ? (
-              <IoIosCheckmarkCircle className={successColorClass} size={90} />
-            ) : (
-              <IoIosCloseCircle className={errorColorClass} size={90} />
-            )}
-            <h6 className={sucBox ? successColorClass : errorColorClass}>
-              {sucBox ? "Success!" : "Error!"}
-            </h6>
+          <div className={`${styles.err_mod_box} ${successColorClass}`}>
+            <IoIosCheckmarkCircle className={successColorClass} size={90} />
+            <h6 className={successColorClass}>Success!</h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
               onClick={() => {
                 setSucBox(false);
+              }}
+              className={"bg-green-500 text-white"}
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
+
+      {failBox && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${errorColorClass}`}>
+            <IoIosCloseCircle className={errorColorClass} size={90} />
+            <h6 className={errorColorClass}>Error!</h6>
+            <p className="text-slate-500">{errMsg}</p>
+            <button
+              onClick={() => {
                 setFailBox(false);
               }}
-              className={
-                sucBox ? "bg-green-500 text-white" : "bg-[#EC2752] text-white"
-              }
+              className={"bg-[#EC2752] text-white"}
             >
               Okay
             </button>
@@ -239,17 +244,11 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
 
       {confBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? successColorClass : errorColorClass
-            }`}
-          >
-            <h6 className={sucBox ? successColorClass : errorColorClass}>
-              Confirmation!
-            </h6>
+          <div className={`${styles.err_mod_box} ${errorColorClass}`}>
+            <h6 className={errorColorClass}>Confirmation!</h6>
             <p className="block text-slate-500">
               Do you want to delete Question -
-              <span className="block">{selectedUserqs} </span>
+              <span className="block">{selectedUserqs}</span>
             </p>
             <div className="flex flex-row gap-2">
               <button

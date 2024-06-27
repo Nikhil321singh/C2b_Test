@@ -57,8 +57,8 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
 
     axios
       .request(config)
-      .then((response) => {
-        const storeNamesArray = response.data.result.map((company) => ({
+      .then((response1) => {
+        const storeNamesArray = response1.data.result.map((company) => ({
           companyName: company.companyName,
           _id: company._id,
         }));
@@ -115,7 +115,7 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
       return;
     }
 
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       userID: formData._id,
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -142,10 +142,10 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
 
     axios
       .request(config)
-      .then((response) => {
-        console.log(response);
+      .then((response2) => {
+        console.log(response2);
         setIsTableLoaded(false);
-        setResponse(response.data.msg);
+        setResponse(response2.data.msg);
         setEditSuccess(true);
       })
       .catch((error) => {
@@ -299,7 +299,7 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
                 <option value="">None</option>
                 {storeData.map((item) => (
                   <option key={item._id} value={item._id}>
-                    {item.storeName + ", " + item.region}
+                    {`${item.storeName}, ${item.region}`}
                   </option>
                 ))}
               </select>

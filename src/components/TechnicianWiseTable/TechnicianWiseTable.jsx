@@ -1,10 +1,8 @@
-import React from "react";
 
 const TechnicianWiseTable = ({ tableData }) => {
   function reverseDate(itemDate) {
     const dateArr = itemDate.split("-");
-    const res = dateArr.reverse().join("-");
-    return res;
+    return dateArr.reverse().join("-");
   }
   return (
     <div className="">

@@ -4,12 +4,13 @@ import { useNavigate } from "react-router";
 import styles from "./ViewOfferDetailTable.module.css";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 import { BeatLoader } from "react-spinners";
+const successColorClass = "text-green-500";
+const errorColorClass = "text-[#EC2752]";
 
 const ViewOfferDetailTable = ({ searchValue }) => {
   const [data, setData] = useState([]);
   const [update, SetUpdate] = useState(false);
   const navigate = useNavigate();
-
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [sucBox, setSucBox] = useState(false);
@@ -32,12 +33,12 @@ const ViewOfferDetailTable = ({ searchValue }) => {
     setConfBox(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     setIsTableLoaded(true);
     setConfBox(false);
     const userToken = sessionStorage.getItem("authToken");
 
-    const res = await axios
+    axios
       .delete(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/offer/delete/${id}`,
         {
@@ -87,21 +88,21 @@ const ViewOfferDetailTable = ({ searchValue }) => {
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div
             className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
+              sucBox ? successColorClass : errorColorClass
             }`}
           >
             {sucBox ? (
               <IoIosCheckmarkCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
+                className={sucBox ? successColorClass : errorColorClass}
                 size={90}
               />
             ) : (
               <IoIosCloseCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
+                className={sucBox ? successColorClass : errorColorClass}
                 size={90}
               />
             )}
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
+            <h6 className={sucBox ? successColorClass : errorColorClass}>
               {sucBox ? "Success!" : "Error!"}
             </h6>
             <p className="text-slate-500">{errMsg}</p>
@@ -123,15 +124,14 @@ const ViewOfferDetailTable = ({ searchValue }) => {
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div
             className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
+              sucBox ? successColorClass : errorColorClass
             }`}
           >
-            {/* <IoIosCheckmarkCircle className={successMod ? "text-green-500" : "text-[#EC2752]"} size={90}/> */}
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
+            <h6 className={sucBox ? successColorClass : errorColorClass}>
               Confirmation!
             </h6>
             <p className="text-slate-500">
-              Do you want to delete offer{" - " + selectedOffName + " "} ?
+              {`Do you want to delete offer - ${selectedOffName} ?`}
             </p>
             <div className="flex flex-row gap-2">
               <button
@@ -142,7 +142,8 @@ const ViewOfferDetailTable = ({ searchValue }) => {
               </button>
               <button
                 onClick={() => {
-                  setConfBox(false), setIsTableLoaded(false);
+                  setConfBox(false);
+                  setIsTableLoaded(false);
                 }}
                 className="bg-white text-[#EC2752]"
               >
@@ -198,12 +199,12 @@ const ViewOfferDetailTable = ({ searchValue }) => {
                       if (e.target.value === "Edit") {
                         handleEdit(item);
                       }
-                      if (e.target.value === "Delete")
+                      if (e.target.value === "Delete") {
                         deleteConfHandler(item._id, item.offerName);
+                      }
                     }}
                   >
                     <option value="">Choose Action</option>
-
                     <option value="Edit">Edit</option>
                     <option value="Delete">Delete</option>
                   </select>
@@ -211,67 +212,6 @@ const ViewOfferDetailTable = ({ searchValue }) => {
               </tr>
             ))}
           </tbody>
-          {/* <tbody>
-            {data.map((val, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {new Date(val?.createdAt).toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.userId?.email}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.phoneNumber}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.userId?.name}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.modelId?.name}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {typeof val.price === "object"
-                    ? val.price["$numberDecimal"]
-                    : val.price}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?._id}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.documentId?.IMEI}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  <p
-                    onClick={() => handleDetailsClick(val)}
-                    className="cursor-pointer "
-                  >
-                    Details
-                  </p>
-                </td>
-
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  <p
-                    onClick={() => handleImageModal(index)}
-                    className="cursor-pointer"
-                  >
-                    Click to open
-                  </p>
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  <FaFilePdf
-                    size={32}
-                    color="red"
-                    onClick={() => hanldlejsx_pdf(index)}
-                    className="cursor-pointer"
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody> */}
         </table>
       </div>
     </div>

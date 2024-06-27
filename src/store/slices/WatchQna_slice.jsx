@@ -54,13 +54,13 @@ const qnaSlice = createSlice({
       for (let item = 0; item < state.Warranty.length; item++) {
         if (
           item !== index &&
-          state.Warranty[item].quetion != "Above 11 months"
+          state.Warranty[item].quetion !== "Above 11 months"
         ) {
           state.Warranty[item].answer = "W2";
           state.Warranty[item].key = "no";
         } else if (
           item !== index &&
-          state.Warranty[item].quetion == "Above 11 months"
+          state.Warranty[item].quetion === "Above 11 months"
         ) {
           state.Warranty[item].answer = "W1";
           state.Warranty[item].key = "no";
@@ -70,6 +70,8 @@ const qnaSlice = createSlice({
     resetState: (state, action) => {
       if (action.type === "RESET_STATE") {
         return initialState;
+      }else{
+        return state;
       }
     },
   },

@@ -14,7 +14,7 @@ import { AnswerProvider } from "./components/AnswerContext";
 import { QuestionProvider } from "./components/QuestionContext";
 import CustomerTable from "./pages/CustomerTable";
 import SpecialOffers from "./pages/SpecialOffers";
-import PurchaseReceipt from "./components/Reciept";
+import PurchaseReceipt from "./components/PurchaseReceipt";
 import AdminHome from "./pages/AdminHome";
 import AdminFinalGrade from "./pages/AdminFinalGrade";
 import GradePricingSheet from "./pages/GradePricingSheet";

@@ -4,7 +4,7 @@ import ReactDOMServer from "react-dom/server";
 import html2pdf from "html2pdf.js";
 import CustomerImageDetails from "../CustomerImageDetails";
 import CustomerFormDetails from "../CustomerFormDetails";
-import PurchaseReceipt from "../Reciept";
+import PurchaseReceipt from "../PurchaseReceipt";
 
 const LeadsCompletedTable = ({ data }) => {
   const [showModal, setShowModal] = useState(false);

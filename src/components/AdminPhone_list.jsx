@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import downArrow from "../assets/down.png";
 import axios from "axios";
-import { useDataContext } from "../components/dataContext";
+import { useDataContext } from "./dataContext";
 import { useDispatch } from "react-redux";
 import { BeatLoader } from "react-spinners";
 import { setBrandID } from "../store/slices/adminAnswerSlice";

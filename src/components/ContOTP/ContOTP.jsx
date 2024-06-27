@@ -2,11 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "./ContOTP.module.css";
 import optImg from "../../assets/otpLogo.svg";
 import OtpInput from "otp-input-react";
-
 import { useNavigate } from "react-router-dom";
-
-import { auth } from "../../firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { setOtpVerified } from "../../store/slices/otpSlice";
 import LoadingSpinner from "../LoadingSpinner";
@@ -14,19 +10,15 @@ import { MdEdit } from "react-icons/md";
 
 const ContOTP = (props) => {
   const navigate = useNavigate();
-
   const deviceSelected = sessionStorage.getItem("DeviceType");
   console.log(deviceSelected);
-
   const [ph, setPh] = useState("");
   const [otpBoxOpen, setOtpBoxOpen] = useState(false);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  //for resend otp
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
-  const [firstTime, setFirstIme] = useState(true);
   const [otpData, setOtpData] = useState({
     name: "",
     email: "",
@@ -44,86 +36,9 @@ const ContOTP = (props) => {
     props.setContinueOTPOpen(false);
   };
 
-  function onCaptchVerify() {
-    console.log(auth);
-    // For Firebase version 9 and above
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
-      size: "invisible",
-      callback: (response) => {
-        // reCAPTCHA solved, allow signInWithPhoneNumber.
-        // ...
-      },
-    });
-  }
-
-  //on submit phone number
-  function onSignup(event) {
-    setLoading(true);
-    if (firstTime) {
-      onCaptchVerify();
-      setFirstIme(false);
-    }
-
-    const appVerifier = window.recaptchaVerifier;
-    const formatPh = "+91" + ph;
-    console.log(formatPh);
-
-    signInWithPhoneNumber(auth, formatPh, appVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
-        setLoading(false);
-        setOtpBoxOpen(true);
-        setDisableResend(true);
-        console.log("OTP sent successfully!");
-      })
-      .catch((error) => {
-        console.log(error);
-        setLoading(false);
-      });
-
-    setOtpData({
-      ...otpData,
-      phone: ph,
-    });
-  }
-
-  function onOTPVerify() {
-    setLoading(true);
-    window.confirmationResult
-      .confirm(otp)
-      .then(async (res) => {
-        console.log("ho gya");
-        dispatch(setOtpVerified(true));
-        navigate("/inputnumber");
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
-  }
-
   const handleNumberEdit = () => {
     setLoading(false);
     setOtpBoxOpen(!otpBoxOpen);
-  };
-
-  //resend otp
-  const resendOTP = () => {
-    // Start the countdown timer
-    setDisableResend(true);
-
-    const appVerifier = window.recaptchaVerifier;
-    const formatPh = "+91" + ph;
-
-    // Resend the OTP without changing the loading state
-    signInWithPhoneNumber(auth, formatPh, appVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
-        console.log("OTP resent successfully!");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   useEffect(() => {
@@ -207,7 +122,6 @@ const ContOTP = (props) => {
             </span>
           )}
         </div>
-
         {otpBoxOpen ? (
           <div className={`${styles.otp_field_wrap}`}>
             <OtpInput
@@ -249,25 +163,6 @@ const ContOTP = (props) => {
                 className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
               />
             </div>
-            {/* <div>
-              <PhoneInput
-                inputProps={{
-                  required: true,
-                }}
-                className="w-[85%] border-2 border-[#EC2752] py-1 rounded-lg"
-                specialLabel=""
-                country={"in"}
-                areaCodes={91}
-                value={ph}
-                onChange={setPh}
-                placeholder="Enter Phone Number"
-                inputStyle={{
-                  // width: "85%",
-                  // borderBottom: "2px solid #EC2752",
-                  border: "none",
-                }}
-              />
-            </div> */}
             <div className="w-[100%] flex flex-row">
               <div className="flex   border-[#EC2752] rounded-lg border-2  w-[85%] flex-row justify-start">
                 <span className="px-3 py-1 text-gray-600 bg-gray-200 rounded-lg">
@@ -277,7 +172,7 @@ const ContOTP = (props) => {
                   type="tel"
                   id="phone"
                   value={ph}
-                  maxlength="10"
+                  maxLength="10"
                   onChange={(e) => {
                     setPh(e.target.value);
                     setOtpData({
@@ -307,17 +202,6 @@ const ContOTP = (props) => {
                 {disableResend ? `Resend in ${timer}` : "Resend OTP"}
               </button>
             </div>
-            {/* <div className="flex  flex-row gap-2  w-[300px] justify-center text-sm font-medium">
-              <span className=" opacity-60 min-w-[132px]">
-                Edit Phone Number?
-              </span>
-              <button
-                className=" text-left min-w-[100px]"
-                onClick={handleNumberEdit}
-              >
-                Edit Number
-              </button>
-            </div> */}
           </div>
         )}
 

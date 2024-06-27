@@ -8,11 +8,11 @@ import { CiSearch } from "react-icons/ci";
 import axios from "axios";
 import { BeatLoader } from "react-spinners";
 import { useQuestionContext } from "../../components/QuestionContext";
-import OrederQuoteCreated from "../../components/OrderQuoteCreated/OrderQuoteCreated";
+import OrderQuoteCreated from "../../components/OrderQuoteCreated/OrderQuoteCreated";
 
 const QuotesCreated = ({ daysfilters, head }) => {
   return (
-    <OrederQuoteCreated
+    <OrderQuoteCreated
       orderType={"quoteData"}
       daysfilters={daysfilters}
       head={head}

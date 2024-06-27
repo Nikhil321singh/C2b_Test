@@ -39,7 +39,7 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
       return;
     }
 
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       id: formData._id,
       storeName: formData.storeName,
       uniqueId: formData.uniqueId,
@@ -51,7 +51,7 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
 
     console.log(data);
 
-    let config = {
+    const config = {
       method: "put",
       maxBodyLength: Infinity,
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/edit`,
@@ -64,10 +64,10 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
 
     axios
       .request(config)
-      .then((response) => {
-        console.log(response);
+      .then((response1) => {
+        console.log(response1);
         setIsTableLoaded(false);
-        setResponse(response.data.msg);
+        setResponse(response1.data.msg);
         setEditSuccess(true);
       })
       .catch((error) => {

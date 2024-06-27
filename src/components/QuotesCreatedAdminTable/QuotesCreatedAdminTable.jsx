@@ -57,7 +57,7 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
                     {data?.user?.firstName
                       ? data?.user?.firstName +
-                        ` ${data.user.lastName ? data?.user?.lastName : ""}`
+                        (data.user.lastName ? data?.user?.lastName : "")
                       : data?.user?.name}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
