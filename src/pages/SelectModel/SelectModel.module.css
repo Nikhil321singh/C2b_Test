@@ -75,24 +75,6 @@
   transition: all 0.5s ease;
 }
 
-.button_unchecked {
-  /* font-size: 0.8rem; */
-  /* background-color: yellow; */
-  /* display: flex;
-  font-size: 0.7rem;
-  width: 100px;
-  flex-direction: row; */
-  /* width: 120px; */
-  /* justify-content: center; */
-  /* align-items: center; */
-  /* padding: 7px 15px; */
-  /* outline: none;
-  border-radius: 0.55rem;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 4px, rgba(0, 0, 0, 0.16) 0px 2px 8px;
-  cursor: pointer;
-  transition: all 0.5s ease; */
-}
-
 .button_unchecked:hover {
   background-color: #ec2752;
   box-shadow: #ec275265 0px 1px 4px, #ec2752c0 0px 2px 8px;
@@ -107,11 +89,9 @@
   margin-bottom: 5px;
 }
 
-.button_wrap button{
-  transition: all .5s ease;
+.button_wrap button {
+  transition: all 0.5s ease;
 }
-
-
 
 .button_wrap button:hover {
   scale: 1.03;
@@ -198,6 +178,4 @@
     justify-content: center;
     width: 100%;
   }
-
-  
 }

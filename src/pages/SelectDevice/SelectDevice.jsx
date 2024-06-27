@@ -84,31 +84,22 @@ export const SeriesFilter = ({
 };
 
 const SelectDevice = () => {
-  const [userName, setUserName] = useState();
   const [modelInfo, setModelInfo] = useState();
-
+  const userToken = sessionStorage.getItem("authToken");
   const Device = sessionStorage.getItem("DeviceType");
   const [selectedBtn, setSelectedBtn] = useState("All");
   const [seriesType, setSeriesType] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-
-  const Dummy_img =
+  const DummyImg =
     Device === "Mobile"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
-
-  const [userToken, setUserToken] = useState(
-    sessionStorage.getItem("authToken")
-  );
   const { brandId } = useParams();
-
   const navigate = useNavigate();
+
   useEffect(() => {
     setIsTableLoaded(true);
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
     const DeviceType = sessionStorage.getItem("DeviceType");
-    setUserName(LoggedInUser?.name);
-
     axios
       .post(
         `${
@@ -193,7 +184,7 @@ const SelectDevice = () => {
                   src={
                     model?.phonePhotos?.front
                       ? model?.phonePhotos?.front
-                      : Dummy_img
+                      : DummyImg
                   }
                   alt=""
                 />
@@ -204,18 +195,14 @@ const SelectDevice = () => {
                   src={
                     model?.phonePhotos?.upFront
                       ? model?.phonePhotos?.upFront
-                      : Dummy_img
+                      : DummyImg
                   }
                   alt=""
                 />
               )}
 
               {!model?.phonePhotos?.front && !model?.phonePhotos?.upFront && (
-                <img
-                  className="w-[80px] mb-2 h-[90px]"
-                  src={Dummy_img}
-                  alt=""
-                />
+                <img className="w-[80px] mb-2 h-[90px]" src={DummyImg} alt="" />
               )}
               <p className="text-[11px] font-medium">{model.name}</p>
             </div>

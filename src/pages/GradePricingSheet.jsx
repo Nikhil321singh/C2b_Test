@@ -13,11 +13,53 @@ import { IoRefresh } from "react-icons/io5";
 import { saveAs } from "file-saver";
 import { ToastContainer, toast } from "react-toastify";
 
+const pageLimit = 10;
+const userToken = sessionStorage.getItem("authToken");
+
+const downloadExcelGradePricingSheet = (apiData) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+  const formattedData = apiData.map((item) => {
+    return {
+      "More Details": item.model?.name,
+      "A+(0.00%)": item.grades?.A_PLUS,
+      "A(10.00%)": item.grades?.A,
+      "B(15.00%)": item.grades?.B,
+      "B-(20.00%)": item.grades?.B_MINUS,
+      "C+(40.00%)": item.grades?.C_PLUS,
+      "C(50.00%)": item.grades?.C,
+      "C-(60.00%)": item.grades?.C_MINUS,
+      "D+(65.00%)": item.grades?.D_PLUS,
+      "D(70.00%)": item.grades?.D,
+      "D-(70.00%)": item.grades?.D_MINUS,
+      "E(90.00%)": item.grades?.E,
+    };
+  });
+  const wsGradePricingSheet = XLSX.utils.json_to_sheet(formattedData);
+  const wbGradePricingSheet = {
+    Sheets: { data: wsGradePricingSheet },
+    SheetNames: ["data"],
+  };
+  const excelBufferGradePricingSheet = XLSX.write(wbGradePricingSheet, {
+    bookType: "xlsx",
+    type: "array",
+  });
+  const dataFileGradePricingSheet = new Blob([excelBufferGradePricingSheet], {
+    type: fileType,
+  });
+  saveAs(dataFileGradePricingSheet, "GradePricingSheet" + fileExtension);
+};
+
+const handleSampleDownload = () => {
+  const sampleFilePath = "sample-file.xlsx";
+  saveAs(sampleFilePath, "sample-file.xlsx");
+};
+
 const GradePricingSheet = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const pageLimit = 10;
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [tableData, setTableData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -25,9 +67,9 @@ const GradePricingSheet = () => {
   const [uploadBox, setUploadBox] = useState(false);
   const [deviceCategory, setDeviceCategory] = useState("Mobile");
   const [file, setFile] = useState(null);
+
   const fetchData = () => {
     setIsTableLoading(true);
-    const userToken = sessionStorage.getItem("authToken");
     axios
       .get(
         `${
@@ -57,16 +99,13 @@ const GradePricingSheet = () => {
 
   const getDataBySearch = () => {
     setIsTableLoading(true);
-    const token = sessionStorage.getItem("authToken");
-
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/grades/modelPriceList?page=${currentPage}&limit=${pageLimit}&search=${searchValue}&deviceType=${deviceCategory}`,
-      headers: { Authorization: token },
+      headers: { Authorization: userToken },
     };
-
     axios
       .request(config)
       .then((res) => {
@@ -83,46 +122,7 @@ const GradePricingSheet = () => {
     getDataBySearch();
   };
 
-  const downloadExcelGradePricingSheet = (apiData) => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = apiData.map((item) => {
-      return {
-        "More Details": item.model?.name,
-        "A+(0.00%)": item.grades?.A_PLUS,
-        "A(10.00%)": item.grades?.A,
-        "B(15.00%)": item.grades?.B,
-        "B-(20.00%)": item.grades?.B_MINUS,
-        "C+(40.00%)": item.grades?.C_PLUS,
-        "C(50.00%)": item.grades?.C,
-        "C-(60.00%)": item.grades?.C_MINUS,
-        "D+(65.00%)": item.grades?.D_PLUS,
-        "D(70.00%)": item.grades?.D,
-        "D-(70.00%)": item.grades?.D_MINUS,
-        "E(90.00%)": item.grades?.E,
-      };
-    });
-
-    const wsGradePricingSheet = XLSX.utils.json_to_sheet(formattedData);
-    const wbGradePricingSheet = {
-      Sheets: { data: wsGradePricingSheet },
-      SheetNames: ["data"],
-    };
-    const excelBufferGradePricingSheet = XLSX.write(wbGradePricingSheet, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    const dataFileGradePricingSheet = new Blob([excelBufferGradePricingSheet], {
-      type: fileType,
-    });
-    saveAs(dataFileGradePricingSheet, "GradePricingSheet" + fileExtension);
-  };
-
   const fetchDownloadDataGradePricingSheet = () => {
-    const userToken = sessionStorage.getItem("authToken");
     axios
       .get(
         `${
@@ -140,11 +140,6 @@ const GradePricingSheet = () => {
       .catch((err) => {
         console.log(err);
       });
-  };
-
-  const handleSampleDownload = () => {
-    const sampleFilePath = "sample-file.xlsx";
-    saveAs(sampleFilePath, "sample-file.xlsx");
   };
 
   const handleSearchClear = () => {
@@ -189,6 +184,7 @@ const GradePricingSheet = () => {
         setIsTableLoading(false);
       });
   };
+
   const handleDeviceCategory = (e) => {
     setDeviceCategory(e.target.value);
   };
@@ -230,7 +226,8 @@ const GradePricingSheet = () => {
                 <button
                   type="reset"
                   onClick={() => {
-                    setUploadBox(false), setIsTableLoading(false);
+                    setUploadBox(false);
+                    setIsTableLoading(false);
                   }}
                   className="bg-white text-[#EC2752]"
                 >
@@ -305,7 +302,6 @@ const GradePricingSheet = () => {
           tableData={tableData}
         />
       </div>
-
       <div className="flex justify-center mt-0 mb-4">
         <button
           onClick={() => setCurrentPage(currentPage - 1)}

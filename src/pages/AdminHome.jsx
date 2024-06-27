@@ -12,6 +12,7 @@ import { FaDownload } from "react-icons/fa";
 import styless from "../pages/AdminModels/AdminModels.module.css";
 import { IoMdAddCircle } from "react-icons/io";
 import * as XLSX from "xlsx";
+const navAdminFnlGrd = "/adminfinalgrade";
 
 const AdminHome = () => {
   const [sideMenu, setsideMenu] = useState(false);
@@ -56,15 +57,15 @@ const AdminHome = () => {
             "combinationOutput",
             JSON.stringify(res.data.data)
           );
-          navigate("/adminfinalgrade");
+          navigate(navAdminFnlGrd);
         })
         .catch((err) => {
           console.log(err);
           toast.error("error occur");
-          navigate("/adminfinalgrade");
+          navigate(navAdminFnlGrd);
         });
     } else {
-      navigate("/adminfinalgrade");
+      navigate(navAdminFnlGrd);
     }
   };
 
@@ -198,9 +199,6 @@ const AdminHome = () => {
                   ))}
                 </select>
               </div>
-
-              {/* //question */}
-
               <div className="flex flex-col w-[70%] gap-2">
                 <span className="text-xl font-medium">
                   Enter your question? *
@@ -214,8 +212,6 @@ const AdminHome = () => {
                   onChange={(e) => setQuestion(e.target.value)}
                 />
               </div>
-
-              {/* //yes */}
               <div>
                 <p className="block text-xl font-medium">Select Yes key*</p>
                 <select
@@ -235,9 +231,6 @@ const AdminHome = () => {
                     ))}
                 </select>
               </div>
-
-              {/* //no */}
-
               <div>
                 <p className="block text-xl font-medium">Select No key*</p>
                 <select
@@ -257,8 +250,6 @@ const AdminHome = () => {
                     ))}
                 </select>
               </div>
-
-              {/* default */}
               <div>
                 <p className="block text-xl font-medium">Select Default key*</p>
                 <select

@@ -6,7 +6,6 @@ import styles from "../styles/Scanner.module.css";
 const Scanner = (props) => {
   const [result, setResult] = useState("");
   const [status, setStatus] = useState("steady");
-  const [torchOn, setTorchOn] = useState(false);
 
   useEffect(() => {
     Quagga.init(

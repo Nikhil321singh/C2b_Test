@@ -17,12 +17,8 @@ const PickupHistory = () => {
   const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-
-  //side menu
   const [sideMenu, setsideMenu] = useState(false);
   const [userRole, setUserRole] = useState("");
-
-  //store Filters
   const [storeName, setStoreName] = useState();
   const [region, setRegion] = useState();
   const [storeData, setStoreData] = useState([]);

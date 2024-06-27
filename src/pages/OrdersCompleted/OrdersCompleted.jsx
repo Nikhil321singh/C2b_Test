@@ -12,21 +12,13 @@ import { useQuestionContext } from "../../components/QuestionContext";
 const OrdersCompleted = ({ daysfilters, head }) => {
   const [newOrderCompletedData, setNewOrderCompletedData] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
   const { daysfilter } = useParams();
   const [flag, setFlag] = useState(true);
   const [serachval, setSerachval] = useState("");
   const { fromDateDup, toDateDup } = useQuestionContext();
-
   const deviceType = sessionStorage.getItem("DeviceType");
-  let valDays;
-  if (daysfilter === "") {
-    valDays = daysfilter;
-  } else {
-    valDays = daysfilter;
-  }
-
+  const valDays = daysfilter;
   const handleSeachSubmit = () => {
     setFlag(!flag);
   };
@@ -34,7 +26,6 @@ const OrdersCompleted = ({ daysfilters, head }) => {
   useEffect(() => {
     setLoading(true);
     const userToken = sessionStorage.getItem("authToken");
-
     axios
       .get(
         `${
@@ -48,21 +39,19 @@ const OrdersCompleted = ({ daysfilters, head }) => {
       )
       .then((res) => {
         console.log("ras", res.data?.Leads);
-        const data = res.data?.Leads;
-        const modifiedDataArray = data.map((data) => {
+        const modifiedDataArray = res.data?.Leads.map((data) => {
           const storageValue = data.storage;
           const filteredConfig = data.model?.config.filter(
             (configItem) => configItem.storage === storageValue
           );
 
-          const modifiedData = {
+          return {
             ...data,
             model: {
               ...data.model,
               config: filteredConfig.length ? filteredConfig[0] : null,
             },
           };
-          return modifiedData;
         });
         console.log("modifiedData", modifiedDataArray);
         setNewOrderCompletedData(modifiedDataArray);

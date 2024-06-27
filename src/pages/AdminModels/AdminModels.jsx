@@ -147,11 +147,7 @@ const AdminModels = () => {
 
   const deleteHandler = (userID) => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
-    const data = JSON.stringify({
-      userID: userID,
-    });
+    console.log(userID);
     setIsTableLoaded(false);
   };
 
@@ -265,7 +261,7 @@ const AdminModels = () => {
               Confirmation!
             </h6>
             <p className="text-slate-500">
-              Do you want to delete store {" " + selectedModel + " "} ?
+              {`Do you want to delete store - ${selectedModel} ?`} ?
             </p>
             <div className="flex flex-row gap-2">
               <button

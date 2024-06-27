@@ -7,12 +7,12 @@ import { useState } from "react";
 import OrdersCreated from "../OrdersCreated/OrdersCreated";
 import OrdersCompleted from "../OrdersCompleted/OrdersCompleted";
 import QuotesCreated from "../QuotesCreated/QuotesCreated";
-
+const ordCreated = "Order Created";
 function Orders() {
   const { daysfilter } = useParams();
   const navigate = useNavigate();
-  const [selectedBtn, setselectedBtn] = useState("Order Created");
-  const buttonList = ["Order Created", "Order Completed", "Quotes Created"];
+  const [selectedBtn, setselectedBtn] = useState(ordCreated);
+  const buttonList = [ordCreated, "Order Completed", "Quotes Created"];
   const handleDeviceChange = (e) => {
     const val = e.target.value;
     sessionStorage.setItem("DeviceType", val);
@@ -65,7 +65,7 @@ function Orders() {
             <option value="Watch">Watch</option>
           </select>
         </div>
-        {selectedBtn === "Order Created" && (
+        {selectedBtn === ordCreated && (
           <OrdersCreated daysfilters={daysfilter} head={true} />
         )}
         {selectedBtn === "Order Completed" && (

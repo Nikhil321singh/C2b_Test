@@ -7,10 +7,16 @@ import Grest_Logo from "../assets/Grest_Logo.jpg";
 import { setOtpVerified } from "../store/slices/otpSlice";
 import { useDispatch, useSelector } from "react-redux";
 import User_Logo from "../assets/User_Logo.jpg";
-import unicorn from "../assets/unicorn.png";
 import SummaryModal from "../components/SummaryModal";
 import { CgSpinner } from "react-icons/cg";
 import apple_watch from "../assets/apple_watch.png";
+
+const Device = sessionStorage.getItem("DeviceType");
+const DummyImg =
+  Device === "Mobile"
+    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
+    : apple_watch;
+
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
     <div
@@ -79,32 +85,29 @@ export const DynamicCouponCard = ({
   );
 };
 
+const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
+const phoneFrontPhoto = phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
+const storedDisableBtn = sessionStorage.getItem("disableBtn");
+const initialDisableBtn = storedDisableBtn
+  ? JSON.parse(storedDisableBtn)
+  : false;
+const discountAvailable = 0;
+const dataModelInfo = JSON.parse(sessionStorage.getItem("dataModel"));
+const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+const userToken = sessionStorage.getItem("authToken");
+
 const SpecialOffers = () => {
-  const [userName, setUserName] = useState();
   const [discountData, setDiscountData] = useState([]);
-  const discountAvailable = 0;
-  const [dataModelInfo, setDataModelInfo] = useState();
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const Price = useSelector((state) => state.responseData.price);
   const [isSelected, setIsSelected] = useState(null);
   const [extraBonus, setExtraBonus] = useState(0);
-  const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-  const phoneFrontPhoto =
-    phoneImg.models?.phonePhotos?.front ||
-    phoneImg.models?.phonePhotos?.upFront;
-  const storedDisableBtn = sessionStorage.getItem("disableBtn");
-  const initialDisableBtn = storedDisableBtn
-    ? JSON.parse(storedDisableBtn)
-    : false;
-
   const [disableBtn, setDisableBtn] = useState(initialDisableBtn);
   const [phonePrice, setPhonePrice] = useState(Price);
   const dispatch = useDispatch(false);
   const { setAnswers } = useQuestionContext();
   const leadId = sessionStorage.getItem("LeadId");
-  const [disable, setDisable] = useState(true);
-
   const navigate = useNavigate();
 
   const handleViewSummary = () => {
@@ -112,31 +115,16 @@ const SpecialOffers = () => {
     setExtraBonus(bonus);
     setShowModal(true);
   };
-
   const handleCloseModal = () => {
     setShowModal(false);
   };
   useEffect(() => {
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    setUserName(LoggedInUser?.name);
-
-    const dataInfo = JSON.parse(sessionStorage.getItem("dataModel"));
-    setDataModelInfo(dataInfo);
-  }, []);
-
-  useEffect(() => {
-    const userToken = sessionStorage.getItem("authToken");
-
     axios
       .get(
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/discounts/findByLeadId?leadId=${leadId}`,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
+        { headers: { authorization: userToken } }
       )
       .then((res) => {
         setDiscountData(res.data.data);
@@ -146,15 +134,7 @@ const SpecialOffers = () => {
       });
   }, []);
 
-  function handleBack() {
-    if (disable) {
-      navigate("/inputnumber");
-    }
-  }
-
-  const handleOffer = (number, userToken) => {
-    console.log("applied");
-
+  const handleOffer = (number) => {
     const finalPayload = {
       leadId: leadId,
       discount: number,
@@ -165,11 +145,7 @@ const SpecialOffers = () => {
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/discounts/applyDiscount`,
         finalPayload,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
+        { headers: { authorization: userToken } }
       )
       .then((res) => {
         const newPrice = res.data.data.price + discountAvailable;
@@ -181,7 +157,6 @@ const SpecialOffers = () => {
         console.log(err);
       });
   };
-
   const navigateHome = () => {
     if (disableBtn) {
       setTimeout(() => {
@@ -196,7 +171,6 @@ const SpecialOffers = () => {
   };
   const handleSubmit = () => {
     setIsLoading(true);
-    setDisable(false);
     const userToken = sessionStorage.getItem("authToken");
     const LeadId = sessionStorage.getItem("LeadId");
     axios
@@ -205,25 +179,18 @@ const SpecialOffers = () => {
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/questionnaires/item-purchased`,
         { id: LeadId },
-        {
-          headers: {
-            Authorization: `${userToken}`,
-          },
-        }
+        { headers: { Authorization: userToken } }
       )
       .then((response) => {
         setAnswers([]);
         sessionStorage.setItem("messageReceived", response.data.message);
         sessionStorage.setItem("disableBtn", JSON.stringify(true));
         setDisableBtn(true);
-
         navigate("/productsold");
-
         navigateHome();
       })
       .catch((err) => {
         console.log(err);
-        setDisable(true);
         setIsLoading(false);
       });
   };
@@ -237,24 +204,18 @@ const SpecialOffers = () => {
   };
 
   useEffect(() => {
-    const userToken = sessionStorage.getItem("authToken");
     if (isSelected === "0") {
-      handleOffer(0.00001, userToken);
+      handleOffer(0.00001);
     }
     if (isSelected === "GRU250") {
-      handleOffer(250, userToken);
+      handleOffer(250);
     } else if (isSelected === "GRU500") {
-      handleOffer(500, userToken);
+      handleOffer(500);
     } else {
-      handleOffer(isSelected, userToken);
+      handleOffer(isSelected);
     }
   }, [isSelected]);
 
-  const Device = sessionStorage.getItem("DeviceType");
-  const Dummy_img =
-    Device === "Mobile"
-      ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-      : apple_watch;
   return (
     <div className="min-h-screen mb-10 overflow-y-auto bg-white">
       <div
@@ -262,7 +223,7 @@ const SpecialOffers = () => {
       >
         <div className="flex items-center justify-between w-full ">
           <div className="flex flex-row-reverse items-center gap-2 ml-4">
-            <p className="mr-4 text-base md:text-xl">{userName}</p>
+            <p className="mr-4 text-base md:text-xl">{LoggedInUser?.name}</p>
 
             <img className="w-[30px]" src={User_Logo} alt="" />
           </div>
@@ -275,20 +236,18 @@ const SpecialOffers = () => {
           />
         </div>
       </div>
-      {/* older card */}
       <div className="w-[90%] md:w-[70%] mx-auto mt-4  ">
         <p className="mb-2 text-lg font-medium">
           The best price for your phone is:
         </p>
         <DevicePriceCards
-          phonePhoto={phoneFrontPhoto ? phoneFrontPhoto : Dummy_img}
+          phonePhoto={phoneFrontPhoto ? phoneFrontPhoto : DummyImg}
           model={dataModelInfo?.models?.name}
           price={phonePrice}
           ram={dataModelInfo?.models?.config?.RAM}
           storage={dataModelInfo?.models?.config?.storage}
         />
       </div>
-
       <div className="flex flex-col gap-2 mt-2">
         <div className="mx-4">
           <p className="font-medium">Special Offers & Benefits</p>
@@ -321,10 +280,8 @@ const SpecialOffers = () => {
               isSelected={isSelected}
             />
           ))}
-
         <div className="mb-20"></div>
       </div>
-
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div className="flex justify-between text-lg font-medium">
           <p className="text-xl">₹{phonePrice}</p>

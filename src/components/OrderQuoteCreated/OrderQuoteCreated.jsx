@@ -18,7 +18,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
   const { fromDateDup, toDateDup } = useQuestionContext();
   const [serachval, setSerachval] = useState("");
   const deviceType = sessionStorage.getItem("DeviceType");
-  let valDays = daysfilter;
+  const valDays = daysfilter;
   const location = useLocation();
   console.log("loc", location);
   const handleSeachSubmit = () => {

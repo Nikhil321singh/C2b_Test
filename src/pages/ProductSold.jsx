@@ -3,6 +3,8 @@ import Grest_Logo from "../assets/Grest_Logo.jpg";
 import User_Logo from "../assets/User_Logo.jpg";
 import { useNavigate } from "react-router-dom";
 import { BsCartCheckFill } from "react-icons/bs";
+const navtoSelDevTP = "/selectdevicetype";
+
 const ProductSold = () => {
   const [userName, setUserName] = useState();
   const [message, setMessage] = useState("");
@@ -17,14 +19,14 @@ const ProductSold = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigate("/selectdevicetype");
+      navigate(navtoSelDevTP);
     }, 30000);
 
     return () => clearInterval(timeout);
   }, [navigate]);
 
   const handleReturn = () => {
-    navigate("/selectdevicetype");
+    navigate(navtoSelDevTP);
   };
   return (
     <div className="bg-white min-h-screen">
@@ -37,7 +39,7 @@ const ProductSold = () => {
           </div>
 
           <img
-            onClick={() => navigate("/selectdevicetype")}
+            onClick={() => navigate(navtoSelDevTP)}
             className="w-28 "
             src={Grest_Logo}
             alt="app logo"

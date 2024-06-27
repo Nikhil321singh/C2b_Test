@@ -10,6 +10,7 @@ import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import DatePicker from "react-datepicker";
 import { FaDownload } from "react-icons/fa";
 import NavigateListing from "../../components/NavigateListing/NavigateListing";
+
 const LeadsCompleted = () => {
   const [loading, setLoading] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
@@ -27,8 +28,8 @@ const LeadsCompleted = () => {
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
   const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [customerPhoneDup, setCustomerPhoneDup] = useState(null);
   const pageLimit = 10;
+
   function getSalesData() {
     setLoading(true);
     const queryParams = new URLSearchParams();
@@ -40,7 +41,7 @@ const LeadsCompleted = () => {
       queryParams.append("customerId", customerId);
     }
     if (customerPhone !== null) {
-      queryParams.append("customerPhone", customerPhoneDup);
+      queryParams.append("customerPhone", customerPhone);
     }
     if (userEmail !== null) {
       queryParams.append("store", userEmail);
@@ -129,15 +130,7 @@ const LeadsCompleted = () => {
   };
 
   const handleCustomerPhoneChange = (value) => {
-    // Check if the phone number doesn't start with '+91'
     setCustomerPhone(value);
-    if (value && !value.startsWith("+91")) {
-      // Add '+91' to the phone number
-      setCustomerPhoneDup(`+91${value}`);
-    } else {
-      // If it already starts with '+91', set as it is
-      setCustomerPhoneDup(value);
-    }
   };
 
   const downloadExcelLeadsompleted = (apiData) => {
@@ -149,7 +142,7 @@ const LeadsCompleted = () => {
       let questionsKeys = "";
       let index = 1;
       console.log(item?.QNA[0]);
-      for (let group in item?.QNA[0]) {
+      for (const group in item?.QNA[0]) {
         item?.QNA[0][group].forEach((qna) => {
           questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
           index++;

@@ -18,12 +18,10 @@ const ViewOfferDetailTable = ({ searchValue }) => {
   const [confBox, setConfBox] = useState(false);
   const [selectedOffId, setSelectedOffId] = useState();
   const [selectedOffName, setSelectedOffName] = useState();
-
   const handleEdit = (item) => {
     item.editoffer = true;
     sessionStorage.setItem("rowData", JSON.stringify(item));
     console.log("hello");
-    // Navigate to edit page
     navigate("/offers");
   };
 
@@ -37,7 +35,6 @@ const ViewOfferDetailTable = ({ searchValue }) => {
     setIsTableLoaded(true);
     setConfBox(false);
     const userToken = sessionStorage.getItem("authToken");
-
     axios
       .delete(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/offer/delete/${id}`,
@@ -62,7 +59,6 @@ const ViewOfferDetailTable = ({ searchValue }) => {
 
   useEffect(() => {
     const userToken = sessionStorage.getItem("authToken");
-
     axios
       .get(
         `${
@@ -75,7 +71,6 @@ const ViewOfferDetailTable = ({ searchValue }) => {
         }
       )
       .then((res) => {
-        console.log(res.data);
         setData(res.data);
       })
       .catch((err) => {
@@ -123,13 +118,9 @@ const ViewOfferDetailTable = ({ searchValue }) => {
       {confBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? successColorClass : errorColorClass
-            }`}
+            className={`${styles.err_mod_box} ${errorColorClass}`}
           >
-            <h6 className={sucBox ? successColorClass : errorColorClass}>
-              Confirmation!
-            </h6>
+            <h6 className={errorColorClass}>Confirmation!</h6>
             <p className="text-slate-500">
               {`Do you want to delete offer - ${selectedOffName} ?`}
             </p>

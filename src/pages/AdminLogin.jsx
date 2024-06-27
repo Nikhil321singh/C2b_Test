@@ -54,10 +54,6 @@ const AdminLogin = () => {
       });
   };
 
-  const handleClick = (event) => {
-    event.preventDefault();
-  };
-
   return (
     <div className="SuperContainer">
       <div className="flex items-center justify-center  bg-white Container">
@@ -189,7 +185,6 @@ const AdminLogin = () => {
                 />
               </div>
             </div>
-
             <Link to="/PasswordRecovery">
               <span className="text-right text-sm font-medium block text-[rgb(236,39,82)] forgetpass">
                 Forget Password?

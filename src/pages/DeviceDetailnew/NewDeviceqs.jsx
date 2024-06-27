@@ -5,17 +5,11 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ImArrowLeft } from "react-icons/im";
 import store from "../../store/store";
-import User_Logo from "../../assets/User_Logo.jpg";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
-import { FaArrowRight } from "react-icons/fa";
-import { FaArrowLeft } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import banner from "../../assets/banner.jpg";
 import { GoDotFill } from "react-icons/go";
-import { MdOutlineKeyboardBackspace } from "react-icons/md";
-// The file where your store is defined
 
-// import quesImg1 from "../../assets/quesImg0.png";
 import quesImg1 from "../../assets/5.jpg";
 import quesImg2 from "../../assets/20.jpg";
 import quesImg3 from "../../assets/8.jpg";
@@ -43,7 +37,6 @@ import quesImg24 from "../../assets/47.png";
 import quesImg25 from "../../assets/46.png";
 import quesImg26 from "../../assets/18.jpg";
 import quesImg27 from "../../assets/19.jpg";
-import quesImg28 from "../../assets/20.jpg";
 import quesImg29 from "../../assets/21.jpg";
 import quesImg30 from "../../assets/22.jpg";
 import quesImg31 from "../../assets/24.jpg";
@@ -52,11 +45,7 @@ import quesImg33 from "../../assets/25.jpg";
 import quesImg34 from "../../assets/26.jpg";
 import quesImg35 from "../../assets/27.jpg";
 import quesImg36 from "../../assets/29.jpg";
-import quesImg37 from "../../assets/24.jpg";
-import quesImg38 from "../../assets/9.jpg";
 import quesImg39 from "../../assets/28.jpg";
-import quesImg40 from "../../assets/27.jpg";
-import quesImg41 from "../../assets/29.jpg";
 import quesImg42 from "../../assets/30.jpg";
 import quesImg43 from "../../assets/32.jpg";
 import quesImg44 from "../../assets/31.jpg";
@@ -67,7 +56,6 @@ import quesImg48 from "../../assets/2.jpg";
 import quesImg49 from "../../assets/3.jpg";
 import quesImg50 from "../../assets/4.jpg";
 import quesImg51 from "../../assets/quesImg0.png";
-import quesImg52 from "../../assets/quesImg0.png";
 
 const imageMap = {
   quesImg1,
@@ -97,7 +85,7 @@ const imageMap = {
   quesImg25,
   quesImg26,
   quesImg27,
-  quesImg28,
+  quesImg28: quesImg2,
   quesImg29,
   quesImg30,
   quesImg31,
@@ -106,11 +94,11 @@ const imageMap = {
   quesImg34,
   quesImg35,
   quesImg36,
-  quesImg37,
-  quesImg38,
+  quesImg37: quesImg31,
+  quesImg38: quesImg19,
   quesImg39,
-  quesImg40,
-  quesImg41,
+  quesImg40: quesImg35,
+  quesImg41: quesImg39,
   quesImg42,
   quesImg43,
   quesImg44,
@@ -121,7 +109,7 @@ const imageMap = {
   quesImg49,
   quesImg50,
   quesImg51,
-  quesImg52,
+  quesImg52: quesImg51,
 };
 
 import {
@@ -137,44 +125,38 @@ import styles from "../SelectDeviceType/SelectDeviceType.module.css";
 import { CiSearch } from "react-icons/ci";
 import { setResponseData } from "../../store/slices/responseSlice";
 import useUserProfile from "../../utils/useUserProfile";
-import { BsArrowRight } from "react-icons/bs";
 import { CgSpinner } from "react-icons/cg";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack } from "react-icons/io";
 import styless from "../QuickQuote/QuickQuote.module.css";
 import QuestionSearch from "../../components/QuestionSearch/QuestionSearch";
 
+const initialState = {
+  Core: [],
+  Cosmetics: [],
+  Display: [],
+  Functional_major: [],
+  Functional_minor: [],
+  Warranty: [],
+};
+
 function NewDeviceqs() {
-  const initialState = {
-    Core: [],
-    Cosmetics: [],
-    Display: [],
-    Functional_major: [],
-    Functional_minor: [],
-    Warranty: [],
-  };
-  const [dataModel, setDataModel] = useState({});
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [userName, setUserName] = useState();
   const [questions, setQuestions] = useState([]);
   const { answers, setAnswers } = useQuestionContext();
   const [visible, setVisible] = useState(1);
   const [newGroupanswers, setNewGroupAnswers] = useState();
   const navigate = useNavigate();
-  const [userToken, setUserToken] = useState("");
   const profile = useUserProfile();
-
-  //geting anser from redux
   const core = useSelector((state) => state.qna.Core);
   const Cosmetics = useSelector((state) => state.qna.Cosmetics);
-
   const Display = useSelector((state) => state.qna.Display);
   const Functional_major = useSelector((state) => state.qna.Functional_major);
   const Functional_minor = useSelector((state) => state.qna.Functional_minor);
   const Warranty = useSelector((state) => state.qna.Warranty);
   const [showPopup, setShowPopup] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  // const [warrantySelect,setWarantySelect]=useState("1")
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   function reducer(state, action) {
     switch (action.type) {
@@ -185,14 +167,8 @@ function NewDeviceqs() {
     }
   }
 
-  //intilize reducer
-  const [state, dispatch] = useReducer(reducer, initialState);
-
-  //call for question from
   useEffect(() => {
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
     const userToken = sessionStorage.getItem("authToken");
-    setUserName(LoggedInUser?.name);
     const fetchData = async () => {
       try {
         const apiUrl = `${
@@ -272,16 +248,11 @@ function NewDeviceqs() {
     };
 
     fetchData();
-
-    const data = localStorage.getItem("dataModel");
-    setDataModel(JSON.parse(data));
     const token = sessionStorage.getItem("authToken");
     if (!token) {
       navigate("/");
     }
   }, []);
-
-  // console.log(state.Core);
 
   function handleADD() {
     if (showPopup === false) {
@@ -321,8 +292,6 @@ function NewDeviceqs() {
   const handlesubmit = async () => {
     setIsLoading(true);
     const token = sessionStorage.getItem("authToken");
-    setUserToken(token);
-    // console.log("tokennnnnnnnn", token);
     const phoneNumber = sessionStorage.getItem("phoneNumber");
     let id = sessionStorage.getItem("dataModel");
     id = JSON.parse(id);
@@ -530,78 +499,9 @@ function NewDeviceqs() {
                               </div>
                             </React.Fragment>
                           ))}
-                          {/* <div className="flex gap-1 two">
-                          <p className="text-xl">{index + 1}.</p>
-                          <p className="text-xl three">{data.quetion}</p>
-                        </div>
-                        <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                          <label
-                            className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              core[index].answer === data.yes
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.yes}
-                              onChange={(e) => {
-                                store.dispatch(
-                                  updateCoreObject({
-                                    index: index,
-                                    newAnswer: data.yes,
-                                    newKey: "yes",
-                                  })
-                                );
-                              }}
-                              checked={core[index].answer === data.yes}
-                            />{" "}
-                            Yes
-                          </label>
-                          <label
-                            className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              core[index].answer === data.no
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.no}
-                              onChange={(e) => {
-                                store.dispatch(
-                                  updateCoreObject({
-                                    index: index,
-                                    newAnswer: data.no,
-                                    newKey: "no",
-                                  })
-                                );
-                              }}
-                              checked={core[index].answer === data.no}
-                            />{" "}
-                            No
-                          </label>
-                        </div>
-                        <div className="border-b-2 opacity-10 border-[#595555] "></div> */}
                         </React.Fragment>
                       ))}
                   </div>
-                  {/* <div className="firstcontain">
-                    <button onClick={handleADD}>
-                      <FaArrowRight color="black" className="svg" />
-                      <div className="text">Continue</div>
-                    </button>
-                  </div> */}
-
-                  {/* <div className="fixed bottom-0 w-full   h-[75px] ">
-                    <div className="flex items-center gap-2 text-white bg-[#EC2752] p-3 justify-center h-[75px]">
-                      <button className="font-bold">"Continue"</button>
-
-                      <BsArrowRight size={23} />
-                    </div>
-                  </div> */}
                 </div>
               )}
 
@@ -663,83 +563,6 @@ function NewDeviceqs() {
                         </React.Fragment>
                       ))}
                   </div>
-                  {/* {state.Cosmetics &&
-                    state.Cosmetics.map((data, index) => (
-                      <div
-                        className="flex flex-col gap-4 mb-4 one"
-                        key={data._id}
-                      >
-                        <div className="flex gap-1 two">
-                          <p className="text-xl">{index + 1}.</p>
-                          <p className="text-xl three">{data.quetion}</p>
-                        </div>
-                        <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                          <label
-                            className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              Cosmetics[index].answer === data.yes
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.yes}
-                              onChange={(e) => {
-                                // handleChange(e, index, data.group, "yes")
-                                store.dispatch(
-                                  updateCosmeticsObject({
-                                    index: index,
-                                    newAnswer: data.yes,
-                                    newKey: "yes",
-                                  })
-                                );
-                              }}
-                              checked={Cosmetics[index].answer === data.yes}
-                            />{" "}
-                            Yes
-                          </label>
-                          <label
-                            className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              Cosmetics[index].answer === data.no
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.no}
-                              onChange={(e) => {
-                                // handleChange(e, index, data.group, "no")
-                                store.dispatch(
-                                  updateCosmeticsObject({
-                                    index: index,
-                                    newAnswer: data.no,
-                                    newKey: "no",
-                                  })
-                                );
-                              }}
-                              checked={Cosmetics[index].answer === data.no}
-                            />{" "}
-                            No
-                          </label>
-                        </div>
-                        <div className="border-b-2 opacity-10 border-[#595555] "></div>
-                      </div>
-                    ))} */}
-
-                  {/* <div className="containButton">
-                    <button onClick={handleSubtract}>
-                      <FaArrowLeft color="black" className="svg" />
-                      <div className="text">Back</div>
-                    </button>
-
-                    <button onClick={handleADD}>
-                      <FaArrowRight color="black" className="svg" />
-                      <div className="text">Continue</div>
-                    </button>
-                  </div> */}
                 </div>
               )}
 
@@ -802,83 +625,6 @@ function NewDeviceqs() {
                         </React.Fragment>
                       ))}
                   </div>
-                  {/* {state.Display &&
-                    state.Display.map((data, index) => (
-                      <div
-                        className="flex flex-col gap-4 mb-4 one"
-                        key={data._id}
-                      >
-                        <div className="flex gap-1 two">
-                          <p className="text-xl">{index + 1}.</p>
-                          <p className="text-xl three">{data.quetion}</p>
-                        </div>
-                        <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                          <label
-                            className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              Display[index].answer === data.yes
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.yes}
-                              onChange={(e) => {
-                                // handleChange(e, index, data.group, "yes")
-                                store.dispatch(
-                                  updateDisplayObject({
-                                    index: index,
-                                    newAnswer: data.yes,
-                                    newKey: "yes",
-                                  })
-                                );
-                              }}
-                              checked={Display[index].answer === data.yes}
-                            />{" "}
-                            Yes
-                          </label>
-                          <label
-                            className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              Display[index].answer === data.no
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.no}
-                              onChange={(e) => {
-                                // handleChange(e, index, data.group, "no")
-                                store.dispatch(
-                                  updateDisplayObject({
-                                    index: index,
-                                    newAnswer: data.no,
-                                    newKey: "no",
-                                  })
-                                );
-                              }}
-                              checked={Display[index].answer === data.no}
-                            />{" "}
-                            No
-                          </label>
-                        </div>
-                        <div className="border-b-2 opacity-10 border-[#595555] "></div>
-                      </div>
-                    ))} */}
-
-                  {/* <div className="containButton">
-                    <button onClick={handleSubtract}>
-                      <FaArrowLeft color="black" className="svg" />
-                      <div className="text">Back</div>
-                    </button>
-
-                    <button onClick={handleADD}>
-                      <FaArrowRight color="black" className="svg" />
-                      <div className="text">Continue</div>
-                    </button>
-                  </div> */}
                 </div>
               )}
 
@@ -943,85 +689,6 @@ function NewDeviceqs() {
                         </React.Fragment>
                       ))}
                   </div>
-                  {/* {state.Functional_major &&
-                    state.Functional_major.map((data, index) => (
-                      <div
-                        className="flex flex-col gap-4 mb-4 one"
-                        key={data._id}
-                      >
-                        <div className="flex gap-1 two">
-                          <p className="text-xl">{index + 1}.</p>
-                          <p className="text-xl three">{data.quetion}</p>
-                        </div>
-                        <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                          <label
-                            className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              Functional_major[index].answer === data.yes
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.yes}
-                              onChange={(e) => {
-                                store.dispatch(
-                                  updateFunctionalMajorObject({
-                                    index: index,
-                                    newAnswer: data.yes,
-                                    newKey: "yes",
-                                  })
-                                );
-                              }}
-                              checked={
-                                Functional_major[index].answer === data.yes
-                              }
-                            />{" "}
-                            Yes
-                          </label>
-                          <label
-                            className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              Functional_major[index].answer === data.no
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.no}
-                              onChange={(e) => {
-                                store.dispatch(
-                                  updateFunctionalMajorObject({
-                                    index: index,
-                                    newAnswer: data.no,
-                                    newKey: "no",
-                                  })
-                                );
-                              }}
-                              checked={
-                                Functional_major[index].answer === data.no
-                              }
-                            />{" "}
-                            No
-                          </label>
-                        </div>
-                        <div className="border-b-2 opacity-10 border-[#595555] "></div>
-                      </div>
-                    ))} */}
-
-                  {/* <div className="containButton">
-                    <button onClick={handleSubtract}>
-                      <FaArrowLeft color="black" className="svg" />
-                      <div className="text">Back</div>
-                    </button>
-
-                    <button onClick={handleADD}>
-                      <FaArrowRight color="black" className="svg" />
-                      <div className="text">Continue</div>
-                    </button>
-                  </div> */}
                 </div>
               )}
 
@@ -1085,87 +752,6 @@ function NewDeviceqs() {
                         </React.Fragment>
                       ))}
                   </div>
-                  {/* {state.Functional_minor &&
-                    state.Functional_minor.map((data, index) => (
-                      <div
-                        className="flex flex-col gap-4 mb-4 one"
-                        key={data._id}
-                      >
-                        <div className="flex gap-1 two">
-                          <p className="text-xl">{index + 1}.</p>
-                          <p className="text-xl three">{data.quetion}</p>
-                        </div>
-                        <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                          <label
-                            className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              Functional_minor[index].answer === data.yes
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.yes}
-                              onChange={(e) => {
-                                // handleChange(e, index, data.group, "yes")
-                                store.dispatch(
-                                  updateFunctionalMinorObject({
-                                    index: index,
-                                    newAnswer: data.yes,
-                                    newKey: "yes",
-                                  })
-                                );
-                              }}
-                              checked={
-                                Functional_minor[index].answer === data.yes
-                              }
-                            />{" "}
-                            Yes
-                          </label>
-                          <label
-                            className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                              Functional_minor[index].answer === data.no
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              name={data._id}
-                              type="radio"
-                              value={data.no}
-                              onChange={(e) => {
-                                // handleChange(e, index, data.group, "no")
-                                store.dispatch(
-                                  updateFunctionalMinorObject({
-                                    index: index,
-                                    newAnswer: data.no,
-                                    newKey: "no",
-                                  })
-                                );
-                              }}
-                              checked={
-                                Functional_minor[index].answer === data.no
-                              }
-                            />{" "}
-                            No
-                          </label>
-                        </div>
-                        <div className="border-b-2 opacity-10 border-[#595555] "></div>
-                      </div>
-                    ))} */}
-
-                  {/* <div className="containButton">
-                    <button onClick={handleSubtract}>
-                      <FaArrowLeft color="black" className="svg" />
-                      <div className="text">Back</div>
-                    </button>
-
-                    <button onClick={handleADD}>
-                      <FaArrowRight color="black" className="svg" />
-                      <div className="text">Continue</div>
-                    </button>
-                  </div> */}
                 </div>
               )}
 
@@ -1225,66 +811,12 @@ function NewDeviceqs() {
                         </React.Fragment>
                       ))}
                   </div>
-
-                  {/* <div className="flex flex-col gap-4 mb-4 one">
-                    <div className="flex gap-1 two">
-                      <p className="text-xl">1.</p>
-                      <p className="text-xl three">What is your phone's age?</p>
-                    </div> 
-
-                    {state.Warranty &&
-                      state.Warranty.map((data, index) => (
-                        <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner flex-col">
-                          <label
-                            className={`text-[#EC2752] font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
-                              Warranty[index].answer === data.yes
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              
-                              type="radio"
-                              value={data.yes}
-                              onChange={(e) => {
-                                // handleChange(e, index, data.group, "yes")
-                                store.dispatch(
-                                  updateWarrantyObject({
-                                    index: index,
-                                    newAnswer: data.yes,
-                                    newKey: "yes",
-                                  })
-                                );
-                                
-                              }}
-                              checked={Warranty[index].answer === data.yes}
-                            />{" "}
-                            {data.quetion}
-                          </label>
-                        </div>
-                      ))}
-                    <div className="border-b-2 opacity-10 border-[#595555] "></div>
-                  </div> */}
                 </div>
               )}
             </div>
           </div>
         </div>
-        {/* {(visible >= 6 )?<div className="fixed bottom-0 w-full   h-[75px] ">
-                    <div className="flex items-center gap-2 text-white bg-[#EC2752] p-3 justify-center h-[75px]" onClick={handlesubmit}>
-                      <button className="font-bold">
-                       Sumbit</button>
 
-                      <BsArrowRight size={23} />
-                    </div>
-                  </div>:<div className="fixed bottom-0 w-full   h-[75px] ">
-                    <div className="flex items-center gap-2 text-white bg-[#EC2752] p-3 justify-center h-[75px]"  onClick={handleADD}>
-                      <button className="font-bold">
-                    Continue</button>
-
-                      <BsArrowRight size={23} />
-                    </div>
-                  </div>} */}
         {visible >= 6 ? (
           <div className="fixed bottom-0 flex justify-center w-full gap-2 p-3 bg-white border-t-2">
             <div
@@ -1313,7 +845,6 @@ function NewDeviceqs() {
               <p className="w-full p-1 text-xl font-medium">
                 {isLoading ? "Submitting" : "Submit"}
               </p>
-              {/* <FaArrowRight /> */}
             </div>
           </div>
         ) : (
@@ -1341,7 +872,6 @@ function NewDeviceqs() {
               className="bg-[#EC2752] w-[50%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
             >
               <p className="w-full p-1 text-xl font-medium">Continue</p>
-              {/* <FaArrowRight /> */}
             </div>
           </div>
         )}

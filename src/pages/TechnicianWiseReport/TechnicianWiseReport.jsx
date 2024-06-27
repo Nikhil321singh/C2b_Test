@@ -147,8 +147,7 @@ const TechnicianWiseReport = () => {
   };
   function reverseDate(itemDate) {
     const dateArr = itemDate.split("-");
-    const res = dateArr.reverse().join("-");
-    return res;
+    return dateArr.reverse().join("-");
   }
   const handleSearchClear = useCallback(() => {
     setSearchValue("");

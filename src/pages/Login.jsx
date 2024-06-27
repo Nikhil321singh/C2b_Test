@@ -9,8 +9,7 @@ import { SocialIcon } from "react-social-icons";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdOutlineMailLock } from "react-icons/md";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { IoEye } from "react-icons/io5";
-import { IoEyeOffSharp } from "react-icons/io5";
+import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 
 const Login = () => {

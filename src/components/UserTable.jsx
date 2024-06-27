@@ -66,7 +66,7 @@ const UserTable = ({ data }) => {
               <td className="p-2 text-sm text-center md:p-3 md:text-base min-w-[170px]">
                 {val?.lead?.model?.type === "Mobile"
                   ? val?.lead?.ram
-                    ? (val?.lead?.storage + "/" + val?.lead?.ram)
+                    ? `${val?.lead?.storage }/${val?.lead?.ram}`
                     : val?.lead?.storage
                   : "-"}
               </td>

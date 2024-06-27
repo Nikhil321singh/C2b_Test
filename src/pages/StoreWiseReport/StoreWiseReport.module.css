@@ -20,61 +20,64 @@
   transform: translateY(4px);
 }
 
-.filter_button{
-  background-color: #EC2752;
+.filter_button {
+  background-color: #ec2752;
   color: white;
   font-weight: 500;
-  font-size: .9rem;
+  font-size: 0.9rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   gap: 7px;
   width: 100%;
-  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158), -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158),
+    -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
   padding: 7px 15px;
-  border-radius: .55rem;
-  transition: all .5s ease;
+  border-radius: 0.55rem;
+  transition: all 0.5s ease;
   cursor: pointer;
 }
 
-.filter_button svg{
-  transition: all .5s ease;
+.filter_button svg {
+  transition: all 0.5s ease;
 }
 
-.filter_drop{
+.filter_drop {
   position: absolute;
   z-index: 10;
-  color: #EC2752;
+  color: #ec2752;
   background-color: white;
   font-weight: 500;
-  font-size: .9rem;
+  font-size: 0.9rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   margin-top: 5px;
-  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158), -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
-  border-radius: .55rem;
-  transition: all .5s ease;
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158),
+    -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
+  border-radius: 0.55rem;
+  transition: all 0.5s ease;
   overflow: hidden;
 }
 
-.filter_option{
+.filter_option {
   /* border-bottom: 2px solid rgba(0, 0, 0, 0.151); */
-  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158), -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158),
+    -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
   width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding: 5px 10px ;
-  transition: all .4s ease;
+  padding: 5px 10px;
+  transition: all 0.4s ease;
   cursor: pointer;
 }
 
-.filter_option:hover{
-  background-color: #EC2752;
+.filter_option:hover {
+  background-color: #ec2752;
   color: white;
 }
 
@@ -108,45 +111,43 @@
   color: white;
 }
 
-.date_picker_wrap{
-   
+.date_picker_wrap input {
+  visibility: hidden;
+  position: absolute;
+  z-index: 0;
+  right: 0;
 }
 
-.date_picker_wrap input{
-    visibility: hidden;
-    position: absolute;
-    z-index: 0;
-    right: 0;
-}
-
-.date_box{
-    color: white;
-    background-color: #EC2752;
-    border-radius: .55rem;
-    font-weight: 500;
-    font-size: .80rem;
-    padding: 5px 7px;
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158), -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
-}
-
-.date_box svg{
-    padding-left: 2px;
-    padding-bottom: 2px;
-}
-
-.icons_box{
+.date_box {
   color: white;
-  background-color: #EC2752;
-  border-radius: .55rem;
+  background-color: #ec2752;
+  border-radius: 0.55rem;
+  font-weight: 500;
+  font-size: 0.8rem;
+  padding: 5px 7px;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158),
+    -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
+}
+
+.date_box svg {
+  padding-left: 2px;
+  padding-bottom: 2px;
+}
+
+.icons_box {
+  color: white;
+  background-color: #ec2752;
+  border-radius: 0.55rem;
   padding: 5px;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158), -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158),
+    -1px -1px 2px 0px rgba(0, 0, 0, 0.034);
 }

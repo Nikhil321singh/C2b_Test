@@ -7,12 +7,14 @@ import { BeatLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 
+const succTextColor = "text-green-500";
+const failTextColor = "text-[#EC2752]";
+const token = sessionStorage.getItem("authToken");
+
 const StoreListing = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     storeName: "",
     region: "",
@@ -21,7 +23,6 @@ const StoreListing = () => {
     contactNumber: "",
     address: "",
   });
-
   const [errMsg, setErrMsg] = useState("");
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
@@ -39,20 +40,7 @@ const StoreListing = () => {
   const submitHandler = (event) => {
     event.preventDefault();
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-    if (formData.email.length <= 5) {
-      console.log("email size is too small, must be more than 5");
-      setIsTableLoaded(false);
-      return;
-    }
-
-    if (formData.contactNumber.length <= 5) {
-      console.log("phone number is invalid");
-      setIsTableLoaded(false);
-      return;
-    }
-
-    let data = JSON.stringify({
+    const data = JSON.stringify({
       storeName: formData.storeName,
       uniqueId: formData.uniqueId,
       email: formData.email,
@@ -60,31 +48,21 @@ const StoreListing = () => {
       region: formData.region,
       address: formData.address,
     });
-
-    console.log(data);
-
-    let config = {
+    const config = {
       method: "post",
-      maxBodyLength: Infinity,
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/create`,
-      headers: {
-        Authorization: token,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: token },
       data: data,
     };
-
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data);
         setErrMsg("Successfully added new store");
         setSucBox(true);
         setIsTableLoaded(false);
         navigate("/storelistingtable");
       })
       .catch((error) => {
-        console.log(error);
         setErrMsg("Failed to add store");
         setFailBox(true);
         setIsTableLoaded(false);
@@ -106,21 +84,21 @@ const StoreListing = () => {
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div
             className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
+              sucBox ? succTextColor : failTextColor
             }`}
           >
             {sucBox ? (
               <IoIosCheckmarkCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
+                className={sucBox ? succTextColor : failTextColor}
                 size={90}
               />
             ) : (
               <IoIosCloseCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
+                className={sucBox ? succTextColor : failTextColor}
                 size={90}
               />
             )}
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
+            <h6 className={sucBox ? succTextColor : failTextColor}>
               {sucBox ? "Success!" : "Error!"}
             </h6>
             <p className="text-slate-500">{errMsg}</p>
@@ -150,7 +128,6 @@ const StoreListing = () => {
             <p className="text-4xl font-bold">Store Listing</p>
             <p className="text-lg">All fields marked with * are required</p>
           </div>
-
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <button
               onClick={() => navigate("/storelistingtable")}
@@ -184,12 +161,12 @@ const StoreListing = () => {
                 required={true}
               />
             </div>
-
             <div className="flex flex-col w-[70%] gap-2 ">
               <span className="font-medium text-xl">Email*</span>
               <input
                 id="email"
                 name="email"
+                minLength={6}
                 value={formData.email}
                 onChange={handleChange}
                 className="border-2 px-2 py-2 rounded-lg  outline-none"
@@ -197,12 +174,12 @@ const StoreListing = () => {
                 required={true}
               />
             </div>
-
             <div className="flex flex-col w-[70%] gap-2">
               <span className="font-medium text-xl">Contact Number*</span>
               <input
                 id="contactNumber"
                 name="contactNumber"
+                minLength={10}
                 value={formData.contactNumber}
                 onChange={handleChange}
                 className="border-2 px-2 py-2 rounded-lg  outline-none"

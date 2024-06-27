@@ -104,9 +104,7 @@ function Categories() {
       : "More";
   const [brandList, setBrandList] = useState([]);
   const [popout, setPopout] = useState(false);
-  const [userToken, setUserToken] = useState(
-    sessionStorage.getItem("authToken")
-  );
+  const userToken = sessionStorage.getItem("authToken");
   const [selectedBtn, setSelectedBtn] = useState(selBtn);
   const [deviceType, setDeviceType] = useState(Device);
 

@@ -7,7 +7,7 @@ import { setOtpVerified } from "../../store/slices/otpSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { MdEdit } from "react-icons/md";
-const Failerr = "Failed To Save Quote" 
+const Failerr = "Failed To Save Quote";
 
 const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
   const showHideClassName = show
@@ -168,11 +168,11 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         )
         .then((res) => {
           console.log(res);
-          setLoading(false)
+          setLoading(false);
         })
         .catch((err) => {
           console.log(err);
-          setLoading(false)
+          setLoading(false);
         });
     } else {
       axios
@@ -187,11 +187,11 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         )
         .then((res) => {
           console.log(res);
-          setLoading(false)
+          setLoading(false);
         })
         .catch((err) => {
           console.log(err);
-          setLoading(false)
+          setLoading(false);
         });
     }
     toast.success(quoteText);

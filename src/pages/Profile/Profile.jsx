@@ -7,9 +7,11 @@ import axios from "axios";
 import styles from "./Profile.module.css";
 import { BeatLoader } from "react-spinners";
 
+const storedProfile = JSON.parse(sessionStorage.getItem("profile")) || {};
+const authToken = sessionStorage.getItem("authToken");
+
 const Profile = () => {
   const [sideMenu, setsideMenu] = useState(false);
-  const [userData, setUserData] = useState({});
   const [profile, setProfile] = useState({
     firstName: "",
     lastName: "",
@@ -26,50 +28,20 @@ const Profile = () => {
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const getData = () => {
-    setIsTableLoaded(true);
-    const authToken = sessionStorage.getItem("authToken");
-    const storedProfile = JSON.parse(sessionStorage.getItem("profile"));
-
-    let config = {
-      method: "get",
-      maxBodyLength: Infinity,
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/userregistry/search?uid=${storedProfile.email}`,
-      headers: { Authorization: authToken },
-    };
-
-    axios
-      .request(config)
-      .then((response) => {
-        console.log(response.data.data[0]);
-        setUserData(response.data.data[0]);
-        setIsTableLoaded(false);
-        setErrorMsg("Click edit button to edit profile");
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsTableLoaded(false);
-      });
-  };
-
   useEffect(() => {
-    getData();
-    const storedProfile = JSON.parse(sessionStorage.getItem("profile")) || {};
     setProfile({
-      firstName: userData?.firstName || "",
-      lastName: userData?.lastName || "",
-      website: userData?.website || "",
-      companyName: userData?.companyName || "",
-      address: userData?.address || "",
-      managerName: userData?.managerName || "",
-      pincode: userData?.pincode || "",
-      email: userData?.email || "",
-      phoneNumber: userData?.phoneNumber || "",
+      firstName: storedProfile?.firstName || "",
+      lastName: storedProfile?.lastName || "",
+      website: storedProfile?.website || "",
+      companyName: storedProfile?.companyName || "",
+      address: storedProfile?.address || "",
+      managerName: storedProfile?.managerName || "",
+      pincode: storedProfile?.pincode || "",
+      email: storedProfile?.email || "",
+      phoneNumber: storedProfile?.phoneNumber || "",
     });
     setProfileImage(storedProfile?.profileImage || "");
-  }, [userData?.email]);
+  }, []);
 
   useEffect(() => {
     if (errorMsg !== "") {
@@ -77,6 +49,8 @@ const Profile = () => {
         setErrorMsg("");
       }, 5000);
       return () => clearTimeout(timeoutId);
+    }else{
+      return () => {};
     }
   }, [errorMsg]);
 
@@ -91,9 +65,6 @@ const Profile = () => {
     const file = e.target.files[0];
     const formData = new FormData();
     formData.append("Profileimage", file);
-
-    const authToken = sessionStorage.getItem("authToken");
-
     try {
       const response = await axios.post(
         `${
@@ -107,20 +78,14 @@ const Profile = () => {
           },
         }
       );
-
       if (response.status === 200) {
         const storedProfile = JSON.parse(sessionStorage.getItem("profile"));
         storedProfile.profileImage = response.data.profileImageLink;
         sessionStorage.setItem("profile", JSON.stringify(storedProfile));
-
         setProfileImage(response.data.profileImageLink);
         setIsTableLoaded(false);
         setErrorMsg("Successfully uploaded profile image");
         handleEditClick();
-      } else {
-        console.log("Failed to upload profile image");
-        setIsTableLoaded(false);
-        setErrorMsg("Failed to upload profile image");
       }
     } catch (error) {
       console.error(
@@ -136,8 +101,6 @@ const Profile = () => {
   const Deleteimage = async (e) => {
     e.preventDefault();
     setIsTableLoaded(true);
-    const authToken = sessionStorage.getItem("authToken");
-
     try {
       const response = await axios.delete(
         `${
@@ -188,16 +151,13 @@ const Profile = () => {
   const handleSaveClick = async (event) => {
     setIsTableLoaded(true);
     event.preventDefault();
-    const authToken = sessionStorage.getItem("authToken");
-
-    for (let key in profile) {
+    for (const key in profile) {
       if (profile[key].trim().length === 0) {
         setIsTableLoaded(false);
         setErrorMsg("Please fill all the fields.");
         return;
       }
     }
-
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/profile/user/edit`,
@@ -208,17 +168,12 @@ const Profile = () => {
           },
         }
       );
-
       if (response.status === 200) {
         console.log("Profile updated successfully");
         sessionStorage.setItem("profile", JSON.stringify(response.data.user));
         setIsEditing(false);
         setIsTableLoaded(false);
         setErrorMsg("Profile updated successfully");
-      } else {
-        console.log("Failed to update profile");
-        setIsTableLoaded(false);
-        setErrorMsg("Failed to update profile");
       }
     } catch (error) {
       console.error("An error occurred while updating the profile:", error);

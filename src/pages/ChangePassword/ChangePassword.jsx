@@ -8,8 +8,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
-import { IoEye } from "react-icons/io5";
-import { IoEyeOffSharp } from "react-icons/io5";
+import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 
 const ChangePassword = () => {
   const [password, setPassword] = useState("");
@@ -57,7 +56,7 @@ const ChangePassword = () => {
         )
         .then((res) => {
           console.log("changed", res.data.msg);
-          if (res.data.msg == "Successfully updated user password ") {
+          if (res.data.msg === "Successfully updated user password ") {
             toast.success(res.data.msg);
             navigate("/");
           }

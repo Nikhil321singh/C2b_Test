@@ -5,7 +5,7 @@ import { useDataContext } from "../components/dataContext";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 
-export default function Test() {
+export default function SelectBrand() {
   const [selectedPhone, setselectedPhone] = useState(null);
   const [data, setData] = useState([]);
   const [selectedphone, setSelectedphone] = useState(null);
@@ -95,66 +95,66 @@ export default function Test() {
       <div></div>
 
       <div className="relative w-screen md:w-[80%] md:mx-auto h-screen  LIST_MODELS max-h-screen-4 ">
-        {data.map((data, index) => (
+        {data.map((dataItem, dataIndex) => (
           <div
-            key={data.brand._id}
+            key={dataItem.brand._id}
             className="relative flex flex-col h-auto mx-6  model mt-7"
           >
             <div
               className={`flex  items-center justify-between p-3  bg-white rounded-lg  h-21 px-22 model  ${
-                selectedPhone === index ? "bg-blue-300 " : ""
+                selectedPhone === dataIndex ? "bg-blue-300 " : ""
               }  `}
               onClick={() => {
-                handlebrandClick(index);
+                handlebrandClick(dataIndex);
               }}
             >
-              <img src={data.brand.logo} alt="logo" className="w-24 h-12" />
+              <img src={dataItem.brand.logo} alt="logo" className="w-24 h-12" />
 
-              {!brandArrows[index] ? (
+              {!brandArrows[dataIndex] ? (
                 <RiArrowDownSLine size={30} />
               ) : (
                 <RiArrowUpSLine size={30} />
               )}
             </div>
-            {selectedPhone === index && (
+            {selectedPhone === dataIndex && (
               <div className=" z-10 flex flex-col items-center justify-between h-21 px-22 top-20 text-xl md:text-3xl">
-                {data.models.map((data, index) => (
+                {dataItem.models.map((dataInItem, dataInIndex) => (
                   <div
-                    key={data._id}
+                    key={dataInItem._id}
                     className="flex flex-col items-center justify-between w-full p-3 gap-2 bg-white border-t-2 rounded h-21 px-22"
                   >
                     <div
                       onClick={() => {
-                        handlemodel(index);
+                        handlemodel(dataInIndex);
                       }}
                       className="flex items-center justify-between w-11/12 "
                     >
-                      <p className="">{data.name}</p>
-                      {modelArrow[index] ? (
+                      <p className="">{dataInItem.name}</p>
+                      {modelArrow[dataInIndex] ? (
                         <RiArrowDownSLine size={30} />
                       ) : (
                         <RiArrowUpSLine size={30} />
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2 w-11/12 justify-between">
-                      {selectedphone === index &&
-                        data.config.map((option, index) => (
+                      {selectedphone === dataInIndex &&
+                        dataInItem.config.map((option, optionIndex) => (
                           <div
-                            key={index}
+                            key={optionIndex}
                             className="flex  items-center"
                             onClick={() => {
-                              handleData(index);
+                              handleData(optionIndex);
                             }}
                           >
                             <input
                               type="radio"
                               name="storage "
                               value={option.storage}
-                              id={index}
+                              id={optionIndex}
                               className="w-4 sm:w-5 h-5 border rounded-full outline-none "
                             />
                             <label
-                              htmlFor={index}
+                              htmlFor={optionIndex}
                               className="cursor-pointer ml-1 sm:ml-3 text-xl sm:text-xl md:text-3x"
                             >
                               {option.RAM}/{option.storage}

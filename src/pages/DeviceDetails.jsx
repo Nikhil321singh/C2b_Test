@@ -6,7 +6,6 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import CircleCard from "../components/CircleCard";
 import ContinueButton from "../components/ContinueButton";
 import DeviceCard from "../components/DeviceCard";
-import useUserProfile from "../utils/useUserProfile";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
 
 const DeviceDetails = () => {

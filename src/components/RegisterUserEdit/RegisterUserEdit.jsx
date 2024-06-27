@@ -27,9 +27,9 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
 
     axios
       .request(config)
-      .then((response) => {
-        console.log(response.data.result);
-        const storeNamesArray = response.data.result.map((store) => ({
+      .then((response2) => {
+        console.log(response2.data.result);
+        const storeNamesArray = response2.data.result.map((store) => ({
           storeName: store.storeName,
           _id: store._id,
           region: store.region,

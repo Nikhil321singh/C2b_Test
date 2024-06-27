@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import downArrow from "../assets/down.png";
-import useUserProfile from "../utils/useUserProfile";
 import { useEffect, useState } from "react";
 import { BsFillShieldLockFill, BsTelephoneFill } from "react-icons/bs";
 import PhoneInput from "react-phone-input-2";
