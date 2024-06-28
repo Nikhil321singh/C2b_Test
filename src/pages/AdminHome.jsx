@@ -166,120 +166,18 @@ const AdminHome = () => {
           }}
           className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-white z-[1000]"
         >
-          <div className="flex flex-col  w-[900px]">
-            <div className="relative flex flex-col gap-2 pb-2 mb-6 ml-10 mr-10 border-b-2">
-              <IoClose
-                size={35}
-                className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
-                onClick={closeHandler}
-              />
-              <p className="text-4xl font-bold">Add New Question</p>
-              <p className="text-lg">All fields marked with * are required</p>
-            </div>
-
-            <div className="flex flex-col gap-4 ml-10">
-              {/* //group */}
-              <div>
-                <p className="block text-xl font-medium">
-                  Select Question Group*
-                </p>
-                <select
-                  className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
-                  name=""
-                  id=""
-                  onChange={(e) => {
-                    setGroup(e.target.value);
-                  }}
-                >
-                  <option value="">Select Group</option>
-                  {Object.keys(options).map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-col w-[70%] gap-2">
-                <span className="text-xl font-medium">
-                  Enter your question? *
-                </span>
-                <input
-                  className="px-2 py-2 mt-1 border-2 rounded-lg outline-none "
-                  type="text"
-                  name="uniqueId"
-                  value={question}
-                  required={true}
-                  onChange={(e) => setQuestion(e.target.value)}
-                />
-              </div>
-              <div>
-                <p className="block text-xl font-medium">Select Yes key*</p>
-                <select
-                  className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
-                  name=""
-                  id=""
-                  onChange={(e) => {
-                    setYes(e.target.value);
-                  }}
-                >
-                  <option value="">Select Yes key</option>
-                  {group &&
-                    options[group].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div>
-                <p className="block text-xl font-medium">Select No key*</p>
-                <select
-                  className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
-                  name=""
-                  id=""
-                  onChange={(e) => {
-                    setNo(e.target.value);
-                  }}
-                >
-                  <option value="">Select No key</option>
-                  {group &&
-                    options[group].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div>
-                <p className="block text-xl font-medium">Select Default key*</p>
-                <select
-                  className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
-                  name=""
-                  id=""
-                  onChange={(e) => {
-                    setDefault(e.target.value);
-                  }}
-                >
-                  <option value="">Select Default key</option>
-                  {group &&
-                    options[group].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                </select>
-              </div>
-
-              <div className="mt-8">
-                <button
-                  className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
-                  onClick={handleSubmit}
-                >
-                  Create
-                </button>
-              </div>
-            </div>
-          </div>
+          <CreateQuestion
+            closeHandler={closeHandler}
+            setGroup={setGroup}
+            options={options}
+            question={question}
+            setQuestion={setQuestion}
+            setYes={setYes}
+            group={group}
+            setNo={setNo}
+            setDefault={setDefault}
+            handleSubmit={handleSubmit}
+          />
         </div>
       )}
 
@@ -322,5 +220,127 @@ const AdminHome = () => {
     </>
   );
 };
+
+
+const CreateQuestion = ({closeHandler, setGroup, options, question,setQuestion, setYes, group, setNo, setDefault, handleSubmit}) => {
+  return (
+    
+        <div className="flex flex-col  w-[900px]">
+          <div className="relative flex flex-col gap-2 pb-2 mb-6 ml-10 mr-10 border-b-2">
+            <IoClose
+              size={35}
+              className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
+              onClick={closeHandler}
+            />
+            <p className="text-4xl font-bold">Add New Question</p>
+            <p className="text-lg">All fields marked with * are required</p>
+          </div>
+
+          <div className="flex flex-col gap-4 ml-10">
+            {/* //group */}
+            <div>
+              <p className="block text-xl font-medium">
+                Select Question Group*
+              </p>
+              <select
+                className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+                name=""
+                id=""
+                onChange={(e) => {
+                  setGroup(e.target.value);
+                }}
+              >
+                <option value="">Select Group</option>
+                {Object.keys(options).map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex flex-col w-[70%] gap-2">
+              <span className="text-xl font-medium">
+                Enter your question? *
+              </span>
+              <input
+                className="px-2 py-2 mt-1 border-2 rounded-lg outline-none "
+                type="text"
+                name="uniqueId"
+                value={question}
+                required={true}
+                onChange={(e) => setQuestion(e.target.value)}
+              />
+            </div>
+            <div>
+              <p className="block text-xl font-medium">Select Yes key*</p>
+              <select
+                className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+                name=""
+                id=""
+                onChange={(e) => {
+                  setYes(e.target.value);
+                }}
+              >
+                <option value="">Select Yes key</option>
+                {group &&
+                  options[group].map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div>
+              <p className="block text-xl font-medium">Select No key*</p>
+              <select
+                className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+                name=""
+                id=""
+                onChange={(e) => {
+                  setNo(e.target.value);
+                }}
+              >
+                <option value="">Select No key</option>
+                {group &&
+                  options[group].map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div>
+              <p className="block text-xl font-medium">Select Default key*</p>
+              <select
+                className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+                name=""
+                id=""
+                onChange={(e) => {
+                  setDefault(e.target.value);
+                }}
+              >
+                <option value="">Select Default key</option>
+                {group &&
+                  options[group].map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div className="mt-8">
+              <button
+                className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+                onClick={handleSubmit}
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+                )
+}
+
 
 export default AdminHome;

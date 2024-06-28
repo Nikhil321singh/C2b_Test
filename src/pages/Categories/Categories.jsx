@@ -21,6 +21,17 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import poco from "../../assets/POCO.png";
 import real from "../../assets/real-logo.png";
 
+const brandImages = {
+  Apple: (logo) => <img className="w-[80px] mb-2" src={logo} alt="Apple" />,
+  OnePlus: (logo) => <img className="w-[80px] mb-2" src={logo} alt="OnePlus" />,
+  POCO: () => <img className="mx-auto" src={poco} alt="POCO" />,
+  Realme: () => <img className="mx-auto" src={real} alt="Realme" />,
+  Xiaomi: () => <img className="mx-auto w-[50px]" src={mi} alt="Xiaomi" />,
+  Samsung: () => <img className="mx-auto" src={smasung} alt="Samsung" />,
+  Vivo: () => <img className="mx-auto" src={vivo} alt="Vivo" />,
+  OPPO: () => <img className="mx-auto" src={Oppo} alt="OPPO" />,
+};
+
 export const DeviceTypeFilter = ({
   selectedBtn,
   setSelectedBtn,
@@ -213,31 +224,14 @@ function Categories() {
             brandList.map((model) => (
               <div
                 key={model._id}
-                className={`${styles.card} w-[30%] md:w-[20%] lg:w-[15%] xl:w-[16%]  md:rounded-lg gap-2 flex flex-col items-center px-2 py-4  text-center h-[7rem]`}
+                className={`${styles.card} w-[30%] md:w-[20%] lg:w-[15%] xl:w-[16%] md:rounded-lg gap-2 flex flex-col items-center px-2 py-4 text-center h-[7rem]`}
                 onClick={() => handleBrandClick(model)}
               >
                 <div className="imagecont h-[70px] w-[80px] flex items-center justify-center">
-                  {model.name == "Apple" || model.name == "OnePlus" ? (
-                    <img className="w-[80px] mb-2 " src={model?.logo} alt="" />
-                  ) : model.name === "POCO" ? (
-                    <img className="mx-auto" src={poco} alt={model.name} />
-                  ) : model.name === "Realme" ? (
-                    <img className="mx-auto " src={real} alt={model.name} />
-                  ) : model.name === "Xiaomi" ? (
-                    <img
-                      className="mx-auto   w-[50px]"
-                      src={mi}
-                      alt={model.name}
-                    />
-                  ) : model.name === "Samsung" ? (
-                    <img className="mx-auto " src={smasung} alt={model.name} />
-                  ) : model.name === "Vivo" ? (
-                    <img className="mx-auto " src={vivo} alt={model.name} />
-                  ) : model.name === "OPPO" ? (
-                    <img className="mx-auto " src={Oppo} alt={model.name} />
-                  ) : null}
+                  {brandImages[model.name]
+                    ? brandImages[model.name](model?.logo)
+                    : null}
                 </div>
-
                 <p className="text-[14px] font-medium">{model.name}</p>
               </div>
             ))}

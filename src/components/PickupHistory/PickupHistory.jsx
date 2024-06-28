@@ -236,51 +236,56 @@ const PickupHistory = () => {
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
           </div>
         )}
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
-            <tr>
-              <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Refrence No</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">
-                Number Of Device
-              </th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pickupData.map((val, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  <button
-                    className={`${styles.view_btn}`}
-                    onClick={() => viewHandler(val?._id)}
-                  >
-                    View
-                  </button>
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.status}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {new Date(val.createdAt).toLocaleDateString("en-GB")}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?._id}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.totalDevice}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.totalAmount}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <PickupTable pickupData={pickupData} viewHandler={viewHandler} />
+      
       </div>
     </div>
+  );
+};
+
+const PickupTable = ({ pickupData, viewHandler }) => {
+  return (
+    <table className="w-full border border-[#EC2752]">
+      <thead className="bg-[#EC2752] text-white">
+        <tr>
+          <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
+          <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
+          <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
+          <th className="p-2 text-sm md:p-3 md:text-base">Refrence No</th>
+          <th className="p-2 text-sm md:p-3 md:text-base">Number Of Device</th>
+          <th className="p-2 text-sm md:p-3 md:text-base">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {pickupData.map((val, index) => (
+          <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
+            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+              <button
+                className={`${styles.view_btn}`}
+                onClick={() => viewHandler(val?._id)}
+              >
+                View
+              </button>
+            </td>
+            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+              {val?.status}
+            </td>
+            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+              {new Date(val.createdAt).toLocaleDateString("en-GB")}
+            </td>
+            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+              {val?._id}
+            </td>
+            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+              {val?.totalDevice}
+            </td>
+            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+              {val?.totalAmount}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 

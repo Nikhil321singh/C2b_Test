@@ -123,7 +123,7 @@ const CustomerTable = () => {
       let questionsKeys = "";
       let index = 1;
       console.log(item?.lead?.QNA[0]);
-      for (let group in item?.lead?.QNA[0]) {
+      for (const group in item?.lead?.QNA[0]) {
         item.lead.QNA[0][group].forEach((qna) => {
           questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
           index++;
@@ -187,7 +187,7 @@ const CustomerTable = () => {
   const getStore = () => {
     const token = sessionStorage.getItem("authToken");
 
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT

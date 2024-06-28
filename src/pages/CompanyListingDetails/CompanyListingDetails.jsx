@@ -38,6 +38,10 @@ const CompanyListingDetails = () => {
   const pageLimit = 10;
   const navigate = useNavigate();
 
+  const getTextColorClass = (isSuccess) =>
+    isSuccess ? "text-green-500" : "text-[#EC2752]";
+
+
   const fetchTableData = () => {
     setIsTableLoading(true);
     const userToken = sessionStorage.getItem("authToken");
@@ -154,7 +158,7 @@ const CompanyListingDetails = () => {
     setConfBox(false);
     const token = sessionStorage.getItem("authToken");
 
-    let config = {
+    const config = {
       method: "delete",
       maxBodyLength: Infinity,
       url: `${
@@ -244,22 +248,20 @@ const CompanyListingDetails = () => {
       {(sucBox || failBox) && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
-            }`}
+            className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}
           >
             {sucBox ? (
               <IoIosCheckmarkCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
+                className={`${getTextColorClass(sucBox)}`}
                 size={90}
               />
             ) : (
               <IoIosCloseCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
+                className={`${getTextColorClass(sucBox)}`}
                 size={90}
               />
             )}
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
+            <h6 className={`${getTextColorClass(sucBox)}`}>
               {sucBox ? "Success!" : "Error!"}
             </h6>
             <p className="text-slate-500">{errMsg}</p>
@@ -280,11 +282,9 @@ const CompanyListingDetails = () => {
       {confBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
-            }`}
+            className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}
           >
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
+            <h6 className={`${getTextColorClass(sucBox)}`}>
               Confirmation!
             </h6>
             <p className="text-slate-500">

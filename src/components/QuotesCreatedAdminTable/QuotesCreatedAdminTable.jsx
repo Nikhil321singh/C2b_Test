@@ -9,6 +9,17 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
     setQNAData(value.lead.QNA);
     setShowModal(true);
   };
+  function getUserFullName(user) {
+    if (!user) return "";
+
+    if (user.firstName) {
+      return user.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : user.firstName;
+    }
+
+    return user.name || "";
+  }
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -55,10 +66,7 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
                     })}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {data?.user?.firstName
-                      ? data?.user?.firstName +
-                        (data.user.lastName ? data?.user?.lastName : "")
-                      : data?.user?.name}
+                    {getUserFullName(data?.user)}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
                     Mobile

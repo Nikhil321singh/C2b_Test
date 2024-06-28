@@ -7,6 +7,30 @@ const UserTable = ({ data }) => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [QNAData, setQNAData] = useState([]);
   const dataIndex = null;
+function getUserFullName(user) {
+  if (!user) return "";
+
+  if (user.firstName) {
+    return user.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user.firstName;
+  }
+
+  return user.name || "";
+}
+  
+  function getDeviceDetails(val) {
+    if (!val || !val.lead || !val.lead.model) return "-";
+
+    if (val.lead.model.type === "Mobile") {
+      if (val.lead.ram) {
+        return `${val.lead.storage}/${val.lead.ram}`;
+      }
+      return val.lead.storage;
+    }
+
+    return "-";
+  }
 
   const handleDetailsClick = (value) => {
     setQNAData(value?.lead?.QNA);
@@ -52,10 +76,7 @@ const UserTable = ({ data }) => {
                 })}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {val?.user?.firstName
-                  ? val?.user?.firstName +
-                    (val.user.lastName ? val?.user?.lastName : "")
-                  : val?.user?.name}
+                {getUserFullName(val?.user)}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.lead?.model?.type}
@@ -64,11 +85,7 @@ const UserTable = ({ data }) => {
                 {val?.lead?.model?.name}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base min-w-[170px]">
-                {val?.lead?.model?.type === "Mobile"
-                  ? val?.lead?.ram
-                    ? `${val?.lead?.storage }/${val?.lead?.ram}`
-                    : val?.lead?.storage
-                  : "-"}
+                {getDeviceDetails(val) }
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.lead?.price}

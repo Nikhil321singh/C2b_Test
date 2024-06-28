@@ -139,58 +139,55 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
 
   // function for bulk download
 
-  useEffect(() => {
-    async function Getqs() {
-      const authToken = sessionStorage.getItem("authToken");
-      const admincategory = sessionStorage.getItem("admincategory");
-      try {
-        const response = await axios.get(
-          `${
-            import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/questionnaires/questionnaireList?deviceType=${admincategory}`,
-          {
-            headers: {
-              authorization: `${authToken}`,
-            },
-          }
-        );
+ useEffect(() => {
+   async function getQuestionnaires() {
+     const authToken = sessionStorage.getItem("authToken");
+     const admincategory = sessionStorage.getItem("admincategory");
+     try {
+       const response = await axios.get(
+         `${
+           import.meta.env.VITE_REACT_APP_ENDPOINT
+         }/api/questionnaires/questionnaireList?deviceType=${admincategory}`,
+         {
+           headers: {
+             authorization: `${authToken}`,
+           },
+         }
+       );
+       return response.data.data;
+     } catch (err) {
+       console.error(err);
+       return [];
+     }
+   }
 
-        const sortedData = response.data.data.sort((a, b) => {
-          if (a._id < b._id) {
-            return -1;
-          }
-          if (a._id > b._id) {
-            return 1;
-          }
-          return 0;
-        });
+   function sortQuestionnaires(data) {
+     return data.sort((a, b) => {
+       if (a._id < b._id) {
+         return -1;
+       }
+       if (a._id > b._id) {
+         return 1;
+       }
+       return 0;
+     });
+   }
 
-        const dummyMobile = [];
-        const dummyWatch = [];
+   function filterQuestionnairesByType(data, typeList) {
+     return data.filter((obj) => typeList.includes(obj._id));
+   }
 
-        sortedData.forEach((obj) => {
-          Mobile.forEach((value) => {
-            console.log("typeof value");
-            console.log(typeof value);
-            console.log(typeof obj._id);
-            if (obj._id === value) {
-              dummyMobile.push(obj);
-            }
-          });
-          Watch.forEach((value) => {
-            if (obj._id === value) {
-              dummyWatch.push(obj);
-            }
-          });
-        });
-        setMobile(dummyMobile);
-        setWatch(dummyWatch);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    Getqs();
-  }, [updateTable]);
+   async function handleQuestionnaires() {
+     const data = await getQuestionnaires();
+     const sortedData = sortQuestionnaires(data);
+     const dummyMobile = filterQuestionnairesByType(sortedData, Mobile);
+     const dummyWatch = filterQuestionnairesByType(sortedData, Watch);
+     setMobile(dummyMobile);
+     setWatch(dummyWatch);
+   }
+
+   handleQuestionnaires();
+ }, [updateTable]);
 
   //for category selection
   const [category, setCategory] = useState("");
@@ -555,5 +552,7 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
     </>
   );
 };
+
+
 
 export default AdminQuestionTable;

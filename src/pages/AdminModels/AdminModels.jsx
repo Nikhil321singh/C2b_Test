@@ -21,6 +21,35 @@ import {
   setStorage,
 } from "../../store/slices/newAdminGrade";
 
+const getEvenRowClass = (index, selectmodel, selectstorage, selectram, val) => {
+  if (index % 2 === 0) {
+    if (
+      selectmodel === val.modelId &&
+      selectstorage === val?.storage &&
+      selectram === val?.RAM
+    ) {
+      return "bg-[#eb869c]";
+    }
+    return "bg-gray-200";
+  }
+  return "";
+};
+
+const getRowClass = (selectmodel, selectstorage, selectram, val) => {
+  if (
+    selectmodel === val.modelId &&
+    selectstorage === val?.storage &&
+    selectram === val?.RAM
+  ) {
+    return "bg-[#eb869c]";
+  }
+  return "";
+};
+
+const getTextColorClass = (isSuccess) =>
+  isSuccess ? "text-green-500" : "text-[#EC2752]";
+const grestTheme = "bg-[#EC2752] text-white";
+
 const AdminModels = () => {
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -40,6 +69,10 @@ const AdminModels = () => {
   const file = null;
   const selectedModel = "";
 
+
+
+   
+  
   function handleNext() {
     navigate("/adminhome");
   }
@@ -48,7 +81,7 @@ const AdminModels = () => {
     setIsTableLoaded(true);
     const token = sessionStorage.getItem("authToken");
 
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -60,19 +93,19 @@ const AdminModels = () => {
       .request(config)
       .then((response) => {
         const responseData = response.data.data;
-        let allConfigurations = [];
+        const allConfigurations = [];
 
         responseData.forEach((brand) => {
           brand.models.forEach((model) => {
-            model.config.forEach((config) => {
+            model.config.forEach((conf) => {
               const newConfig = {
                 brandId: brand.brand._id,
                 brandName: brand.brand.name,
                 modelId: model._id,
                 modelName: model.name,
-                storage: config.storage,
-                RAM: config.RAM,
-                price: config.price,
+                storage: conf.storage,
+                RAM: conf.RAM,
+                price: conf.price,
               };
               allConfigurations.push(newConfig);
             });
@@ -91,38 +124,38 @@ const AdminModels = () => {
     setIsTableLoaded(true);
     const token = sessionStorage.getItem("authToken");
     const admincategory = sessionStorage.getItem("admincategory");
-    let data = JSON.stringify({
+    const sendData = JSON.stringify({
       name: searchValue,
       deviceType: admincategory,
     });
 
-    let config = {
+    const config = {
       method: "post",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/user/Dashboard/search/phones`,
       headers: { Authorization: token, "Content-Type": "application/json" },
-      data: data,
+      data: sendData,
     };
     axios
       .request(config)
       .then((response) => {
         console.log(response.data);
         const responseData = response.data;
-        let allConfigurations = [];
+        const allConfigurations = [];
 
         responseData.forEach((model) => {
           const brandName = model.name.split(" ")[0];
 
-          model.config.forEach((config) => {
+          model.config.forEach((conf) => {
             const newConfig = {
               brandId: model.brandId,
               modelId: model._id,
               brandName: brandName,
               modelName: model.name,
-              storage: config.storage,
-              RAM: config.RAM,
-              price: config.price,
+              storage: conf.storage,
+              RAM: conf.RAM,
+              price: conf.price,
             };
             allConfigurations.push(newConfig);
           });
@@ -216,23 +249,19 @@ const AdminModels = () => {
       )}
       {(sucBox || failBox) && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
-            }`}
-          >
+          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
             {sucBox ? (
               <IoIosCheckmarkCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
+                className={`${getTextColorClass(sucBox)}`}
                 size={90}
               />
             ) : (
               <IoIosCloseCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
+                className={`${getTextColorClass(sucBox)}`}
                 size={90}
               />
             )}
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
+            <h6 className={`${getTextColorClass(sucBox)}`}>
               {sucBox ? "Success!" : "Error!"}
             </h6>
             <p className="text-slate-500">{errMsg}</p>
@@ -241,9 +270,7 @@ const AdminModels = () => {
                 setSucBox(false);
                 setFailBox(false);
               }}
-              className={
-                sucBox ? "bg-green-500 text-white" : "bg-[#EC2752] text-white"
-              }
+              className={sucBox ? "bg-green-500 text-white" : grestTheme}
             >
               Okay
             </button>
@@ -252,27 +279,22 @@ const AdminModels = () => {
       )}
       {confBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
-            }`}
-          >
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
-              Confirmation!
-            </h6>
+          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
+            <h6 className={`${getTextColorClass(sucBox)}`}>Confirmation!</h6>
             <p className="text-slate-500">
               {`Do you want to delete store - ${selectedModel} ?`} ?
             </p>
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => deleteHandler(selectedModel)}
-                className={"bg-[#EC2752] text-white"}
+                className={grestTheme}
               >
                 Okay
               </button>
               <button
                 onClick={() => {
-                  setConfBox(false), setIsTableLoaded(false);
+                  setConfBox(false);
+                  setIsTableLoaded(false);
                 }}
                 className="bg-white text-[#EC2752]"
               >
@@ -284,12 +306,8 @@ const AdminModels = () => {
       )}
       {uploadBox && (
         <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50 z-48">
-          <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
-            }`}
-          >
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
+          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
+            <h6 className={`${getTextColorClass(sucBox)}`}>
               Bulk Upload Stores
             </h6>
             <form className="flex flex-col gap-4" onSubmit={handleBulkSubmit}>
@@ -307,13 +325,14 @@ const AdminModels = () => {
                 />
               </div>
               <div className="flex flex-row gap-2">
-                <button type="submit" className={"bg-[#EC2752] text-white"}>
+                <button type="submit" className={grestTheme}>
                   Upload
                 </button>
                 <button
                   type="reset"
                   onClick={() => {
-                    setUploadBox(false), setIsTableLoaded(false);
+                    setUploadBox(false);
+                    setIsTableLoaded(false);
                   }}
                   className="bg-white text-[#EC2752]"
                 >
@@ -374,89 +393,96 @@ const AdminModels = () => {
         </div>
       </div>
       <div className={`${styles.pd_cont}`}>
-        <div className="m-2 overflow-x-auto md:m-5">
-          <table className="w-full border border-[#EC2752]">
-            <thead className="bg-[#EC2752] text-white">
-              <tr>
-                <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
-                <th className="p-2 text-sm md:p-3 md:text-base">Brand</th>
-                <th className="p-2 text-sm md:p-3 md:text-base">Model Name</th>
-                <th className="p-2 text-sm md:p-3 md:text-base">RAM</th>
-                <th className="p-2 text-sm md:p-3 md:text-base">Storage</th>
-                <th className="p-2 text-sm md:p-3 md:text-base">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((val, index) => (
-                <tr
-                  key={index}
-                  className={`${
-                    index % 2 === 0
-                      ? selectmodel === val.modelId &&
-                        selectstorage === val?.storage &&
-                        selectram === val?.RAM
-                        ? "bg-[#eb869c]"
-                        : "bg-gray-200"
-                      : ""
-                  } ${
-                    selectmodel === val.modelId &&
-                    selectstorage === val?.storage &&
-                    selectram === val?.RAM
-                      ? "bg-[#eb869c]"
-                      : ""
-                  }`}
-                >
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    <div className="flex flex-col gap-1">
-                      <button
-                        className={`${styles.view_btn}`}
-                        onClick={() => {
-                          selectHandler(val.modelId, val.storage, val?.RAM);
-                        }}
-                      >
-                        Select
-                      </button>
-                      <button
-                        className={`${styles.acpt_btn}`}
-                        onClick={() => {
-                          deleteHandler(val);
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {val?.brandName}
-                  </td>
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {val?.modelName}
-                  </td>
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {category === "Mobile" ? val?.RAM : "-"}
-                  </td>
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {category === "Mobile" ? val?.storage : "-"}
-                  </td>
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {val?.price}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="flex justify-center mb-2">
-            <button
-              onClick={handleNext}
-              className="text-center  mx-2 px-4 py-2 rounded-lg bg-[#EC2752] text-white cursor-pointer mt-3"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+        <AdminModelsTable
+          grestTheme={grestTheme}
+          data={data}
+          selectmodel={selectmodel}
+          selectstorage={selectstorage}
+          selectram={selectram}
+          selectHandler={selectHandler}
+          deleteHandler={deleteHandler}
+          category={category}
+          handleNext={handleNext}
+        />
       </div>
     </div>
   );
 };
 
+const AdminModelsTable = ({grestTheme, data, selectmodel, selectstorage, selectram, selectHandler, deleteHandler, category, handleNext}) => {
+  return (
+    <div className="m-2 overflow-x-auto md:m-5">
+      <table className="w-full border border-[#EC2752]">
+        <thead className={grestTheme}>
+          <tr>
+            <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Brand</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Model Name</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">RAM</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Storage</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data?.map((val, index) => (
+            <tr
+              key={index}
+              className={`${getEvenRowClass(
+                index,
+                selectmodel,
+                selectstorage,
+                selectram,
+                val
+              )} ${getRowClass(selectmodel, selectstorage, selectram, val)}`}
+            >
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <div className="flex flex-col gap-1">
+                  <button
+                    className={`${styles.view_btn}`}
+                    onClick={() => {
+                      selectHandler(val.modelId, val.storage, val?.RAM);
+                    }}
+                  >
+                    Select
+                  </button>
+                  <button
+                    className={`${styles.acpt_btn}`}
+                    onClick={() => {
+                      deleteHandler(val);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.brandName}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.modelName}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {category === "Mobile" ? val?.RAM : "-"}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {category === "Mobile" ? val?.storage : "-"}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.price}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="flex justify-center mb-2">
+        <button
+          onClick={handleNext}
+          className="text-center  mx-2 px-4 py-2 rounded-lg bg-[#EC2752] text-white cursor-pointer mt-3"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
 export default AdminModels;
