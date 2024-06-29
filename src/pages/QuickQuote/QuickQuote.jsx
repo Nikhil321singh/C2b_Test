@@ -22,6 +22,17 @@ import { CgSpinner } from "react-icons/cg";
 import useUserProfile from "../../utils/useUserProfile";
 import { setResponseData } from "../../store/slices/responseSlice";
 
+const PinkBgWhText = "bg-[#EC2752] text-white";
+
+const initialState = {
+  Core: [],
+  Cosmetics: [],
+  Display: [],
+  Functional_major: [],
+  Functional_minor: [],
+  Warranty: [],
+};
+
 const QuickQuote = () => {
   const navigate = useNavigate();
   const { answersQuick, setAnswersQUICK } = useQuestionContext();
@@ -29,39 +40,30 @@ const QuickQuote = () => {
   const core = useSelector((state) => state.qnaQuick.Core);
   const Cosmetics = useSelector((state) => state.qnaQuick.Cosmetics);
   const Display = useSelector((state) => state.qnaQuick.Display);
-  const Functional_major = useSelector(
+  const FunctionalMajor = useSelector(
     (state) => state.qnaQuick.Functional_major
   );
-  const Functional_minor = useSelector(
+  const FunctionalMinor = useSelector(
     (state) => state.qnaQuick.Functional_minor
   );
   const Warranty = useSelector((state) => state.qnaQuick.Warranty);
   const qnaQuick = useSelector((state) => state.qnaQuick);
+  const [isLoading, setIsLoading] = useState(false);
+  const profile = useUserProfile();
 
   const backHandler = () => {
     navigate("/selectmodel");
   };
 
-  const initialState = {
-    Core: [],
-    Cosmetics: [],
-    Display: [],
-    Functional_major: [],
-    Functional_minor: [],
-    Warranty: [],
-  };
-  // fot mpping
   function reducer(state, action) {
-    switch (action.type) {
-      case "SET_GROUP_ANSWERS":
-        return { ...state, [action.group]: action.answers };
-      default:
-        throw new Error();
+    if(action.type === "SET_GROUP_ANSWERS"){
+      return { ...state, [action.group]: action.answers };
+    }else {
+      throw new Error();
     }
   }
 
-  //intilize reducer
-  const [state, Dispatch] = useReducer(reducer, initialState);
+  const [QQState, Dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     const userToken = sessionStorage.getItem("authToken");
@@ -77,7 +79,6 @@ const QuickQuote = () => {
           },
         });
 
-        //test
         [
           "Core",
           "Cosmetics",
@@ -92,7 +93,9 @@ const QuickQuote = () => {
 
           Dispatch({ type: "SET_GROUP_ANSWERS", group, answers });
         });
+
         const newPopulateAnswers = response.data.data.map((ele) => ele.default);
+
         if (answersQuick.length === 0) {
           const newAnswers = newPopulateAnswers.map((answer, index) => {
             return {
@@ -129,8 +132,7 @@ const QuickQuote = () => {
       navigate("/");
     }
   }, []);
-  const [isLoading, setIsLoading] = useState(false);
-  const profile = useUserProfile();
+
   const handlesubmit = async () => {
     setIsLoading(true);
     const token = sessionStorage.getItem("authToken");
@@ -199,8 +201,8 @@ const QuickQuote = () => {
             <div className="underline"></div>
             <div className="questionList ">
               <div className="containClass ">
-                {state.Core &&
-                  state.Core.map((data, index) => (
+                {QQState.Core &&
+                  QQState.Core.map((data, index) => (
                     <div
                       className="flex flex-col gap-4 mb-4 one relative"
                       key={data._id}
@@ -213,7 +215,7 @@ const QuickQuote = () => {
                         <label
                           className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                             core[index].answer === data.yes
-                              ? "bg-[#EC2752] text-white"
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -237,7 +239,7 @@ const QuickQuote = () => {
                         <label
                           className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                             core[index].answer === data.no
-                              ? "bg-[#EC2752] text-white"
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -267,8 +269,8 @@ const QuickQuote = () => {
               {/* //for cosmetics */}
 
               <div className="containClass">
-                {state.Cosmetics &&
-                  state.Cosmetics.map((data, index) => (
+                {QQState.Cosmetics &&
+                  QQState.Cosmetics.map((data, index) => (
                     <div
                       className="flex flex-col gap-4 mb-4 one"
                       key={data._id}
@@ -281,7 +283,7 @@ const QuickQuote = () => {
                         <label
                           className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                             Cosmetics[index].answer === data.yes
-                              ? "bg-[#EC2752] text-white"
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -305,7 +307,7 @@ const QuickQuote = () => {
                         <label
                           className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                             Cosmetics[index].answer === data.no
-                              ? "bg-[#EC2752] text-white"
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -335,8 +337,8 @@ const QuickQuote = () => {
               {/* //for display */}
 
               <div className="containClass">
-                {state.Display &&
-                  state.Display.map((data, index) => (
+                {QQState.Display &&
+                  QQState.Display.map((data, index) => (
                     <div
                       className="flex flex-col gap-4 mb-4 one"
                       key={data._id}
@@ -349,7 +351,7 @@ const QuickQuote = () => {
                         <label
                           className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                             Display[index].answer === data.yes
-                              ? "bg-[#EC2752] text-white"
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -373,7 +375,7 @@ const QuickQuote = () => {
                         <label
                           className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                             Display[index].answer === data.no
-                              ? "bg-[#EC2752] text-white"
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -403,8 +405,8 @@ const QuickQuote = () => {
               {/* //Functional_major*/}
 
               <div className="containClass">
-                {state.Functional_major &&
-                  state.Functional_major.map((data, index) => (
+                {QQState.Functional_major &&
+                  QQState.Functional_major.map((data, index) => (
                     <div
                       className="flex flex-col gap-4 mb-4 one"
                       key={data._id}
@@ -416,8 +418,8 @@ const QuickQuote = () => {
                       <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
                         <label
                           className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            Functional_major[index].answer === data.yes
-                              ? "bg-[#EC2752] text-white"
+                            FunctionalMajor[index].answer === data.yes
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -435,15 +437,15 @@ const QuickQuote = () => {
                               );
                             }}
                             checked={
-                              Functional_major[index].answer === data.yes
+                              FunctionalMajor[index].answer === data.yes
                             }
                           />{" "}
                           Yes
                         </label>
                         <label
                           className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            Functional_major[index].answer === data.no
-                              ? "bg-[#EC2752] text-white"
+                            FunctionalMajor[index].answer === data.no
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -460,7 +462,7 @@ const QuickQuote = () => {
                                 })
                               );
                             }}
-                            checked={Functional_major[index].answer === data.no}
+                            checked={FunctionalMajor[index].answer === data.no}
                           />{" "}
                           No
                         </label>
@@ -473,8 +475,8 @@ const QuickQuote = () => {
               {/* //for Functional_minor */}
 
               <div className="containClass">
-                {state.Functional_minor &&
-                  state.Functional_minor.map((data, index) => (
+                {QQState.Functional_minor &&
+                  QQState.Functional_minor.map((data, index) => (
                     <div
                       className="flex flex-col gap-4 mb-4 one"
                       key={data._id}
@@ -486,8 +488,8 @@ const QuickQuote = () => {
                       <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
                         <label
                           className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            Functional_minor[index].answer === data.yes
-                              ? "bg-[#EC2752] text-white"
+                            FunctionalMinor[index].answer === data.yes
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -505,15 +507,15 @@ const QuickQuote = () => {
                               );
                             }}
                             checked={
-                              Functional_minor[index].answer === data.yes
+                              FunctionalMinor[index].answer === data.yes
                             }
                           />{" "}
                           Yes
                         </label>
                         <label
                           className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            Functional_minor[index].answer === data.no
-                              ? "bg-[#EC2752] text-white"
+                            FunctionalMinor[index].answer === data.no
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >
@@ -530,7 +532,7 @@ const QuickQuote = () => {
                                 })
                               );
                             }}
-                            checked={Functional_minor[index].answer === data.no}
+                            checked={FunctionalMinor[index].answer === data.no}
                           />{" "}
                           No
                         </label>
@@ -549,13 +551,13 @@ const QuickQuote = () => {
                     <p className="text-xl three">What is your phone's age?</p>
                   </div>
 
-                  {state.Warranty &&
-                    state.Warranty.map((data, index) => (
-                      <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner flex-col">
+                  {QQState.Warranty &&
+                    QQState.Warranty.map((data, index) => (
+                      <div key={index} className="max-w-[500px] flex gap-4 ml-3 lableconatiner flex-col">
                         <label
                           className={`text-[#EC2752] font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
                             Warranty[index].answer === data.yes
-                              ? "bg-[#EC2752] text-white"
+                              ? PinkBgWhText
                               : ""
                           }`}
                         >

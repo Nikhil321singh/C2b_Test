@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
 import StoreWiseTable from "../../components/StoreWiseTable/StoreWiseTable";
@@ -11,13 +11,67 @@ import DatePicker from "react-datepicker";
 import { IoMdSearch } from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
 
+const isSelled = "true";
+const rotateCss = "rotate-180";
+
+const downloadExcelStoreWise = (apiData) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+
+  const formattedData = apiData.map((item) => {
+    return {
+      "Purchase Date": new Date(item.createdAt).toLocaleDateString("en-IN"),
+      Technicians: item.userId?.firstName,
+      "IMEI No.": item.documentId?.IMEI,
+      "Product Details": item.modelId?.name,
+      Location: item.store?.storeName,
+      "Price Offered To Customer": item.price,
+      "Unique ID": item.uniqueCode,
+    };
+  });
+
+  
+
+  const wsStoreWise = XLSX.utils.json_to_sheet(formattedData);
+  const wbStoreWise = { Sheets: { data: wsStoreWise }, SheetNames: ["data"] };
+  const excelBufferStoreWise = XLSX.write(wbStoreWise, {
+    bookType: "xlsx",
+    type: "array",
+  });
+
+  const dataFileStoreWise = new Blob([excelBufferStoreWise], {
+    type: fileType,
+  });
+  saveAs(dataFileStoreWise, "StoreWise_Report" + fileExtension);
+};
+
+const fetchDownloadDataStoreWise = (deviceCategory) => {
+  const userToken = sessionStorage.getItem("authToken");
+  axios
+    .get(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}`,
+      {
+        headers: {
+          authorization: `${userToken}`,
+        },
+      }
+    )
+    .then((res) => {
+      downloadExcelStoreWise(res.data.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
 const StoreWiseReport = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [tableData, setTableData] = useState();
-  const [isSelled, setIsSelled] = useState("true");
-  const [totalCount, setTotalCount] = useState(0);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const pageLimit = 10;
   const [storeName, setStoreName] = useState("");
@@ -32,7 +86,9 @@ const StoreWiseReport = () => {
   const [fromDate, setFromDate] = useState("");
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
   const [toDate, setToDate] = useState("");
-  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
+  const [toDateDup, setToDateDup] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [grestRec, setGrestRec] = useState("");
   const [grestDrop, setGrestDrop] = useState(false);
   const [allUser, setAllUser] = useState([]);
@@ -58,7 +114,6 @@ const StoreWiseReport = () => {
       .then((res) => {
         setMaxPages(Math.ceil(res.data.totalCounts / 10));
         setTableData(res.data.data);
-        setTotalCount(res.data.totalCounts);
         setIsTableLoaded(false);
       })
       .catch((err) => {
@@ -71,7 +126,7 @@ const StoreWiseReport = () => {
     setIsTableLoaded(true);
     const token = sessionStorage.getItem("authToken");
 
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -106,7 +161,7 @@ const StoreWiseReport = () => {
     setIsTableLoaded(true);
     const token = sessionStorage.getItem("authToken");
 
-    let config = {
+    const config = {
       method: "get",
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/userregistry/all`,
       headers: { Authorization: token },
@@ -134,57 +189,6 @@ const StoreWiseReport = () => {
     getStore();
     getTechnicians();
   }, []);
-
-  const downloadExcelStoreWise = (apiData) => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = apiData.map((item) => {
-      return {
-        "Purchase Date": new Date(item.createdAt).toLocaleDateString("en-IN"),
-        Technicians: item.userId?.firstName,
-        "IMEI No.": item.documentId?.IMEI,
-        "Product Details": item.modelId?.name,
-        Location: item.store?.storeName,
-        "Price Offered To Customer": item.price,
-        "Unique ID": item.uniqueCode,
-      };
-    });
-
-    const wsStoreWise = XLSX.utils.json_to_sheet(formattedData);
-    const wbStoreWise = { Sheets: { data: wsStoreWise }, SheetNames: ["data"] };
-    const excelBufferStoreWise = XLSX.write(wbStoreWise, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    const dataFileStoreWise = new Blob([excelBufferStoreWise], {
-      type: fileType,
-    });
-    saveAs(dataFileStoreWise, "StoreWise_Report" + fileExtension);
-  };
-
-  const fetchDownloadDataStoreWise = () => {
-    const userToken = sessionStorage.getItem("authToken");
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll?page=${0}&limit=${totalCount}&is_selled=${isSelled}&deviceType=${deviceCategory}`,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        downloadExcelStoreWise(res.data.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
 
   useEffect(() => {
     fetchStoreData();
@@ -266,7 +270,6 @@ const StoreWiseReport = () => {
         setToDateDup(formattedToday);
       }
       setFromDateDup(formattedDate);
-      console.log(formattedDate + " to " + formattedToday);
     }
   };
 
@@ -312,9 +315,7 @@ const StoreWiseReport = () => {
     setTechId("");
     setTechName("");
   };
-  const handleDeviceCategory = (e) => {
-    setDeviceCategory(e.target.value);
-  };
+
   return (
     <div>
       {isTableLoaded && (
@@ -333,7 +334,7 @@ const StoreWiseReport = () => {
             name=""
             id=""
             className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
-            onChange={handleDeviceCategory}
+            onChange={(e) => setDeviceCategory(e.target.value)}
           >
             <option
               className="bg-white text-[#EC2752] font-medium"
@@ -365,7 +366,7 @@ const StoreWiseReport = () => {
         <div>
           <button
             className={`${styles.bulkdown_button}`}
-            onClick={fetchDownloadDataStoreWise}
+            onClick={() => fetchDownloadDataStoreWise(deviceCategory)}
           >
             <FaDownload /> Bulk Download
           </button>
@@ -383,16 +384,15 @@ const StoreWiseReport = () => {
               <p className="truncate">
                 {techName === "" ? "Select Technician" : techName}
               </p>
-              <FaAngleDown
-                size={17}
-                className={`${techDrop && "rotate-180"}`}
-              />
+              <FaAngleDown size={17} className={`${techDrop && rotateCss}`} />
             </div>
             {techDrop && (
               <div className={`${styles.filter_drop}`}>
                 <div
                   onClick={() => {
-                    setTechName(""), setTechId(""), setTechDrop(false);
+                    setTechName("");
+                    setTechId("");
+                    setTechDrop(false);
                   }}
                   className={`${styles.filter_option}`}
                 >
@@ -422,10 +422,7 @@ const StoreWiseReport = () => {
                   ? "Grest Received ?"
                   : "Grest Rec. " + grestRec}
               </p>
-              <FaAngleDown
-                size={17}
-                className={`${grestDrop && "rotate-180"}`}
-              />
+              <FaAngleDown size={17} className={`${grestDrop && rotateCss}`} />
             </div>
             {grestDrop && (
               <div className={`${styles.filter_drop}`}>
@@ -460,10 +457,7 @@ const StoreWiseReport = () => {
               <p className="truncate">
                 {region === "" ? "Select Region" : region}
               </p>
-              <FaAngleDown
-                size={17}
-                className={`${regionDrop && "rotate-180"}`}
-              />
+              <FaAngleDown size={17} className={`${regionDrop && rotateCss}`} />
             </div>
             {regionDrop && (
               <div className={`${styles.filter_drop}`}>
@@ -489,10 +483,7 @@ const StoreWiseReport = () => {
               <p className="truncate">
                 {storeName === "" ? "Select Store" : storeName}
               </p>
-              <FaAngleDown
-                size={17}
-                className={`${storeDrop && "rotate-180"}`}
-              />
+              <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
             </div>
             {storeDrop && (
               <div

@@ -7,11 +7,10 @@ import { MdOutlineMailLock } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import OtpInput from "otp-input-react";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { IoEye } from "react-icons/io5";
-import { IoEyeOffSharp } from "react-icons/io5";
+import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 
-const PasswordRecovery = () => {
+const ForgetPassword = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState("email");
@@ -19,52 +18,40 @@ const PasswordRecovery = () => {
   const [change, setChange] = useState(1);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showUserPassword, setShowUserPassword] = useState(false);
-  const [showUserPassword2, setShowUserPassword2] = useState(false);
   const navigate = useNavigate();
+
   const handleEmailSubmit = (event) => {
+    setIsLoading(true);
     event.preventDefault();
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email address");
-    } else {
-      setIsLoading(true);
-      event.preventDefault();
-      const data = {
-        email: email,
-      };
-
-      axios
-        .post(
-          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/users/sendOTP`,
-          data
-        )
-        .then((response) => {
-          toast.success("OTP sent");
-          setStep("otp");
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          toast.error("failed to sent OTP");
-          console.error(error);
-          setIsLoading(false);
-        });
-    }
+    const data = {
+      email: email,
+    };
+    axios
+      .post(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/users/sendOTP`,
+        data
+      )
+      .then((response) => {
+        toast.success("OTP sent");
+        setStep("otp");
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        toast.error("failed to sent OTP");
+        console.error(error);
+        setIsLoading(false);
+      });
   };
 
-  //for verfiy otp
   const handleOtpSubmit = async (event) => {
     setIsLoading(true);
     event.preventDefault();
-
     const data = {
       email: email,
       otp: otp,
     };
-
     try {
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/users/verifyEmailOtp`,
         data
       );
@@ -81,25 +68,20 @@ const PasswordRecovery = () => {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
-
   const handleConfirmPasswordChange = (event) => {
     setConfirmPassword(event.target.value);
   };
 
-  //set password
-
   const handleSubmit = async (event) => {
-    setIsLoading(true);
     event.preventDefault();
     if (password !== confirmPassword) {
-      setIsLoading(false);
       alert("Passwords do not match!");
     } else {
+      setIsLoading(true);
       const data = {
         email: email,
         newPassword: password,
       };
-
       try {
         const response = await axios.post(
           `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/users/reset/Password`,
@@ -129,7 +111,7 @@ const PasswordRecovery = () => {
           <div className="underline"></div>
         </div>
         <div className="innerbox">
-          {change == 1 && step === "email" ? (
+          {change === 1 && step === "email" ? (
             <div className="flex flex-col items-center w-full gap-6">
               <div>
                 <p className="mt-5 font-bold text-center opacity-60">
@@ -154,6 +136,7 @@ const PasswordRecovery = () => {
                       name="email"
                       type="email"
                       autoComplete="email"
+                      minLength={5}
                       required
                       placeholder="Enter email address"
                       value={email}
@@ -161,11 +144,10 @@ const PasswordRecovery = () => {
                     />
                   </div>
                 </div>
-
                 <div className="mb-6 login_button_holder">
                   <button
                     type="submit"
-                    className={`login_button ${isLoading && "opacity-[.8]"}`}
+                    className={`login_button ${isLoading && "opacity-[0.8]"}`}
                     disabled={isLoading}
                   >
                     {isLoading && (
@@ -183,134 +165,30 @@ const PasswordRecovery = () => {
               </form>
             </div>
           ) : (
-            change != 2 && (
-              <div className="flex flex-col items-center w-full gap-6">
-                <div>
-                  <p className="mt-5 font-bold text-center opacity-60">
-                    Enter OTP to verify email address
-                  </p>
-                </div>
-                <form
-                  className="flex flex-col w-full gap-6"
-                  onSubmit={handleOtpSubmit}
-                >
-                  <input type="hidden" name="remember" value="true" />
-                  <div className="">
-                    <div className="flex flex-col items-center ml-3">
-                      <OtpInput
-                        value={otp}
-                        onChange={setOtp}
-                        OTPLength={6}
-                        otpType="number"
-                        disabled={false}
-                        autoFocus
-                        inputStyles={{
-                          border: "2px solid #EC2752",
-                          borderRadius: ".55rem",
-                          outline: "none",
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mb-6 login_button_holder">
-                    <button
-                      type="submit"
-                      className={`login_button ${isLoading && "opacity-[.8]"}`}
-                      disabled={isLoading}
-                    >
-                      {isLoading && (
-                        <div className="-ml-4 spinner">
-                          <LoadingSpinner />
-                        </div>
-                      )}
-                      {isLoading ? (
-                        <span className="-ml-4">Loading</span>
-                      ) : (
-                        <span>Verify Email</span>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
+            change !== 2 && (
+              <OTPInput
+                isLoading={isLoading}
+                handleOtpSubmit={handleOtpSubmit}
+                otp={otp}
+                setOtp={setOtp}
+              />
             )
           )}
-
-          {change == 2 && (
+          {change === 2 && (
             <div className="flex flex-col items-center w-full gap-6">
               <div>
                 <p className="mt-5 font-bold text-center opacity-60">
                   Create new password
                 </p>
               </div>
-              <form
-                onSubmit={handleSubmit}
-                className="flex flex-col w-full gap-6"
-              >
-                <input type="hidden" name="remember" value="true" />
-                <div className="flex flex-col gap-6">
-                  <div className="relative input">
-                    <RiLockPasswordLine
-                      size={25}
-                      style={{ margin: "0px 10px", color: "#EC2752" }}
-                    />
-                    <input
-                      id="password"
-                      name="password"
-                      type={showUserPassword ? "text" : "password"}
-                      required
-                      placeholder="New Password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                    />
-                    <span
-                      onClick={() => setShowUserPassword(!showUserPassword)}
-                      className="absolute transform -translate-y-1/2 cursor-pointer right-2 top-6"
-                    >
-                      {!showUserPassword ? <IoEyeOffSharp /> : <IoEye />}
-                    </span>
-                  </div>
-                  <div className="relative input">
-                    <RiLockPasswordLine
-                      size={25}
-                      style={{ margin: "0px 10px", color: "#EC2752" }}
-                    />
-                    <input
-                      id="confirm-password"
-                      name="confirmPassword"
-                      type={showUserPassword2 ? "text" : "password"}
-                      required
-                      placeholder="Confirm Password"
-                      value={confirmPassword}
-                      onChange={handleConfirmPasswordChange}
-                    />
-                    <span
-                      onClick={() => setShowUserPassword2(!showUserPassword2)}
-                      className="absolute transform -translate-y-1/2 cursor-pointer right-2 top-6"
-                    >
-                      {!showUserPassword2 ? <IoEyeOffSharp /> : <IoEye />}
-                    </span>
-                  </div>
-                </div>
-                <div className="mb-6 login_button_holder">
-                  <button
-                    type="submit"
-                    className={`login_button ${isLoading && "opacity-[.8]"}`}
-                    disabled={isLoading}
-                  >
-                    {isLoading && (
-                      <div className="-ml-4 spinner">
-                        <LoadingSpinner />
-                      </div>
-                    )}
-                    {isLoading ? (
-                      <span className="-ml-4">Loading</span>
-                    ) : (
-                      <span>Change Password</span>
-                    )}
-                  </button>
-                </div>
-              </form>
+              <PassConfirm
+                handleSubmit={handleSubmit}
+                password={password}
+                handlePasswordChange={handlePasswordChange}
+                confirmPassword={confirmPassword}
+                handleConfirmPasswordChange={handleConfirmPasswordChange}
+                isLoading={isLoading}
+              />
             </div>
           )}
         </div>
@@ -319,4 +197,137 @@ const PasswordRecovery = () => {
   );
 };
 
-export default PasswordRecovery;
+export default ForgetPassword;
+
+const OTPInput = ({ isLoading, handleOtpSubmit, otp, setOtp }) => {
+  return (
+    <div className="flex flex-col items-center w-full gap-6">
+      <div>
+        <p className="mt-5 font-bold text-center opacity-60">
+          Enter OTP to verify email address
+        </p>
+      </div>
+      <form className="flex flex-col w-full gap-6" onSubmit={handleOtpSubmit}>
+        <input type="hidden" name="remember" value="true" />
+        <div className="">
+          <div className="flex flex-col items-center ml-3">
+            <OtpInput
+              value={otp}
+              onChange={setOtp}
+              OTPLength={6}
+              otpType="number"
+              disabled={false}
+              autoFocus
+              inputStyles={{
+                border: "2px solid #EC2752",
+                borderRadius: ".55rem",
+                outline: "none",
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="mb-6 login_button_holder">
+          <button
+            type="submit"
+            className={`login_button ${isLoading && "opacity-[.8]"}`}
+            disabled={isLoading}
+          >
+            {isLoading && (
+              <div className="-ml-4 spinner">
+                <LoadingSpinner />
+              </div>
+            )}
+            {isLoading ? (
+              <span className="-ml-4">Loading</span>
+            ) : (
+              <span>Verify Email</span>
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+const PassConfirm = ({
+  handleSubmit,
+  password,
+  handlePasswordChange,
+  confirmPassword,
+  handleConfirmPasswordChange,
+  isLoading,
+}) => {
+  const [showUserPassword, setShowUserPassword] = useState(false);
+  const [showUserPassword2, setShowUserPassword2] = useState(false);
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col w-full gap-6">
+      <input type="hidden" name="remember" value="true" />
+      <div className="flex flex-col gap-6">
+        <div className="relative input">
+          <RiLockPasswordLine
+            size={25}
+            style={{ margin: "0px 10px", color: "#EC2752" }}
+          />
+          <input
+            minLength={6}
+            id="password"
+            name="password"
+            type={showUserPassword ? "text" : "password"}
+            required
+            placeholder="New Password"
+            value={password}
+            onChange={handlePasswordChange}
+          />
+          <span
+            onClick={() => setShowUserPassword(!showUserPassword)}
+            className="absolute transform -translate-y-1/2 cursor-pointer right-2 top-6"
+          >
+            {!showUserPassword ? <IoEyeOffSharp /> : <IoEye />}
+          </span>
+        </div>
+        <div className="relative input">
+          <RiLockPasswordLine
+            size={25}
+            style={{ margin: "0px 10px", color: "#EC2752" }}
+          />
+          <input
+            minLength={6}
+            id="confirm-password"
+            name="confirmPassword"
+            type={showUserPassword2 ? "text" : "password"}
+            required
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={handleConfirmPasswordChange}
+          />
+          <span
+            onClick={() => setShowUserPassword2(!showUserPassword2)}
+            className="absolute transform -translate-y-1/2 cursor-pointer right-2 top-6"
+          >
+            {!showUserPassword2 ? <IoEyeOffSharp /> : <IoEye />}
+          </span>
+        </div>
+      </div>
+      <div className="mb-6 login_button_holder">
+        <button
+          type="submit"
+          className={`login_button ${isLoading && "opacity-[.8]"}`}
+          disabled={isLoading}
+        >
+          {isLoading && (
+            <div className="-ml-4 spinner">
+              <LoadingSpinner />
+            </div>
+          )}
+          {isLoading ? (
+            <span className="-ml-4">Loading</span>
+          ) : (
+            <span>Change Password</span>
+          )}
+        </button>
+      </div>
+    </form>
+  );
+};

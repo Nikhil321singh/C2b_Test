@@ -1,44 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { FaRegUser } from "react-icons/fa";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
-import unicorn from "../../assets/unicorn.png";
 import FAQ from "../../components/FAQ";
 import styles from "./SelectModel.module.css";
-import User_Logo from "../../assets/User_Logo.jpg";
 import { useNavigate } from "react-router";
-import mobileLogo from "../../assets/mobile-logo.png";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
-import { resetState } from "../../store/slices/QNAslice";
 import store from "../../store/store";
 import { useQuestionContext } from "../../components/QuestionContext";
 import apple_watch from "../../assets/apple_watch.png";
 
+const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
+const phoneFrontPhoto =
+  phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
+const Device = sessionStorage.getItem("DeviceType");
+const DummyImg =
+  Device === "Mobile"
+    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
+    : apple_watch;
+
 const SelectModel = () => {
-  const [userName, setUserName] = useState();
   const [modelData, setModelData] = useState();
   const { resetState } = useQuestionContext();
-  const [phoneFrontPhoto, setPhoneFrontPhoto] = useState(() => {
-    const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-    return (
-      phoneImg.models?.phonePhotos?.front ||
-      phoneImg.models?.phonePhotos?.upFront
-    );
-  });
-  const [selectedModalDetails, setSelectedModalDetails] = useState(() => {
-    const modelConfigData = JSON.parse(
-      sessionStorage.getItem("dataModelConfig")
-    );
-    return modelConfigData
-      ? { ...modelConfigData, selectedConfig: modelConfigData.config[0] }
-      : null;
-  });
-
-  //for making dummmy image
-  const Device = sessionStorage.getItem("DeviceType");
-  const Dummy_img =
-    Device === "Mobile"
-      ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-      : apple_watch;
   const [selectedConfig, setSelectedConfig] = useState(() => {
     const modelConfigData = JSON.parse(
       sessionStorage.getItem("dataModelConfig")
@@ -49,9 +30,6 @@ const SelectModel = () => {
 
   const navigate = useNavigate();
   useEffect(() => {
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    setUserName(LoggedInUser?.name);
-
     const data = JSON.parse(sessionStorage.getItem("dataModel"));
     setModelData(data);
     const modelConfigData = JSON.parse(
@@ -64,10 +42,6 @@ const SelectModel = () => {
 
   const handleConfigClick = (configItem) => {
     setSelectedConfig(configItem);
-    setSelectedModalDetails((prevDetails) => ({
-      ...prevDetails,
-      selectedConfig: configItem,
-    }));
   };
 
   const handleExactValue = () => {
@@ -125,24 +99,12 @@ const SelectModel = () => {
       </div>
 
       <div className={styles.select_model_wrap}>
-        {/* <div className={styles.mobile_card}>
-          <img
-            className=""
-            src={
-              phoneFrontPhoto
-                ? phoneFrontPhoto
-                : "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-            }
-            alt=""
-          />
-        </div> */}
         <div className={`flex flex-col ${styles.product_details_wrap}`}>
           <div className={` ${styles.modelCard}`}>
             <div className={` ${styles.mobile_img_wrap}`}>
               <img
                 className="max-w-[128px] max-h-[130px]"
-                src={phoneFrontPhoto ? phoneFrontPhoto : Dummy_img}
-                // src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmjX4AzMXjxyVKyfHZNlt877tnGHoEoDqOlA&usqp=CAU"
+                src={phoneFrontPhoto ? phoneFrontPhoto : DummyImg}
                 alt=""
               />
             </div>
@@ -206,40 +168,7 @@ const SelectModel = () => {
               diagnosis by our experts.
             </p>
           </div>
-          {/* <div className="my-2">
-            <p className="mx-2 my-2 text-3xl font-medium">Product Details</p>
 
-            {selectedModalDetails && (
-              <div
-                className={`${styles.table} font-medium border-2 w-[22rem] mx-2 sm:w-[500px] `}
-              >
-                <div className="flex p-1 bg-gray-200 border-2">
-                  <p>Core</p>
-                  <p className="w-1/2 text-gray-600">
-                    {selectedModalDetails?.core}
-                  </p>
-                </div>
-                <div className="flex p-1">
-                  <p>Back Camera</p>
-                  <p className="w-1/2 text-gray-600">
-                    {selectedModalDetails?.back_camera}
-                  </p>
-                </div>
-                <div className="flex p-1 bg-gray-200 border-2">
-                  <p className={`w-1/2`}>Storage</p>
-                  <p className="w-1/2 text-gray-600">
-                    {selectedModalDetails?.selectedConfig?.storage}
-                  </p>
-                </div>
-                <div className="flex p-1">
-                  <p>Chipset</p>
-                  <p className="w-1/2 text-gray-600">
-                    {selectedModalDetails?.chipset}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div> */}
           <div className="mx-2 mt-2">
             <div className="text-[#EC2752] font-semibold text-2xl mb-2">
               FAQ's
@@ -248,26 +177,6 @@ const SelectModel = () => {
           </div>
         </div>
       </div>
-      {/* coupons */}
-
-      {/* <div className=" bg-gradient-to-br from-[#f6cbd7] to-[#dd6887]  max-w-[400px] text-white rounded-md mx-4 px-2 py-4 ">
-        <div></div>
-        <div className="flex items-center justify-between gap-1">
-          <div className="rounded-full bg-white flex items-center justify-center border-2 h-[70px] w-[70px]">
-            <img className="w-[75%]" src={unicorn} alt="" />
-          </div>
-          <div className="">
-            <p className="font-bold  w-[80px] text-xl relative ]">GRU250</p>
-            <p className="text-sm pl-1 w-[160px] font-medium">
-              Unlock a ₹250 Bonus on Your Old Mobile Phone Trade-In!
-            </p>
-          </div>
-          <div className="border-l-2 h-[80px]"></div>
-          <div className="h-[80px] w-[80px] p-2 font-bold text-[20px] text-center">
-            <p className="">Grab Offer</p>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 };

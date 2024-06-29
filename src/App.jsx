@@ -22,7 +22,7 @@ import AdminLogin from "./pages/AdminLogin";
 import SelectDeviceType from "./pages/SelectDeviceType/SelectDeviceType";
 import SelectDevice from "./pages/SelectDevice/SelectDevice";
 import SelectModel from "./pages/SelectModel/SelectModel";
-import PasswordRecovery from "./pages/ForgetPassword";
+import ForgetPassword from "./pages/ForgetPassword";
 import DeviceQuote from "./pages/DeviceQuote.jsx/DeviceQuote";
 import NewDeviceqs from "./pages/DeviceDetailnew/NewDeviceqs";
 import ProductSold from "./pages/ProductSold";
@@ -111,7 +111,7 @@ function App() {
                 <Route path="/quickquote" element={<QuickQuote />}></Route>
                 <Route
                   path="/PasswordRecovery"
-                  element={<PasswordRecovery />}
+                  element={<ForgetPassword />}
                 ></Route>
                 <Route
                   path="/device/Qestions"

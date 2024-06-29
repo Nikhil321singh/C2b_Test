@@ -13,59 +13,98 @@ import { BeatLoader } from "react-spinners";
 import QuotesCreatedAdminTable from "../../components/QuotesCreatedAdminTable/QuotesCreatedAdminTable";
 import * as XLSX from "xlsx";
 
-const QuotesCreatedAdmin = () => {
-  const [sideMenu, setsideMenu] = useState(false);
-  const [maxPages, setMaxPages] = useState(0);
-  const [tableData, setTableData] = useState();
-  const [currentPage, setCurrentPage] = useState(0);
-  const [pageLimit, setPageLimit] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
-  const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [downloadData, setDownloadData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
-  const [saveparam, setSaveparam] = useState("");
-  const [allStore, setAllStore] = useState([]);
-  const [storeData, setStoreData] = useState([]);
-  const [regionData, setRegionData] = useState([]);
-  const [storeName, setStoreName] = useState("");
-  const [storeDrop, setStoreDrop] = useState(false);
-  const [userName, setUserName] = useState();
-  const [storeId, setStoreId] = useState("");
-  const [region, setRegion] = useState("");
-  const [toDate, setToDate] = useState(null);
-  const [fromDate, setFromDate] = useState(null);
-  const [fromDateDup, setFromDateDup] = useState("2023-01-01");
-  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
-  const getTableData = () => {
-    setIsTableLoaded(true);
+const userToken = sessionStorage.getItem("authToken");
 
-    const userToken = sessionStorage.getItem("authToken");
+const downloadExcelQuotesAdminCreated = (apiData) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
 
-    const queryParams = new URLSearchParams();
-    if (searchValue !== null) {
-      queryParams.append("search", searchValue);
+  const formattedData = apiData.map((item) => {
+    let questionsKeys = "";
+    let index = 1;
+    console.log(item?.lead?.QNA[0]);
+    for (let group in item?.lead?.QNA[0]) {
+      item.lead.QNA[0][group].forEach((qna) => {
+        questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
+        index++;
+      });
     }
+    return {
+      "Date Created": new Date(item.createdAt).toLocaleDateString("en-IN"),
+      "User Name": item.user?.name,
+      "Product Name": item.lead?.model?.name,
+      "Final Price Offered to Custoemr": item.lead?.price,
+      "Unique Id": item.lead?.uniqueCode,
+      "Customer Name": item.lead?.name,
+      "Phone Number": item.lead?.phoneNumber,
+      "Email Id": item.lead?.emailId,
+      "Question/Ans": questionsKeys,
+    };
+  });
 
-    if (storeId !== null) {
-      queryParams.append("store", storeId);
-    }
+  const quotesAdminData = XLSX.utils.json_to_sheet(formattedData);
+  const quotesAdminRes = {
+    Sheets: { data: quotesAdminData },
+    SheetNames: ["data"],
+  };
+  const excelAdminBuffer = XLSX.write(quotesAdminRes, {
+    bookType: "xlsx",
+    type: "array",
+  });
 
-    setSaveparam(queryParams.toString());
+  const dataAdminQuotesCreatedFile = new Blob([excelAdminBuffer], {
+    type: fileType,
+  });
+  saveAs(dataAdminQuotesCreatedFile, "Quotes_Created" + fileExtension);
+};
 
-    const endPoint = `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/prospects/findAll/quotecreated?fromdate=${fromDateDup}&todate=${toDateDup}&search${searchValue}&store=${storeId}`;
-
-    axios
-      .get(endPoint, {
+const fetchDownloadData = () => {
+  axios
+    .get(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/prospects/findAll/quotecreated`,
+      {
         headers: {
           authorization: `${userToken}`,
         },
-      })
+      }
+    )
+    .then((res) => {
+      downloadExcelQuotesAdminCreated(res.data.data.quoteData.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const QuotesCreatedAdmin = () => {
+  const [sideMenu, setsideMenu] = useState(false);
+  const [tableData, setTableData] = useState();
+  const [isTableLoaded, setIsTableLoaded] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [storeData, setStoreData] = useState([]);
+  const [storeName, setStoreName] = useState("");
+  const [storeDrop, setStoreDrop] = useState(false);
+  const [storeId, setStoreId] = useState("");
+  const [toDate, setToDate] = useState(null);
+  const [fromDate, setFromDate] = useState(null);
+  const [fromDateDup, setFromDateDup] = useState("2023-01-01");
+  const [toDateDup, setToDateDup] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+
+  const getTableData = () => {
+    setIsTableLoaded(true);
+    axios
+      .get(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/prospects/findAll/quotecreated?fromdate=${fromDateDup}&todate=${toDateDup}&search${searchValue}&store=${storeId}`,
+        { headers: { authorization: userToken } }
+      )
       .then((res) => {
-        setMaxPages(Math.ceil(res.data.data.quoteData.count / 10));
-        setTotalCount(res.data.data.quoteData.count);
-        console.log("resaaa", res.data.data.quoteData.data);
         setTableData(res.data.data.quoteData.data);
         setIsTableLoaded(false);
       })
@@ -77,33 +116,21 @@ const QuotesCreatedAdmin = () => {
 
   const getStore = () => {
     setIsTableLoaded(true);
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    const token = sessionStorage.getItem("authToken");
-    setUserName(LoggedInUser?.name);
-
     let config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/store/findAll?page=0&limit=9999`,
-      headers: { Authorization: token },
+      headers: { Authorization: userToken },
     };
-
     axios
       .request(config)
       .then((response) => {
-        const allData = response.data.result;
         const storeNamesArray = response.data.result.map((store) => ({
           storeName: store.storeName,
           _id: store._id,
         }));
-        const uniqueRegionsArray = [
-          ...new Set(response.data.result.map((store) => store.region)),
-        ];
-        console.log(storeNamesArray);
-        setAllStore(allData);
         setStoreData(storeNamesArray);
-        setRegionData(uniqueRegionsArray);
         setIsTableLoaded(false);
       })
       .catch((error) => {
@@ -135,76 +162,8 @@ const QuotesCreatedAdmin = () => {
     getTableData();
   }, []);
 
-  const downloadExcelQuotesAdminCreated = (apiData) => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = apiData.map((item) => {
-      let questionsKeys = "";
-      let index = 1;
-      console.log(item?.lead?.QNA[0]);
-      for (let group in item?.lead?.QNA[0]) {
-        item.lead.QNA[0][group].forEach((qna) => {
-          questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
-          index++;
-        });
-      }
-      return {
-        "Date Created": new Date(item.createdAt).toLocaleDateString("en-IN"),
-        "User Name": item.user?.name,
-        "Product Name": item.lead?.model?.name,
-        "Final Price Offered to Custoemr": item.lead?.price,
-        "Unique Id": item.lead?.uniqueCode,
-        "Customer Name": item.lead?.name,
-        "Phone Number": item.lead?.phoneNumber,
-        "Email Id": item.lead?.emailId,
-        "Question/Ans": questionsKeys,
-      };
-    });
-
-    const quotesAdminData = XLSX.utils.json_to_sheet(formattedData);
-    const quotesAdminRes = {
-      Sheets: { data: quotesAdminData },
-      SheetNames: ["data"],
-    };
-    const excelAdminBuffer = XLSX.write(quotesAdminRes, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    const dataAdminQuotesCreatedFile = new Blob([excelAdminBuffer], {
-      type: fileType,
-    });
-    saveAs(dataAdminQuotesCreatedFile, "Quotes_Created" + fileExtension);
-  };
-
-  const fetchDownloadData = () => {
-    const userToken = sessionStorage.getItem("authToken");
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll/quotecreated`,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        setDownloadData(res.data.data.quoteData.data);
-        downloadExcelQuotesAdminCreated(res.data.data.quoteData.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore.filter((store) => store._id === value._id);
-    const newRegion = filteredStores[0].region;
-    setRegion(newRegion);
     setStoreName(value.storeName);
     setStoreId(value._id);
   };
@@ -219,8 +178,8 @@ const QuotesCreatedAdmin = () => {
         .split("T")[0];
       setFromDateDup(formattedDate);
     }
-    console.log("from", date);
   };
+
   const handleToDateChange = (date) => {
     if (date !== null) {
       setToDate(date);
@@ -231,7 +190,6 @@ const QuotesCreatedAdmin = () => {
         .split("T")[0];
       setToDateDup(formattedDate);
     }
-    console.log("to", date);
   };
 
   return (
@@ -245,7 +203,6 @@ const QuotesCreatedAdmin = () => {
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
-
       <NavigateListing />
       <div className="flex gap-2 mx-2 items-center justify-center outline-none mt-5 w-[100%]">
         <div className={`${styles.search_bar_wrap}`}>
@@ -267,7 +224,6 @@ const QuotesCreatedAdmin = () => {
         >
           <FaDownload /> Bulk Download
         </button>
-
         <div className="[bg-[#F5F4F9]">
           <DatePicker
             selected={fromDate}
@@ -286,7 +242,6 @@ const QuotesCreatedAdmin = () => {
             placeholderText="Select to date"
           />
         </div>
-
         <div className="relative w-[250px]">
           <div
             className={`${styles.filter_button}`}
@@ -316,10 +271,7 @@ const QuotesCreatedAdmin = () => {
           )}
         </div>
       </div>
-      <QuotesCreatedAdminTable
-        tableData={tableData}
-        currentPage={currentPage}
-      />
+      <QuotesCreatedAdminTable tableData={tableData} currentPage={0} />
     </div>
   );
 };

@@ -20,7 +20,7 @@ const qnaSlice = createSlice({
       state[group] = answers;
     },
     updateCoreObject: (state, action) => {
-      const { index, noKey, yesKey, newKey, selectedIndex } = action.payload;
+      const { index, noKey, yesKey, selectedIndex } = action.payload;
       let loopEntered = false;
       state.Core[index].selected[selectedIndex] =
         !state.Core[index].selected[selectedIndex];
@@ -42,12 +42,7 @@ const qnaSlice = createSlice({
       }
     },
     updateCosmeticsObject: (state, action) => {
-      // const { index, newAnswer, newKey } = action.payload;
-      // if (state.Cosmetics[index]) {
-      //   state.Cosmetics[index].answer = newAnswer;
-      //   state.Cosmetics[index].key = newKey;
-      // }
-      const { index, noKey, yesKey, newKey, selectedIndex } = action.payload;
+      const { index, noKey, yesKey, selectedIndex } = action.payload;
       let loopEntered = false;
       state.Cosmetics[index].selected[selectedIndex] =
         !state.Cosmetics[index].selected[selectedIndex];
@@ -69,12 +64,7 @@ const qnaSlice = createSlice({
       }
     },
     updateDisplayObject: (state, action) => {
-      // const { index, newAnswer, newKey } = action.payload;
-      // if (state.Display[index]) {
-      //   state.Display[index].answer = newAnswer;
-      //   state.Display[index].key = newKey;
-      // }
-      const { index, noKey, yesKey, newKey, selectedIndex } = action.payload;
+      const { index, noKey, yesKey, selectedIndex } = action.payload;
       let loopEntered = false;
       state.Display[index].selected[selectedIndex] =
         !state.Display[index].selected[selectedIndex];
@@ -96,12 +86,7 @@ const qnaSlice = createSlice({
       }
     },
     updateFunctionalMajorObject: (state, action) => {
-      // const { index, newAnswer, newKey } = action.payload;
-      // if (state.Functional_major[index]) {
-      //   state.Functional_major[index].answer = newAnswer;
-      //   state.Functional_major[index].key = newKey;
-      // }
-      const { index, noKey, yesKey, newKey, selectedIndex } = action.payload;
+      const { index, noKey, yesKey, selectedIndex } = action.payload;
       let loopEntered = false;
       state.Functional_major[index].selected[selectedIndex] =
         !state.Functional_major[index].selected[selectedIndex];
@@ -123,12 +108,7 @@ const qnaSlice = createSlice({
       }
     },
     updateFunctionalMinorObject: (state, action) => {
-      // const { index, newAnswer, newKey } = action.payload;
-      // if (state.Functional_minor[index]) {
-      //   state.Functional_minor[index].answer = newAnswer;
-      //   state.Functional_minor[index].key = newKey;
-      // }
-      const { index, noKey, yesKey, newKey, selectedIndex } = action.payload;
+      const { index, noKey, yesKey, selectedIndex } = action.payload;
       let loopEntered = false;
       state.Functional_minor[index].selected[selectedIndex] =
         !state.Functional_minor[index].selected[selectedIndex];
@@ -179,6 +159,8 @@ const qnaSlice = createSlice({
     resetState: (state, action) => {
       if (action.type === "RESET_STATE") {
         return initialState;
+      } else {
+        return state;
       }
     },
   },
