@@ -14,41 +14,95 @@ import { IoMdSearch } from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
 import styless from "../pages/QuotesCreatedAdmin/QuotesCreatedAdmin.module.css";
 
+const getStore = async () => {
+  const token = sessionStorage.getItem("authToken");
+  const config = {
+    method: "get",
+    url: `${
+      import.meta.env.VITE_REACT_APP_ENDPOINT
+    }/api/store/findAll?page=0&limit=9999`,
+    headers: { Authorization: token },
+  };
+  let storeNamesArray = [];
+  await axios
+    .request(config)
+    .then((response) => {
+      console.log(response.data.result);
+      storeNamesArray = response.data.result.map((store1) => ({
+        storeName: store1.storeName,
+        _id: store1._id,
+      }));
+      console.log(storeNamesArray);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  return storeNamesArray;
+};
+
+const downloadExcelCustomerTable = (apiData) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+
+  const formattedData = apiData.map((item) => {
+    let questionsKeys = "";
+    let index = 1;
+    console.log(item?.lead?.QNA[0]);
+    for (const group in item?.lead?.QNA[0]) {
+      item.lead.QNA[0][group].forEach((qna) => {
+        questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
+        index++;
+      });
+    }
+    return {
+      "Date Created": new Date(item?.createdAt).toLocaleDateString("en-IN"),
+      "User Name": item?.user?.name,
+      category: item?.lead?.model?.type,
+      "Product Name": item?.lead?.model?.name,
+      Variant: item?.lead?.storage,
+      "Final Price Offered to Customer": item?.lead?.price,
+      "Unique Id": item?.lead?.uniqueCode,
+      "Customer Name": item?.lead?.name,
+      "Phone Number": item?.lead?.phoneNumber,
+      "Email Id": item?.lead?.emailId,
+      "Question/Ans": questionsKeys,
+    };
+  });
+
+  const wsCustomerTable = XLSX.utils.json_to_sheet(formattedData);
+  const wbCustomerTable = {
+    Sheets: { data: wsCustomerTable },
+    SheetNames: ["data"],
+  };
+  const excelBufferCustomerTable = XLSX.write(wbCustomerTable, {
+    bookType: "xlsx",
+    type: "array",
+  });
+
+  const dataFileCustomerTable = new Blob([excelBufferCustomerTable], {
+    type: fileType,
+  });
+  saveAs(dataFileCustomerTable, "Leads_Created" + fileExtension);
+};
+
 const CustomerTable = () => {
   const [tableDataDup, setTableDataDup] = useState([]);
   const [loading, setLoading] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
   const currentSalesPage = 0;
   const salesPageSize = 10;
-  useEffect(() => {
-    const userToken = sessionStorage.getItem("authToken");
-    axios
-      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/users/getAllUsers`, {
-        headers: {
-          authorization: `${userToken}`,
-        },
-      })
-      .then((res) => {
-        console.log(res.data.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
   const [search, setSearch] = useState("");
   const store = "";
   const [fromDate, setFromDate] = useState("");
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
   const [toDate, setToDate] = useState("");
-  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
-
+  const [toDateDup, setToDateDup] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [storeDrop, setStoreDrop] = useState(false);
   const [storeName, setStoreName] = useState("");
   const [storeData, setStoreData] = useState([]);
-  const [allStore, setAllStore] = useState([]);
-  const [regionData, setRegionData] = useState([]);
-  const [region, setRegion] = useState();
 
   useEffect(() => {
     setLoading(true);
@@ -114,55 +168,6 @@ const CustomerTable = () => {
     console.log("to", date);
   };
 
-  const downloadExcelCustomerTable = (apiData) => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = apiData.map((item) => {
-      let questionsKeys = "";
-      let index = 1;
-      console.log(item?.lead?.QNA[0]);
-      for (const group in item?.lead?.QNA[0]) {
-        item.lead.QNA[0][group].forEach((qna) => {
-          questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
-          index++;
-        });
-      }
-
-      const formattedItem = {
-        "Date Created": new Date(item?.createdAt).toLocaleDateString("en-IN"),
-        "User Name": item?.user?.name,
-        category: item?.lead?.model?.type,
-        "Product Name": item?.lead?.model?.name,
-        Variant: item?.lead?.storage,
-        "Final Price Offered to Customer": item?.lead?.price,
-        "Unique Id": item?.lead?.uniqueCode,
-        "Customer Name": item?.lead?.name,
-        "Phone Number": item?.lead?.phoneNumber,
-        "Email Id": item?.lead?.emailId,
-        "Question/Ans": questionsKeys,
-      };
-
-      return formattedItem;
-    });
-
-    const wsCustomerTable = XLSX.utils.json_to_sheet(formattedData);
-    const wbCustomerTable = {
-      Sheets: { data: wsCustomerTable },
-      SheetNames: ["data"],
-    };
-    const excelBufferCustomerTable = XLSX.write(wbCustomerTable, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    const dataFileCustomerTable = new Blob([excelBufferCustomerTable], {
-      type: fileType,
-    });
-    saveAs(dataFileCustomerTable, "Leads_Created" + fileExtension);
-  };
-
   const fetchDownloadDataCustomerTable = () => {
     const userToken = sessionStorage.getItem("authToken");
     axios
@@ -183,50 +188,20 @@ const CustomerTable = () => {
         console.log(err);
       });
   };
-
-  const getStore = () => {
-    const token = sessionStorage.getItem("authToken");
-
-    const config = {
-      method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=0&limit=9999`,
-      headers: { Authorization: token },
-    };
-
-    axios
-      .request(config)
-      .then((response) => {
-        console.log(response.data.result);
-        const allData = response.data.result;
-        const storeNamesArray = response.data.result.map((store) => ({
-          storeName: store.storeName,
-          _id: store._id,
-        }));
-        const uniqueRegionsArray = [
-          ...new Set(response.data.result.map((store) => store.region)),
-        ];
-        setAllStore(allData);
-        setStoreData(storeNamesArray);
-        setRegionData(uniqueRegionsArray);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore.filter((store) => store._id === value._id);
-    const newRegion = filteredStores[0].region;
-    setRegion(newRegion);
     setStoreName(value.storeName);
   };
 
+  const saveStore = async () => {
+    const temparr = await getStore();
+    setStoreData(temparr);
+  };
+
   useEffect(() => {
-    getStore();
+    saveStore();
   }, []);
+
   return (
     <div>
       {loading && (
@@ -234,12 +209,10 @@ const CustomerTable = () => {
           <BeatLoader color={"#EC2752"} loading={loading} size={15} />
         </div>
       )}
-
       <div className="navbar">
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
-
       <NavigateListing />
       <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
         <div className={`${styles.search_bar_wrap}`}>
@@ -261,7 +234,6 @@ const CustomerTable = () => {
         >
           <FaDownload /> Bulk Download
         </button>
-
         <div className="[bg-[#F5F4F9]">
           <DatePicker
             selected={fromDate}
@@ -280,7 +252,6 @@ const CustomerTable = () => {
             placeholderText="Select to date"
           />
         </div>
-
         <div className="relative w-[250px]">
           <div
             className={`${styless.filter_button}`}
@@ -310,7 +281,6 @@ const CustomerTable = () => {
           )}
         </div>
       </div>
-
       <UserTable data={tableDataDup} />
     </div>
   );

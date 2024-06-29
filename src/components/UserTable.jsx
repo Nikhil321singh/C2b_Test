@@ -7,20 +7,24 @@ const UserTable = ({ data }) => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [QNAData, setQNAData] = useState([]);
   const dataIndex = null;
-function getUserFullName(user) {
-  if (!user) return "";
+  function getUserFullName(user) {
+    if (!user){ 
+      return "";
+    }
 
-  if (user.firstName) {
-    return user.lastName
-      ? `${user.firstName} ${user.lastName}`
-      : user.firstName;
+    if (user.firstName) {
+      return user.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : user.firstName;
+    }
+
+    return user.name || "";
   }
 
-  return user.name || "";
-}
-  
   function getDeviceDetails(val) {
-    if (!val || !val.lead || !val.lead.model) return "-";
+    if (!val || !val.lead || !val.lead.model) {
+      return "-";
+    }
 
     if (val.lead.model.type === "Mobile") {
       if (val.lead.ram) {
@@ -85,7 +89,7 @@ function getUserFullName(user) {
                 {val?.lead?.model?.name}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base min-w-[170px]">
-                {getDeviceDetails(val) }
+                {getDeviceDetails(val)}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.lead?.price}

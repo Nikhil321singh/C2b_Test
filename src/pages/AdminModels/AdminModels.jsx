@@ -69,10 +69,6 @@ const AdminModels = () => {
   const file = null;
   const selectedModel = "";
 
-
-
-   
-  
   function handleNext() {
     navigate("/adminhome");
   }
@@ -225,7 +221,6 @@ const AdminModels = () => {
     saveAs(dataFile, "All_Models_Data" + fileExtension);
   };
 
-  //Bulk upload
   const handleBulkSubmit = (event) => {
     setIsTableLoaded(true);
     event.preventDefault();
@@ -394,7 +389,7 @@ const AdminModels = () => {
       </div>
       <div className={`${styles.pd_cont}`}>
         <AdminModelsTable
-          grestTheme={grestTheme}
+          grestTheme1={grestTheme}
           data={data}
           selectmodel={selectmodel}
           selectstorage={selectstorage}
@@ -409,11 +404,21 @@ const AdminModels = () => {
   );
 };
 
-const AdminModelsTable = ({grestTheme, data, selectmodel, selectstorage, selectram, selectHandler, deleteHandler, category, handleNext}) => {
+const AdminModelsTable = ({
+  grestTheme1,
+  data,
+  selectmodel,
+  selectstorage,
+  selectram,
+  selectHandler,
+  deleteHandler,
+  category,
+  handleNext,
+}) => {
   return (
     <div className="m-2 overflow-x-auto md:m-5">
       <table className="w-full border border-[#EC2752]">
-        <thead className={grestTheme}>
+        <thead className={grestTheme1}>
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Brand</th>
@@ -484,5 +489,5 @@ const AdminModelsTable = ({grestTheme, data, selectmodel, selectstorage, selectr
       </div>
     </div>
   );
-}
+};
 export default AdminModels;

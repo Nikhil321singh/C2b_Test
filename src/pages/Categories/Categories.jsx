@@ -103,16 +103,21 @@ export const DeviceTypeFilter = ({
   );
 };
 
+
+function deviceSetter (DevType) {
+  if(DevType === "Mobile"){
+    return "Mobiles";
+  }else if(DevType === "Laptop"){
+    return "Laptops"
+  }else if(DevType === "Watch"){
+    return "Watches";
+  }
+  return "More";
+}
+
 function Categories() {
   const Device = sessionStorage.getItem("DeviceType");
-  const selBtn =
-    Device === "Mobile"
-      ? "Mobiles"
-      : Device === "Laptop"
-      ? "Laptops"
-      : Device === "Watch"
-      ? "Watches"
-      : "More";
+  const selBtn = deviceSetter(Device);
   const [brandList, setBrandList] = useState([]);
   const [popout, setPopout] = useState(false);
   const userToken = sessionStorage.getItem("authToken");
@@ -135,9 +140,9 @@ function Categories() {
 
   const handleBrandClick = (brandItem) => {
     console.log("morere", deviceType);
-    if (deviceType == "Laptop" || deviceType == undefined) {
+    if (deviceType === "Laptop" || deviceType === undefined) {
       handleDeviceClick();
-    } else if (deviceType == "Watch" && brandItem.name != "Apple") {
+    } else if (deviceType === "Watch" && brandItem.name !== "Apple") {
       handleDeviceClick();
     } else {
       const detail = { brand: brandItem, models: {}, _id: brandItem._id };

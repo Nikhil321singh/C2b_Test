@@ -79,7 +79,6 @@ const Profile = () => {
         }
       );
       if (response.status === 200) {
-        const storedProfile = JSON.parse(sessionStorage.getItem("profile"));
         storedProfile.profileImage = response.data.profileImageLink;
         sessionStorage.setItem("profile", JSON.stringify(storedProfile));
         setProfileImage(response.data.profileImageLink);
@@ -113,7 +112,6 @@ const Profile = () => {
         }
       );
       if (response.status === 200) {
-        const storedProfile = JSON.parse(sessionStorage.getItem("profile"));
         storedProfile.profileImage = null;
         sessionStorage.setItem("profile", JSON.stringify(storedProfile));
 

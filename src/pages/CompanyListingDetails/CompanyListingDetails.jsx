@@ -288,7 +288,7 @@ const CompanyListingDetails = () => {
               Confirmation!
             </h6>
             <p className="text-slate-500">
-              Do you want to delete store {" " + selectedCompany + " "} ?
+              ${`Do you want to delete store ${selectedCompany} ?`}
             </p>
             <div className="flex flex-row gap-2">
               <button
@@ -299,7 +299,8 @@ const CompanyListingDetails = () => {
               </button>
               <button
                 onClick={() => {
-                  setConfBox(false), setIsTableLoading(false);
+                  setConfBox(false);
+                  setIsTableLoading(false);
                 }}
                 className="bg-white text-[#EC2752]"
               >

@@ -4,16 +4,23 @@ import SideMenu from "../../components/SideMenu";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import toast from "react-hot-toast";
+const navViewOfferr = "/viewofferdetail";
+
+const storedItem = JSON.parse(sessionStorage.getItem("rowData")) || {};
+const item = storedItem;
+const authToken = sessionStorage.getItem("authToken");
+const offerArray = [
+  { id: "GRU1000", label: "GRU1000" },
+  { id: "GRU1000", label: "GRU1000" },
+  { id: "GRU2000", label: "GRU2000" },
+  { id: "GRU700", label: "GRU700" },
+  { id: "GRU900", label: "GRU900" },
+];
 
 const Offers = () => {
   const [sideMenu, setsideMenu] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(true);
   const navigate = useNavigate();
-
-  const [item, setItem] = useState({});
-  console.log(item);
-
   const [offerName, setOfferName] = useState(
     item?.offerName ? item?.offerName : ""
   );
@@ -28,8 +35,6 @@ const Offers = () => {
   };
 
   const getData = () => {
-    const authToken = sessionStorage.getItem("authToken");
-
     const data = {
       offerName: offerName,
       price: price,
@@ -38,9 +43,8 @@ const Offers = () => {
       createdBy: createdBy,
       warranty: warranty,
     };
-
     if (item && item.editoffer) {
-      let config = {
+      const config = {
         method: "put",
         maxBodyLength: Infinity,
         url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/offer/edit/${
@@ -49,7 +53,6 @@ const Offers = () => {
         data,
         headers: { authorization: authToken },
       };
-
       axios
         .request(config)
         .then((response) => {
@@ -61,14 +64,14 @@ const Offers = () => {
           setValidTo("");
           setCreatedBy("");
           setWarranty(true);
-          navigate("/viewofferdetail");
+          navigate(navViewOfferr);
         })
         .catch((error) => {
           console.log(error);
           toast.error("Failed to updated offer details");
         });
     } else {
-      let config = {
+      const config = {
         method: "post",
         maxBodyLength: Infinity,
         url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/offer/create`,
@@ -80,7 +83,7 @@ const Offers = () => {
         .request(config)
         .then((response) => {
           toast.success("Successfully created offer");
-          navigate("/viewofferdetail");
+          navigate(navViewOfferr);
         })
         .catch((error) => {
           console.log(error);
@@ -91,26 +94,19 @@ const Offers = () => {
 
   const handleOffer = (e) => {
     e.preventDefault();
-
     getData();
   };
-
-  useEffect(() => {
-    const storedItem = JSON.parse(sessionStorage.getItem("rowData"));
-    setItem(storedItem);
-  }, []);
 
   useEffect(() => {
     if (item) {
       const date = new Date(item.validFrom);
       const year = date.getFullYear();
-      const month = ("0" + (date.getMonth() + 1)).slice(-2); // Months are 0-indexed in JavaScript
-      const day = ("0" + date.getDate()).slice(-2);
-
+      const month = `0${date.getMonth() + 1}`.slice(-2); // Months are 0-indexed in JavaScript
+      const day = `0${date.getDate()}`.slice(-2);
       const dateto = new Date(item.validTo);
       const yearto = dateto.getFullYear();
-      const monthto = ("0" + (dateto.getMonth() + 1)).slice(-2); // Months are 0-indexed in JavaScript
-      const dayto = ("0" + dateto.getDate()).slice(-2);
+      const monthto = `0${dateto.getMonth() + 1}`.slice(-2); // Months are 0-indexed in JavaScript
+      const dayto = `0${dateto.getDate()}`.slice(-2);
 
       setOfferName(item.offerName || "");
       setPrice(item.price || 0);
@@ -143,7 +139,7 @@ const Offers = () => {
 
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <button
-              onClick={() => navigate("/viewofferdetail")}
+              onClick={() => navigate(navViewOfferr)}
               className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
             >
               View Detail
@@ -251,56 +247,23 @@ const Offers = () => {
               ></div>
               <div className="bg-white p-8 rounded-lg z-10">
                 <div className="flex flex-col gap-2">
-                  <div className="flex gap-4 items-center justify-between">
-                    <p className="text-xl font-medium min-w-[80px] ">GRU1000</p>
-                    <select className="bg-gray-200  font-medium rounded-lg p-2 outline-none">
-                      <option value="">Choose Action</option>
-                      <option value="">View</option>
-                      <option value="">Edit</option>
-                      <option value="">Delete</option>
-                      <option value="">Download</option>
-                    </select>
-                  </div>
-                  <div className="flex gap-4 items-center justify-between">
-                    <p className="text-xl font-medium min-w-[80px]">GRU1000</p>
-                    <select className="bg-gray-200 font-medium rounded-lg p-2 outline-none">
-                      <option value="">Choose Action</option>
-                      <option value="">View</option>
-                      <option value="">Edit</option>
-                      <option value="">Delete</option>
-                      <option value="">Download</option>
-                    </select>
-                  </div>
-                  <div className="flex gap-4 items-center justify-between">
-                    <p className="text-xl font-medium min-w-[80px]">GRU2000</p>
-                    <select className="bg-gray-200 font-medium rounded-lg p-2 outline-none">
-                      <option value="">Choose Action</option>
-                      <option value="">View</option>
-                      <option value="">Edit</option>
-                      <option value="">Delete</option>
-                      <option value="">Download</option>
-                    </select>
-                  </div>
-                  <div className="flex gap-4 items-center justify-between">
-                    <p className="text-xl font-medium min-w-[80px]">GRU700</p>
-                    <select className="bg-gray-200 font-medium rounded-lg p-2 outline-none">
-                      <option value="">Choose Action</option>
-                      <option value="">View</option>
-                      <option value="">Edit</option>
-                      <option value="">Delete</option>
-                      <option value="">Download</option>
-                    </select>
-                  </div>
-                  <div className="flex gap-4 items-center justify-between">
-                    <p className="text-xl font-medium min-w-[80px]">GRU900</p>
-                    <select className="bg-gray-200 font-medium rounded-lg p-2 outline-none">
-                      <option value="">Choose Action</option>
-                      <option value="">View</option>
-                      <option value="">Edit</option>
-                      <option value="">Delete</option>
-                      <option value="">Download</option>
-                    </select>
-                  </div>
+                  {offerArray.map((item, offerIndex) => (
+                    <div
+                      key={offerIndex}
+                      className="flex gap-4 items-center justify-between"
+                    >
+                      <p className="text-xl font-medium min-w-[80px]">
+                        {item.label}
+                      </p>
+                      <select className="bg-gray-200 font-medium rounded-lg p-2 outline-none">
+                        <option value="">Choose Action</option>
+                        <option value="">View</option>
+                        <option value="">Edit</option>
+                        <option value="">Delete</option>
+                        <option value="">Download</option>
+                      </select>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

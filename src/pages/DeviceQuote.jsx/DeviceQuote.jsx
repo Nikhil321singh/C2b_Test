@@ -9,6 +9,18 @@ import DeviceReport from "../../components/DeviceReport/DeviceReport";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import apple_watch from "../../assets/apple_watch.png";
 
+const Device = sessionStorage.getItem("DeviceType");
+const DummyImg =
+  Device === "Mobile"
+    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
+    : apple_watch;
+const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
+const phoneFrontPhoto =
+  phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
+const exactQuoteValue = sessionStorage.getItem("ExactQuote");
+const dataModel = JSON.parse(sessionStorage.getItem("dataModel"));
+const deviceModalInfo = dataModel;
+
 const DeviceQuote = () => {
   const [showModal, setShowModal] = useState(false);
   const [continueOTPOpen, setContinueOTPOpen] = useState(false);
@@ -16,20 +28,7 @@ const DeviceQuote = () => {
   const [quoteSaved, setQuoteSaved] = useState(false);
   const [quoteId, setQuoteId] = useState("");
   const [termsChecked, setTermsChecked] = useState(false);
-  const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-  const phoneFrontPhoto =
-    phoneImg.models?.phonePhotos?.front ||
-    phoneImg.models?.phonePhotos?.upFront;
-
-  const exactQuoteValue = sessionStorage.getItem("ExactQuote");
-
-  const Device = sessionStorage.getItem("DeviceType");
-  const Dummy_img =
-    Device === "Mobile"
-      ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-      : apple_watch;
   const Price = useSelector((state) => state.responseData.price);
-  console.log(Price);
   const uniqueCode = useSelector((state) => state.responseData.uniqueCode);
 
   useEffect(() => {
@@ -44,24 +43,11 @@ const DeviceQuote = () => {
     setShowDeviceReport(!showDeviceReport);
   };
 
-  const [deviceModalInfo, selDeviceModalInfo] = useState(() => {
-    const dataModel = JSON.parse(sessionStorage.getItem("dataModel"));
-    return dataModel;
-  });
-
   const navigate = useNavigate();
-
   const toggleModal = () => {
     setShowModal(!showModal);
   };
 
-  const handleReturn = () => {
-    navigate("/selectdevicetype");
-  };
-
-  const handleExactClick = () => {
-    navigate("/device/Qestions");
-  };
   return (
     <div className={`bg-white min-h-screen ${styles.page_wrap}`}>
       {continueOTPOpen && <ContOTP setContinueOTPOpen={setContinueOTPOpen} />}
@@ -90,7 +76,7 @@ const DeviceQuote = () => {
             <div>
               <img
                 className="w-[50px]"
-                src={phoneFrontPhoto ? phoneFrontPhoto : Dummy_img}
+                src={phoneFrontPhoto ? phoneFrontPhoto : DummyImg}
                 alt=""
               />
             </div>
@@ -150,7 +136,7 @@ const DeviceQuote = () => {
           <div className="flex flex-col w-1/2 text-xl font-medium">
             <p>₹{Price}</p>
           </div>
-          {quoteSaved === false && exactQuoteValue === "true" ? (
+          {quoteSaved === false && exactQuoteValue === "true" && (
             <div
               onClick={termsChecked ? continueOTPHandler : undefined}
               className={`${
@@ -159,18 +145,20 @@ const DeviceQuote = () => {
             >
               <p className="font-medium mx-auto text-xl p-[6px] ">Continue</p>
             </div>
-          ) : quoteSaved === false && exactQuoteValue === "false" ? (
+          )}
+          {quoteSaved === false && exactQuoteValue === "false" && (
             <div
-              onClick={handleExactClick}
+              onClick={() => navigate("/device/Qestions")}
               className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
             >
               <p className="p-2 mx-auto text-lg font-medium ">
                 Get Exact Value
               </p>
             </div>
-          ) : (
+          )}
+          {quoteSaved === true && (
             <div
-              onClick={handleReturn}
+              onClick={() => navigate("/selectdevicetype")}
               className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
             >
               <p className="p-2 mx-auto text-lg font-medium ">Return To Home</p>

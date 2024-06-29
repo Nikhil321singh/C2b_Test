@@ -12,15 +12,41 @@ import AdminNavbar from "../Admin_Navbar";
 import SideMenu from "../SideMenu";
 import ProfileBox from "../ProfileBox/ProfileBox";
 
+const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+const userRole = LoggedInUser?.role;
+const token = sessionStorage.getItem("authToken");
+
+const downloadExcel = (pickupData) => {
+  console.log("data down", pickupData);
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+
+  const formattedData = pickupData.map((item) => {
+    return {
+      "Lot Id": item._id,
+      Date: new Date(item.createdAt).toLocaleDateString("en-GB"),
+      Status: item.status,
+      "Total Amount": item.totalAmount,
+      "Total Devices": item.totalDevice,
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(formattedData);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const dataFile = new Blob([excelBuffer], { type: fileType });
+  saveAs(dataFile, "Pickedup_Devices_Lots_Data" + fileExtension);
+};
+
 const PickupHistory = () => {
   const [pickupData, setPickupData] = useState([]);
   const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
-  const [userRole, setUserRole] = useState("");
-  const [storeName, setStoreName] = useState();
-  const [region, setRegion] = useState();
+  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
+  const [region, setRegion] = useState(LoggedInUser?.region);
   const [storeData, setStoreData] = useState([]);
   const [regionData, setRegionData] = useState([]);
   const [regionDrop, setRegionDrop] = useState(false);
@@ -28,17 +54,8 @@ const PickupHistory = () => {
   const [allStore, setAllStore] = useState([]);
   const firsttime = useRef(true);
 
-  useEffect(() => {
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    setStoreName(LoggedInUser?.storeName);
-    setRegion(LoggedInUser?.region);
-    setUserRole(LoggedInUser?.role);
-  }, []);
-
   const getData = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
     const config = {
       method: "get",
       url: `${
@@ -46,7 +63,6 @@ const PickupHistory = () => {
       }/api/pickupDevices/history?region=${region}&storeName=${storeName}`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response) => {
@@ -62,8 +78,6 @@ const PickupHistory = () => {
 
   const getStore = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
     const config = {
       method: "get",
       url: `${
@@ -71,7 +85,6 @@ const PickupHistory = () => {
       }/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response) => {
@@ -126,29 +139,6 @@ const PickupHistory = () => {
     setShowView(true);
   };
 
-  const downloadExcel = () => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = pickupData.map((item) => {
-      return {
-        "Lot Id": item._id,
-        Date: new Date(item.createdAt).toLocaleDateString("en-GB"),
-        Status: item.status,
-        "Total Amount": item.totalAmount,
-        "Total Devices": item.totalDevice,
-      };
-    });
-
-    const ws = XLSX.utils.json_to_sheet(formattedData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-
-    const dataFile = new Blob([excelBuffer], { type: fileType });
-    saveAs(dataFile, "Pickedup_Devices_Lots_Data" + fileExtension);
-  };
-
   return (
     <div>
       {isTableLoaded && (
@@ -170,7 +160,10 @@ const PickupHistory = () => {
         )}
       </div>
       <NavigateTable />
-      <button className={`${styles.bulkdown_button}`} onClick={downloadExcel}>
+      <button
+        className={`${styles.bulkdown_button}`}
+        onClick={() => downloadExcel(pickupData)}
+      >
         <FaDownload /> Bulk Download
       </button>
       <div className="flex m-2 gap-2 w-100 items-center outline-none">
@@ -237,7 +230,6 @@ const PickupHistory = () => {
           </div>
         )}
         <PickupTable pickupData={pickupData} viewHandler={viewHandler} />
-      
       </div>
     </div>
   );

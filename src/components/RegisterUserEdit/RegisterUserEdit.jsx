@@ -2,21 +2,18 @@ import React, { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import axios from "axios";
 import { IoClose } from "react-icons/io5";
+const token = sessionStorage.getItem("authToken");
 
 const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
   const [isGrest, setIsGrest] = useState(userData.grestMember ? "yes" : "no");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [formData, setFormData] = useState(userData);
   const [response, setResponse] = useState("");
-
-  //storefilter
   const [storeData, setStoreData] = useState([]);
   const [companyData, setCompanyData] = useState([]);
 
   const getStore = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
     const config = {
       method: "get",
       url: `${
@@ -24,7 +21,6 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
       }/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response2) => {
@@ -45,8 +41,6 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
 
   const getCompany = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
     const config = {
       method: "get",
       url: `${
@@ -102,18 +96,6 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
     event.preventDefault();
     setIsTableLoaded(true);
     const token = sessionStorage.getItem("authToken");
-
-    if (formData.email.length <= 5) {
-      console.log("email size is too small, must be more than 5");
-      setIsTableLoaded(false);
-      return;
-    }
-
-    if (formData.phoneNumber.length <= 5) {
-      console.log("phone number is invalid");
-      setIsTableLoaded(false);
-      return;
-    }
 
     const data = JSON.stringify({
       userID: formData._id,
@@ -238,6 +220,7 @@ const RegisterUserEditForm = ({
             <input
               name="email"
               id="email"
+              minLength={5}
               placeholder="Enter your email address"
               value={formData.email}
               onChange={handleChange}
@@ -251,6 +234,7 @@ const RegisterUserEditForm = ({
             <input
               name="phoneNumber"
               id="phoneNumber"
+              minLength={10}
               placeholder="Enter 10-digit mobile number"
               value={formData.phoneNumber}
               onChange={handleChange}
