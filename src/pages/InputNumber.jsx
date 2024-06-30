@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAnswerContext } from "../components/AnswerContext";
 import useUserProfile from "../utils/useUserProfile";
-import PricePage from "./Price";
+import Price from "./Price";
 import axios from "axios";
 import OTPpage from "./OTP_page";
 import { useDispatch } from "react-redux";
@@ -73,7 +73,7 @@ const InputNumber = () => {
   }, [change, dispatch]);
 
   return otpVerified ? (
-    <PricePage submitdata={submitdata} userToken={userToken} />
+    <Price submitdata={submitdata} userToken={userToken} />
   ) : (
     <>
       <OTPpage

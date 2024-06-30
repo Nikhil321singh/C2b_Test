@@ -18,6 +18,34 @@ import SideMenu from "../../components/SideMenu";
 import StoreEdit from "../../components/StoreEdit/StoreEdit";
 import { useNavigate } from "react-router-dom";
 
+const succTextColor = "text-green-500";
+const failTextColor = "text-[#EC2752]";
+const token = sessionStorage.getItem("authToken");
+
+const downloadExcel = (dataDown,curPage) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+
+  const formattedData = dataDown.map((item) => {
+    return {
+      "Date Created": new Date(item.createdAt).toLocaleDateString("en-GB"),
+      "Store Name": item?.storeName,
+      "Store Unique Id": item?.uniqueId,
+      "Store Email": item.email,
+      "Store Phone Number": item.contactNumber,
+      Region: item.region,
+      Address: item.address,
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(formattedData);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const dataFile = new Blob([excelBuffer], { type: fileType });
+  saveAs(dataFile, `Stores_Data_${curPage}${fileExtension}`);
+};
+
 const StoreListingTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -28,9 +56,7 @@ const StoreListingTable = () => {
   const [editBoxOpen, setEditBoxOpen] = useState(false);
   const [editSuccess, setEditSuccess] = useState(false);
   const [curPage, setCurPage] = useState(0);
-
   const [selectedStr, setSelectedStr] = useState();
-
   const [errMsg, setErrMsg] = useState("");
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
@@ -40,16 +66,13 @@ const StoreListingTable = () => {
 
   const getData = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/store/findAll?page=${curPage}&limit=10`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response) => {
@@ -73,9 +96,7 @@ const StoreListingTable = () => {
       setFailBox(true);
       return;
     }
-    const token = sessionStorage.getItem("authToken");
-
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -125,7 +146,7 @@ const StoreListingTable = () => {
     setConfBox(false);
     const token = sessionStorage.getItem("authToken");
 
-    let config = {
+    const config = {
       method: "delete",
       maxBodyLength: Infinity,
       url: `${
@@ -173,31 +194,6 @@ const StoreListingTable = () => {
     getData();
   };
 
-  const downloadExcel = () => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = data.map((item) => {
-      return {
-        "Date Created": new Date(item.createdAt).toLocaleDateString("en-GB"),
-        "Store Name": item?.storeName,
-        "Store Unique Id": item?.uniqueId,
-        "Store Email": item.email,
-        "Store Phone Number": item.contactNumber,
-        Region: item.region,
-        Address: item.address,
-      };
-    });
-
-    const ws = XLSX.utils.json_to_sheet(formattedData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-
-    const dataFile = new Blob([excelBuffer], { type: fileType });
-    saveAs(dataFile, "Stores_Data_" + curPage + fileExtension);
-  };
-
   const nextHandler = () => {
     setIsTableLoaded(true);
     if (data.length >= 10 && searchValue === "") {
@@ -226,11 +222,8 @@ const StoreListingTable = () => {
   const handleBulkSubmit = (event) => {
     setIsTableLoaded(true);
     event.preventDefault();
-    const token = sessionStorage.getItem("authToken");
-
     const formData = new FormData();
     formData.append("file", file);
-
     axios
       .post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/uploadStores`,
@@ -278,39 +271,29 @@ const StoreListingTable = () => {
           <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
         </div>
       </div>
-      {(sucBox || failBox) && (
+      {sucBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
-            }`}
-          >
-            {sucBox ? (
-              <IoIosCheckmarkCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
-                size={90}
-              />
-            ) : (
-              <IoIosCloseCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
-                size={90}
-              />
-            )}
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
-              {sucBox ? "Success!" : "Error!"}
-            </h6>
+          <div className={`${styles.err_mod_box} ${succTextColor}`}>
+            <IoIosCheckmarkCircle className={succTextColor} size={90} />
+            <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
-              onClick={() => {
-                setSucBox(false);
-                setFailBox(false);
-              }}
-              className={
-                sucBox ? "bg-green-500 text-white" : "bg-[#EC2752] text-white"
-              }
-            >
-              Okay
-            </button>
+              onClick={() => {setSucBox(false)}}
+              className={"bg-green-500 text-white"}
+            >Okay</button>
+          </div>
+        </div>
+      )}
+      {failBox && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+            <IoIosCloseCircle className={failTextColor} size={90} />
+            <h6 className={failTextColor}>Error!</h6>
+            <p className="text-slate-500">{errMsg}</p>
+            <button
+              onClick={() => {setFailBox(false)}}
+              className={"bg-[#EC2752] text-white"}
+            >Okay</button>
           </div>
         </div>
       )}
@@ -318,14 +301,14 @@ const StoreListingTable = () => {
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div
             className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
+             sucBox ? succTextColor : failTextColor
             }`}
           >
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
+            <h6 className={sucBox ? succTextColor : failTextColor}>
               Confirmation!
             </h6>
             <p className="text-slate-500">
-              Do you want to delete store {" " + selectedStr + " "} ?
+              {`Do you want to delete store ${selectedStr} ?`}
             </p>
             <div className="flex flex-row gap-2">
               <button
@@ -336,7 +319,7 @@ const StoreListingTable = () => {
               </button>
               <button
                 onClick={() => {
-                  setConfBox(false), setIsTableLoaded(false);
+                  setConfBox(false); setIsTableLoaded(false);
                 }}
                 className="bg-white text-[#EC2752]"
               >
@@ -377,7 +360,7 @@ const StoreListingTable = () => {
                 <button
                   type="reset"
                   onClick={() => {
-                    setUploadBox(false), setIsTableLoaded(false);
+                    setUploadBox(false); setIsTableLoaded(false);
                   }}
                   className="bg-white text-[#EC2752]"
                 >
@@ -434,7 +417,7 @@ const StoreListingTable = () => {
           </div>
           <button
             className={`${styles.bulkdown_button}`}
-            onClick={downloadExcel}
+            onClick={() => downloadExcel(data, curPage)}
           >
             <FaDownload /> Bulk Download
           </button>

@@ -6,7 +6,7 @@ import InputNumber from "./pages/InputNumber";
 import DeviceDetails from "./pages/DeviceDetails";
 import Login from "./pages/Login";
 import DeviceInformation from "./pages/DeviceInformation";
-import PricePage from "./pages/Price";
+import Price from "./pages/Price";
 import { Provider } from "react-redux";
 import store from "./store/store";
 import Register from "./pages/Register";
@@ -97,7 +97,7 @@ function App() {
                   element={<SpecialOffers />}
                 ></Route>
                 <Route path="/Reciept" element={<PurchaseReceipt />}></Route>
-                <Route path="/pricepage" element={<PricePage />}></Route>
+                <Route path="/pricepage" element={<Price />}></Route>
                 <Route
                   path="/selectdevicetype"
                   element={<SelectDeviceType />}

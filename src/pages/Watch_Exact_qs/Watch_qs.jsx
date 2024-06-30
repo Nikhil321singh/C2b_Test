@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import "../DeviceDetailnew/newDeviceqs.scss";
 import { useQuestionContext } from "../../components/QuestionContext";
 import axios from "axios";
@@ -47,17 +47,23 @@ import acces4 from "../../assets/access4.png";
 const AccImg = [acces1, acces2, acces3, acces4];
 import { useSelector } from "react-redux";
 import banner from "../../assets/banner.jpg";
-import { MdOutlineKeyboardBackspace } from "react-icons/md";
-import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
+import {
+  MdRadioButtonChecked,
+  MdRadioButtonUnchecked,
+  MdOutlineKeyboardBackspace,
+} from "react-icons/md";
+
+const token = sessionStorage.getItem("authToken");
+const userToken = sessionStorage.getItem("authToken");
+const initialState = {
+  Functional: [],
+  Physical: [],
+  Accessories: [],
+  Warranty: [],
+};
+const id = JSON.parse(sessionStorage.getItem("dataModel"));
 
 function Watchqs() {
-  const initialState = {
-    Functional: [],
-    Physical: [],
-    Accessories: [],
-    Warranty: [],
-  };
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { answers, setAnswers } = useQuestionContext();
   const [visible, setVisible] = useState(1);
   const navigate = useNavigate();
@@ -66,97 +72,65 @@ function Watchqs() {
   const Physical = useSelector((state) => state.watchQNA.Physical);
   const Accessories = useSelector((state) => state.watchQNA.Accessories);
   const Warranty = useSelector((state) => state.watchQNA.Warranty);
+  const qna = useSelector((state) => state.watchQNA);
+  const [WTCstate, dispatch] = useReducer(reducer, initialState);
   const [showPopup, setShowPopup] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
   function reducer(state, action) {
-    switch (action.type) {
-      case "SET_GROUP_ANSWERS":
-        return { ...state, [action.group]: action.answers };
-      default:
-        throw new Error();
+    if (action.type === "SET_GROUP_ANSWERS") {
+      return { ...state, [action.group]: action.answers };
+    } else {
+      throw new Error();
     }
   }
-  const [state, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-    const userToken = sessionStorage.getItem("authToken");
-    const fetchData = async () => {
-      try {
-        const apiUrl = `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/findAll?page=0&limit=31&type=Watch`;
+  const fetchData = async () => {
+    try {
+      const apiUrl = `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/questionnaires/findAll?page=0&limit=31&type=Watch`;
+      const response = await axios.get(apiUrl, {
+        headers: { authorization: userToken },
+      });
 
-        const response = await axios.get(apiUrl, {
-          headers: {
-            authorization: `${userToken}`,
-          },
+      ["Functional", "Physical", "Accessories", "Warranty"].forEach((group) => {
+        const answersTemp = response.data.data.filter(
+          (question) => question.group === group
+        );
+        dispatch({ type: "SET_GROUP_ANSWERS", group, answers: answersTemp });
+      });
+      const newPopulateAnswers = response.data.data.map((ele) => ele.default);
+      if (answers.length === 0) {
+        const newAnswers = newPopulateAnswers.map((answer, index) => {
+          return {
+            quetion: response.data.data[index].quetion,
+            answer,
+            key: response.data.data[index].yes === answer ? "yes" : "no",
+            group: response.data.data[index].group,
+          };
         });
-
+        setAnswers(newAnswers);
         ["Functional", "Physical", "Accessories", "Warranty"].forEach(
           (group) => {
-            const answers = response.data.data.filter(
+            const answersTemp = newAnswers.filter(
               (question) => question.group === group
             );
-
-            dispatch({ type: "SET_GROUP_ANSWERS", group, answers });
+            store.dispatch(setGroupAnswers({ group, answers: answersTemp }));
           }
         );
-        const newPopulateAnswers = response.data.data.map((ele) => ele.default);
-
-        if (answers.length === 0) {
-          const newAnswers = newPopulateAnswers.map((answer, index) => {
-            return {
-              quetion: response.data.data[index].quetion,
-              answer,
-              key: response.data.data[index].yes === answer ? "yes" : "no",
-              group: response.data.data[index].group,
-            };
-          });
-
-          setAnswers(newAnswers);
-
-          ["Functional", "Physical", "Accessories", "Warranty"].forEach(
-            (group) => {
-              const answers = newAnswers.filter(
-                (question) => question.group === group
-              );
-              store.dispatch(setGroupAnswers({ group, answers }));
-            }
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
       }
-    };
-
-    fetchData();
-
-    const data = localStorage.getItem("dataModel");
-    const token = sessionStorage.getItem("authToken");
-    if (!token) {
-      navigate("/");
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }, []);
-
-  function handleADD() {
-    setVisible(visible + 1);
-  }
-
-  function handleSubtract() {
-    setVisible(visible - 1);
-  }
-
-  const handlepop = () => {
-    setShowPopup(false);
   };
 
-  const qna = useSelector((state) => state.watchQNA);
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const handlesubmit = async () => {
     setIsLoading(true);
-    const token = sessionStorage.getItem("authToken");
-    let id = sessionStorage.getItem("dataModel");
-    id = JSON.parse(id);
-
     const finalPayload = {
       QNA: qna,
       phoneNumber: id?.phoneNumber ? id?.phoneNumber : "123456789",
@@ -176,7 +150,6 @@ function Watchqs() {
         },
       }
     );
-
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
@@ -188,10 +161,6 @@ function Watchqs() {
     navigate("/devicequote");
   };
 
-  const backHandler = () => {
-    navigate("/selectmodel");
-  };
-
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [visible]);
@@ -200,69 +169,21 @@ function Watchqs() {
     <>
       <div className={`popup ${showPopup ? "show" : ""}`}>
         <img src={banner} alt="banner" />
-
         <div className="text">
           Help us calculate your device value correctly by answering to the
           following questions
         </div>
-
-        <button onClick={handlepop}> Got it</button>
+        <button onClick={() => setShowPopup(false)}> Got it</button>
       </div>
-
       <div className="mainQContainer">
-        <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
-          <div className="flex items-center justify-between w-full ">
-            <ProfileBox />
-
-            <img
-              onClick={() => navigate("/selectdevicetype")}
-              className="w-28 "
-              src={Grest_Logo}
-              alt="app logo"
-            />
-          </div>
-        </div>
-        <div className={`${styles.quick_page_nav}`}>
-          <IoIosArrowBack
-            onClick={backHandler}
-            size={25}
-            className="ml-2 text-[#EC2752]"
-          />
-          <p className="ml-2 text-xl font-medium">Device Details</p>
-        </div>
-
-        <div
-          className={`${styles.search_box_wrap} mt-[15px] mb-[5px] w-[90vw]`}
-        >
-          <div
-            className={`flex items-center bg-gray-200  p-2 mb-1 rounded-lg w-[100%] ${styles.search_box}`}
-          >
-            <div className="flex items-center">
-              <CiSearch size={20} className="inline ml-1" />
-            </div>
-            <input
-              placeholder="Search Question"
-              onChange={() => console.log("state is ", state)}
-              onClick={() => setIsSearchOpen(true)}
-              className="inline w-full mx-2 bg-gray-200 outline-none"
-              type="text"
-            />
-            {isSearchOpen && (
-              <QuestionSearch
-                setIsSearchOpen={setIsSearchOpen}
-                state={state}
-                dispatch={dispatch}
-              />
-            )}
-          </div>
-        </div>
+        <WatchHeader WTCstate={WTCstate} dispatch={dispatch} />
 
         <div className="innerContainer">
           <div className="flex items-center justify-center underline underline-offset-4 pt-4 text-lg font-medium tracking-tight text-{1.325rem}">
             {visible > 1 && visible <= 3 && (
               <div
                 className="text-white rounded-[.45rem] flex flex-row justify-center items-center mr-2 bg-[#ec2752]"
-                onClick={handleSubtract}
+                onClick={() => setVisible(visible - 1)}
               >
                 <MdOutlineKeyboardBackspace size={30} />
               </div>
@@ -274,300 +195,17 @@ function Watchqs() {
           </div>
           <div className="px-4 py-4 pt-0">
             <div className="questionList">
-              {visible == 1 && (
-                <div className="containClass">
-                  <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
-                    <p>
-                      Please choose appropriate condition to get accurate quote
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-2">
-                    {state.Functional &&
-                      state.Functional.map((data, index) => (
-                        <div
-                          key={data._id}
-                          className={`${
-                            Functional[index].answer === data.yes
-                              ? styles.option_selected
-                              : styles.option_selected_not
-                          } flex flex-col justify-start items-center`}
-                          onClick={() => {
-                            if (Functional[index].answer === data.yes) {
-                              store.dispatch(
-                                updateFunctionalObject({
-                                  index: index,
-                                  newAnswer: data.no,
-                                  newKey: "no",
-                                })
-                              );
-                            } else {
-                              store.dispatch(
-                                updateFunctionalObject({
-                                  index: index,
-                                  newAnswer: data.yes,
-                                  newKey: "yes",
-                                })
-                              );
-                            }
-                          }}
-                        >
-                          <img src={funcImg[index]} className="bg-white" />
-                          <p className="py-2 px-2 w-[100%] flex flex-row items-center justify-center text-xs font-medium text-balance">
-                            {data.quetion}
-                          </p>
-                        </div>
-                      ))}
-                  </div>
-                </div>
+              {visible === 1 && (
+                <FirstPart WTCstate={WTCstate} Functional={Functional} />
               )}
-
-              {/* //for cosmetics */}
-              {visible == 2 && (
-                <div className="containClass">
-                  <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
-                    <p>Please select your device physical condition</p>
-                  </div>
-                  {state.Physical && (
-                    <div className="flex flex-col justify-start gap-2">
-                      <div
-                        className={`${
-                          Physical[0].answer === state.Physical[0].yes
-                            ? styles.option_selected
-                            : styles.option_selected_not
-                        } p-2 text-black bg-white flex flex-col justify-start`}
-                        onClick={() => {
-                          store.dispatch(
-                            updatePhysicalObject({
-                              index: 0,
-                              newAnswer: state.Physical[0].yes,
-                              newKey: "yes",
-                            })
-                          );
-                        }}
-                      >
-                        <div className="flex flex-row items-center text-lg font-bold">
-                          {Physical[0].answer === state.Physical[0].yes ? (
-                            <MdRadioButtonChecked
-                              size={20}
-                              className="mr-2 text-[#ec2752]"
-                            />
-                          ) : (
-                            <MdRadioButtonUnchecked
-                              size={20}
-                              className="mr-2 text-[#676767]"
-                            />
-                          )}{" "}
-                          Flawless
-                        </div>
-                        <div className="ml-2 text-sm font-medium text-gray-500">
-                          <p>• Looks Like Brand new!</p>
-                          <p>• No imperfections!</p>
-                        </div>
-                      </div>
-                      <div
-                        className={`${
-                          Physical[1].answer === state.Physical[1].yes
-                            ? styles.option_selected
-                            : styles.option_selected_not
-                        } p-2 text-black bg-white flex flex-col justify-start`}
-                        onClick={() => {
-                          store.dispatch(
-                            updatePhysicalObject({
-                              index: 1,
-                              newAnswer: state.Physical[1].yes,
-                              newKey: "yes",
-                            })
-                          );
-                        }}
-                      >
-                        <div className="flex flex-row items-center text-lg font-bold">
-                          {Physical[1].answer === state.Physical[1].yes ? (
-                            <MdRadioButtonChecked
-                              size={20}
-                              className="mr-2 text-[#ec2752]"
-                            />
-                          ) : (
-                            <MdRadioButtonUnchecked
-                              size={20}
-                              className="mr-2 text-[#676767]"
-                            />
-                          )}{" "}
-                          Good
-                        </div>
-                        <div className="ml-2 text-sm font-medium text-gray-500">
-                          <p>• Minor scratches</p>
-                          <p>• Normal signs of usage</p>
-                          <p>• No dents or bents on Corners</p>
-                        </div>
-                      </div>
-                      <div
-                        className={`${
-                          Physical[2].answer === state.Physical[2].yes
-                            ? styles.option_selected
-                            : styles.option_selected_not
-                        } p-2 text-black bg-white flex flex-col justify-start`}
-                        onClick={() => {
-                          store.dispatch(
-                            updatePhysicalObject({
-                              index: 2,
-                              newAnswer: state.Physical[2].yes,
-                              newKey: "yes",
-                            })
-                          );
-                        }}
-                      >
-                        <div className="flex flex-row items-center text-lg font-bold">
-                          {Physical[2].answer === state.Physical[2].yes ? (
-                            <MdRadioButtonChecked
-                              size={20}
-                              className="mr-2 text-[#ec2752]"
-                            />
-                          ) : (
-                            <MdRadioButtonUnchecked
-                              size={20}
-                              className="mr-2 text-[#676767]"
-                            />
-                          )}{" "}
-                          Average
-                        </div>
-                        <div className="ml-2 text-sm font-medium text-gray-500">
-                          <p>• Moderate to heavy scratches</p>
-                          <p>• Slight wear, dent</p>
-                        </div>
-                      </div>
-                      <div
-                        className={`${
-                          Physical[3].answer === state.Physical[3].yes
-                            ? styles.option_selected
-                            : styles.option_selected_not
-                        } p-2 text-black bg-white flex flex-col justify-start`}
-                        onClick={() => {
-                          store.dispatch(
-                            updatePhysicalObject({
-                              index: 3,
-                              newAnswer: state.Physical[3].yes,
-                              newKey: "yes",
-                            })
-                          );
-                        }}
-                      >
-                        <div className="flex flex-row items-center text-lg font-bold">
-                          {Physical[3].answer === state.Physical[3].yes ? (
-                            <MdRadioButtonChecked
-                              size={20}
-                              className="mr-2 text-[#ec2752]"
-                            />
-                          ) : (
-                            <MdRadioButtonUnchecked
-                              size={20}
-                              className="mr-2 text-[#676767]"
-                            />
-                          )}{" "}
-                          Below Average/Broken
-                        </div>
-                        <div className="ml-2 text-sm font-medium text-gray-500">
-                          <p>• Deep scratches</p>
-                          <p>• Major dents or warping</p>
-                          <p>• Glass broken</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+              {visible === 2 && (
+                <SecondPart WTCstate={WTCstate} Physical={Physical} />
               )}
-
-              {visible == 3 && (
-                <div className="containClass">
-                  <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
-                    <p>Please select accessories which are available</p>
-                  </div>
-                  <div className="grid grid-cols-2">
-                    {state.Accessories &&
-                      state.Accessories.map((data, index) => (
-                        <div
-                          key={data._id}
-                          className={`${
-                            Accessories[index].answer === data.yes
-                              ? styles.option_selected
-                              : styles.option_selected_not
-                          } flex flex-col justify-start items-center`}
-                          onClick={() => {
-                            if (Accessories[index].answer === data.yes) {
-                              store.dispatch(
-                                updateAccessoriesObject({
-                                  index: index,
-                                  newAnswer: data.no,
-                                  newKey: "no",
-                                })
-                              );
-                            } else {
-                              store.dispatch(
-                                updateAccessoriesObject({
-                                  index: index,
-                                  newAnswer: data.yes,
-                                  newKey: "yes",
-                                })
-                              );
-                            }
-                          }}
-                        >
-                          <img src={AccImg[index]} className="bg-white" />
-                          <p className="py-2 px-2 w-[100%] flex flex-row items-center justify-center text-xs font-medium text-balance">
-                            {data.quetion}
-                          </p>
-                        </div>
-                      ))}
-                  </div>
-                </div>
+              {visible === 3 && (
+                <ThirdPart WTCstate={WTCstate} Accessories={Accessories} />
               )}
-              {visible == 4 && (
-                <div className="containClass">
-                  <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
-                    <p>
-                      Please choose appropriate condition to get accurate quote
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-4 mb-4 one">
-                    <div className="flex font-medium gap-1 two">
-                      <p className="text-xl">1.</p>
-                      <p className="text-xl three">
-                        What is your smartwatch's age?
-                      </p>
-                    </div>
-
-                    {state.Warranty &&
-                      state.Warranty.map((data, index) => (
-                        <div className="max-w-[500px]  flex gap-4 ml-3 lableconatiner flex-col">
-                          <label
-                            className={`text-[#EC2752] ${
-                              styles.ansBox
-                            } font-medium  justify-center w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
-                              Warranty[index].answer === data.yes
-                                ? "bg-[#EC2752] text-white"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              type="radio"
-                              value={data.yes}
-                              onChange={(e) => {
-                                store.dispatch(
-                                  updateWatchWarrantyObject({
-                                    index: index,
-                                    newAnswer: data.yes,
-                                    newKey: "yes",
-                                  })
-                                );
-                              }}
-                              checked={Warranty[index].answer === data.yes}
-                            />{" "}
-                            {data.quetion}
-                          </label>
-                        </div>
-                      ))}
-                    <div className="border-b-2 opacity-10 border-[#595555] "></div>
-                  </div>
-                </div>
+              {visible === 4 && (
+                <FourthPart WTCstate={WTCstate} Warranty={Warranty} />
               )}
             </div>
           </div>
@@ -593,7 +231,7 @@ function Watchqs() {
         ) : (
           <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2">
             <div
-              onClick={handleADD}
+              onClick={() => setVisible(visible + 1)}
               className="bg-[#EC2752] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
             >
               <p className="w-full p-1 text-xl font-medium">Continue</p>
@@ -606,3 +244,356 @@ function Watchqs() {
 }
 
 export default Watchqs;
+
+const WatchHeader = ({ WTCstate, dispatch }) => {
+  const navigate = useNavigate();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  return (
+    <React.Fragment>
+      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
+        <div className="flex items-center justify-between w-full ">
+          <ProfileBox />
+          <img
+            onClick={() => navigate("/selectdevicetype")}
+            className="w-28 "
+            src={Grest_Logo}
+            alt="app logo"
+          />
+        </div>
+      </div>
+      <div className={`${styles.quick_page_nav}`}>
+        <IoIosArrowBack
+          onClick={() => navigate("/selectmodel")}
+          size={25}
+          className="ml-2 text-[#EC2752]"
+        />
+        <p className="ml-2 text-xl font-medium">Device Details</p>
+      </div>
+      <div className={`${styles.search_box_wrap} mt-[15px] mb-[5px] w-[90vw]`}>
+        <div
+          className={`flex items-center bg-gray-200  p-2 mb-1 rounded-lg w-[100%] ${styles.search_box}`}
+        >
+          <div className="flex items-center">
+            <CiSearch size={20} className="inline ml-1" />
+          </div>
+          <input
+            placeholder="Search Question"
+            onChange={() => console.log("state is ", WTCstate)}
+            onClick={() => setIsSearchOpen(true)}
+            className="inline w-full mx-2 bg-gray-200 outline-none"
+            type="text"
+          />
+          {isSearchOpen && (
+            <QuestionSearch
+              setIsSearchOpen={setIsSearchOpen}
+              state={WTCstate}
+              dispatch={dispatch}
+            />
+          )}
+        </div>
+      </div>
+    </React.Fragment>
+  );
+};
+
+const FirstPart = ({ WTCstate, Functional }) => {
+  return (
+    <div className="containClass">
+      <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
+        <p>Please choose appropriate condition to get accurate quote</p>
+      </div>
+      <div className="grid grid-cols-2">
+        {WTCstate?.Functional &&
+          WTCstate?.Functional.map((data, index) => (
+            <div
+              key={data._id}
+              className={`${
+                Functional[index]?.answer === data.yes
+                  ? styles.option_selected
+                  : styles.option_selected_not
+              } flex flex-col justify-start items-center`}
+              onClick={() => {
+                if (Functional[index]?.answer === data.yes) {
+                  store.dispatch(
+                    updateFunctionalObject({
+                      index: index,
+                      newAnswer: data.no,
+                      newKey: "no",
+                    })
+                  );
+                } else {
+                  store.dispatch(
+                    updateFunctionalObject({
+                      index: index,
+                      newAnswer: data.yes,
+                      newKey: "yes",
+                    })
+                  );
+                }
+              }}
+            >
+              <img src={funcImg[index]} className="bg-white" />
+              <p className="py-2 px-2 w-[100%] flex flex-row items-center justify-center text-xs font-medium text-balance">
+                {data.quetion}
+              </p>
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+const SecondPart = ({ WTCstate, Physical }) => {
+  return (
+    <div className="containClass">
+      <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
+        <p>Please select your device physical condition</p>
+      </div>
+      {WTCstate?.Physical && (
+        <div className="flex flex-col justify-start gap-2">
+          <div
+            className={`${
+              Physical[0]?.answer === WTCstate?.Physical[0]?.yes
+                ? styles.option_selected
+                : styles.option_selected_not
+            } p-2 text-black bg-white flex flex-col justify-start`}
+            onClick={() => {
+              store.dispatch(
+                updatePhysicalObject({
+                  index: 0,
+                  newAnswer: WTCstate?.Physical[0]?.yes,
+                  newKey: "yes",
+                })
+              );
+            }}
+          >
+            <div className="flex flex-row items-center text-lg font-bold">
+              {Physical[0]?.answer === WTCstate?.Physical[0]?.yes ? (
+                <MdRadioButtonChecked
+                  size={20}
+                  className="mr-2 text-[#ec2752]"
+                />
+              ) : (
+                <MdRadioButtonUnchecked
+                  size={20}
+                  className="mr-2 text-[#676767]"
+                />
+              )}{" "}
+              Flawless
+            </div>
+            <div className="ml-2 text-sm font-medium text-gray-500">
+              <p>• Looks Like Brand new!</p>
+              <p>• No imperfections!</p>
+            </div>
+          </div>
+          <div
+            className={`${
+              Physical[1]?.answer === WTCstate?.Physical[1]?.yes
+                ? styles.option_selected
+                : styles.option_selected_not
+            } p-2 text-black bg-white flex flex-col justify-start`}
+            onClick={() => {
+              store.dispatch(
+                updatePhysicalObject({
+                  index: 1,
+                  newAnswer: WTCstate?.Physical[1]?.yes,
+                  newKey: "yes",
+                })
+              );
+            }}
+          >
+            <div className="flex flex-row items-center text-lg font-bold">
+              {Physical[1]?.answer === WTCstate?.Physical[1]?.yes ? (
+                <MdRadioButtonChecked
+                  size={20}
+                  className="mr-2 text-[#ec2752]"
+                />
+              ) : (
+                <MdRadioButtonUnchecked
+                  size={20}
+                  className="mr-2 text-[#676767]"
+                />
+              )}{" "}
+              Good
+            </div>
+            <div className="ml-2 text-sm font-medium text-gray-500">
+              <p>• Minor scratches</p>
+              <p>• Normal signs of usage</p>
+              <p>• No dents or bents on Corners</p>
+            </div>
+          </div>
+          <div
+            className={`${
+              Physical[2]?.answer === WTCstate?.Physical[2].yes
+                ? styles.option_selected
+                : styles.option_selected_not
+            } p-2 text-black bg-white flex flex-col justify-start`}
+            onClick={() => {
+              store.dispatch(
+                updatePhysicalObject({
+                  index: 2,
+                  newAnswer: WTCstate?.Physical[2].yes,
+                  newKey: "yes",
+                })
+              );
+            }}
+          >
+            <div className="flex flex-row items-center text-lg font-bold">
+              {Physical[2]?.answer === WTCstate?.Physical[2].yes ? (
+                <MdRadioButtonChecked
+                  size={20}
+                  className="mr-2 text-[#ec2752]"
+                />
+              ) : (
+                <MdRadioButtonUnchecked
+                  size={20}
+                  className="mr-2 text-[#676767]"
+                />
+              )}{" "}
+              Average
+            </div>
+            <div className="ml-2 text-sm font-medium text-gray-500">
+              <p>• Moderate to heavy scratches</p>
+              <p>• Slight wear, dent</p>
+            </div>
+          </div>
+          <div
+            className={`${
+              Physical[3]?.answer === WTCstate?.Physical[3].yes
+                ? styles.option_selected
+                : styles.option_selected_not
+            } p-2 text-black bg-white flex flex-col justify-start`}
+            onClick={() => {
+              store.dispatch(
+                updatePhysicalObject({
+                  index: 3,
+                  newAnswer: WTCstate?.Physical[3].yes,
+                  newKey: "yes",
+                })
+              );
+            }}
+          >
+            <div className="flex flex-row items-center text-lg font-bold">
+              {Physical[3]?.answer === WTCstate?.Physical[3].yes ? (
+                <MdRadioButtonChecked
+                  size={20}
+                  className="mr-2 text-[#ec2752]"
+                />
+              ) : (
+                <MdRadioButtonUnchecked
+                  size={20}
+                  className="mr-2 text-[#676767]"
+                />
+              )}{" "}
+              Below Average/Broken
+            </div>
+            <div className="ml-2 text-sm font-medium text-gray-500">
+              <p>• Deep scratches</p>
+              <p>• Major dents or warping</p>
+              <p>• Glass broken</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ThirdPart = ({ WTCstate, Accessories }) => {
+  return (
+    <div className="containClass">
+      <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
+        <p>Please select accessories which are available</p>
+      </div>
+      <div className="grid grid-cols-2">
+        {WTCstate?.Accessories &&
+          WTCstate?.Accessories.map((data, index) => (
+            <div
+              key={data._id}
+              className={`${
+                Accessories[index]?.answer === data.yes
+                  ? styles.option_selected
+                  : styles.option_selected_not
+              } flex flex-col justify-start items-center`}
+              onClick={() => {
+                if (Accessories[index]?.answer === data.yes) {
+                  store.dispatch(
+                    updateAccessoriesObject({
+                      index: index,
+                      newAnswer: data.no,
+                      newKey: "no",
+                    })
+                  );
+                } else {
+                  store.dispatch(
+                    updateAccessoriesObject({
+                      index: index,
+                      newAnswer: data.yes,
+                      newKey: "yes",
+                    })
+                  );
+                }
+              }}
+            >
+              <img src={AccImg[index]} className="bg-white" />
+              <p className="py-2 px-2 w-[100%] flex flex-row items-center justify-center text-xs font-medium text-balance">
+                {data.quetion}
+              </p>
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+const FourthPart = ({ WTCstate, Warranty }) => {
+  return (
+    <div className="containClass">
+      <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
+        <p>Please choose appropriate condition to get accurate quote</p>
+      </div>
+      <div className="flex flex-col gap-4 mb-4 one">
+        <div className="flex font-medium gap-1 two">
+          <p className="text-xl">1.</p>
+          <p className="text-xl three">What is your smartwatch's age?</p>
+        </div>
+
+        {WTCstate?.Warranty &&
+          WTCstate?.Warranty.map((data, index) => (
+            <div
+              key={index}
+              className="max-w-[500px]  flex gap-4 ml-3 lableconatiner flex-col"
+            >
+              <label
+                className={`text-[#EC2752] ${
+                  styles.ansBox
+                } font-medium  justify-center w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
+                  Warranty[index]?.answer === data.yes
+                    ? "bg-[#EC2752] text-white"
+                    : ""
+                }`}
+              >
+                <input
+                  type="radio"
+                  value={data.yes}
+                  onChange={(e) => {
+                    store.dispatch(
+                      updateWatchWarrantyObject({
+                        index: index,
+                        newAnswer: data.yes,
+                        newKey: "yes",
+                      })
+                    );
+                  }}
+                  checked={Warranty[index]?.answer === data.yes}
+                />{" "}
+                {data.quetion}
+              </label>
+            </div>
+          ))}
+        <div className="border-b-2 opacity-10 border-[#595555] "></div>
+      </div>
+    </div>
+  );
+};

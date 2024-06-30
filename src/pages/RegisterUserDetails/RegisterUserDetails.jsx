@@ -17,6 +17,39 @@ import SideMenu from "../../components/SideMenu";
 import RegisterUserEdit from "../../components/RegisterUserEdit/RegisterUserEdit";
 import { useNavigate } from "react-router-dom";
 
+const succTextColor = "text-green-500";
+const failTextColor = "text-[#EC2752]";
+const token = sessionStorage.getItem("authToken");
+
+const downloadExcel = (dataDown) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+
+  const formattedData = dataDown.map((item) => {
+    return {
+      "User Id": item._id,
+      "Date Created": new Date(item.createdAt).toLocaleDateString("en-GB"),
+      "User Name": `${item?.firstName} ${item?.lastName}`,
+      "User Email": item.email,
+      "Phone Number": item.phoneNumber,
+      "Grest Member": item.grestMember,
+      "Company Name": item.companyName,
+      Role: item.role,
+      "Store Name": item.stores?.storeName,
+      Region: item.stores?.region,
+      Address: item.address,
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(formattedData);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
+  const dataFile = new Blob([excelBuffer], { type: fileType });
+  saveAs(dataFile, "Users_Data" + fileExtension);
+};
+
 const RegisterUserDetails = () => {
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -34,62 +67,46 @@ const RegisterUserDetails = () => {
   const [failBox, setFailBox] = useState(false);
   const [confBox, setConfBox] = useState(false);
 
-  const navigate = useNavigate();
-
   const getData = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
-    let config = {
+    const config = {
       method: "get",
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/userregistry/all`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data.data);
         setData(response.data.data);
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setErrMsg("Failed to load data");
         setFailBox(true);
         setIsTableLoaded(false);
       });
   };
-
   const getDataBySearch = () => {
     setIsTableLoaded(true);
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    const token = sessionStorage.getItem("authToken");
-
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/userregistry/search?uid=${searchValue}&storeName=${storeValue}&role=${roleValue}`,
       headers: { Authorization: token },
     };
-
-    console.log(config);
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data.data);
         setData(response.data.data);
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setErrMsg("Failed to load data");
         setFailBox(true);
         setIsTableLoaded(false);
       });
   };
-
   useEffect(() => {
     if (editSuccess) {
       getData();
@@ -99,31 +116,20 @@ const RegisterUserDetails = () => {
       setEditBoxOpen(false);
     }
   }, [editSuccess]);
-
   const editHandler = (userData) => {
     console.log(userData);
     setUserEditData(userData);
     setEditBoxOpen(true);
   };
-
   const deleteConfHandler = (userID, userEmail) => {
     setSelectedUser(userID);
     setSelectedEmail(userEmail);
     setConfBox(true);
   };
-
   const deleteHandler = (userID) => {
     setIsTableLoaded(true);
     setConfBox(false);
-
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    const token = sessionStorage.getItem("authToken");
-
-    let data = JSON.stringify({
-      userID: userID,
-    });
-
-    let config = {
+    const config = {
       method: "delete",
       maxBodyLength: Infinity,
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/userregistry/delete`,
@@ -131,20 +137,19 @@ const RegisterUserDetails = () => {
         Authorization: token,
         "Content-Type": "application/json",
       },
-      data: data,
+      data: JSON.stringify({
+        userID: userID,
+      })
     };
-
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data);
         getDataBySearch();
-        setErrMsg("Succesfully deleted user with email - " + selectedEmail);
+        setErrMsg(`Succesfully deleted user with email - ${selectedEmail}`);
         setSucBox(true);
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setErrMsg("Failed to deleted user with email - " + selectedEmail);
         setFailBox(true);
         setIsTableLoaded(false);
@@ -157,42 +162,6 @@ const RegisterUserDetails = () => {
 
   const handleSearchClick = () => {
     getDataBySearch();
-  };
-
-  const handleSearchClear = () => {
-    setSearchValue("");
-    setStoreValue("");
-    setRoleValue("");
-    getData();
-  };
-
-  const downloadExcel = () => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = data.map((item) => {
-      return {
-        "User Id": item._id,
-        "Date Created": new Date(item.createdAt).toLocaleDateString("en-GB"),
-        "User Name": item?.firstName + " " + item?.lastName,
-        "User Email": item.email,
-        "Phone Number": item.phoneNumber,
-        "Grest Member": item.grestMember,
-        "Company Name": item.companyName,
-        Role: item.role,
-        "Store Name": item.stores?.storeName,
-        Region: item.stores?.region,
-        Address: item.address,
-      };
-    });
-
-    const ws = XLSX.utils.json_to_sheet(formattedData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-
-    const dataFile = new Blob([excelBuffer], { type: fileType });
-    saveAs(dataFile, "Users_Data" + fileExtension);
   };
 
   useEffect(() => {
@@ -220,68 +189,47 @@ const RegisterUserDetails = () => {
           <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
         </div>
       </div>
-      {(sucBox || failBox) && (
+      {sucBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
-            }`}
-          >
-            {sucBox ? (
-              <IoIosCheckmarkCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
-                size={90}
-              />
-            ) : (
-              <IoIosCloseCircle
-                className={sucBox ? "text-green-500" : "text-[#EC2752]"}
-                size={90}
-              />
-            )}
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
-              {sucBox ? "Success!" : "Error!"}
-            </h6>
+          <div className={`${styles.err_mod_box} ${succTextColor}`}>
+            <IoIosCheckmarkCircle className={succTextColor} size={90} />
+            <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
-              onClick={() => {
-                setSucBox(false);
-                setFailBox(false);
-              }}
-              className={
-                sucBox ? "bg-green-500 text-white" : "bg-[#EC2752] text-white"
-              }
-            >
-              Okay
-            </button>
+              onClick={() => {setSucBox(false)}}
+              className={"bg-green-500 text-white"}
+            >Okay</button>
+          </div>
+        </div>
+      )}
+      {failBox && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+            <IoIosCloseCircle className={failTextColor} size={90} />
+            <h6 className={failTextColor}>Error!</h6>
+            <p className="text-slate-500">{errMsg}</p>
+            <button
+              onClick={() => {setFailBox(false)}}
+              className={"bg-[#EC2752] text-white"}
+            >Okay</button>
           </div>
         </div>
       )}
       {confBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? "text-green-500" : "text-[#EC2752]"
-            }`}
-          >
-            <h6 className={sucBox ? "text-green-500" : "text-[#EC2752]"}>
-              Confirmation!
-            </h6>
+          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+            <h6 className={failTextColor}>Confirmation!</h6>
             <p className="text-slate-500">
-              {"Do you want to delete user with email - " + selectedEmail} ?
+              {`Do you want to delete user with email - ${selectedEmail} ?`}
             </p>
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => deleteHandler(selectedUser)}
-                className={"bg-[#EC2752] text-white"}
-              >
-                Okay
-              </button>
+                className={"bg-[#EC2752] text-white"}>Okay</button>
               <button
                 onClick={() => {
-                  setConfBox(false), setIsTableLoaded(false);
-                }}
-                className="bg-white text-[#EC2752]"
-              >
+                  setConfBox(false); setIsTableLoaded(false);
+                }} className="bg-white text-[#EC2752]">
                 Cancel
               </button>
             </div>
@@ -293,131 +241,148 @@ const RegisterUserDetails = () => {
           <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
         </div>
       )}
-
-      <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
-        <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={() => {
-              navigate("/registeruser");
-            }}
-          >
-            <IoMdAdd /> Add User
-          </button>
-          <div className={`${styles.search_bar_wrap}`}>
-            <input
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="text-sm"
-              type="text"
-              placeholder="Search Name/Email/Number/UserId"
-              value={searchValue}
-            />
-            <IoMdSearch onClick={handleSearchClick} size={25} />
-          </div>
-          <div className={`${styles.search_bar_wrap}`}>
-            <input
-              onChange={(e) => setRoleValue(e.target.value)}
-              className="text-sm"
-              type="text"
-              placeholder="Search role"
-              value={roleValue}
-            />
-            <IoMdSearch onClick={handleSearchClick} size={25} />
-          </div>
-          <div className={`${styles.search_bar_wrap}`}>
-            <input
-              onChange={(e) => setStoreValue(e.target.value)}
-              className="text-sm"
-              type="text"
-              placeholder="Search Store"
-              value={storeValue}
-            />
-            <IoMdSearch onClick={handleSearchClick} size={25} />
-          </div>
-          <div className={styles.icons_box}>
-            <IoRefresh onClick={handleSearchClear} className="" size={25} />
-          </div>
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={downloadExcel}
-          >
-            <FaDownload /> Bulk Download
-          </button>
-        </div>
-      </div>
-      <div className="m-2 overflow-x-auto md:m-5">
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
-            <tr>
-              <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Name</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Email</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Phone Number</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Company</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Grest Member</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Role</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Store</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Region</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Address</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((val, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  <div className="flex flex-col gap-1">
-                    <button
-                      className={`${styles.view_btn}`}
-                      onClick={() => {
-                        editHandler(val);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className={`${styles.acpt_btn}`}
-                      onClick={() => {
-                        deleteConfHandler(val?._id, val?.email);
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.firstName + " " + val?.lastName}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.email}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.phoneNumber}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.companyName}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.grestMember ? "Yes" : "No"}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.role}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.stores?.storeName}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.stores?.region}
-                </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.address}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <TableFilters setSearchValue={setSearchValue} searchValue={searchValue} handleSearchClick={handleSearchClick} getData={getData}
+        storeValue={storeValue} setRoleValue={setRoleValue} roleValue={roleValue} setStoreValue={setStoreValue} data={data}
+      />
+      <RegisterUserTable data={data} editHandler={editHandler} deleteConfHandler={deleteConfHandler}/>
     </div>
   );
 };
 
 export default RegisterUserDetails;
+
+const TableFilters = ({setSearchValue, searchValue, handleSearchClick, setRoleValue, roleValue, storeValue, setStoreValue, getData, data }) => {
+  const navigate = useNavigate();
+  const handleSearchClear = () => {
+    setSearchValue("");
+    setStoreValue("");
+    setRoleValue("");
+    getData();
+  };
+
+  return <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
+  <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
+    <button
+      className={`${styles.bulkdown_button}`}
+      onClick={() => {
+        navigate("/registeruser");
+      }}
+    >
+      <IoMdAdd /> Add User
+    </button>
+    <div className={`${styles.search_bar_wrap}`}>
+      <input
+        onChange={(e) => setSearchValue(e.target.value)}
+        className="text-sm"
+        type="text"
+        placeholder="Search Name/Email/Number/UserId"
+        value={searchValue}
+      />
+      <IoMdSearch onClick={handleSearchClick} size={25} />
+    </div>
+    <div className={`${styles.search_bar_wrap}`}>
+      <input
+        onChange={(e) => setRoleValue(e.target.value)}
+        className="text-sm"
+        type="text"
+        placeholder="Search role"
+        value={roleValue}
+      />
+      <IoMdSearch onClick={handleSearchClick} size={25} />
+    </div>
+    <div className={`${styles.search_bar_wrap}`}>
+      <input
+        onChange={(e) => setStoreValue(e.target.value)}
+        className="text-sm"
+        type="text"
+        placeholder="Search Store"
+        value={storeValue}
+      />
+      <IoMdSearch onClick={handleSearchClick} size={25} />
+    </div>
+    <div className={styles.icons_box}>
+      <IoRefresh onClick={handleSearchClear} className="" size={25} />
+    </div>
+    <button
+      className={`${styles.bulkdown_button}`}
+      onClick={() => downloadExcel(data)}
+    >
+      <FaDownload /> Bulk Download
+    </button>
+  </div>
+</div>
+}
+
+const RegisterUserTable = ({data, editHandler, deleteConfHandler}) => {
+  return <div className="m-2 overflow-x-auto md:m-5">
+  <table className="w-full border border-[#EC2752]">
+    <thead className="bg-[#EC2752] text-white">
+      <tr>
+        <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
+        <th className="p-2 text-sm md:p-3 md:text-base">Name</th>
+        <th className="p-2 text-sm md:p-3 md:text-base">Email</th>
+        <th className="p-2 text-sm md:p-3 md:text-base">Phone Number</th>
+        <th className="p-2 text-sm md:p-3 md:text-base">Company</th>
+        <th className="p-2 text-sm md:p-3 md:text-base">Grest Member</th>
+        <th className="p-2 text-sm md:p-3 md:text-base">Role</th>
+        <th className="p-2 text-sm md:p-3 md:text-base">Store</th>
+        <th className="p-2 text-sm md:p-3 md:text-base">Region</th>
+        <th className="p-2 text-sm md:p-3 md:text-base">Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      {data.map((val, index) => (
+        <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            <div className="flex flex-col gap-1">
+              <button
+                className={`${styles.view_btn}`}
+                onClick={() => {
+                  editHandler(val);
+                }}
+              >
+                Edit
+              </button>
+              <button
+                className={`${styles.acpt_btn}`}
+                onClick={() => {
+                  deleteConfHandler(val?._id, val?.email);
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </td>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            {`${val?.firstName} ${val?.lastName}`}
+          </td>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            {val?.email}
+          </td>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            {val?.phoneNumber}
+          </td>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            {val?.companyName}
+          </td>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            {val?.grestMember ? "Yes" : "No"}
+          </td>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            {val?.role}
+          </td>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            {val?.stores?.storeName}
+          </td>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            {val?.stores?.region}
+          </td>
+          <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            {val?.address}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+}

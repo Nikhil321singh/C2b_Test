@@ -10,19 +10,20 @@ import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
 const token = sessionStorage.getItem("authToken");
+const initStoreForm = {
+  storeName: "",
+  region: "",
+  email: "",
+  uniqueId: "",
+  contactNumber: "",
+  address: "",
+}
 
 const StoreListing = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    storeName: "",
-    region: "",
-    email: "",
-    uniqueId: "",
-    contactNumber: "",
-    address: "",
-  });
+  const [formData, setFormData] = useState(initStoreForm);
   const [errMsg, setErrMsg] = useState("");
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
