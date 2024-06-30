@@ -19,35 +19,56 @@ import { FaAngleDown, FaDownload } from "react-icons/fa6";
 import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
 
-const OutStanding = () => {
-  const [userRole, setUserRole] = useState(0);
+const succTextColor = "text-green-500";
+const failTextColor = "text-[#EC2752]";
+const token = sessionStorage.getItem("authToken");
+const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+const userRole = LoggedInUser?.role || "";
+
+const downloadExcel = (dataDown) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+  const formattedData = dataDown.map((item) => {
+    return {
+      "Lot Id": item._id,
+      "Date Created": new Date(item.createdAt).toLocaleDateString("en-GB"),
+      "Last Update": new Date(item.updatedAt).toLocaleDateString("en-GB"),
+      Status: item.status,
+      "Requested Status": item.request,
+      "Total Amount": item.totalAmount,
+      "Total Devices": item.totalDevice,
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(formattedData);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const dataFile = new Blob([excelBuffer], { type: fileType });
+  saveAs(dataFile, "Outstanding_Devices_Lots_Data" + fileExtension);
+};
+
+const OutStandingDevices = () => {
   const [data, setData] = useState([]);
   const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [dateValue, setDateValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
-  const [sideMenu, setsideMenu] = useState(false);
+  
   const [tempId, setTempId] = useState();
   const [errorMsg, setErrorMsg] = useState("successfully updated status");
   const [successMod, setSuccessMod] = useState(false);
   const [failMod, setFailMode] = useState(false);
   const [confMod, setConfMod] = useState(false);
-  const [storeName, setStoreName] = useState();
-  const [region, setRegion] = useState();
+  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
+  const [region, setRegion] = useState(LoggedInUser?.region);
   const [storeData, setStoreData] = useState([]);
   const [regionData, setRegionData] = useState([]);
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
   const [allStore, setAllStore] = useState([]);
   let firsttime = useRef(true);
-
-  useEffect(() => {
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    setStoreName(LoggedInUser?.storeName);
-    setRegion(LoggedInUser?.region);
-    setUserRole(LoggedInUser?.role);
-  }, []);
 
   useEffect(() => {
     if (failMod || successMod) {
@@ -61,26 +82,20 @@ const OutStanding = () => {
 
   const getData = () => {
     setIsTableLoaded(true);
-    const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    const token = sessionStorage.getItem("authToken");
-
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/outstanding/all?region=${region}&storeName=${storeName}`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data.data);
         setData(response.data.data);
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setErrorMsg(`Failed to load data`);
         setFailMode(true);
         setIsTableLoaded(false);
@@ -89,20 +104,16 @@ const OutStanding = () => {
 
   const getStore = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data.result);
         const allData = response.data.result;
         const storeNamesArray = response.data.result.map(
           (store) => store.storeName
@@ -116,32 +127,26 @@ const OutStanding = () => {
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setIsTableLoaded(false);
       });
   };
 
   const getDataBySearch = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/outstanding/search?rid=${searchValue}&date=${dateValue}&region=${region}&storeName=${storeName}`,
       headers: { Authorization: token },
     };
-    console.log(config);
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data.data);
         setData(response.data.data);
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setErrorMsg(`Failed to load data`);
         setFailMode(true);
         setIsTableLoaded(false);
@@ -177,10 +182,6 @@ const OutStanding = () => {
     setStoreName(value);
   };
 
-  const handleSearchClick = () => {
-    getDataBySearch();
-  };
-
   const handleSearchClear = () => {
     setSearchValue("");
     setDateValue("");
@@ -192,21 +193,11 @@ const OutStanding = () => {
       "en-GB"
     );
     setDateValue(formattedDate);
-    console.log(dateValue);
   };
 
   const statusUpdateHandler = (refID, newStatus) => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
-    let data = JSON.stringify({
-      refIDs: [refID],
-      newStatus: newStatus,
-    });
-
-    console.log(data);
-
-    let config = {
+    const config = {
       method: "post",
       maxBodyLength: Infinity,
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/outstanding/update`,
@@ -214,13 +205,14 @@ const OutStanding = () => {
         Authorization: token,
         "Content-Type": "application/json",
       },
-      data: data,
+      data: JSON.stringify({
+        refIDs: [refID],
+        newStatus: newStatus,
+      }),
     };
-
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
         getData();
         setErrorMsg(
           `Successfully updated the status of lot ${refID} to ${newStatus}`
@@ -229,7 +221,6 @@ const OutStanding = () => {
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setErrorMsg(
           `Failed to updated the status of lot ${refID} to ${newStatus}`
         );
@@ -244,171 +235,31 @@ const OutStanding = () => {
     setConfMod(true);
   };
 
-  // Handle the request for lots to acc
-  const forwardReqHandler = (refID, newStatus) => {
-    setIsTableLoaded(true);
-    setConfMod(false);
-    const token = sessionStorage.getItem("authToken");
-
-    let data = JSON.stringify({
-      refIDs: refID,
-      newStatus: newStatus,
-    });
-
-    let config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/outstanding/forwardreq`,
-      headers: {
-        Authorization: token,
-        "Content-Type": "application/json",
-      },
-      data: data,
-    };
-
-    axios
-      .request(config)
-      .then((response) => {
-        console.log(JSON.stringify(response.data));
-        getData();
-        setTempId();
-        setErrorMsg(`Successfully forwarded lot ${refID} to pending devices`);
-        setSuccessMod(true);
-        setIsTableLoaded(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setErrorMsg(`Failed to forward the request`);
-        setFailMode(true);
-        setIsTableLoaded(false);
-      });
-  };
-
   const viewHandler = (refID) => {
     setViewRef(refID);
     setShowView(true);
   };
 
-  const downloadExcel = () => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = data.map((item) => {
-      return {
-        "Lot Id": item._id,
-        "Date Created": new Date(item.createdAt).toLocaleDateString("en-GB"),
-        "Last Update": new Date(item.updatedAt).toLocaleDateString("en-GB"),
-        Status: item.status,
-        "Requested Status": item.request,
-        "Total Amount": item.totalAmount,
-        "Total Devices": item.totalDevice,
-      };
-    });
-
-    const ws = XLSX.utils.json_to_sheet(formattedData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-
-    const dataFile = new Blob([excelBuffer], { type: fileType });
-    saveAs(dataFile, "Outstanding_Devices_Lots_Data" + fileExtension);
-  };
-
   return (
     <div className={`${styles.pickedup_page}`}>
-      <div className="flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER ">
-        {userRole === "Technician" ? (
-          <div className="flex items-center justify-between w-full ">
-            <ProfileBox />
-            <img className="w-28 " src={Grest_Logo} alt="app logo" />
-          </div>
-        ) : (
-          <div className="navbar">
-            <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
-            <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
-          </div>
-        )}
-      </div>
-      {(successMod || failMod) && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${
-              successMod ? "text-green-500" : "text-[#EC2752]"
-            }`}
-          >
-            {successMod ? (
-              <IoIosCheckmarkCircle
-                className={successMod ? "text-green-500" : "text-[#EC2752]"}
-                size={90}
-              />
-            ) : (
-              <IoIosCloseCircle
-                className={successMod ? "text-green-500" : "text-[#EC2752]"}
-                size={90}
-              />
-            )}
-            <h6 className={successMod ? "text-green-500" : "text-[#EC2752]"}>
-              {successMod ? "Success!" : "Error!"}
-            </h6>
-            <p className="text-slate-500">{errorMsg}</p>
-            <button
-              onClick={() => {
-                setSuccessMod(false);
-                setFailMode(false);
-              }}
-              className={
-                successMod
-                  ? "bg-green-500 text-white"
-                  : "bg-[#EC2752] text-white"
-              }
-            >
-              Okay
-            </button>
-          </div>
-        </div>
-      )}
-      {confMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${
-              successMod ? "text-green-500" : "text-[#EC2752]"
-            }`}
-          >
-            <h6 className={successMod ? "text-green-500" : "text-[#EC2752]"}>
-              Confirmation!
-            </h6>
-            <p className="text-slate-500">
-              Do you want to update status of {" " + tempId + " "} lot ?
-            </p>
-            <div className="flex flex-row gap-2">
-              <button
-                onClick={() => forwardReqHandler(tempId, "Request Forwarded")}
-                className={"bg-[#EC2752] text-white"}
-              >
-                Okay
-              </button>
-              <button
-                onClick={() => {
-                  setConfMod(false), setIsTableLoaded(false);
-                }}
-                className="bg-white text-[#EC2752]"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {isTableLoaded && (
-        <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
-        </div>
-      )}
+      <ExtComps
+        successMod={successMod}
+        errorMsg={errorMsg}
+        setSuccessMod={setSuccessMod}
+        isTableLoaded={isTableLoaded}
+        setIsTableLoaded={setIsTableLoaded}
+        failMod={failMod}
+        setFailMode={setFailMode}
+        confMod={confMod}
+        setConfMod={setConfMod}
+        setErrorMsg={setErrorMsg}
+        getData={getData}
+        tempId={tempId}
+        setTempId={setTempId}
+      />
       <div className="flex flex-row m-2 gap-4"></div>
       <NavigateTable />
-      <button className={`${styles.bulkdown_button}`} onClick={downloadExcel}>
+      <button className={`${styles.bulkdown_button}`} onClick={() => downloadExcel(data)}>
         <FaDownload /> Bulk Download
       </button>
       <div className="m-2 flex flex-col gap-2">
@@ -421,7 +272,7 @@ const OutStanding = () => {
               placeholder="Search"
               value={searchValue}
             />
-            <IoMdSearch onClick={handleSearchClick} size={34} />
+            <IoMdSearch onClick={() => getDataBySearch()} size={34} />
           </div>
           <div className={styles.icons_box}>
             <IoRefresh onClick={handleSearchClear} className="" size={25} />
@@ -630,4 +481,138 @@ const OutStanding = () => {
   );
 };
 
-export default OutStanding;
+export default OutStandingDevices;
+
+const ExtComps = ({
+  successMod,
+  errorMsg,
+  setSuccessMod,
+  isTableLoaded,
+  setIsTableLoaded,
+  failMod,
+  setFailMode,
+  confMod,
+  setConfMod,
+  setErrorMsg,
+  getData,
+  tempId,
+  setTempId
+}) => {
+
+  const [sideMenu, setsideMenu] = useState(false);
+
+  const forwardReqHandler = (refID, newStatus) => {
+    setIsTableLoaded(true);
+    setConfMod(false);
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/outstanding/forwardreq`,
+      headers: {
+        Authorization: token
+      },
+      data: JSON.stringify({
+        refIDs: refID,
+        newStatus: newStatus,
+      }),
+    };
+    axios
+      .request(config)
+      .then((response) => {
+        getData();
+        setTempId();
+        setErrorMsg(`Successfully forwarded lot ${refID} to pending devices`);
+        setSuccessMod(true);
+        setIsTableLoaded(false);
+      })
+      .catch((error) => {
+        setErrorMsg(`Failed to forward the request`);
+        setFailMode(true);
+        setIsTableLoaded(false);
+      });
+  };
+
+  return <React.Fragment>
+    <div className="flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER ">
+        {userRole === "Technician" ? (
+          <div className="flex items-center justify-between w-full ">
+            <ProfileBox />
+            <img className="w-28 " src={Grest_Logo} alt="app logo" />
+          </div>
+        ) : (
+          <div className="navbar">
+            <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
+            <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
+          </div>
+        )}
+      </div>
+      {successMod && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${succTextColor}`}>
+            <IoIosCheckmarkCircle className={succTextColor} size={90} />
+            <h6 className={succTextColor}>Success!</h6>
+            <p className="text-slate-500">{errorMsg}</p>
+            <button
+              onClick={() => {
+                setSuccessMod(false);
+              }}
+              className={"bg-green-500 text-white"}
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
+      {failMod && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+            <IoIosCloseCircle className={failTextColor} size={90} />
+            <h6 className={failTextColor}>Error!</h6>
+            <p className="text-slate-500">{errorMsg}</p>
+            <button
+              onClick={() => {
+                setFailMode(false);
+              }}
+              className={"bg-[#EC2752] text-white"}
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
+      {confMod && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+            <h6 className={failTextColor}>Confirmation!</h6>
+            <p className="text-slate-500">
+              {`Do you want to update status of Lot - ${tempId} ?`}
+            </p>
+            <div className="flex flex-row gap-2">
+              <button
+                onClick={() => forwardReqHandler(tempId, "Request Forwarded")}
+                className={"bg-[#EC2752] text-white"}
+              >
+                Okay
+              </button>
+              <button
+                onClick={() => {
+                  setConfMod(false);
+                  setIsTableLoaded(false);
+                }}
+                className="bg-white text-[#EC2752]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isTableLoaded && (
+        <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+        </div>
+      )}
+  </React.Fragment>
+}

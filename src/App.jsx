@@ -35,7 +35,7 @@ import Profile from "./pages/Profile/Profile";
 import RegisterUser from "./pages/RegisterUser/RegisterUser";
 import StoreListing from "./pages/StoreListing/StoreListing";
 import CompanyListing from "./pages/CompanyListing/CompanyListing";
-import OutStanding from "./pages/OutStandingDevices/OutStandingDevices";
+import OutStandingDevices from "./pages/OutStandingDevices/OutStandingDevices";
 import Offers from "./pages/Offers/Offers";
 import ViewOfferDetail from "./pages/ViewOfferDetail/ViewOfferDetail";
 import StoreWiseReport from "./pages/StoreWiseReport/StoreWiseReport";
@@ -126,7 +126,7 @@ function App() {
                   path="/pickedupdevices"
                   element={<PickedUpDevices />}
                 ></Route>
-                <Route path="/outstanding" element={<OutStanding />}></Route>
+                <Route path="/outstanding" element={<OutStandingDevices />}></Route>
                 <Route path="/viewpickup" element={<ViewPickup />}></Route>
                 <Route
                   path="/pickuphistory"
