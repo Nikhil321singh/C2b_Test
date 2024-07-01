@@ -179,35 +179,14 @@ const LeadsCompleted = () => {
     });
     saveAs(dataFileLeadsCompleted, "Leads_Completed" + fileExtension);
   };
-
-  const fetchDownloadData = () => {
-    const userToken = sessionStorage.getItem("authToken");
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}`,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        downloadExcelLeadsompleted(res.data.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   return (
     <div>
       <SubLeadsCompleted
         loading={loading}
         setsideMenu={setsideMenu}
         sideMenu={sideMenu}
-        fetchDownloadData={fetchDownloadData}
+        downloadExcelLeadsompleted={downloadExcelLeadsompleted}
+        totalCount={totalCount}
         toggleFilter={toggleFilter}
         isFilterOpen={isFilterOpen}
         productName={productName}
@@ -237,9 +216,10 @@ const SubLeadsCompleted = ({
   loading,
   setsideMenu,
   sideMenu,
-  fetchDownloadData,
   toggleFilter,
   isFilterOpen,
+  downloadExcelLeadsompleted,
+  totalCount,
   productName,
   setProductName,
   customerId,
@@ -259,6 +239,26 @@ const SubLeadsCompleted = ({
   currentPage,
   maxPages,
 }) => {
+  const fetchDownloadData = () => {
+    const userToken = sessionStorage.getItem("authToken");
+    axios
+      .get(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}`,
+        {
+          headers: {
+            authorization: `${userToken}`,
+          },
+        }
+      )
+      .then((res) => {
+        downloadExcelLeadsompleted(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <div className="overflow-y-hidden">
       {loading && (
@@ -270,9 +270,7 @@ const SubLeadsCompleted = ({
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
-
       <NavigateListing />
-
       <div className="mt-2 ml-4">
         <button
           className={`${styles.bulkdown_button}`}
@@ -331,7 +329,6 @@ const SubLeadsCompleted = ({
               onChange={(e) => handleCustomerPhoneChange(e.target.value)}
             />
           </div>
-
           <div>
             <p className="block text-sm text-gray-600 font-medium">
               Store Filter
@@ -346,67 +343,62 @@ const SubLeadsCompleted = ({
               }
             >
               <option value="">Select store</option>
-              {userEmailList.map((particularUser) => (
-                <option key={particularUser._id} value={particularUser._id}>
-                  {particularUser.email}
+              {userEmailList.map((particular_user) => (
+                <option key={particular_user._id} value={particular_user._id}>
+                  {particular_user.email}
                 </option>
               ))}
             </select>
           </div>
           <div>
-            <p className=" text-sm block font-medium text-gray-600">
-              From Date
-            </p>
+            <p className="block font-medium text-gray-600">From Date</p>
             <DatePicker
-              onChange={handleFromDateChange}
               selected={fromDate}
-              className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+              onChange={handleFromDateChange}
               dateFormat="yyyy-MM-dd"
+              className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
               placeholderText="Select from date"
             />
           </div>
           <div>
-            <p className="font-medium block text-sm text-gray-600">To Date</p>
+            <p className="block text-sm font-medium text-gray-600">To Date</p>
             <DatePicker
               selected={toDate}
-              dateFormat="yyyy-MM-dd"
               onChange={handleToDateChange}
-              placeholderText="Select to date"
+              dateFormat="yyyy-MM-dd"
               className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+              placeholderText="Select to date"
             />
           </div>
-
           <button
-            className="bg-[#EC2752] relative top-5 text-white font-bold rounded-md p-2 h-[40px] w-1/2 focus:outline-none"
             onClick={handleFilterSearch}
+            className="bg-[#EC2752] relative top-5 font-bold text-white rounded-md p-2 h-[40px] w-1/2 focus:outline-none"
           >
             Search
           </button>
         </form>
       </div>
-
       <LeadsCompletedTable data={tableData} />
-
-      <div className="flex justify-center mb-4 mt-0">
+      <div className="flex justify-center mt-0 mb-4">
         <button
-          disabled={currentPage === 0}
           onClick={() => setCurrentPage(currentPage - 1)}
-          className={`mx-2 py-2 px-4 rounded-lg ${
+          disabled={currentPage === 0}
+          className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
-              ? "text-gray-600 bg-gray-400 cursor-not-allowed"
-              : "bg-[#EC2752] cursor-pointer text-white"
+              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+              : "bg-[#EC2752] text-white cursor-pointer"
           }`}
         >
           Previous
         </button>
         <button
           onClick={() => setCurrentPage(currentPage + 1)}
-          className={`py-2 mx-2 px-4 rounded-lg ${
+          disabled={currentPage === maxPages - 1}
+          className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "cursor-pointer bg-[#EC2752] text-white"
+              : "bg-[#EC2752] text-white cursor-pointer"
           }`}
-          disabled={currentPage === maxPages - 1}
         >
           Next
         </button>
