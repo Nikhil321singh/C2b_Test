@@ -287,97 +287,128 @@ function NewDeviceqs() {
         </div>
         <button onClick={() => setShowPopup(false)}> Got it</button>
       </div>
-      <div className="mainQContainer">
-        <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
-          <div className="flex items-center justify-between w-full ">
-            <ProfileBox />
-            <img
-              onClick={() => navigate("/selectdevicetype")}
-              className="w-28 "
-              src={Grest_Logo}
-              alt="app logo"
-            />
-          </div>
-        </div>
-        <div className={`${styless.quick_page_nav}`}>
-          <IoIosArrowBack
-            onClick={() => navigate("/selectmodel")}
-            size={25}
-            className="ml-2 text-[#EC2752]"
-          />
-          <p className="ml-2 text-xl font-medium">Device Details</p>
-        </div>
-        <div
-          className={`${styles.search_box_wrap} mt-[15px] mb-[5px] w-[90vw]`}
-        >
-          <div
-            className={`flex items-center bg-gray-200  p-2 mb-1 rounded-lg w-[100%] ${styles.search_box}`}
-          >
-            <div className="flex items-center">
-              <CiSearch size={20} className="inline ml-1" />
-            </div>
-            <input
-              placeholder="Search Question"
-              onChange={() => console.log("state is ", NDstate)}
-              onClick={() => setIsSearchOpen(true)}
-              className="inline w-full mx-2 bg-gray-200 outline-none"
-              type="text"
-            />
-            {isSearchOpen && (
-              <QuestionSearch
-                setIsSearchOpen={setIsSearchOpen}
-                state={NDstate}
-                dispatch={dispatch}
-              />
-            )}
-          </div>
-        </div>
-        <div className="innerContainer">
-          <div className={`maindata`}>
-            <div className="text-lg font-medium tracking-tight text-{1.325rem}">
-              Tell us more about your device?
-            </div>
-            <div className="underline"></div>
-            <div className="questionList">
-              {visible === 1 && <FirstPart NDstate={NDstate} core={core} />}
-              {visible === 2 && (
-                <SecondPart Cosmetics={Cosmetics} NDstate={NDstate} />
-              )}
-              {visible === 3 && (
-                <ThirdPart Display={Display} NDstate={NDstate} />
-              )}
-              {visible === 4 && (
-                <FourthPart
-                  FunctionalMajor={FunctionalMajor}
-                  NDstate={NDstate}
-                />
-              )}
-              {visible === 5 && (
-                <FifthPart
-                  FunctionalMinor={FunctionalMinor}
-                  NDstate={NDstate}
-                />
-              )}
-              {visible === 6 && (
-                <SixthPart Warranty={Warranty} NDstate={NDstate} />
-              )}
-            </div>
-          </div>
-        </div>
-        <AboveSix
-          visible={visible}
-          setVisible={setVisible}
-          updateAns={updateAns}
-          showPopup={showPopup}
-          qna={qna}
-          profile={profile}
-        />
-      </div>
+      <MainQContainer
+        NDstate={NDstate}
+        setIsSearchOpen={setIsSearchOpen}
+        isSearchOpen={isSearchOpen}
+        dispatch={dispatch}
+        visible={visible}
+        core={core}
+        Cosmetics={Cosmetics}
+        Display={Display}
+        FunctionalMajor={FunctionalMajor}
+        FunctionalMinor={FunctionalMinor}
+        Warranty={Warranty}
+        setVisible={setVisible}
+        updateAns={updateAns}
+        showPopup={showPopup}
+        qna={qna}
+        profile={profile}
+      />
     </>
   );
 }
 
 export default NewDeviceqs;
+
+const MainQContainer = ({
+  NDstate,
+  setIsSearchOpen,
+  isSearchOpen,
+  dispatch,
+  visible,
+  core,
+  Cosmetics,
+  Display,
+  FunctionalMajor,
+  FunctionalMinor,
+  Warranty,
+  setVisible,
+  updateAns,
+  showPopup,
+  qna,
+  profile,
+}) => {
+  const navigate = useNavigate();
+  return (
+    <div className="mainQContainer">
+      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
+        <div className="flex items-center justify-between w-full ">
+          <ProfileBox />
+          <img
+            onClick={() => navigate("/selectdevicetype")}
+            className="w-28 "
+            src={Grest_Logo}
+            alt="app logo"
+          />
+        </div>
+      </div>
+      <div className={`${styless.quick_page_nav}`}>
+        <IoIosArrowBack
+          onClick={() => navigate("/selectmodel")}
+          size={25}
+          className="ml-2 text-[#EC2752]"
+        />
+        <p className="ml-2 text-xl font-medium">Device Details</p>
+      </div>
+      <div className={`${styles.search_box_wrap} mt-[15px] mb-[5px] w-[90vw]`}>
+        <div
+          className={`flex items-center bg-gray-200  p-2 mb-1 rounded-lg w-[100%] ${styles.search_box}`}
+        >
+          <div className="flex items-center">
+            <CiSearch size={20} className="inline ml-1" />
+          </div>
+          <input
+            placeholder="Search Question"
+            onChange={() => console.log("state is ", NDstate)}
+            onClick={() => setIsSearchOpen(true)}
+            className="inline w-full mx-2 bg-gray-200 outline-none"
+            type="text"
+          />
+          {isSearchOpen && (
+            <QuestionSearch
+              setIsSearchOpen={setIsSearchOpen}
+              state={NDstate}
+              dispatch={dispatch}
+            />
+          )}
+        </div>
+      </div>
+      <div className="innerContainer">
+        <div className={`maindata`}>
+          <div className="text-lg font-medium tracking-tight text-{1.325rem}">
+            Tell us more about your device?
+          </div>
+          <div className="underline"></div>
+          <div className="questionList">
+            {visible === 1 && <FirstPart NDstate={NDstate} core={core} />}
+            {visible === 2 && (
+              <SecondPart Cosmetics={Cosmetics} NDstate={NDstate} />
+            )}
+            {visible === 3 && <ThirdPart Display={Display} NDstate={NDstate} />}
+            {visible === 4 && (
+              <FourthPart FunctionalMajor={FunctionalMajor} NDstate={NDstate} />
+            )}
+            {visible === 5 && (
+              <FifthPart FunctionalMinor={FunctionalMinor} NDstate={NDstate} />
+            )}
+            {visible === 6 && (
+              <SixthPart Warranty={Warranty} NDstate={NDstate} />
+            )}
+          </div>
+        </div>
+      </div>
+      <AboveSix
+        visible={visible}
+        setVisible={setVisible}
+        updateAns={updateAns}
+        showPopup={showPopup}
+        qna={qna}
+        profile={profile}
+      />
+    </div>
+  );
+};
 
 const FirstPart = ({ NDstate, core }) => {
   return (

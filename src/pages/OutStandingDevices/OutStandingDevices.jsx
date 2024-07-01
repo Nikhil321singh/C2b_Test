@@ -297,13 +297,13 @@ const ExtComps = ({
         </div>
       )}
       {failMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
+        <div className="bg-black bg-opacity-50 fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full ">
           <div className={`${failTextColor} ${styles.err_mod_box}`}>
-            <IoIosCloseCircle size={90} className={failTextColor} />
+            <IoIosCloseCircle className={failTextColor} size={90} />
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
-              className={"bg-[#EC2752] text-white"}
+              className={"text-white bg-[#EC2752] "}
               onClick={() => {
                 setFailMode(false);
               }}
