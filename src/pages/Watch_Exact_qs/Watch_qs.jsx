@@ -100,20 +100,20 @@ function Watchqs() {
         );
         dispatch({ type: "SET_GROUP_ANSWERS", group, answers: answersTemp });
       });
-      const newPopulateAnswers = response.data.data.map((ele) => ele.default);
+      const populateAnswers = response.data.data.map((elem) => elem.default);
       if (answers.length === 0) {
-        const newAnswers = newPopulateAnswers.map((answer, index) => {
+        const currentAnswers = populateAnswers.map((answer, index) => {
           return {
-            quetion: response.data.data[index].quetion,
             answer,
+            quetion: response.data.data[index].quetion,
             key: response.data.data[index].yes === answer ? "yes" : "no",
             group: response.data.data[index].group,
           };
         });
-        setAnswers(newAnswers);
+        setAnswers(currentAnswers);
         ["Functional", "Physical", "Accessories", "Warranty"].forEach(
           (group) => {
-            const answersTemp = newAnswers.filter(
+            const answersTemp = currentAnswers.filter(
               (question) => question.group === group
             );
             store.dispatch(setGroupAnswers({ group, answers: answersTemp }));

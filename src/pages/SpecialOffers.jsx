@@ -86,7 +86,9 @@ export const DynamicCouponCard = ({
 };
 
 const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-const phoneFrontPhoto = phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
+const phoneFrontPhoto =
+  phoneImg?.models?.phonePhotos?.front ||
+  phoneImg?.models?.phonePhotos?.upFront;
 const storedDisableBtn = sessionStorage.getItem("disableBtn");
 const initialDisableBtn = storedDisableBtn
   ? JSON.parse(storedDisableBtn)
@@ -171,7 +173,7 @@ const SpecialOffers = () => {
   };
   const handleSubmit = () => {
     setIsLoading(true);
-    const userToken = sessionStorage.getItem("authToken");
+    const userIdToken = sessionStorage.getItem("authToken");
     const LeadId = sessionStorage.getItem("LeadId");
     axios
       .post(
@@ -179,7 +181,7 @@ const SpecialOffers = () => {
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/questionnaires/item-purchased`,
         { id: LeadId },
-        { headers: { Authorization: userToken } }
+        { headers: { Authorization: userIdToken } }
       )
       .then((response) => {
         setAnswers([]);
@@ -218,6 +220,40 @@ const SpecialOffers = () => {
 
   return (
     <div className="min-h-screen mb-10 overflow-y-auto bg-white">
+      <SubSpecialOffers
+        navigate={navigate}
+        phonePrice={phonePrice}
+        Price={Price}
+        hanldePermanenet={hanldePermanenet}
+        isSelected={isSelected}
+        discountData={discountData}
+        handleViewSummary={handleViewSummary}
+        handleSubmit={handleSubmit}
+        isLoading={isLoading}
+        showModal={showModal}
+        handleCloseModal={handleCloseModal}
+        extraBonus={extraBonus}
+      />
+    </div>
+  );
+};
+
+const SubSpecialOffers = ({
+  phonePrice,
+  Price,
+  hanldePermanenet,
+  isSelected,
+  discountData,
+  handleViewSummary,
+  handleSubmit,
+  isLoading,
+  showModal,
+  handleCloseModal,
+  extraBonus,
+}) => {
+  const navigate = useNavigate();
+  return (
+    <div>
       <div
         className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}
       >
@@ -272,7 +308,7 @@ const SpecialOffers = () => {
           ></CouponCard>
         )}
         {discountData &&
-          discountData.map((val, index) => (
+          discountData.map((val) => (
             <DynamicCouponCard
               key={val._id}
               discount={val.discount}

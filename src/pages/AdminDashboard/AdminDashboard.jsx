@@ -182,39 +182,39 @@ const AdminDashboard = () => {
       <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
         <div className={`${styles.search_bar_wrap}`}>
           <input
-            onChange={(e) => setSearchValue(e.target.value)}
             className="text-sm"
-            type="text"
+            onChange={(e) => setSearchValue(e.target.value)}
             placeholder="Search..."
+            type="text"
             value={searchValue}
           />
-          <IoMdSearch onClick={handleSearchClick} size={25} />
+          <IoMdSearch size={25} onClick={handleSearchClick} />
         </div>
         <div className={styles.icons_box}>
-          <IoRefresh onClick={handleSearchClear} className="" size={25} />
+          <IoRefresh className="" onClick={handleSearchClear} size={25} />
         </div>
         <button
-          className={`${styles.bulkdown_button}`}
           onClick={fetchDownloadData}
+          className={`${styles.bulkdown_button}`}
         >
           <FaDownload /> Bulk Download
         </button>
 
         <div className="[bg-[#F5F4F9]">
           <DatePicker
-            selected={fromDate}
             onChange={handleFromDateChange}
-            dateFormat="yyyy-MM-dd"
+            selected={fromDate}
             className={` mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md`}
+            dateFormat="yyyy-MM-dd"
             placeholderText="Select from date"
           />
         </div>
         <div>
           <DatePicker
-            selected={toDate}
             onChange={handleToDateChange}
-            dateFormat="yyyy-MM-dd"
+            selected={toDate}
             className="mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md"
+            dateFormat="yyyy-MM-dd"
             placeholderText="Select to date"
           />
         </div>

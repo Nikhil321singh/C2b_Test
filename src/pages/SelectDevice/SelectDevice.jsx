@@ -24,46 +24,46 @@ export const SeriesFilter = ({
     { name: "Ultra", apiType: "Ultra" },
     { name: "Ultra 2", apiType: "Ultra 2" },
   ];
-
-  const categoryContainerRef = useRef(null);
+  const catContainerRef = useRef(null);
 
   const scrollCategory = (direction) => {
     const scrollAmount = 200;
 
-    if (categoryContainerRef.current) {
-      if (direction === "left") {
-        categoryContainerRef.current.scrollBy({
-          left: -scrollAmount,
+    if (catContainerRef.current) {
+      if (direction === "right") {
+        catContainerRef.current.scrollBy({
+          left: scrollAmount,
           behavior: "smooth",
         });
-      } else if (direction === "right") {
-        categoryContainerRef.current.scrollBy({
-          left: scrollAmount,
+      } else if (direction === "left") {
+        catContainerRef.current.scrollBy({
+          left: -scrollAmount,
           behavior: "smooth",
         });
       }
     }
   };
+
   return (
     <div className={`${styles.select_button_wrap}`}>
       <button
-        className={`translate-x-3 ${styles.scroll_button}`}
         onClick={() => scrollCategory("left")}
+        className={`translate-x-3 ${styles.scroll_button}`}
       >
         <IoIosArrowBack size={30} />
       </button>
       <div
         ref={categoryContainerRef}
-        className={`flex flex-shrink-0 gap-4 px-1 overflow-x-auto scrollbar-hide scroll-smooth ${styles.select_button_box}`}
+        className={`flex flex-shrink-0 px-1 gap-4 overflow-x-auto scroll-smooth scrollbar-hide ${styles.select_button_box}`}
       >
         {categories.map((category, index) => (
           <div
-            key={index}
             className={`${
               selectedBtn === category.name
                 ? styles.button_checked
                 : styles.button_unchecked
             } text-xs font-medium text-nowrap flex-grow flex-shrink-0 px-0 w-[70px]`}
+            key={index}
             onClick={() => {
               setSelectedBtn(category.name);
               setSeriesType(category.apiType);

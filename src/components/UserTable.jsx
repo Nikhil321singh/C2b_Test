@@ -8,7 +8,7 @@ const UserTable = ({ data }) => {
   const [QNAData, setQNAData] = useState([]);
   const dataIndex = null;
   function getUserFullName(user) {
-    if (!user){ 
+    if (!user) {
       return "";
     }
 

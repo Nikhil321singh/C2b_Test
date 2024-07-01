@@ -21,27 +21,27 @@ const ExportTableData = ({
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/prospects/findAllSelled?page=${0}&limit=${currentTableTotalCount}&filter=${selecTime}`;
       }
-      const response = await axios.get(endpoint);
-      downloadExcel(response.data.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+      const res = await axios.get(endpoint);
+      downloadExcelFile(res.data.data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
     }
   };
-  const downloadExcel = (apiData) => {
+  const downloadExcelFile = (apiData) => {
     const fileType =
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
 
-    const formattedData = apiData.map((item) => {
+    const fileExten = ".xlsx";
+    const formattedData = apiData.map((elem) => {
       return {
-        phoneNumber: item.phoneNumber,
-        "User Email": item.userId?.email,
-        "Customer Mobile No.": item.phoneNumber,
-        "Customer Name": item.name,
-        Product: item.modelId?.name,
-        Price: item.actualPrice,
-        "Prospect Id": item.userId?._id,
-        "IMEI No.": item.documentId?.IMEI,
+        phoneNumber: elem.phoneNumber,
+        "User Email": elem.userId?.email,
+        "Customer Mobile No.": elem.phoneNumber,
+        "Customer Name": elem.name,
+        Product: elem.modelId?.name,
+        Price: elem.actualPrice,
+        "Prospect Id": elem.userId?._id,
+        "IMEI No.": elem.documentId?.IMEI,
       };
     });
 
@@ -50,7 +50,7 @@ const ExportTableData = ({
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
 
     const dataFile = new Blob([excelBuffer], { type: fileType });
-    saveAs(dataFile, "Table_Data" + fileExtension);
+    saveAs(dataFile, "Table_Data" + fileExten);
   };
   return (
     <div>

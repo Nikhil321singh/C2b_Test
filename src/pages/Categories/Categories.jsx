@@ -33,29 +33,29 @@ const brandImages = {
 };
 
 export const DeviceTypeFilter = ({
-  selectedBtn,
   setSelectedBtn,
   setDeviceType,
+  selectedBtn,
 }) => {
   const categories = [
+    { name: "Watches", image: watch, apiType: "Watch" },
     { name: "Mobiles", image: mobile, apiType: "Mobile" },
     { name: "Laptops", image: laptop, apiType: "Laptop" },
-    { name: "Watches", image: watch, apiType: "Watch" },
     { name: "More", image: null },
   ];
 
   const categoryContainerRef = useRef(null);
 
-  const scrollCategory = (direction) => {
+  const scrollDirection = (directive) => {
     const scrollAmount = 200;
 
     if (categoryContainerRef.current) {
-      if (direction === "left") {
+      if (directive === "left") {
         categoryContainerRef.current.scrollBy({
           left: -scrollAmount,
           behavior: "smooth",
         });
-      } else if (direction === "right") {
+      } else if (directive === "right") {
         categoryContainerRef.current.scrollBy({
           left: scrollAmount,
           behavior: "smooth",
@@ -67,26 +67,26 @@ export const DeviceTypeFilter = ({
     <div className={`${styles.select_button_wrap}`}>
       <button
         className={`translate-x-3 ${styles.scroll_button}`}
-        onClick={() => scrollCategory("left")}
+        onClick={() => scrollDirection("left")}
       >
         <IoIosArrowBack size={30} />
       </button>
       <div
+        className={`flex flex-shrink-0 gap-4 overflow-x-auto px-1 scrollbar-hide scroll-smooth ${styles.select_button_box}`}
         ref={categoryContainerRef}
-        className={`flex flex-shrink-0 gap-4 px-1 overflow-x-auto scrollbar-hide scroll-smooth ${styles.select_button_box}`}
       >
         {categories.map((category, index) => (
           <div
+            onClick={() => {
+              setSelectedBtn(category.name);
+              setDeviceType(category.apiType);
+            }}
             key={index}
             className={
               selectedBtn === category.name
                 ? styles.button_checked
                 : styles.button_unchecked
             }
-            onClick={() => {
-              setSelectedBtn(category.name);
-              setDeviceType(category.apiType);
-            }}
           >
             {category.image && <img src={category.image} alt={category.name} />}
             <span>{category.name}</span>
@@ -95,7 +95,7 @@ export const DeviceTypeFilter = ({
       </div>
       <button
         className={`-translate-x-3 ${styles.scroll_button}`}
-        onClick={() => scrollCategory("right")}
+        onClick={() => scrollDirection("right")}
       >
         <IoIosArrowForward size={30} />
       </button>
@@ -103,13 +103,12 @@ export const DeviceTypeFilter = ({
   );
 };
 
-
-function deviceSetter (DevType) {
-  if(DevType === "Mobile"){
+function deviceSetter(DevType) {
+  if (DevType === "Mobile") {
     return "Mobiles";
-  }else if(DevType === "Laptop"){
-    return "Laptops"
-  }else if(DevType === "Watch"){
+  } else if (DevType === "Laptop") {
+    return "Laptops";
+  } else if (DevType === "Watch") {
     return "Watches";
   }
   return "More";

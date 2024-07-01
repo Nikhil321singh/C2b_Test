@@ -78,7 +78,7 @@ const PickupHistory = () => {
 
   const getStore = () => {
     setIsTableLoaded(true);
-    const config = {
+    const conf = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -86,24 +86,22 @@ const PickupHistory = () => {
       headers: { Authorization: token },
     };
     axios
-      .request(config)
-      .then((response) => {
-        console.log(response.data.result);
-        const allData = response.data.result;
-        const storeNamesArray = response.data.result.map(
-          (store) => store.storeName
-        );
+      .request(conf)
+      .then((res) => {
+        console.log(res.data.result);
+        const allData = res.data.result;
+        const storeNamesArray = res.data.result.map((store) => store.storeName);
         const uniqueRegionsArray = [
-          ...new Set(response.data.result.map((store) => store.region)),
+          ...new Set(res.data.result.map((store) => store.region)),
         ];
-        setAllStore(allData);
         setStoreData(storeNamesArray);
-        setRegionData(uniqueRegionsArray);
+        setAllStore(allData);
         setIsTableLoaded(false);
+        setRegionData(uniqueRegionsArray);
       })
       .catch((error) => {
-        console.log(error);
         setIsTableLoaded(false);
+        console.log(error);
       });
   };
 
@@ -116,22 +114,20 @@ const PickupHistory = () => {
   }, [storeName, region]);
 
   const handleRegionChange = (value) => {
-    setRegionDrop(false);
     setStoreName("");
-    const filteredStores = allStore.filter((store) => store.region === value);
-    const storeNamesArray = filteredStores.map((store) => store.storeName);
-    setStoreData(storeNamesArray);
+    setRegionDrop(false);
+    const filterStores = allStore.filter((store) => store.region === value);
+    const storeNamesArray = filterStores.map((store) => store.storeName);
     setRegion(value);
+    setStoreData(storeNamesArray);
   };
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore.filter(
-      (store) => store.storeName === value
-    );
-    const newRegion = filteredStores[0].region;
-    setRegion(newRegion);
+    const filterStores = allStore.filter((store) => store.storeName === value);
+    const newRegion = filterStores[0].region;
     setStoreName(value);
+    setRegion(newRegion);
   };
 
   const viewHandler = (refID) => {
@@ -166,57 +162,57 @@ const PickupHistory = () => {
       >
         <FaDownload /> Bulk Download
       </button>
-      <div className="flex m-2 gap-2 w-100 items-center outline-none">
-        <div className="relative w-[45%]">
+      <div className="m-2 flex gap-2 w-100 items-center outline-none">
+        <div className="w-[45%] relative">
           <div
-            className={`${styles.filter_button}`}
             onClick={() => {
               setRegionDrop(!regionDrop);
             }}
+            className={`${styles.filter_button}`}
           >
-            <p className="truncate">
+            <p className="truncate ">
               {region === "" ? "Select Region" : region}
             </p>
             <FaAngleDown
-              size={17}
               className={`${regionDrop && "rotate-180"}`}
+              size={17}
             />
           </div>
           {regionDrop && (
             <div className={`${styles.filter_drop}`}>
-              {regionData.map((item) => (
+              {regionData.map((elem) => (
                 <div
-                  key={item}
-                  onClick={() => handleRegionChange(item)}
+                  key={elem}
+                  onClick={() => handleRegionChange(elem)}
                   className={`${styles.filter_option}`}
                 >
-                  <p className="truncate">{item}</p>
+                  <p className="truncate">{elem}</p>
                 </div>
               ))}
             </div>
           )}
         </div>
-        <div className="relative w-[70%]">
+        <div className="w-[70%] relative">
           <div
-            className={`${styles.filter_button}`}
             onClick={() => {
               setStoreDrop(!storeDrop);
             }}
+            className={`${styles.filter_button}`}
           >
             <p className="truncate">
               {storeName === "" ? "Select Store" : storeName}
             </p>
-            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
+            <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
           </div>
           {storeDrop && (
             <div className={`${styles.filter_drop}`}>
-              {storeData.map((item, index) => (
+              {storeData.map((element, index) => (
                 <div
+                  onClick={() => handleStoreChange(element)}
                   key={index}
-                  onClick={() => handleStoreChange(item)}
                   className={`${styles.filter_option}`}
                 >
-                  <p className="truncate">{item}</p>
+                  <p className="truncate">{element}</p>
                 </div>
               ))}
             </div>
@@ -259,19 +255,19 @@ const PickupTable = ({ pickupData, viewHandler }) => {
                 View
               </button>
             </td>
-            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            <td className="text-sm p-2 text-center md:p-3 md:text-base">
               {val?.status}
             </td>
-            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            <td className="p-2 text-center text-sm md:p-3 md:text-base">
               {new Date(val.createdAt).toLocaleDateString("en-GB")}
             </td>
-            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            <td className="text-center p-2 text-sm md:p-3 md:text-base">
               {val?._id}
             </td>
-            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            <td className="p-2 text-center text-sm md:p-3 md:text-base">
               {val?.totalDevice}
             </td>
-            <td className="p-2 text-sm text-center md:p-3 md:text-base">
+            <td className="text-sm p-2 text-center md:p-3 md:text-base">
               {val?.totalAmount}
             </td>
           </tr>

@@ -17,7 +17,7 @@ const initStoreForm = {
   uniqueId: "",
   contactNumber: "",
   address: "",
-}
+};
 
 const StoreListing = () => {
   const [sideMenu, setsideMenu] = useState(false);
@@ -65,24 +65,24 @@ const StoreListing = () => {
       })
       .catch((error) => {
         setErrMsg("Failed to add store");
-        setFailBox(true);
         setIsTableLoaded(false);
+        setFailBox(true);
       });
   };
 
   return (
-    <div className="min-h-screen  pb-8 bg-[#F5F4F9]">
+    <div className="min-h-screen bg-[#F5F4F9] pb-8">
       <div className="navbar">
-        <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
-        <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
+        <AdminNavbar sideMenu={sideMenu} setsideMenu={setsideMenu} />
+        <SideMenu sideMenu={sideMenu} setsideMenu={setsideMenu} />
       </div>
       {isTableLoaded && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full bg-black bg-opacity-50 h-full">
+          <BeatLoader color={"#EC2752"} size={15} loading={isTableLoaded} />
         </div>
       )}
       {(sucBox || failBox) && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full bg-black bg-opacity-50 w-full">
           <div
             className={`${styles.err_mod_box} ${
               sucBox ? succTextColor : failTextColor
@@ -137,93 +137,103 @@ const StoreListing = () => {
               View Detail
             </button>
           </div>
-          <form className="ml-10 flex flex-col gap-4" onSubmit={submitHandler}>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Store Name*</span>
-              <input
-                id="storeName"
-                name="storeName"
-                value={formData.storeName}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Unique Id*</span>
-              <input
-                id="uniqueId"
-                name="uniqueId"
-                value={formData.uniqueId}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none "
-                type="text"
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2 ">
-              <span className="font-medium text-xl">Email*</span>
-              <input
-                id="email"
-                name="email"
-                minLength={6}
-                value={formData.email}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="email"
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Contact Number*</span>
-              <input
-                id="contactNumber"
-                name="contactNumber"
-                minLength={10}
-                value={formData.contactNumber}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="number"
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Region*</span>
-              <input
-                id="region"
-                name="region"
-                value={formData.region}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="text"
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Adddress*</span>
-              <input
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="text"
-                required={true}
-              />
-            </div>
-            <div className="mt-8">
-              <button
-                type="submit"
-                className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
-              >
-                Submit Form
-              </button>
-            </div>
-          </form>
+          <StoreListingForm
+            submitHandler={submitHandler}
+            formData={formData}
+            handleChange={handleChange}
+          />
         </div>
       </div>
     </div>
+  );
+};
+
+const StoreListingForm = ({ submitHandler, formData, handleChange }) => {
+  return (
+    <form onSubmit={submitHandler} className="flex flex-col gap-4 ml-10">
+      <div className="flex flex-col gap-2 w-[70%]">
+        <span className="text-xl font-medium">Store Name*</span>
+        <input
+          id="storeName"
+          value={formData.storeName}
+          name="storeName"
+          className="border-2 px-2 py-2 rounded-lg outline-none"
+          onChange={handleChange}
+          type="text"
+          required={true}
+        />
+      </div>
+      <div className="w-[70%] flex flex-col gap-2">
+        <span className="font-medium text-xl">Unique Id*</span>
+        <input
+          id="uniqueId"
+          name="uniqueId"
+          value={formData.uniqueId}
+          className="border-2 px-2 py-2 rounded-lg  outline-none "
+          onChange={handleChange}
+          type="text"
+          required={true}
+        />
+      </div>
+      <div className="flex flex-col w-[70%] gap-2 ">
+        <span className="text-xl font-medium">Email*</span>
+        <input
+          id="email"
+          minLength={6}
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          className="border-2 px-2 py-2 rounded-lg  outline-none"
+          type="email"
+          required={true}
+        />
+      </div>
+      <div className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Contact Number*</span>
+        <input
+          id="contactNumber"
+          name="contactNumber"
+          minLength={10}
+          className="border-2 px-2 py-2 rounded-lg  outline-none"
+          onChange={handleChange}
+          value={formData.contactNumber}
+          type="number"
+          required={true}
+        />
+      </div>
+      <div className="flex flex-col gap-2 w-[70%]">
+        <span className="text-xl font-medium">Region*</span>
+        <input
+          id="region"
+          name="region"
+          className="border-2 px-2 py-2 rounded-lg  outline-none"
+          value={formData.region}
+          type="text"
+          onChange={handleChange}
+          required={true}
+        />
+      </div>
+      <div className="flex flex-col gap-2 w-[70%]">
+        <span className="font-medium text-xl">Adddress*</span>
+        <input
+          id="address"
+          name="address"
+          className="border-2 px-2 py-2 rounded-lg  outline-none"
+          onChange={handleChange}
+          type="text"
+          value={formData.address}
+          required={true}
+        />
+      </div>
+      <div className="mt-8">
+        <button
+          type="submit"
+          className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+        >
+          Submit Form
+        </button>
+      </div>
+    </form>
   );
 };
 

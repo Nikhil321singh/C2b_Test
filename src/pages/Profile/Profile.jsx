@@ -49,7 +49,7 @@ const Profile = () => {
         setErrorMsg("");
       }, 5000);
       return () => clearTimeout(timeoutId);
-    }else{
+    } else {
       return () => {};
     }
   }, [errorMsg]);
@@ -191,14 +191,43 @@ const Profile = () => {
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
+      <ProfileDetail
+        errorMsg={errorMsg}
+        profileImage={profileImage}
+        isEditing={isEditing}
+        handleUploadButtonClick={handleUploadButtonClick}
+        handleFileInputChange={handleFileInputChange}
+        Deleteimage={Deleteimage}
+        handleEditClick={handleEditClick}
+        profile={profile}
+        handleInputChange={handleInputChange}
+        handleSaveClick={handleSaveClick}
+      />
+    </div>
+  );
+};
 
-      <div
-        style={{
-          boxShadow:
-            "rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px",
-        }}
-        className="items-center bg-white w-[900px] flex py-4 mx-auto mt-4 justify-center flex-col"
-      >
+const ProfileDetail = ({
+  errorMsg,
+  profileImage,
+  isEditing,
+  handleUploadButtonClick,
+  handleFileInputChange,
+  Deleteimage,
+  handleEditClick,
+  profile,
+  handleInputChange,
+  handleSaveClick,
+}) => {
+  return (
+    <div
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px",
+      }}
+      className="items-center bg-white w-[900px] flex py-4 mx-auto mt-4 justify-center flex-col"
+    >
+      <div>
         <div className="flex flex-col justify-center items-center">
           <p className="text-4xl font-bold">Profile</p>
           <p className="font-medium text-[#EC2752]">{errorMsg}</p>
@@ -247,131 +276,77 @@ const Profile = () => {
             </div>
           </div>
           <div className="w-full flex gap-4">
-            <label className="flex flex-col w-1/2 gap-2">
-              <span className="font-medium text-xl">First Name</span>
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                name="firstName"
-                value={profile.firstName}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-              />
-            </label>
-
-            <label className="flex flex-col w-1/2 gap-2">
-              <span className="font-medium text-xl">Last Name</span>
-
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                name="lastName"
-                value={profile.lastName}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-              />
-            </label>
+            <ProfileDetailLabel
+              spanText={"First Name"}
+              profileValue={profile.firstName}
+              inputName={"firstName"}
+              handleInputChange={handleInputChange}
+              isEditing={isEditing}
+            />
+            <ProfileDetailLabel
+              spanText={"Last Name"}
+              profileValue={profile.lastName}
+              inputName={"lastName"}
+              handleInputChange={handleInputChange}
+              isEditing={isEditing}
+            />
           </div>
           <div className="w-full flex gap-4">
-            <label className="flex flex-col w-1/2 gap-2 ">
-              <span className="font-medium text-xl">Email</span>
-
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                name="email"
-                value={profile.email}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-              />
-            </label>
-            <label className="flex flex-col w-1/2 gap-2">
-              <span className="font-medium text-xl">Website</span>
-
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                name="website"
-                value={profile.website}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-              />
-            </label>
+            <ProfileDetailLabel
+              spanText={"Email"}
+              profileValue={profile.email}
+              inputName={"email"}
+              handleInputChange={handleInputChange}
+              isEditing={isEditing}
+            />
+            <ProfileDetailLabel
+              spanText={"Website"}
+              profileValue={profile.website}
+              inputName={"website"}
+              handleInputChange={handleInputChange}
+              isEditing={isEditing}
+            />
           </div>
           <div className="w-full flex gap-4">
-            <label className="flex flex-col w-full gap-2">
-              <span className="font-medium text-xl">Contact Number</span>
-
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                name="phoneNumber"
-                value={profile.phoneNumber}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-              />
-            </label>
-            <label className="flex flex-col w-full gap-2">
-              <span className="font-medium text-xl">Company Name</span>
-
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                name="companyName"
-                value={profile.companyName}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-              />
-            </label>
+            <ProfileDetailLabel
+              spanText={"Contact Number"}
+              profileValue={profile.phoneNumber}
+              inputName={"phoneNumber"}
+              handleInputChange={handleInputChange}
+              isEditing={isEditing}
+            />
+            <ProfileDetailLabel
+              spanText={"Company Name"}
+              profileValue={profile.companyName}
+              inputName={"companyName"}
+              handleInputChange={handleInputChange}
+              isEditing={isEditing}
+            />
           </div>
           <div className="w-full flex gap-4">
-            <label className="flex flex-col w-full gap-2">
-              <span className="font-medium text-xl">Address</span>
-
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                name="address"
-                value={profile.address}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-              />
-            </label>
-            <label className="flex flex-col w-full gap-2">
-              <span className="font-medium text-xl">Manager Name</span>
-
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                name="managerName"
-                value={profile.managerName}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-              />
-            </label>
+            <ProfileDetailLabel
+              spanText={"Address"}
+              profileValue={profile.address}
+              inputName={"address"}
+              handleInputChange={handleInputChange}
+              isEditing={isEditing}
+            />
+            <ProfileDetailLabel
+              spanText={"Manager Name"}
+              profileValue={profile.managerName}
+              inputName={"managerName"}
+              handleInputChange={handleInputChange}
+              isEditing={isEditing}
+            />
           </div>
           <div className="w-full flex gap-4 items-center">
-            <label className="flex flex-col w-1/2 gap-2">
-              <span className="font-medium text-xl">Pin Code</span>
-
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                name="pincode"
-                value={profile.pincode}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                required
-              />
-            </label>
+            <ProfileDetailLabel
+              spanText={"Pin Code"}
+              profileValue={profile.pincode}
+              inputName={"pincode"}
+              handleInputChange={handleInputChange}
+              isEditing={isEditing}
+            />
             {isEditing && (
               <div className={`flex flex-row gap-2 mt-8`}>
                 <button
@@ -392,6 +367,29 @@ const Profile = () => {
         </form>
       </div>
     </div>
+  );
+};
+
+const ProfileDetailLabel = ({
+  spanText,
+  profileValue,
+  inputName,
+  handleInputChange,
+  isEditing,
+}) => {
+  return (
+    <label className="flex flex-col w-1/2 gap-2">
+      <span className="font-medium text-xl">{spanText}</span>
+      <input
+        className="border-2 px-2 py-2 rounded-lg outline-none"
+        type="text"
+        name={inputName}
+        value={profileValue}
+        onChange={handleInputChange}
+        disabled={!isEditing}
+        required
+      />
+    </label>
   );
 };
 

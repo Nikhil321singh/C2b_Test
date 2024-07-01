@@ -112,9 +112,6 @@
   color: white;
 }
 
-.date_picker_wrap {
-}
-
 .date_picker_wrap input {
   visibility: hidden;
   position: absolute;

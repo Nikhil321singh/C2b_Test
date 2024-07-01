@@ -170,53 +170,60 @@ const RegisterUserEditForm = ({
 }) => {
   return (
     <div
-      style={{boxShadow:"rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px"}}
+      style={{
+        boxShadow:
+          "rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px",
+      }}
       className="items-center bg-white max-w-[900px] flex py-8 mx-auto mt-4 justify-center flex-col"
     >
       <div className="flex flex-col w-[900px]">
         <div className="mb-6 relative flex flex-col gap-2 border-b-2 mr-10 pb-2 ml-10">
-          <IoClose size={35} onClick={closeHandler}
-            className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500"/>
+          <IoClose
+            size={35}
+            onClick={closeHandler}
+            className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500"
+          />
           <p className="text-4xl font-bold">Update User Details</p>
           <p className="text-lg">All fields marked with * are required</p>
         </div>
         <form className="ml-10 flex flex-col gap-4" onSubmit={submitHandler}>
-          <label className="flex flex-col w-[70%] gap-2">
+          <label className="flex flex-col gap-2 w-[70%]">
             <span className="font-medium text-xl">First name*</span>
             <input
-              name="firstName"
               id="firstName"
+              name="firstName"
+              className="border-2 px-2 py-2 rounded-lg outline-none"
               placeholder="Enter first name"
               value={formData.firstName}
               onChange={handleChange}
-              className="border-2 px-2 py-2 rounded-lg outline-none"
               type="text"
               required
             />
           </label>
-          <label className="flex flex-col w-[70%] gap-2">
+          <label className="flex flex-col gap-2 w-[70%]">
             <span className="font-medium text-xl">Last name</span>
             <input
               name="lastName"
               id="lastName"
               placeholder="Enter last name"
               value={formData.lastName}
-              onChange={handleChange}
               className="border-2 px-2 py-2 rounded-lg outline-none"
+              onChange={handleChange}
               type="text"
             />
           </label>
-          <label className="flex flex-col w-[70%] gap-2">
-            <span className="font-medium text-xl">Email*</span>
+          <label className="flex flex-col gap-2 w-[70%]">
+            <span className="text-xl font-medium">Email*</span>
             <input
               name="email"
               id="email"
               minLength={5}
               placeholder="Enter your email address"
+              className="border-2 px-2 py-2 rounded-lg  outline-none "
               value={formData.email}
               onChange={handleChange}
-              className="border-2 px-2 py-2 rounded-lg  outline-none "
-              type="email" required
+              type="email"
+              required
             />
           </label>
           <label className="flex flex-col w-[70%] gap-2 ">
@@ -229,14 +236,17 @@ const RegisterUserEditForm = ({
               value={formData.phoneNumber}
               onChange={handleChange}
               className="border-2 px-2 py-2 rounded-lg  outline-none"
-              type="number" required
+              type="number"
+              required
             />
           </label>
           <label className="flex flex-col w-[70%] gap-2">
             <span className="font-medium text-xl">Is Grest Member?*</span>
             <div className="flex gap-4">
               <div
-                className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${isGrest === "yes" ? "bg-[#EC2752] text-white" : ""}`}
+                className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${
+                  isGrest === "yes" ? "bg-[#EC2752] text-white" : ""
+                }`}
               >
                 <input
                   onChange={() => setIsGrest("yes")}
@@ -250,7 +260,9 @@ const RegisterUserEditForm = ({
                 <label htmlFor="yes">Yes</label>
               </div>
               <div
-                className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${isGrest === "no" ? "bg-[#EC2752] text-white" : ""} `}
+                className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${
+                  isGrest === "no" ? "bg-[#EC2752] text-white" : ""
+                } `}
               >
                 <input
                   onChange={() => setIsGrest("no")}
@@ -272,11 +284,14 @@ const RegisterUserEditForm = ({
               name="companyId"
               value={formData.companyId}
               className="outline-none text-base border-2 px-2 py-2 rounded-lg"
-              onChange={handleChange} required
+              onChange={handleChange}
+              required
             >
               <option value="">None</option>
               {companyData.map((item) => (
-                <option key={item._id} value={item._id}>{item.companyName}</option>
+                <option key={item._id} value={item._id}>
+                  {item.companyName}
+                </option>
               ))}
             </select>
           </label>
@@ -287,7 +302,8 @@ const RegisterUserEditForm = ({
               name="storeId"
               value={formData.storeId}
               className="outline-none text-base border-2 px-2 py-2 rounded-lg"
-              onChange={handleChange} required
+              onChange={handleChange}
+              required
             >
               <option value="">None</option>
               {storeData.map((item) => (
@@ -334,13 +350,18 @@ const RegisterUserEditForm = ({
             />
           </label>
           <div className="mt-8">
-            <button type="submit"
-              className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]">Update Details</button>
+            <button
+              type="submit"
+              className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+            >
+              Update Details
+            </button>
             <p className="text-[#EC2752]">{response}</p>
           </div>
         </form>
       </div>
     </div>
-)};
+  );
+};
 
 export default RegisterUserEdit;

@@ -71,17 +71,17 @@ const OrdersCompleted = ({ daysfilters, head }) => {
   return (
     <div className="min-h-screen">
       {loading && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={loading} size={15} />
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
+          <BeatLoader loading={loading} color={"#EC2752"} size={15} />
         </div>
       )}
       {head === undefined && (
-        <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-          <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center h-16 w-screen py-4 border-b-2 bg-white HEADER ">
+          <div className="w-full flex items-center justify-between  ">
             <ProfileBox />
             <img
-              onClick={() => navigate("/selectdevicetype")}
               className="w-28 "
+              onClick={() => navigate("/selectdevicetype")}
               src={Grest_Logo}
               alt="app logo"
             />
@@ -90,20 +90,20 @@ const OrdersCompleted = ({ daysfilters, head }) => {
       )}
 
       <div
-        className={`mx-auto mt-2 flex items-center bg-gray-200  p-2 mb-1 rounded-lg w-[90%] ${styles.search_box}`}
+        className={`mt-2 mx-auto flex items-center p-2 mb-1 bg-gray-200 rounded-lg w-[90%] ${styles.search_box}`}
       >
         <div className="flex items-center">
-          <CiSearch size={20} className="inline ml-1" />
+          <CiSearch className="inline ml-1" size={20} />
         </div>
         <input
-          placeholder="Search..."
           className="inline w-full mx-2 bg-gray-200 outline-none"
+          placeholder="Search..."
           type="text"
           value={serachval}
           onChange={(e) => setSerachval(e.target.value)}
         />
-        <div className=" text-center bg-[#EC2752] px-2  py-1 rounded-lg">
-          <button className="text-white " onClick={handleSeachSubmit}>
+        <div className="bg-[#EC2752] text-center px-2 py-1 rounded-lg">
+          <button onClick={handleSeachSubmit} className="text-white ">
             Search
           </button>
         </div>

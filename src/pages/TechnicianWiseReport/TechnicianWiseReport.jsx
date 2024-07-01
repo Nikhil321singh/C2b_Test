@@ -124,24 +124,24 @@ const TechnicianWiseReport = () => {
   const handleFromDateChange = (date) => {
     if (date !== null) {
       setFromDate(date);
-      const formattedDate = new Date(
+      const formatDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
       )
         .toISOString()
         .split("T")[0];
-      setFromDateDup(formattedDate);
+      setFromDateDup(formatDate);
     }
     console.log("from", date);
   };
   const handleToDateChange = (date) => {
     if (date !== null) {
       setToDate(date);
-      const formattedDate = new Date(
+      const formatDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
       )
         .toISOString()
         .split("T")[0];
-      setToDateDup(formattedDate);
+      setToDateDup(formatDate);
     }
     console.log("to", date);
   };
