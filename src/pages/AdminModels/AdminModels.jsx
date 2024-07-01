@@ -206,7 +206,6 @@ const AdminModels = () => {
         confBox={confBox}
         deleteHandler={deleteHandler}
         setConfBox={setConfBox}
-        selectedModel={selectedModel}
         setCategory={setCategory}
       />
       <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
@@ -259,7 +258,6 @@ const ExtComps = ({
   confBox,
   deleteHandler,
   setConfBox,
-  selectedModel,
   setCategory,
 }) => {
   const [sideMenu, setsideMenu] = useState(false);

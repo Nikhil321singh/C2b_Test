@@ -129,13 +129,13 @@ const LeadsCompleted = () => {
       });
   }, []);
 
-  const handleFromDateChange = (date, e) => {
-    if (date === null) {
+  const handleFromDateChange = (DateTemp, e) => {
+    if (DateTemp === null) {
       setFromDate("");
     } else {
-      setFromDate(date);
+      setFromDate(DateTemp);
       const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
+        DateTemp.getTime() - DateTemp.getTimezoneOffset() * 60000
       )
         .toISOString()
         .split("T")[0];
@@ -143,13 +143,13 @@ const LeadsCompleted = () => {
     }
   };
 
-  const handleToDateChange = (date) => {
-    if (date === null) {
+  const handleToDateChange = (DateTemp) => {
+    if (DateTemp === null) {
       setToDate("");
     } else {
-      setToDate(date);
+      setToDate(DateTemp);
       const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
+        DateTemp.getTime() - DateTemp.getTimezoneOffset() * 60000
       )
         .toISOString()
         .split("T")[0];
