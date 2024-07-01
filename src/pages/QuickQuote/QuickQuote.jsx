@@ -56,9 +56,9 @@ const QuickQuote = () => {
   };
 
   function reducer(state, action) {
-    if(action.type === "SET_GROUP_ANSWERS"){
+    if (action.type === "SET_GROUP_ANSWERS") {
       return { ...state, [action.group]: action.answers };
-    }else {
+    } else {
       throw new Error();
     }
   }
@@ -171,439 +171,228 @@ const QuickQuote = () => {
   };
 
   return (
-    <>
-      <div className="mainQContainer">
-        <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
-          <div className="flex items-center justify-between w-full ">
-            <ProfileBox />
-            <img
-              onClick={() => navigate("/selectdevicetype")}
-              className="w-28 "
-              src={Grest_Logo}
-              alt="app logo"
-            />
-          </div>
-        </div>
-        <div className={`${styless.quick_page_nav}`}>
-          <IoIosArrowBack
-            onClick={backHandler}
-            size={25}
-            className="ml-2 text-[#EC2752]"
+    <div className="mainQContainer">
+      <div className="flex items-center w-screen py-4 h-16 border-b-2  bg-white HEADER header">
+        <div className="w-full flex items-center justify-between">
+          <ProfileBox />
+          <img
+            className="w-28"
+            onClick={() => navigate("/selectdevicetype")}
+            alt="app logo"
+            src={Grest_Logo}
           />
-          <p className="ml-2 text-xl font-medium">Device Details</p>
-        </div>
-
-        <div className="innerContainer">
-          <div className="maindata">
-            <div className="text-lg font-medium tracking-tight text-{1.325rem}">
-              Tell us more about your device?
-            </div>
-            <div className="underline"></div>
-            <div className="questionList ">
-              <div className="containClass ">
-                {QQState.Core &&
-                  QQState.Core.map((data, index) => (
-                    <div
-                      className="flex flex-col gap-4 mb-4 one relative"
-                      key={data._id}
-                    >
-                      <div className="flex items-baseline gap-1 two">
-                        <p className="font-medium text-xl">{index + 1}.</p>
-                        <p className="text-xl three">{data.quetion}</p>
-                      </div>
-                      <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                        <label
-                          className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            core[index].answer === data.yes
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.yes}
-                            onChange={(e) => {
-                              dispatch(
-                                updateCoreObjects({
-                                  index: index,
-                                  newAnswer: data.yes,
-                                  newKey: "yes",
-                                })
-                              );
-                            }}
-                            checked={core[index].answer === data.yes}
-                          />{" "}
-                          Yes
-                        </label>
-                        <label
-                          className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            core[index].answer === data.no
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.no}
-                            onChange={(e) => {
-                              dispatch(
-                                updateCoreObjects({
-                                  index: index,
-                                  newAnswer: data.no,
-                                  newKey: "no",
-                                })
-                              );
-                            }}
-                            checked={core[index].answer === data.no}
-                          />{" "}
-                          No
-                        </label>
-                      </div>
-                      <div className="border-b-2 opacity-10 border-[#595555] "></div>
-                    </div>
-                  ))}
-              </div>
-
-              {/* //for cosmetics */}
-
-              <div className="containClass">
-                {QQState.Cosmetics &&
-                  QQState.Cosmetics.map((data, index) => (
-                    <div
-                      className="flex flex-col gap-4 mb-4 one"
-                      key={data._id}
-                    >
-                      <div className="flex items-baseline gap-1 two">
-                        <p className="font-medium text-xl">{index + 3}.</p>
-                        <p className="text-xl three">{data.quetion}</p>
-                      </div>
-                      <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                        <label
-                          className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            Cosmetics[index].answer === data.yes
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.yes}
-                            onChange={(e) => {
-                              dispatch(
-                                updateCosmeticsObjects({
-                                  index: index,
-                                  newAnswer: data.yes,
-                                  newKey: "yes",
-                                })
-                              );
-                            }}
-                            checked={Cosmetics[index].answer === data.yes}
-                          />{" "}
-                          Yes
-                        </label>
-                        <label
-                          className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            Cosmetics[index].answer === data.no
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.no}
-                            onChange={(e) => {
-                              dispatch(
-                                updateCosmeticsObjects({
-                                  index: index,
-                                  newAnswer: data.no,
-                                  newKey: "no",
-                                })
-                              );
-                            }}
-                            checked={Cosmetics[index].answer === data.no}
-                          />{" "}
-                          No
-                        </label>
-                      </div>
-                      <div className="border-b-2 opacity-10 border-[#595555]"></div>
-                    </div>
-                  ))}
-              </div>
-
-              {/* //for display */}
-
-              <div className="containClass">
-                {QQState.Display &&
-                  QQState.Display.map((data, index) => (
-                    <div
-                      className="flex flex-col gap-4 mb-4 one"
-                      key={data._id}
-                    >
-                      <div className="flex items-baseline gap-1 two">
-                        <p className="font-medium text-xl">{index + 5}.</p>
-                        <p className="text-xl three">{data.quetion}</p>
-                      </div>
-                      <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                        <label
-                          className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            Display[index].answer === data.yes
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.yes}
-                            onChange={(e) => {
-                              dispatch(
-                                updateDisplayObjects({
-                                  index: index,
-                                  newAnswer: data.yes,
-                                  newKey: "yes",
-                                })
-                              );
-                            }}
-                            checked={Display[index].answer === data.yes}
-                          />{" "}
-                          Yes
-                        </label>
-                        <label
-                          className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            Display[index].answer === data.no
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.no}
-                            onChange={(e) => {
-                              dispatch(
-                                updateDisplayObjects({
-                                  index: index,
-                                  newAnswer: data.no,
-                                  newKey: "no",
-                                })
-                              );
-                            }}
-                            checked={Display[index].answer === data.no}
-                          />{" "}
-                          No
-                        </label>
-                      </div>
-                      <div className="border-b-2 opacity-10 border-[#595555] "></div>
-                    </div>
-                  ))}
-              </div>
-
-              {/* //Functional_major*/}
-
-              <div className="containClass">
-                {QQState.Functional_major &&
-                  QQState.Functional_major.map((data, index) => (
-                    <div
-                      className="flex flex-col gap-4 mb-4 one"
-                      key={data._id}
-                    >
-                      <div className="flex items-baseline gap-1 two">
-                        <p className="font-medium text-xl">{index + 7}.</p>
-                        <p className="text-xl three">{data.quetion}</p>
-                      </div>
-                      <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                        <label
-                          className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            FunctionalMajor[index].answer === data.yes
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.yes}
-                            onChange={(e) => {
-                              dispatch(
-                                updateFunctionalMajorObjects({
-                                  index: index,
-                                  newAnswer: data.yes,
-                                  newKey: "yes",
-                                })
-                              );
-                            }}
-                            checked={
-                              FunctionalMajor[index].answer === data.yes
-                            }
-                          />{" "}
-                          Yes
-                        </label>
-                        <label
-                          className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            FunctionalMajor[index].answer === data.no
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.no}
-                            onChange={(e) => {
-                              dispatch(
-                                updateFunctionalMajorObjects({
-                                  index: index,
-                                  newAnswer: data.no,
-                                  newKey: "no",
-                                })
-                              );
-                            }}
-                            checked={FunctionalMajor[index].answer === data.no}
-                          />{" "}
-                          No
-                        </label>
-                      </div>
-                      <div className="border-b-2 opacity-10 border-[#595555]"></div>
-                    </div>
-                  ))}
-              </div>
-
-              {/* //for Functional_minor */}
-
-              <div className="containClass">
-                {QQState.Functional_minor &&
-                  QQState.Functional_minor.map((data, index) => (
-                    <div
-                      className="flex flex-col gap-4 mb-4 one"
-                      key={data._id}
-                    >
-                      <div className="flex items-baseline gap-1 two">
-                        <p className="font-medium text-xl">{index + 9}.</p>
-                        <p className="text-xl three">{data.quetion}</p>
-                      </div>
-                      <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                        <label
-                          className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            FunctionalMinor[index].answer === data.yes
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.yes}
-                            onChange={(e) => {
-                              dispatch(
-                                updateFunctionalMinorObjects({
-                                  index: index,
-                                  newAnswer: data.yes,
-                                  newKey: "yes",
-                                })
-                              );
-                            }}
-                            checked={
-                              FunctionalMinor[index].answer === data.yes
-                            }
-                          />{" "}
-                          Yes
-                        </label>
-                        <label
-                          className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                            FunctionalMinor[index].answer === data.no
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            name={data._id}
-                            type="radio"
-                            value={data.no}
-                            onChange={(e) => {
-                              dispatch(
-                                updateFunctionalMinorObjects({
-                                  index: index,
-                                  newAnswer: data.no,
-                                  newKey: "no",
-                                })
-                              );
-                            }}
-                            checked={FunctionalMinor[index].answer === data.no}
-                          />{" "}
-                          No
-                        </label>
-                      </div>
-                      <div className="border-b-2 opacity-10 border-[#595555]"></div>
-                    </div>
-                  ))}
-              </div>
-
-              {/* //fro Warranty */}
-
-              <div className="containClass">
-                <div className="flex flex-col gap-4 mb-4 one">
-                  <div className="flex gap-1 two">
-                    <p className="text-xl">11.</p>
-                    <p className="text-xl three">What is your phone's age?</p>
-                  </div>
-
-                  {QQState.Warranty &&
-                    QQState.Warranty.map((data, index) => (
-                      <div key={index} className="max-w-[500px] flex gap-4 ml-3 lableconatiner flex-col">
-                        <label
-                          className={`text-[#EC2752] font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
-                            Warranty[index].answer === data.yes
-                              ? PinkBgWhText
-                              : ""
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            value={data.yes}
-                            onChange={(e) => {
-                              store.dispatch(
-                                updateWarrantyObjects({
-                                  index: index,
-                                  newAnswer: data.yes,
-                                  newKey: "yes",
-                                })
-                              );
-                            }}
-                            checked={Warranty[index].answer === data.yes}
-                          />{" "}
-                          {data.quetion}
-                        </label>
-                      </div>
-                    ))}
-                  <div className="border-b-2 opacity-10 border-[#595555] "></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2">
-          <div
-            onClick={handlesubmit}
-            className="bg-[#EC2752] text-center relative  py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
-          >
-            {isLoading && (
-              <CgSpinner
-                size={20}
-                className="mt-1 absolute left-[28%] top-[8px] animate-spin"
-              />
-            )}
-            <p className="w-full p-1 text-xl font-medium">
-              {isLoading ? "Submitting" : "Submit"}
-            </p>
-          </div>
         </div>
       </div>
-    </>
+      <div className={`${styless.quick_page_nav}`}>
+        <IoIosArrowBack
+          className="ml-2 text-[#EC2752]"
+          size={25}
+          onClick={backHandler}
+        />
+        <p className="ml-2 font-medium text-xl">Device Details</p>
+      </div>
+
+      <div className="innerContainer">
+        <div className="maindata">
+          <div className="text-lg font-medium tracking-tight text-{1.325rem}">
+            Tell us more about your device?
+          </div>
+          <div className="underline"></div>
+          <QuestionList
+            QQState={QQState}
+            core={core}
+            dispatch={dispatch}
+            Cosmetics={Cosmetics}
+            Display={Display}
+            FunctionalMajor={FunctionalMajor}
+            FunctionalMinor={FunctionalMinor}
+            Warranty={Warranty}
+          />
+        </div>
+      </div>
+
+      <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2">
+        <div
+          onClick={handlesubmit}
+          className="bg-[#EC2752] text-center relative  py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
+        >
+          {isLoading && (
+            <CgSpinner
+              size={20}
+              className="mt-1 absolute left-[28%] top-[8px] animate-spin"
+            />
+          )}
+          <p className="w-full p-1 text-xl font-medium">
+            {isLoading ? "Submitting" : "Submit"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const QuestionList = ({
+  QQState,
+  core,
+  dispatch,
+  Cosmetics,
+  Display,
+  FunctionalMajor,
+  FunctionalMinor,
+  Warranty,
+}) => {
+  return (
+    <div className="questionList ">
+      <QuestionsElement
+        State={QQState.Core}
+        Task={core}
+        dispatch={dispatch}
+        currentIndex={1}
+        taskFun={updateCoreObjects}
+      />
+
+      {/* //for cosmetics */}
+      <QuestionsElement
+        State={QQState.Cosmetics}
+        Task={Cosmetics}
+        dispatch={dispatch}
+        currentIndex={3}
+        taskFun={updateCosmeticsObjects}
+      />
+
+      {/* //for display */}
+      <QuestionsElement
+        State={QQState.Display}
+        Task={Display}
+        dispatch={dispatch}
+        currentIndex={5}
+        taskFun={updateDisplayObjects}
+      />
+
+      {/* //Functional_major*/}
+      <QuestionsElement
+        State={QQState.Functional_major}
+        Task={FunctionalMajor}
+        dispatch={dispatch}
+        currentIndex={7}
+        taskFun={updateFunctionalMajorObjects}
+      />
+
+      {/* //for Functional_minor */}
+      <QuestionsElement
+        State={QQState.Functional_minor}
+        Task={FunctionalMinor}
+        dispatch={dispatch}
+        currentIndex={9}
+        taskFun={updateFunctionalMinorObjects}
+      />
+
+      {/* //fro Warranty */}
+
+      <div className="containClass">
+        <div className="flex flex-col gap-4 mb-4 one">
+          <div className="flex gap-1 two">
+            <p className="text-xl">11.</p>
+            <p className="text-xl three">What is your phone's age?</p>
+          </div>
+
+          {QQState.Warranty &&
+            QQState.Warranty.map((data, index) => (
+              <div
+                key={index}
+                className="max-w-[500px] flex gap-4 ml-3 lableconatiner flex-col"
+              >
+                <label
+                  className={`text-[#EC2752] font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
+                    Warranty[index].answer === data.yes ? PinkBgWhText : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    value={data.yes}
+                    onChange={(e) => {
+                      store.dispatch(
+                        updateWarrantyObjects({
+                          index: index,
+                          newAnswer: data.yes,
+                          newKey: "yes",
+                        })
+                      );
+                    }}
+                    checked={Warranty[index].answer === data.yes}
+                  />{" "}
+                  {data.quetion}
+                </label>
+              </div>
+            ))}
+          <div className="border-b-2 opacity-10 border-[#595555] "></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const QuestionsElement = ({ State, Task, dispatch, currentIndex, taskFun }) => {
+  console.log(currentIndex);
+  return (
+    <div className="containClass">
+      {State &&
+        State.map((data, index) => (
+          <div className="flex flex-col gap-4 mb-4 one" key={data._id}>
+            <div className="flex items-baseline gap-1 two">
+              <p className="font-medium text-xl">{index + currentIndex}.</p>
+              <p className="text-xl three">{data.quetion}</p>
+            </div>
+            <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
+              <label
+                className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                  Task[index].answer === data.yes ? PinkBgWhText : ""
+                }`}
+              >
+                <input
+                  name={data._id}
+                  type="radio"
+                  value={data.yes}
+                  onChange={(e) => {
+                    dispatch(
+                      taskFun({
+                        index: index,
+                        newAnswer: data.yes,
+                        newKey: "yes",
+                      })
+                    );
+                  }}
+                  checked={Task[index].answer === data.yes}
+                />{" "}
+                Yes
+              </label>
+              <label
+                className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                  Task[index].answer === data.no ? PinkBgWhText : ""
+                }`}
+              >
+                <input
+                  name={data._id}
+                  type="radio"
+                  value={data.no}
+                  onChange={(e) => {
+                    dispatch(
+                      taskFun({
+                        index: index,
+                        newAnswer: data.no,
+                        newKey: "no",
+                      })
+                    );
+                  }}
+                  checked={Task[index].answer === data.no}
+                />{" "}
+                No
+              </label>
+            </div>
+            <div className="border-b-2 opacity-10 border-[#595555]"></div>
+          </div>
+        ))}
+    </div>
   );
 };
 

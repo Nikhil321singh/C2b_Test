@@ -57,21 +57,22 @@ const qnaQuickSlice = createSlice({
     updateWarrantyObjects: (state, action) => {
       const { index, newAnswer, newKey } = action.payload;
       if (state.Warranty[index]) {
-        state.Warranty[index].answer = newAnswer;
         state.Warranty[index].key = newKey;
+        state.Warranty[index].answer = newAnswer;
       }
       for (let item = 0; item < state.Warranty.length; item++) {
         if (
           item !== index &&
-          state.Warranty[item].quetion !== "Above 11 months"
-        ) {
-          state.Warranty[item].answer = "W2";
-          state.Warranty[item].key = "no";
-        } else if (
-          item !== index &&
           state.Warranty[item].quetion === "Above 11 months"
         ) {
           state.Warranty[item].answer = "W1";
+          state.Warranty[item].key = "no";
+        }
+        else if (
+          item !== index &&
+          state.Warranty[item].quetion !== "Above 11 months"
+        ) {
+          state.Warranty[item].answer = "W2";
           state.Warranty[item].key = "no";
         }
       }

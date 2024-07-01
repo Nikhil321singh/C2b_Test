@@ -330,16 +330,16 @@ const ExtComps = ({
       {editBoxOpen && (
         <div className={`${styles.edit_page}`}>
           <StoreEdit
-            storeData={storeEditData}
-            setEditBoxOpen={setEditBoxOpen}
             setEditSuccess={setEditSuccess}
+            setEditBoxOpen={setEditBoxOpen}
+            storeData={storeEditData}
           />
         </div>
       )}
-      <div className="flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER ">
+      <div className="flex items-center w-screen border-b-2 py-4 h-16 bg-white HEADER ">
         <div className="navbar">
-          <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
-          <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
+          <AdminNavbar sideMenu={sideMenu} setsideMenu={setsideMenu} />
+          <SideMenu sideMenu={sideMenu} setsideMenu={setsideMenu} />
         </div>
       </div>
       {sucBox && (
@@ -400,41 +400,12 @@ const ExtComps = ({
         </div>
       )}
       {uploadBox && (
-        <div className="fixed top-0 left-0 z-48 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <h6 className={failTextColor}>Bulk Upload Stores</h6>
-            <form className="flex flex-col gap-4" onSubmit={handleBulkSubmit}>
-              <div className="flex flex-col">
-                <p className="mb-1 text-lg items-start text-slate-500">
-                  Upload Store Data Excel
-                </p>
-                <input
-                  type="file"
-                  name="excelFile"
-                  id="excelFile"
-                  accept=".xlsx, .xls"
-                  onChange={(e) => handleExcelFileChange(e)}
-                  required={true}
-                />
-              </div>
-              <div className="flex flex-row gap-2">
-                <button type="submit" className={"bg-[#EC2752] text-white"}>
-                  Upload
-                </button>
-                <button
-                  type="reset"
-                  onClick={() => {
-                    setUploadBox(false);
-                    setIsTableLoaded(false);
-                  }}
-                  className="bg-white text-[#EC2752]"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <BulkUploadBox
+          handleBulkSubmit={handleBulkSubmit}
+          handleExcelFileChange={handleExcelFileChange}
+          setUploadBox={setUploadBox}
+          setIsTableLoaded={setIsTableLoaded}
+        />
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
@@ -442,6 +413,51 @@ const ExtComps = ({
         </div>
       )}
     </React.Fragment>
+  );
+};
+
+const BulkUploadBox = ({
+  handleBulkSubmit,
+  handleExcelFileChange,
+  setUploadBox,
+  setIsTableLoaded,
+}) => {
+  return (
+    <div className="fixed top-0 left-0 z-48 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>Bulk Upload Stores</h6>
+        <form className="flex flex-col gap-4" onSubmit={handleBulkSubmit}>
+          <div className="flex flex-col">
+            <p className="mb-1 text-lg items-start text-slate-500">
+              Upload Store Data Excel
+            </p>
+            <input
+              type="file"
+              name="excelFile"
+              id="excelFile"
+              accept=".xlsx, .xls"
+              onChange={(e) => handleExcelFileChange(e)}
+              required={true}
+            />
+          </div>
+          <div className="flex flex-row gap-2">
+            <button type="submit" className={"bg-[#EC2752] text-white"}>
+              Upload
+            </button>
+            <button
+              type="reset"
+              onClick={() => {
+                setUploadBox(false);
+                setIsTableLoaded(false);
+              }}
+              className="bg-white text-[#EC2752]"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 

@@ -50,36 +50,36 @@ const downloadExcel = (dataDown) => {
 };
 
 const OutStandingDevices = () => {
-  const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [dateValue, setDateValue] = useState("");
+  const [data, setData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [tempId, setTempId] = useState();
+  const [dateValue, setDateValue] = useState("");
   const [errorMsg, setErrorMsg] = useState("successfully updated status");
-  const [successMod, setSuccessMod] = useState(false);
+  const [tempId, setTempId] = useState();
   const [failMod, setFailMode] = useState(false);
-  const [confMod, setConfMod] = useState(false);
+  const [successMod, setSuccessMod] = useState(false);
   const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
-  const [region, setRegion] = useState(LoggedInUser?.region);
+  const [confMod, setConfMod] = useState(false);
   const [storeData, setStoreData] = useState([]);
-  const [regionData, setRegionData] = useState([]);
+  const [region, setRegion] = useState(LoggedInUser?.region);
   const [allStore, setAllStore] = useState([]);
+  const [regionData, setRegionData] = useState([]);
   const firsttime = useRef(true);
 
   useEffect(() => {
-    if (failMod || successMod) {
-      const timeoutId = setTimeout(() => {
-        setFailMode(false);
+    if (successMod || failMod) {
+      const timeoutID = setTimeout(() => {
         setSuccessMod(false);
+        setFailMode(false);
       }, 5000);
-      return () => clearTimeout(timeoutId);
+      return () => clearTimeout(timeoutID);
     }
     return () => {};
-  }, [failMod, successMod]);
+  }, [successMod, failMod]);
 
   const getData = () => {
     setIsTableLoaded(true);
-    const config = {
+    const conf = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -87,13 +87,13 @@ const OutStandingDevices = () => {
       headers: { Authorization: token },
     };
     axios
-      .request(config)
-      .then((response) => {
-        setData(response.data.data);
+      .request(conf)
+      .then((res) => {
+        setData(res.data.data);
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        setErrorMsg(`Failed to load data`);
+        setErrorMsg("Failed to load data");
         setFailMode(true);
         setIsTableLoaded(false);
       });
@@ -101,7 +101,7 @@ const OutStandingDevices = () => {
 
   const getStore = () => {
     setIsTableLoaded(true);
-    const config = {
+    const conf = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -109,18 +109,16 @@ const OutStandingDevices = () => {
       headers: { Authorization: token },
     };
     axios
-      .request(config)
-      .then((response) => {
-        const allData = response.data.result;
-        const storeNamesArray = response.data.result.map(
-          (store) => store.storeName
-        );
-        const uniqueRegionsArray = [
-          ...new Set(response.data.result.map((store) => store.region)),
+      .request(conf)
+      .then((res) => {
+        const allData = res.data.result;
+        const storeNames = res.data.result.map((store) => store.storeName);
+        const uniqueRegions = [
+          ...new Set(res.data.result.map((store) => store.region)),
         ];
+        setStoreData(storeNames);
+        setRegionData(uniqueRegions);
         setAllStore(allData);
-        setStoreData(storeNamesArray);
-        setRegionData(uniqueRegionsArray);
         setIsTableLoaded(false);
       })
       .catch((error) => {
@@ -130,7 +128,7 @@ const OutStandingDevices = () => {
 
   const getDataBySearch = () => {
     setIsTableLoaded(true);
-    const config = {
+    const conf = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -138,49 +136,49 @@ const OutStandingDevices = () => {
       headers: { Authorization: token },
     };
     axios
-      .request(config)
-      .then((response) => {
-        setData(response.data.data);
+      .request(conf)
+      .then((res) => {
+        setData(res.data.data);
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        setErrorMsg(`Failed to load data`);
-        setFailMode(true);
+        setErrorMsg(`Failed to load data -> ${error}`);
         setIsTableLoaded(false);
+        setFailMode(true);
       });
   };
 
   useEffect(() => {
-    if (firsttime.current && !!storeName && !!region) {
-      getData();
+    if (!firsttime.current && !!storeName && !!region) {
+      getDataBySearch();
+    } else if (firsttime.current && !!storeName && !!region) {
       getStore();
       firsttime.current = false;
-    } else if (!firsttime.current && !!storeName && !!region) {
-      getDataBySearch();
+      getData();
     }
   }, [dateValue, storeName, region]);
 
   const confHandler = (id) => {
-    setTempId(id);
     setIsTableLoaded(true);
+    setTempId(id);
     setConfMod(true);
   };
 
   return (
     <div className={`${styles.pickedup_page}`}>
       <ExtComps
-        successMod={successMod}
         errorMsg={errorMsg}
-        setSuccessMod={setSuccessMod}
+        successMod={successMod}
         isTableLoaded={isTableLoaded}
-        setIsTableLoaded={setIsTableLoaded}
+        setSuccessMod={setSuccessMod}
         failMod={failMod}
-        setFailMode={setFailMode}
+        setIsTableLoaded={setIsTableLoaded}
         confMod={confMod}
-        setConfMod={setConfMod}
+        setFailMode={setFailMode}
         setErrorMsg={setErrorMsg}
-        getData={getData}
+        setConfMod={setConfMod}
         tempId={tempId}
+        getData={getData}
         setTempId={setTempId}
       />
       <div className="flex flex-row m-2 gap-4"></div>
@@ -253,45 +251,45 @@ const ExtComps = ({
     axios
       .request(config)
       .then((response) => {
-        getData();
         setTempId();
+        getData();
         setErrorMsg(`Successfully forwarded lot ${refID} to pending devices`);
-        setSuccessMod(true);
         setIsTableLoaded(false);
+        setSuccessMod(true);
       })
       .catch((error) => {
+        setIsTableLoaded(false);
         setErrorMsg(`Failed to forward the request`);
         setFailMode(true);
-        setIsTableLoaded(false);
       });
   };
 
   return (
     <React.Fragment>
-      <div className="flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER ">
+      <div className="flex items-center w-screen border-b-2 py-4 h-16 bg-white HEADER ">
         {userRole === "Technician" ? (
-          <div className="flex items-center justify-between w-full ">
+          <div className="w-full flex items-center justify-between">
             <ProfileBox />
-            <img className="w-28 " src={Grest_Logo} alt="app logo" />
+            <img src={Grest_Logo} className="w-28 " alt="app logo" />
           </div>
         ) : (
           <div className="navbar">
-            <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
-            <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
+            <AdminNavbar sideMenu={sideMenu} setsideMenu={setsideMenu} />
+            <SideMenu sideMenu={sideMenu} setsideMenu={setsideMenu} />
           </div>
         )}
       </div>
       {successMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
-            <IoIosCheckmarkCircle className={succTextColor} size={90} />
+            <IoIosCheckmarkCircle size={90} className={succTextColor} />
             <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
+              className={"bg-green-500 text-white"}
               onClick={() => {
                 setSuccessMod(false);
               }}
-              className={"bg-green-500 text-white"}
             >
               Okay
             </button>
@@ -299,16 +297,16 @@ const ExtComps = ({
         </div>
       )}
       {failMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <IoIosCloseCircle className={failTextColor} size={90} />
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
+          <div className={`${failTextColor} ${styles.err_mod_box}`}>
+            <IoIosCloseCircle size={90} className={failTextColor} />
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
+              className={"bg-[#EC2752] text-white"}
               onClick={() => {
                 setFailMode(false);
               }}
-              className={"bg-[#EC2752] text-white"}
             >
               Okay
             </button>
@@ -316,8 +314,8 @@ const ExtComps = ({
         </div>
       )}
       {confMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
+          <div className={`${failTextColor} ${styles.err_mod_box}`}>
             <h6 className={failTextColor}>Confirmation!</h6>
             <p className="text-slate-500">
               {`Do you want to update status of Lot - ${tempId} ?`}
@@ -325,16 +323,16 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => forwardReqHandler(tempId, "Request Forwarded")}
-                className={"bg-[#EC2752] text-white"}
+                className={"text-white bg-[#EC2752]"}
               >
                 Okay
               </button>
               <button
+                className="bg-white text-[#EC2752]"
                 onClick={() => {
                   setConfMod(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
               >
                 Cancel
               </button>
@@ -343,8 +341,8 @@ const ExtComps = ({
         </div>
       )}
       {isTableLoaded && (
-        <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+        <div className="fixed top-0 left-0 z-49 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
+          <BeatLoader color={"#EC2752"} size={15} loading={isTableLoaded} />
         </div>
       )}
     </React.Fragment>
@@ -370,28 +368,26 @@ const OutstandingFilter = ({
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
 
-  const handleRegionChange = (value) => {
+  const handleRegionChange = (val) => {
     setRegionDrop(false);
     setStoreName("");
-    const filteredStores = allStore.filter((store) => store.region === value);
-    const storeNamesArray = filteredStores.map((store) => store.storeName);
-    setStoreData(storeNamesArray);
-    setRegion(value);
+    const filterStores = allStore.filter((store) => store.region === val);
+    const storeNames = filterStores.map((store) => store.storeName);
+    setStoreData(storeNames);
+    setRegion(val);
   };
 
-  const handleStoreChange = (value) => {
+  const handleStoreChange = (val) => {
     setStoreDrop(false);
-    const filteredStores = allStore.filter(
-      (store) => store.storeName === value
-    );
-    const newRegion = filteredStores[0].region;
-    setRegion(newRegion);
-    setStoreName(value);
+    const filterStores = allStore.filter((store) => store.storeName === val);
+    const bRnewRegion = filterStores[0].region;
+    setRegion(bRnewRegion);
+    setStoreName(val);
   };
 
   const handleSearchClear = () => {
-    setSearchValue("");
     setDateValue("");
+    setSearchValue("");
     getData();
   };
 
@@ -411,34 +407,34 @@ const OutstandingFilter = ({
         <FaDownload /> Bulk Download
       </button>
       <div className="m-2 flex flex-col gap-2">
-        <div className="flex gap-2 items-center outline-none">
+        <div className="outline-none flex gap-2 items-center">
           <div className={`${styles.search_bar_wrap}`}>
             <input
-              onChange={(e) => setSearchValue(e.target.value)}
               className="text-sm"
-              type="text"
+              onChange={(e) => setSearchValue(e.target.value)}
               placeholder="Search"
+              type="text"
               value={searchValue}
             />
-            <IoMdSearch onClick={() => getDataBySearch()} size={34} />
+            <IoMdSearch size={34} onClick={() => getDataBySearch()} />
           </div>
           <div className={styles.icons_box}>
-            <IoRefresh onClick={handleSearchClear} className="" size={25} />
+            <IoRefresh size={25} onClick={handleSearchClear} className="" />
           </div>
           <div
-            className={`flex flex-row justify-center items-center ${styles.date_picker_wrap}`}
+            className={`flex flex-row items-center justify-center ${styles.date_picker_wrap}`}
           >
             <input
-              type="date"
               id="datepicker"
-              style={{ color: "#EC2752" }}
+              type="date"
               className=""
-              value={dateValue}
+              style={{ color: "#EC2752" }}
               onChange={dateChangeHandler}
+              value={dateValue}
             />
             <div
-              className={styles.date_box}
               onClick={() => document.getElementById("datepicker").showPicker()}
+              className={styles.date_box}
             >
               <p>{dateValue ? dateValue : "DD/MM/YYYY"}</p>
               <BsCalendarDate size={25} />
@@ -446,57 +442,57 @@ const OutstandingFilter = ({
           </div>
         </div>
       </div>
-      <div className="flex m-2 gap-2 w-100 items-center outline-none">
-        <div className="relative w-[45%]">
+      <div className="m-2 flex items-center gap-2 w-100 outline-none">
+        <div className="w-[45%] relative">
           <div
-            className={`${styles.filter_button}`}
             onClick={() => {
               setRegionDrop(!regionDrop);
             }}
+            className={`${styles.filter_button}`}
           >
             <p className="truncate">
               {region === "" ? "Select Region" : region}
             </p>
             <FaAngleDown
-              size={17}
               className={`${regionDrop && "rotate-180"}`}
+              size={17}
             />
           </div>
           {regionDrop && (
             <div className={`${styles.filter_drop}`}>
-              {regionData.map((item) => (
+              {regionData.map((elem) => (
                 <div
-                  key={item}
-                  onClick={() => handleRegionChange(item)}
+                  key={elem}
                   className={`${styles.filter_option}`}
+                  onClick={() => handleRegionChange(elem)}
                 >
-                  <p className="truncate">{item}</p>
+                  <p className="truncate">{elem}</p>
                 </div>
               ))}
             </div>
           )}
         </div>
-        <div className="relative w-[70%]">
+        <div className="w-[70%] relative">
           <div
-            className={`${styles.filter_button}`}
             onClick={() => {
               setStoreDrop(!storeDrop);
             }}
+            className={`${styles.filter_button}`}
           >
             <p className="truncate">
               {storeName === "" ? "Select Store" : storeName}
             </p>
-            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
+            <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
           </div>
           {storeDrop && (
             <div className={`${styles.filter_drop}`}>
-              {storeData.map((item, index) => (
+              {storeData.map((elem, index) => (
                 <div
-                  key={index}
-                  onClick={() => handleStoreChange(item)}
                   className={`${styles.filter_option}`}
+                  key={index}
+                  onClick={() => handleStoreChange(elem)}
                 >
-                  <p className="truncate">{item}</p>
+                  <p className="truncate">{elem}</p>
                 </div>
               ))}
             </div>
@@ -648,22 +644,22 @@ const OutstandingTable = ({
                     </div>
                   )}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-center text-sm md:p-3 md:text-base">
                   {val?.status}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-center text-sm md:p-3 md:text-base">
                   {val?.request}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-center text-sm md:p-3 md:text-base">
                   {new Date(val.createdAt).toLocaleDateString("en-GB")}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-center text-sm md:p-3 md:text-base">
                   {val?._id}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-center text-sm md:p-3 md:text-base">
                   {val?.totalDevice}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-center text-sm md:p-3 md:text-base">
                   {val?.totalAmount}
                 </td>
               </tr>

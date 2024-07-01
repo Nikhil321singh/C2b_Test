@@ -10,7 +10,9 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
     setShowModal(true);
   };
   function getUserFullName(user) {
-    if (!user) return "";
+    if (!user) {
+      return "";
+    }
 
     if (user.firstName) {
       return user.lastName

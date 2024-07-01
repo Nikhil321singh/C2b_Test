@@ -491,8 +491,8 @@ const SelectDeviceType = () => {
     setData(`${temp?.brand} ${temp?.model}`);
   };
 
-  const searchPhone = async (data) => {
-    const tempRes = await searchPhoneAPI(data);
+  const searchPhone = async (tempData) => {
+    const tempRes = await searchPhoneAPI(tempData);
     setModel(tempRes || []);
   };
 
