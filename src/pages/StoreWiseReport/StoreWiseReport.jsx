@@ -13,12 +13,13 @@ import { IoRefresh } from "react-icons/io5";
 
 const isSelled = "true";
 const rotateCss = "rotate-180";
+const token = sessionStorage.getItem("authToken");
+const pageLimit = 10;
 
 const downloadExcelStoreWise = (apiData) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
-
   const formattedData = apiData.map((item) => {
     return {
       "Purchase Date": new Date(item.createdAt).toLocaleDateString("en-IN"),
@@ -30,9 +31,6 @@ const downloadExcelStoreWise = (apiData) => {
       "Unique ID": item.uniqueCode,
     };
   });
-
-  
-
   const wsStoreWise = XLSX.utils.json_to_sheet(formattedData);
   const wbStoreWise = { Sheets: { data: wsStoreWise }, SheetNames: ["data"] };
   const excelBufferStoreWise = XLSX.write(wbStoreWise, {
@@ -68,48 +66,35 @@ const fetchDownloadDataStoreWise = (deviceCategory) => {
 };
 
 const StoreWiseReport = () => {
-  const [sideMenu, setsideMenu] = useState(false);
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [tableData, setTableData] = useState();
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const pageLimit = 10;
   const [storeName, setStoreName] = useState("");
   const [storeId, setStoreId] = useState("");
   const [region, setRegion] = useState("");
   const [storeData, setStoreData] = useState([]);
   const [regionalData, setRegionalData] = useState([]);
-  const [regionDrop, setRegionDrop] = useState(false);
-  const [storeDrop, setStoreDrop] = useState(false);
   const [entireStore, setEntireStore] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
   const [toDate, setToDate] = useState("");
-  const [toDateDup, setToDateDup] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [toDateDup, setToDateDup] = useState( new Date().toISOString().split("T")[0] );
   const [grestRec, setGrestRec] = useState("");
-  const [grestDrop, setGrestDrop] = useState(false);
   const [allUser, setAllUser] = useState([]);
   const [techId, setTechId] = useState("");
   const [techName, setTechName] = useState("");
-  const [techDrop, setTechDrop] = useState(false);
   const [deviceCategory, setDeviceCategory] = useState("Mobile");
 
   const fetchStoreData = () => {
-    const userToken = sessionStorage.getItem("authToken");
     setIsTableLoaded(true);
     axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll?page=${currentPage}&limit=${pageLimit}&is_selled=${isSelled}&store=${storeId}&rid=${searchValue}&grestRec=${grestRec}&endDate=${toDateDup}&startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
+      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll?page=${
+        currentPage}&limit=${pageLimit}&is_selled=${isSelled}&store=${storeId}&rid=${
+        searchValue}&grestRec=${grestRec}&endDate=${toDateDup}&startDate=${fromDateDup
+        }&userId=${techId}&deviceType=${deviceCategory}`,
+        { headers: { Authorization: token } }
       )
       .then((res) => {
         setMaxPages(Math.ceil(res.data.totalCounts / 10));
@@ -117,28 +102,20 @@ const StoreWiseReport = () => {
         setIsTableLoaded(false);
       })
       .catch((err) => {
-        console.log(err);
         setIsTableLoaded(false);
       });
   };
-
   const getStore = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=0&limit=9999`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response) => {
         const allStoreData = response.data.result;
-        console.log(response.data.result);
         const storeArr = response.data.result.map((store) => ({
           storeName: store.storeName,
           _id: store._id,
@@ -152,21 +129,16 @@ const StoreWiseReport = () => {
         setRegionalData(regionsUniqueArray);
       })
       .catch((error) => {
-        console.log(error);
         setIsTableLoaded(false);
       });
   };
-
   const getTechnicians = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
     const config = {
       method: "get",
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/userregistry/all`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response) => {
@@ -180,7 +152,6 @@ const StoreWiseReport = () => {
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setIsTableLoaded(false);
       });
   };
@@ -192,61 +163,13 @@ const StoreWiseReport = () => {
 
   useEffect(() => {
     fetchStoreData();
-  }, [
-    currentPage,
-    pageLimit,
-    grestRec,
-    fromDateDup,
-    toDateDup,
-    techId,
-    deviceCategory,
-  ]);
+  }, [currentPage, pageLimit, grestRec, fromDateDup, toDateDup, techId, deviceCategory]);
 
   useEffect(() => {
-    if (!!storeId) {
+    if (storeId) {
       fetchStoreData();
     }
   }, [storeId]);
-
-  const handleSearchClick = () => {
-    fetchStoreData();
-  };
-
-  const handleRegionChange = (value) => {
-    setRegionDrop(false);
-    setStoreName("");
-    const filteredStores = entireStore.filter(
-      (store) => store.region === value
-    );
-    const storeNamesArray = filteredStores.map((store) => ({
-      storeName: store.storeName,
-      _id: store._id,
-    }));
-    setStoreData(storeNamesArray);
-    setRegion(value);
-  };
-
-  const handleStoreChange = (value) => {
-    setStoreDrop(false);
-    const filteredStores = entireStore.filter(
-      (store) => store._id === value._id
-    );
-    const newRegion = filteredStores[0].region;
-    setRegion(newRegion);
-    setStoreName(value.storeName);
-    setStoreId(value._id);
-  };
-
-  const handleTechChange = (value) => {
-    setTechName(value.userName);
-    setTechId(value._id);
-    setTechDrop(false);
-  };
-
-  const handleGrestRecChange = (value) => {
-    setGrestRec(value);
-    setGrestDrop(false);
-  };
 
   const handleFromDateChange = (date) => {
     if (date === null) {
@@ -255,24 +178,17 @@ const StoreWiseReport = () => {
       setFromDate(date);
       const formattedDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split("T")[0];
-
+      ).toISOString().split("T")[0];
       const today = new Date();
       const formattedToday = new Date(
         today.getTime() - today.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split("T")[0];
-
+      ).toISOString().split("T")[0];
       if (toDate === "") {
         setToDateDup(formattedToday);
       }
       setFromDateDup(formattedDate);
     }
   };
-
   const handleToDateChange = (date) => {
     if (date === null) {
       setToDate("");
@@ -280,28 +196,18 @@ const StoreWiseReport = () => {
       setToDate(date);
       const formattedDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split("T")[0];
+      ).toISOString().split("T")[0];
       setToDateDup(formattedDate);
-
       if (fromDate === "") {
         const fromDateOneYearBefore = new Date(date);
-        fromDateOneYearBefore.setFullYear(
-          fromDateOneYearBefore.getFullYear() - 1
-        );
-
+        fromDateOneYearBefore.setFullYear(fromDateOneYearBefore.getFullYear() - 1);
         const formattedFromDate = new Date(
-          fromDateOneYearBefore.getTime() -
-            fromDateOneYearBefore.getTimezoneOffset() * 60000
-        )
-          .toISOString()
-          .split("T")[0];
+          fromDateOneYearBefore.getTime() - fromDateOneYearBefore.getTimezoneOffset() * 60000
+        ).toISOString().split("T")[0];
         setFromDateDup(formattedFromDate);
       }
     }
   };
-
   const handleSearchClear = () => {
     setStoreName("");
     setStoreId("");
@@ -315,9 +221,62 @@ const StoreWiseReport = () => {
     setTechId("");
     setTechName("");
   };
-
   return (
     <div>
+      <UpperFilter
+        isTableLoaded={isTableLoaded}
+        deviceCategory={deviceCategory}
+        setDeviceCategory={setDeviceCategory}
+        setSearchValue={setSearchValue}
+        searchValue={searchValue}
+        handleSearchClear={handleSearchClear}
+        fetchStoreData={fetchStoreData}
+      />
+      <MainFilter
+        techName={techName}
+        setTechName={setTechName}
+        setTechId={setTechId}
+        allUser={allUser}
+        grestRec={grestRec}
+        region={region}
+        regionalData={regionalData}
+        storeName={storeName}
+        setStoreName={setStoreName}
+        setStoreId={setStoreId}
+        setRegion={setRegion}
+        setGrestRec={setGrestRec}
+        storeData={storeData}
+        setStoreData={setStoreData}
+        toDate={toDate}
+        handleFromDateChange={handleFromDateChange}
+        handleToDateChange={handleToDateChange}
+        fromDate={fromDate}
+        entireStore={entireStore}
+      />
+      <TableCont
+        currentPage={currentPage}
+        tableData={tableData}
+        setCurrentPage={setCurrentPage}
+        maxPages={maxPages}
+      />
+    </div>
+  );
+};
+
+export default StoreWiseReport;
+
+const UpperFilter = ({
+  isTableLoaded,
+  deviceCategory,
+  setDeviceCategory,
+  setSearchValue,
+  searchValue,
+  handleSearchClear,
+  fetchStoreData,
+}) => {
+  const [sideMenu, setsideMenu] = useState(false);
+  return (
+    <React.Fragment>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
@@ -358,7 +317,7 @@ const StoreWiseReport = () => {
             placeholder="Search Store Name/Email/Id/Region"
             value={searchValue}
           />
-          <IoMdSearch onClick={handleSearchClick} size={25} />
+          <IoMdSearch onClick={() => fetchStoreData()} size={25} />
         </div>
         <div className={styles.icons_box}>
           <IoRefresh onClick={handleSearchClear} className="" size={25} />
@@ -372,155 +331,221 @@ const StoreWiseReport = () => {
           </button>
         </div>
       </div>
-      <div className="flex flex-row w-100 gap-2 items-center justify-center">
-        <div className="flex flex-row px-5 gap-2 w-[100%] justify-center items-center">
-          <div className="relative w-[15%]">
-            <div
-              className={`${styles.filter_button}`}
-              onClick={() => {
-                setTechDrop(!techDrop);
-              }}
-            >
-              <p className="truncate">
-                {techName === "" ? "Select Technician" : techName}
-              </p>
-              <FaAngleDown size={17} className={`${techDrop && rotateCss}`} />
-            </div>
-            {techDrop && (
-              <div className={`${styles.filter_drop}`}>
-                <div
-                  onClick={() => {
-                    setTechName("");
-                    setTechId("");
-                    setTechDrop(false);
-                  }}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">Show All</p>
-                </div>
-                {allUser.map((item) => (
-                  <div
-                    key={item._id}
-                    onClick={() => handleTechChange(item)}
-                    className={`${styles.filter_option}`}
-                  >
-                    <p className="truncate">{item.userName}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+    </React.Fragment>
+  );
+};
+
+const MainFilter = ({
+  techName,
+  setTechName,
+  setTechId,
+  allUser,
+  grestRec,
+  region,
+  regionalData,
+  storeName,
+  setStoreName,
+  setStoreId,
+  setRegion,
+  setGrestRec,
+  storeData,
+  setStoreData,
+  toDate,
+  handleFromDateChange,
+  handleToDateChange,
+  fromDate,
+  entireStore,
+}) => {
+  const [regionDrop, setRegionDrop] = useState(false);
+  const [storeDrop, setStoreDrop] = useState(false);
+  const [grestDrop, setGrestDrop] = useState(false);
+  const [techDrop, setTechDrop] = useState(false);
+  const handleRegionChange = (value) => {
+    setRegionDrop(false);
+    setStoreName("");
+    const filteredStores = entireStore.filter(
+      (store) => store.region === value
+    );
+    const storeNamesArray = filteredStores.map((store) => ({
+      storeName: store.storeName,
+      _id: store._id,
+    }));
+    setStoreData(storeNamesArray);
+    setRegion(value);
+  };
+  const handleStoreChange = (value) => {
+    setStoreDrop(false);
+    const filteredStores = entireStore.filter(
+      (store) => store._id === value._id
+    );
+    const newRegion = filteredStores[0].region;
+    setRegion(newRegion);
+    setStoreName(value.storeName);
+    setStoreId(value._id);
+  };
+  const handleTechChange = (value) => {
+    setTechName(value.userName);
+    setTechId(value._id);
+    setTechDrop(false);
+  };
+  const handleGrestRecChange = (value) => {
+    setGrestRec(value);
+    setGrestDrop(false);
+  };
+  return (
+    <div className="flex flex-row w-100 gap-2 items-center justify-center">
+      <div className="flex flex-row px-5 gap-2 w-[100%] justify-center items-center">
+        <div className="relative w-[15%]">
+          <div
+            className={`${styles.filter_button}`}
+            onClick={() => {
+              setTechDrop(!techDrop);
+            }}
+          >
+            <p className="truncate">
+              {techName === "" ? "Select Technician" : techName}
+            </p>
+            <FaAngleDown size={17} className={`${techDrop && rotateCss}`} />
           </div>
-          <div className="relative w-[15%]">
-            <div
-              className={`${styles.filter_button}`}
-              onClick={() => {
-                setGrestDrop(!grestDrop);
-              }}
-            >
-              <p className="truncate">
-                {grestRec === ""
-                  ? "Grest Received ?"
-                  : "Grest Rec. " + grestRec}
-              </p>
-              <FaAngleDown size={17} className={`${grestDrop && rotateCss}`} />
-            </div>
-            {grestDrop && (
-              <div className={`${styles.filter_drop}`}>
-                <div
-                  onClick={() => handleGrestRecChange("")}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">Show All</p>
-                </div>
-                <div
-                  onClick={() => handleGrestRecChange("yes")}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">Yes</p>
-                </div>
-                <div
-                  onClick={() => handleGrestRecChange("no")}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">No</p>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="relative w-[20%]">
-            <div
-              className={`${styles.filter_button}`}
-              onClick={() => {
-                setRegionDrop(!regionDrop);
-              }}
-            >
-              <p className="truncate">
-                {region === "" ? "Select Region" : region}
-              </p>
-              <FaAngleDown size={17} className={`${regionDrop && rotateCss}`} />
-            </div>
-            {regionDrop && (
-              <div className={`${styles.filter_drop}`}>
-                {regionalData.map((item) => (
-                  <div
-                    key={item}
-                    onClick={() => handleRegionChange(item)}
-                    className={`${styles.filter_option}`}
-                  >
-                    <p className="truncate">{item}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="relative w-[35%]">
-            <div
-              className={`${styles.filter_button}`}
-              onClick={() => {
-                setStoreDrop(!storeDrop);
-              }}
-            >
-              <p className="truncate">
-                {storeName === "" ? "Select Store" : storeName}
-              </p>
-              <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
-            </div>
-            {storeDrop && (
+          {techDrop && (
+            <div className={`${styles.filter_drop}`}>
               <div
-                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
+                onClick={() => {
+                  setTechName("");
+                  setTechId("");
+                  setTechDrop(false);
+                }}
+                className={`${styles.filter_option}`}
               >
-                {storeData.map((item, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleStoreChange(item)}
-                    className={`${styles.filter_option}`}
-                  >
-                    <p className="truncate">{item.storeName}</p>
-                  </div>
-                ))}
+                <p className="truncate">Show All</p>
               </div>
-            )}
+              {allUser.map((item) => (
+                <div
+                  key={item._id}
+                  onClick={() => handleTechChange(item)}
+                  className={`${styles.filter_option}`}
+                >
+                  <p className="truncate">{item.userName}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="relative w-[15%]">
+          <div
+            className={`${styles.filter_button}`}
+            onClick={() => {
+              setGrestDrop(!grestDrop);
+            }}
+          >
+            <p className="truncate">
+              {grestRec === "" ? "Grest Received ?" : "Grest Rec. " + grestRec}
+            </p>
+            <FaAngleDown size={17} className={`${grestDrop && rotateCss}`} />
           </div>
-          <div className="w-[15%]">
-            <DatePicker
-              selected={fromDate}
-              onChange={handleFromDateChange}
-              dateFormat="yyyy-MM-dd"
-              className="outline-none p-2 w-[100%] border rounded-md text-sm text-center"
-              placeholderText="Select from date"
-            />
+          {grestDrop && (
+            <div className={`${styles.filter_drop}`}>
+              <div
+                onClick={() => handleGrestRecChange("")}
+                className={`${styles.filter_option}`}
+              >
+                <p className="truncate">Show All</p>
+              </div>
+              <div
+                onClick={() => handleGrestRecChange("yes")}
+                className={`${styles.filter_option}`}
+              >
+                <p className="truncate">Yes</p>
+              </div>
+              <div
+                onClick={() => handleGrestRecChange("no")}
+                className={`${styles.filter_option}`}
+              >
+                <p className="truncate">No</p>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="relative w-[20%]">
+          <div
+            className={`${styles.filter_button}`}
+            onClick={() => {
+              setRegionDrop(!regionDrop);
+            }}
+          >
+            <p className="truncate">
+              {region === "" ? "Select Region" : region}
+            </p>
+            <FaAngleDown size={17} className={`${regionDrop && rotateCss}`} />
           </div>
-          <div className="w-[15%]">
-            <DatePicker
-              selected={toDate}
-              onChange={handleToDateChange}
-              dateFormat="yyyy-MM-dd"
-              className="outline-none p-2 w-[100%] border rounded-md text-sm text-center"
-              placeholderText="Select to date"
-            />
+          {regionDrop && (
+            <div className={`${styles.filter_drop}`}>
+              {regionalData.map((item) => (
+                <div
+                  key={item}
+                  onClick={() => handleRegionChange(item)}
+                  className={`${styles.filter_option}`}
+                >
+                  <p className="truncate">{item}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="relative w-[35%]">
+          <div
+            className={`${styles.filter_button}`}
+            onClick={() => {
+              setStoreDrop(!storeDrop);
+            }}
+          >
+            <p className="truncate">
+              {storeName === "" ? "Select Store" : storeName}
+            </p>
+            <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
           </div>
+          {storeDrop && (
+            <div
+              className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
+            >
+              {storeData.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleStoreChange(item)}
+                  className={`${styles.filter_option}`}
+                >
+                  <p className="truncate">{item.storeName}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="w-[15%]">
+          <DatePicker
+            selected={fromDate}
+            onChange={handleFromDateChange}
+            dateFormat="yyyy-MM-dd"
+            className="outline-none p-2 w-[100%] border rounded-md text-sm text-center"
+            placeholderText="Select from date"
+          />
+        </div>
+        <div className="w-[15%]">
+          <DatePicker
+            selected={toDate}
+            onChange={handleToDateChange}
+            dateFormat="yyyy-MM-dd"
+            className="outline-none p-2 w-[100%] border rounded-md text-sm text-center"
+            placeholderText="Select to date"
+          />
         </div>
       </div>
+    </div>
+  );
+};
+
+const TableCont = ({ currentPage, tableData, setCurrentPage, maxPages }) => {
+  return (
+    <React.Fragment>
       <div className="max-w-full min-h-screen">
         <StoreWiseTable currentPage={currentPage} tableData={tableData} />
       </div>
@@ -548,8 +573,6 @@ const StoreWiseReport = () => {
           Next
         </button>
       </div>
-    </div>
+    </React.Fragment>
   );
 };
-
-export default StoreWiseReport;
