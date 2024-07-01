@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setSelectedOptions } from "../store/slices/newAdminGrade";
 import styles from "../pages/RegisterUserDetails/RegisterUserDetails.module.css";
 
@@ -422,43 +422,39 @@ const QSComp = ({
                   name=""
                   id=""
                   value={yes}
-                  onChange={(e) => {
-                    setYes(e.target.value);
-                  }}
+                  onChange={(e) => setYes(e.target.value)}
                 >
                   <option value="">Select Yes key</option>
                   {group &&
-                    options[group].map((option) => (
-                      <option key={option} value={option}>
+                    options[group].map((option, optionkey) => (
+                      <option value={option} key={optionkey}>
                         {option}
                       </option>
                     ))}
                 </select>
               </div>
               <div>
-                <p className="block text-xl font-medium">Select No key*</p>
+                <p className="block font-medium text-xl">Select No Key*</p>
                 <select
-                  className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
-                  name=""
+                  className="rounded-md mt-1 p-2 w-[150px] sm:w-[250px] border"
                   id=""
+                  name=""
                   value={no}
-                  onChange={(e) => {
-                    setNo(e.target.value);
-                  }}
+                  onChange={(e) => setNo(e.target.value)}
                 >
-                  <option value="">Select No key</option>
+                  <option value="">Select No Key</option>
                   {group &&
-                    options[group].map((option) => (
-                      <option key={option} value={option}>
+                    options[group].map((option, optionkey) => (
+                      <option  value={option} key={optionkey}>
                         {option}
                       </option>
                     ))}
                 </select>
               </div>
               <div>
-                <p className="block text-xl font-medium">Select Default key*</p>
+                <p className="block text-xl font-medium">Select Default Key*</p>
                 <select
-                  className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+                  className="mt-1 p-2 w-[150px] rounded-md sm:w-[250px] border"
                   name=""
                   id=""
                   value={defaultOption}

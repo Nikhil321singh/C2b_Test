@@ -44,7 +44,6 @@ const downloadExcel = (apiData) => {
 };
 
 const handleDownload = (totalCount) => {
-  const userToken = sessionStorage.getItem("authToken");
   axios
     .get(
       `${
@@ -70,7 +69,6 @@ const pageLimit = 10;
 const userToken = sessionStorage.getItem("authToken");
 
 const CompanyListingDetails = () => {
-  const [sideMenu, setsideMenu] = useState(false);
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [tableData, setTableData] = useState();
@@ -502,24 +500,24 @@ const CompanyTable = ({
       </div>
       <div className="flex justify-center mt-0 mb-4">
         <button
-          onClick={() => setCurrentPage(currentPage - 1)}
-          disabled={currentPage === 0}
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
               : "bg-[#EC2752] text-white cursor-pointer"
           }`}
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 0}
         >
           Previous
         </button>
         <button
-          onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={currentPage === maxPages - 1}
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
               : "bg-[#EC2752] text-white cursor-pointer"
           }`}
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === maxPages - 1}
         >
           Next
         </button>
