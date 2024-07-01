@@ -43,34 +43,34 @@ const getStore = async () => {
 const downloadExcelCustomerTable = (apiData) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = ".xlsx";
+  const fileEx = ".xlsx";
 
-  const formattedData = apiData.map((item) => {
-    let questionsKeys = "";
+  const formatData = apiData.map((element) => {
     let index = 1;
-    console.log(item?.lead?.QNA[0]);
-    for (const group in item?.lead?.QNA[0]) {
-      item.lead.QNA[0][group].forEach((qna) => {
+    console.log(element?.lead?.QNA[0]);
+    let questionsKeys = "";
+    for (const group in element?.lead?.QNA[0]) {
+      element.lead.QNA[0][group].forEach((qna) => {
         questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
         index++;
       });
     }
     return {
-      "Date Created": new Date(item?.createdAt).toLocaleDateString("en-IN"),
-      "User Name": item?.user?.name,
-      category: item?.lead?.model?.type,
-      "Product Name": item?.lead?.model?.name,
-      Variant: item?.lead?.storage,
-      "Final Price Offered to Customer": item?.lead?.price,
-      "Unique Id": item?.lead?.uniqueCode,
-      "Customer Name": item?.lead?.name,
-      "Phone Number": item?.lead?.phoneNumber,
-      "Email Id": item?.lead?.emailId,
+      "Date Created": new Date(element?.createdAt).toLocaleDateString("en-IN"),
+      "User Name": element?.user?.name,
+      category: element?.lead?.model?.type,
+      "Product Name": element?.lead?.model?.name,
+      Variant: element?.lead?.storage,
+      "Final Price Offered to Customer": element?.lead?.price,
+      "Unique Id": element?.lead?.uniqueCode,
+      "Customer Name": element?.lead?.name,
+      "Phone Number": element?.lead?.phoneNumber,
+      "Email Id": element?.lead?.emailId,
       "Question/Ans": questionsKeys,
     };
   });
 
-  const wsCustomerTable = XLSX.utils.json_to_sheet(formattedData);
+  const wsCustomerTable = XLSX.utils.json_to_sheet(formatData);
   const wbCustomerTable = {
     Sheets: { data: wsCustomerTable },
     SheetNames: ["data"],
@@ -83,7 +83,7 @@ const downloadExcelCustomerTable = (apiData) => {
   const dataFileCustomerTable = new Blob([excelBufferCustomerTable], {
     type: fileType,
   });
-  saveAs(dataFileCustomerTable, "Leads_Created" + fileExtension);
+  saveAs(dataFileCustomerTable, "Leads_Created" + fileEx);
 };
 
 const CustomerTable = () => {

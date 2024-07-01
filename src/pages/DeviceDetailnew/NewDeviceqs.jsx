@@ -268,10 +268,10 @@ function NewDeviceqs() {
   }, [visible]);
 
   const updateAns = (group) => {
-    const answers = newGroupanswers.filter(
+    const filteredAnswers = newGroupanswers.filter(
       (question) => question.group === group
     );
-    store.dispatch(setGroupAnswers({ group, answers }));
+    store.dispatch(setGroupAnswers({ group, filteredAnswers }));
     if (showPopup === false) {
       setVisible(visible + 1);
     }
@@ -282,7 +282,8 @@ function NewDeviceqs() {
       <div className={`popup ${showPopup ? "show" : ""}`}>
         <img src={banner} alt="banner" />
         <div className="text">
-          Help us calculate your device value correctly by answering to the following questions
+          Help us calculate your device value correctly by answering to the
+          following questions
         </div>
         <button onClick={() => setShowPopup(false)}> Got it</button>
       </div>
@@ -346,10 +347,16 @@ function NewDeviceqs() {
                 <ThirdPart Display={Display} NDstate={NDstate} />
               )}
               {visible === 4 && (
-                <FourthPart FunctionalMajor={FunctionalMajor} NDstate={NDstate} />
+                <FourthPart
+                  FunctionalMajor={FunctionalMajor}
+                  NDstate={NDstate}
+                />
               )}
               {visible === 5 && (
-                <FifthPart FunctionalMinor={FunctionalMinor} NDstate={NDstate} />
+                <FifthPart
+                  FunctionalMinor={FunctionalMinor}
+                  NDstate={NDstate}
+                />
               )}
               {visible === 6 && (
                 <SixthPart Warranty={Warranty} NDstate={NDstate} />
@@ -357,8 +364,14 @@ function NewDeviceqs() {
             </div>
           </div>
         </div>
-        <AboveSix visible={visible} setVisible={setVisible} updateAns={updateAns}
-          showPopup={showPopup} qna={qna} profile={profile} />
+        <AboveSix
+          visible={visible}
+          setVisible={setVisible}
+          updateAns={updateAns}
+          showPopup={showPopup}
+          qna={qna}
+          profile={profile}
+        />
       </div>
     </>
   );
@@ -735,7 +748,7 @@ const AboveSix = ({
 
   const handlesubmit = async () => {
     setIsLoading(true);
-    console.log(id, profile)
+    console.log(id, profile);
     const finalPayload = {
       QNA: qna,
       phoneNumber: id?.phoneNumber ? id?.phoneNumber : "123456789",

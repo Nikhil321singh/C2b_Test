@@ -80,7 +80,9 @@ const StoreWiseReport = () => {
   const [fromDate, setFromDate] = useState("");
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
   const [toDate, setToDate] = useState("");
-  const [toDateDup, setToDateDup] = useState( new Date().toISOString().split("T")[0] );
+  const [toDateDup, setToDateDup] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [grestRec, setGrestRec] = useState("");
   const [allUser, setAllUser] = useState([]);
   const [techId, setTechId] = useState("");
@@ -90,10 +92,10 @@ const StoreWiseReport = () => {
   const fetchStoreData = () => {
     setIsTableLoaded(true);
     axios
-      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll?page=${
-        currentPage}&limit=${pageLimit}&is_selled=${isSelled}&store=${storeId}&rid=${
-        searchValue}&grestRec=${grestRec}&endDate=${toDateDup}&startDate=${fromDateDup
-        }&userId=${techId}&deviceType=${deviceCategory}`,
+      .get(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/prospects/findAll?page=${currentPage}&limit=${pageLimit}&is_selled=${isSelled}&store=${storeId}&rid=${searchValue}&grestRec=${grestRec}&endDate=${toDateDup}&startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
         { headers: { Authorization: token } }
       )
       .then((res) => {
@@ -109,7 +111,9 @@ const StoreWiseReport = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll?page=0&limit=9999`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
     axios
@@ -163,7 +167,15 @@ const StoreWiseReport = () => {
 
   useEffect(() => {
     fetchStoreData();
-  }, [currentPage, pageLimit, grestRec, fromDateDup, toDateDup, techId, deviceCategory]);
+  }, [
+    currentPage,
+    pageLimit,
+    grestRec,
+    fromDateDup,
+    toDateDup,
+    techId,
+    deviceCategory,
+  ]);
 
   useEffect(() => {
     if (storeId) {
@@ -178,11 +190,15 @@ const StoreWiseReport = () => {
       setFromDate(date);
       const formattedDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
+      )
+        .toISOString()
+        .split("T")[0];
       const today = new Date();
       const formattedToday = new Date(
         today.getTime() - today.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
+      )
+        .toISOString()
+        .split("T")[0];
       if (toDate === "") {
         setToDateDup(formattedToday);
       }
@@ -196,14 +212,21 @@ const StoreWiseReport = () => {
       setToDate(date);
       const formattedDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
+      )
+        .toISOString()
+        .split("T")[0];
       setToDateDup(formattedDate);
       if (fromDate === "") {
         const fromDateOneYearBefore = new Date(date);
-        fromDateOneYearBefore.setFullYear(fromDateOneYearBefore.getFullYear() - 1);
+        fromDateOneYearBefore.setFullYear(
+          fromDateOneYearBefore.getFullYear() - 1
+        );
         const formattedFromDate = new Date(
-          fromDateOneYearBefore.getTime() - fromDateOneYearBefore.getTimezoneOffset() * 60000
-        ).toISOString().split("T")[0];
+          fromDateOneYearBefore.getTime() -
+            fromDateOneYearBefore.getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .split("T")[0];
         setFromDateDup(formattedFromDate);
       }
     }
@@ -394,150 +417,206 @@ const MainFilter = ({
   };
   return (
     <div className="flex flex-row w-100 gap-2 items-center justify-center">
-      <div className="flex flex-row px-5 gap-2 w-[100%] justify-center items-center">
-        <div className="relative w-[15%]">
-          <div
-            className={`${styles.filter_button}`}
-            onClick={() => {
-              setTechDrop(!techDrop);
-            }}
-          >
-            <p className="truncate">
-              {techName === "" ? "Select Technician" : techName}
-            </p>
-            <FaAngleDown size={17} className={`${techDrop && rotateCss}`} />
-          </div>
-          {techDrop && (
-            <div className={`${styles.filter_drop}`}>
-              <div
-                onClick={() => {
-                  setTechName("");
-                  setTechId("");
-                  setTechDrop(false);
-                }}
-                className={`${styles.filter_option}`}
-              >
-                <p className="truncate">Show All</p>
-              </div>
-              {allUser.map((item) => (
-                <div
-                  key={item._id}
-                  onClick={() => handleTechChange(item)}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{item.userName}</p>
-                </div>
-              ))}
-            </div>
-          )}
+      <MainFilterSub
+        setTechDrop={setTechDrop}
+        techDrop={techDrop}
+        techName={techName}
+        setTechName={setTechName}
+        setTechId={setTechId}
+        allUser={allUser}
+        handleTechChange={handleTechChange}
+        setGrestDrop={setGrestDrop}
+        grestDrop={grestDrop}
+        grestRec={grestRec}
+        handleGrestRecChange={handleGrestRecChange}
+        setRegionDrop={setRegionDrop}
+        regionDrop={regionDrop}
+        region={region}
+        regionalData={regionalData}
+        handleRegionChange={handleRegionChange}
+        setStoreDrop={setStoreDrop}
+        storeDrop={storeDrop}
+        storeName={storeName}
+        storeData={storeData}
+        handleStoreChange={handleStoreChange}
+        fromDate={fromDate}
+        handleFromDateChange={handleFromDateChange}
+        toDate={toDate}
+        handleToDateChange={handleToDateChange}
+      />
+    </div>
+  );
+};
+
+const MainFilterSub = ({
+  setTechDrop,
+  techDrop,
+  techName,
+  setTechName,
+  setTechId,
+  allUser,
+  handleTechChange,
+  setGrestDrop,
+  grestDrop,
+  grestRec,
+  handleGrestRecChange,
+  setRegionDrop,
+  regionDrop,
+  region,
+  regionalData,
+  handleRegionChange,
+  setStoreDrop,
+  storeDrop,
+  storeName,
+  storeData,
+  handleStoreChange,
+  fromDate,
+  handleFromDateChange,
+  toDate,
+  handleToDateChange,
+}) => {
+  return (
+    <div className="flex flex-row px-5 gap-2 w-[100%] justify-center items-center">
+      <div className="relative w-[15%]">
+        <div
+          className={`${styles.filter_button}`}
+          onClick={() => {
+            setTechDrop(!techDrop);
+          }}
+        >
+          <p className="truncate">
+            {techName === "" ? "Select Technician" : techName}
+          </p>
+          <FaAngleDown size={17} className={`${techDrop && rotateCss}`} />
         </div>
-        <div className="relative w-[15%]">
-          <div
-            className={`${styles.filter_button}`}
-            onClick={() => {
-              setGrestDrop(!grestDrop);
-            }}
-          >
-            <p className="truncate">
-              {grestRec === "" ? "Grest Received ?" : "Grest Rec. " + grestRec}
-            </p>
-            <FaAngleDown size={17} className={`${grestDrop && rotateCss}`} />
-          </div>
-          {grestDrop && (
-            <div className={`${styles.filter_drop}`}>
-              <div
-                onClick={() => handleGrestRecChange("")}
-                className={`${styles.filter_option}`}
-              >
-                <p className="truncate">Show All</p>
-              </div>
-              <div
-                onClick={() => handleGrestRecChange("yes")}
-                className={`${styles.filter_option}`}
-              >
-                <p className="truncate">Yes</p>
-              </div>
-              <div
-                onClick={() => handleGrestRecChange("no")}
-                className={`${styles.filter_option}`}
-              >
-                <p className="truncate">No</p>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="relative w-[20%]">
-          <div
-            className={`${styles.filter_button}`}
-            onClick={() => {
-              setRegionDrop(!regionDrop);
-            }}
-          >
-            <p className="truncate">
-              {region === "" ? "Select Region" : region}
-            </p>
-            <FaAngleDown size={17} className={`${regionDrop && rotateCss}`} />
-          </div>
-          {regionDrop && (
-            <div className={`${styles.filter_drop}`}>
-              {regionalData.map((item) => (
-                <div
-                  key={item}
-                  onClick={() => handleRegionChange(item)}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{item}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="relative w-[35%]">
-          <div
-            className={`${styles.filter_button}`}
-            onClick={() => {
-              setStoreDrop(!storeDrop);
-            }}
-          >
-            <p className="truncate">
-              {storeName === "" ? "Select Store" : storeName}
-            </p>
-            <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
-          </div>
-          {storeDrop && (
+        {techDrop && (
+          <div className={`${styles.filter_drop}`}>
             <div
-              className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
+              onClick={() => {
+                setTechName("");
+                setTechId("");
+                setTechDrop(false);
+              }}
+              className={`${styles.filter_option}`}
             >
-              {storeData.map((item, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleStoreChange(item)}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{item.storeName}</p>
-                </div>
-              ))}
+              <p className="truncate">Show All</p>
             </div>
-          )}
+            {allUser.map((item) => (
+              <div
+                key={item._id}
+                onClick={() => handleTechChange(item)}
+                className={`${styles.filter_option}`}
+              >
+                <p className="truncate">{item.userName}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="relative w-[15%]">
+        <div
+          className={`${styles.filter_button}`}
+          onClick={() => {
+            setGrestDrop(!grestDrop);
+          }}
+        >
+          <p className="truncate">
+            {grestRec === "" ? "Grest Received ?" : "Grest Rec. " + grestRec}
+          </p>
+          <FaAngleDown size={17} className={`${grestDrop && rotateCss}`} />
         </div>
-        <div className="w-[15%]">
-          <DatePicker
-            selected={fromDate}
-            onChange={handleFromDateChange}
-            dateFormat="yyyy-MM-dd"
-            className="outline-none p-2 w-[100%] border rounded-md text-sm text-center"
-            placeholderText="Select from date"
-          />
+        {grestDrop && (
+          <div className={`${styles.filter_drop}`}>
+            <div
+              onClick={() => handleGrestRecChange("")}
+              className={`${styles.filter_option}`}
+            >
+              <p className="truncate">Show All</p>
+            </div>
+            <div
+              onClick={() => handleGrestRecChange("yes")}
+              className={`${styles.filter_option}`}
+            >
+              <p className="truncate">Yes</p>
+            </div>
+            <div
+              onClick={() => handleGrestRecChange("no")}
+              className={`${styles.filter_option}`}
+            >
+              <p className="truncate">No</p>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="relative w-[20%]">
+        <div
+          className={`${styles.filter_button}`}
+          onClick={() => {
+            setRegionDrop(!regionDrop);
+          }}
+        >
+          <p className="truncate">{region === "" ? "Select Region" : region}</p>
+          <FaAngleDown size={17} className={`${regionDrop && rotateCss}`} />
         </div>
-        <div className="w-[15%]">
-          <DatePicker
-            selected={toDate}
-            onChange={handleToDateChange}
-            dateFormat="yyyy-MM-dd"
-            className="outline-none p-2 w-[100%] border rounded-md text-sm text-center"
-            placeholderText="Select to date"
-          />
+        {regionDrop && (
+          <div className={`${styles.filter_drop}`}>
+            {regionalData.map((item) => (
+              <div
+                key={item}
+                onClick={() => handleRegionChange(item)}
+                className={`${styles.filter_option}`}
+              >
+                <p className="truncate">{item}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="relative w-[35%]">
+        <div
+          className={`${styles.filter_button}`}
+          onClick={() => {
+            setStoreDrop(!storeDrop);
+          }}
+        >
+          <p className="truncate">
+            {storeName === "" ? "Select Store" : storeName}
+          </p>
+          <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
         </div>
+        {storeDrop && (
+          <div
+            className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
+          >
+            {storeData.map((item, index) => (
+              <div
+                key={index}
+                onClick={() => handleStoreChange(item)}
+                className={`${styles.filter_option}`}
+              >
+                <p className="truncate">{item.storeName}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="w-[15%]">
+        <DatePicker
+          selected={fromDate}
+          onChange={handleFromDateChange}
+          dateFormat="yyyy-MM-dd"
+          className="outline-none p-2 w-[100%] border rounded-md text-sm text-center"
+          placeholderText="Select from date"
+        />
+      </div>
+      <div className="w-[15%]">
+        <DatePicker
+          selected={toDate}
+          onChange={handleToDateChange}
+          dateFormat="yyyy-MM-dd"
+          className="outline-none p-2 w-[100%] border rounded-md text-sm text-center"
+          placeholderText="Select to date"
+        />
       </div>
     </div>
   );

@@ -514,68 +514,13 @@ const DPFilter = ({
           </div>
         </div>
       </div>
-      <div className="flex gap-2 items-center outline-none">
-        <div className="relative">
-          <div
-            className={`${styles.filter_button}`}
-            onClick={handleFilterClick}
-          >
-            <p className="truncate">
-              {statusValue === "" ? "Select Status" : statusValue}
-            </p>
-            <FaAngleDown
-              size={17}
-              className={`${showFilterDropdown && RotateCss}`}
-            />
-          </div>
-          {showFilterDropdown && (
-            <div className={`${styles.filter_drop}`}>
-              <div
-                onClick={() => {
-                  setStatusValue(PickupAvail);
-                  handleFilterClick();
-                }}
-                className={`${styles.filter_option}`}
-              >
-                <p>Available for Pickup</p>
-              </div>
-              <div
-                onClick={() => {
-                  setStatusValue("On Hold");
-                  handleFilterClick();
-                }}
-                className={`${styles.filter_option}`}
-              >
-                <p>On Hold</p>
-              </div>
-              <div
-                onClick={() => {
-                  setStatusValue("Cancelled");
-                  handleFilterClick();
-                }}
-                className={`${styles.filter_option}`}
-              >
-                <p>Cancelled</p>
-              </div>
-              <div
-                onClick={() => {
-                  setStatusValue("");
-                  handleFilterClick();
-                }}
-                className={`${styles.filter_option}`}
-              >
-                <p>Show All</p>
-              </div>
-            </div>
-          )}
-        </div>
-        <button
-          className={`${styles.bulkdown_button}`}
-          onClick={() => downloadExcel(pendingTableData)}
-        >
-          <FaDownload /> Bulk Download
-        </button>
-      </div>
+      <DPFilterSub
+        handleFilterClick={handleFilterClick}
+        statusValue={statusValue}
+        showFilterDropdown={showFilterDropdown}
+        setStatusValue={setStatusValue}
+        pendingTableData={pendingTableData}
+      />
       <div className="flex gap-2 w-100 items-center outline-none">
         <div className="relative w-[45%]">
           <div
@@ -630,6 +575,76 @@ const DPFilter = ({
           )}
         </div>
       </div>
+    </div>
+  );
+};
+
+const DPFilterSub = ({
+  handleFilterClick,
+  statusValue,
+  showFilterDropdown,
+  setStatusValue,
+  pendingTableData,
+}) => {
+  return (
+    <div className="flex gap-2 items-center outline-none">
+      <div className="relative">
+        <div className={`${styles.filter_button}`} onClick={handleFilterClick}>
+          <p className="truncate">
+            {statusValue === "" ? "Select Status" : statusValue}
+          </p>
+          <FaAngleDown
+            size={17}
+            className={`${showFilterDropdown && RotateCss}`}
+          />
+        </div>
+        {showFilterDropdown && (
+          <div className={`${styles.filter_drop}`}>
+            <div
+              onClick={() => {
+                setStatusValue(PickupAvail);
+                handleFilterClick();
+              }}
+              className={`${styles.filter_option}`}
+            >
+              <p>Available for Pickup</p>
+            </div>
+            <div
+              onClick={() => {
+                setStatusValue("On Hold");
+                handleFilterClick();
+              }}
+              className={`${styles.filter_option}`}
+            >
+              <p>On Hold</p>
+            </div>
+            <div
+              onClick={() => {
+                setStatusValue("Cancelled");
+                handleFilterClick();
+              }}
+              className={`${styles.filter_option}`}
+            >
+              <p>Cancelled</p>
+            </div>
+            <div
+              onClick={() => {
+                setStatusValue("");
+                handleFilterClick();
+              }}
+              className={`${styles.filter_option}`}
+            >
+              <p>Show All</p>
+            </div>
+          </div>
+        )}
+      </div>
+      <button
+        className={`${styles.bulkdown_button}`}
+        onClick={() => downloadExcel(pendingTableData)}
+      >
+        <FaDownload /> Bulk Download
+      </button>
     </div>
   );
 };

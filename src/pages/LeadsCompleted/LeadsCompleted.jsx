@@ -346,9 +346,9 @@ const SubLeadsCompleted = ({
               }
             >
               <option value="">Select store</option>
-              {userEmailList.map((particular_user) => (
-                <option key={particular_user._id} value={particular_user._id}>
-                  {particular_user.email}
+              {userEmailList.map((particularUser) => (
+                <option key={particularUser._id} value={particularUser._id}>
+                  {particularUser.email}
                 </option>
               ))}
             </select>

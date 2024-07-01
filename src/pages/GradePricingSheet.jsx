@@ -312,20 +312,20 @@ const GradePricingSheetSub = ({
         </div>
         <div className={`${styles.search_bar_wrap}`}>
           <input
-            onChange={(e) => setSearchValue(e.target.value)}
             className="text-sm"
+            onChange={(e) => setSearchValue(e.target.value)}
             type="text"
-            placeholder="Search..."
             value={searchValue}
+            placeholder="Search..."
           />
-          <IoMdSearch onClick={handleSearchClick} size={25} />
+          <IoMdSearch size={25} onClick={handleSearchClick} size={25} />
         </div>
         <div className={styles.icons_box}>
-          <IoRefresh onClick={handleSearchClear} className="" size={25} />
+          <IoRefresh onClick={handleSearchClear} size={25} className="" />
         </div>
         <button
-          className={`${styles.bulkdown_button}`}
           onClick={fetchDownloadDataGradePricingSheet}
+          className={`${styles.bulkdown_button}`}
         >
           <FaDownload /> Bulk Download
         </button>
@@ -350,26 +350,26 @@ const GradePricingSheetSub = ({
           tableData={tableData}
         />
       </div>
-      <div className="flex justify-center mt-0 mb-4">
+      <div className="mt-0 mb-4 flex justify-center ">
         <button
-          onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
+          onClick={() => setCurrentPage(currentPage - 1)}
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              ? " text-gray-600 cursor-not-allowed bg-gray-400"
+              : " text-white cursor-pointer bg-[#EC2752]"
           }`}
         >
           Previous
         </button>
         <button
-          onClick={() => setCurrentPage(currentPage + 1)}
           disabled={currentPage === maxPages - 1}
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              ? "text-gray-600 bg-gray-400  cursor-not-allowed"
+              : "bg-[#EC2752]  cursor-pointer text-white"
           }`}
+          onClick={() => setCurrentPage(currentPage + 1)}
         >
           Next
         </button>

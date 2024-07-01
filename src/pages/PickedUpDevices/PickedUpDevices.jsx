@@ -33,31 +33,31 @@ const PickedUpDevices = () => {
   const [dateValue, setDateValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [tempId, setTempId] = useState();
-  const [errorMsg, setErrorMsg] = useState("successfully updated status");
   const [successMod, setSuccessMod] = useState(false);
-  const [failMod, setFailMode] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("successfully updated status");
   const [confMod, setConfMod] = useState(false);
-  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
+  const [failMod, setFailMode] = useState(false);
   const [region, setRegion] = useState(LoggedInUser?.region);
-  const [storeData, setStoreData] = useState([]);
+  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
   const [regionData, setRegionData] = useState([]);
-  const [allStore, setAllStore] = useState([]);
+  const [storeData, setStoreData] = useState([]);
   const firsttime = useRef(true);
+  const [allStore, setAllStore] = useState([]);
 
   useEffect(() => {
-    if (failMod || successMod) {
-      const timeoutId = setTimeout(() => {
-        setFailMode(false);
+    if (successMod || failMod) {
+      const timeout_id = setTimeout(() => {
         setSuccessMod(false);
+        setFailMode(false);
       }, 5000);
-      return () => clearTimeout(timeoutId);
+      return () => clearTimeout(timeout_id);
     }
     return () => {};
   }, [failMod, successMod]);
 
   const getData = () => {
     setIsTableLoaded(true);
-    const config = {
+    const configuration = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -65,21 +65,21 @@ const PickedUpDevices = () => {
       headers: { Authorization: token },
     };
     axios
-      .request(config)
-      .then((response) => {
-        setData(response.data.data);
+      .request(configuration)
+      .then((res) => {
+        setData(res.data.data);
         setIsTableLoaded(false);
       })
       .catch((error) => {
         setErrorMsg(`Failed to load data`);
-        setFailMode(true);
         setIsTableLoaded(false);
+        setFailMode(true);
       });
   };
 
   const getStore = () => {
     setIsTableLoaded(true);
-    const config = {
+    const configuration = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -87,19 +87,17 @@ const PickedUpDevices = () => {
       headers: { Authorization: token },
     };
     axios
-      .request(config)
-      .then((response) => {
-        const allData = response.data.result;
-        const storeNamesArray = response.data.result.map(
-          (store) => store.storeName
-        );
-        const uniqueRegionsArray = [
-          ...new Set(response.data.result.map((store) => store.region)),
+      .request(configuration)
+      .then((res) => {
+        const allData = res.data.result;
+        const storeNamesArr = res.data.result.map((store) => store.storeName);
+        const uniqueRegionsArr = [
+          ...new Set(res.data.result.map((store) => store.region)),
         ];
+        setStoreData(storeNamesArr);
         setAllStore(allData);
-        setStoreData(storeNamesArray);
-        setRegionData(uniqueRegionsArray);
         setIsTableLoaded(false);
+        setRegionData(uniqueRegionsArr);
       })
       .catch((error) => {
         setIsTableLoaded(false);
@@ -108,7 +106,7 @@ const PickedUpDevices = () => {
 
   const getDataBySearch = () => {
     setIsTableLoaded(true);
-    const config = {
+    const configuration = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -116,7 +114,7 @@ const PickedUpDevices = () => {
       headers: { Authorization: token },
     };
     axios
-      .request(config)
+      .request(configuration)
       .then((response) => {
         setData(response.data.data);
         setIsTableLoaded(false);
@@ -215,7 +213,9 @@ const ExtComps = ({
     setIsTableLoaded(true);
     const config = {
       method: "post",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pickupDevices/update`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pickupDevices/update`,
       headers: { Authorization: token },
       data: JSON.stringify({
         refIDs: [refID],
@@ -226,7 +226,9 @@ const ExtComps = ({
       .request(config)
       .then((response) => {
         getData();
-        setErrorMsg(`Successfully Updated Status of Lot ${refID} to ${newStatus}`);
+        setErrorMsg(
+          `Successfully Updated Status of Lot ${refID} to ${newStatus}`
+        );
         if (newStatus === PickConf) {
           setErrorMsg(`Pickup Confirmed for Lot ${refID}, check it on history`);
         }
@@ -234,9 +236,7 @@ const ExtComps = ({
         setSuccessMod(true);
       })
       .catch((error) => {
-        setErrorMsg(
-          `Failed to Updated Status of Lot ${refID} to ${newStatus}`
-        );
+        setErrorMsg(`Failed to Updated Status of Lot ${refID} to ${newStatus}`);
         setFailMode(true);
         setIsTableLoaded(false);
       });
@@ -258,16 +258,16 @@ const ExtComps = ({
         )}
       </div>
       {successMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div className="fixed left-0 top-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
-            <IoIosCheckmarkCircle className={succTextColor} size={90} />
+            <IoIosCheckmarkCircle size={90} className={succTextColor} />
             <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
+              className={"text-white bg-green-500 "}
               onClick={() => {
                 setSuccessMod(false);
               }}
-              className={"bg-green-500 text-white"}
             >
               Okay
             </button>
@@ -292,8 +292,8 @@ const ExtComps = ({
         </div>
       )}
       {confMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
+          <div className={`${failTextColor} ${styles.err_mod_box} `}>
             <h6 className={failTextColor}>Confirmation!</h6>
             <p className="text-slate-500">
               {`Confirm Pickup for lot - ${tempId} ?`}
@@ -383,31 +383,31 @@ const PickedUpFilter = ({
       <div className="mt-[3px] flex gap-2 items-center outline-none">
         <div className={`${styles.search_bar_wrap}`}>
           <input
-            onChange={(e) => setSearchValue(e.target.value)}
             className="text-sm"
+            onChange={(e) => setSearchValue(e.target.value)}
             type="text"
-            placeholder="Search"
             value={searchValue}
+            placeholder="Search"
           />
-          <IoMdSearch onClick={() => getDataBySearch()} size={34} />
+          <IoMdSearch size={34} onClick={() => getDataBySearch()} />
         </div>
         <div className={styles.icons_box}>
-          <IoRefresh onClick={handleSearchClear} className="" size={25} />
+          <IoRefresh className="" onClick={handleSearchClear} size={25} />
         </div>
         <div
-          className={`flex flex-row justify-center items-center ${styles.date_picker_wrap}`}
+          className={`flex flex-row  items-center justify-center ${styles.date_picker_wrap}`}
         >
           <input
-            type="date"
             id="datepicker"
             style={{ color: "#EC2752" }}
-            className=""
+            type="date"
             value={dateValue}
             onChange={dateChangeHandler}
+            className=""
           />
           <div
-            className={styles.date_box}
             onClick={() => document.getElementById("datepicker").showPicker()}
+            className={styles.date_box}
           >
             <p>{dateValue ? dateValue : "DD/MM/YYYY"}</p>
             <BsCalendarDate size={25} />
@@ -432,39 +432,39 @@ const PickedUpFilter = ({
           </div>
           {regionDrop && (
             <div className={`${styles.filter_drop}`}>
-              {regionData.map((item) => (
+              {regionData.map((element) => (
                 <div
-                  key={item}
-                  onClick={() => handleRegionChange(item)}
+                  key={element}
                   className={`${styles.filter_option}`}
+                  onClick={() => handleRegionChange(element)}
                 >
-                  <p className="truncate">{item}</p>
+                  <p className="truncate">{element}</p>
                 </div>
               ))}
             </div>
           )}
         </div>
-        <div className="relative w-[70%]">
+        <div className="w-[70%] relative ">
           <div
-            className={`${styles.filter_button}`}
             onClick={() => {
               setStoreDrop(!storeDrop);
             }}
+            className={`${styles.filter_button}`}
           >
             <p className="truncate">
               {storeName === "" ? "Select Store" : storeName}
             </p>
-            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
+            <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
           </div>
           {storeDrop && (
             <div className={`${styles.filter_drop}`}>
-              {storeData.map((item, index) => (
+              {storeData.map((element, index) => (
                 <div
                   key={index}
-                  onClick={() => handleStoreChange(item)}
+                  onClick={() => handleStoreChange(element)}
                   className={`${styles.filter_option}`}
                 >
-                  <p className="truncate">{item}</p>
+                  <p className="truncate">{element}</p>
                 </div>
               ))}
             </div>
