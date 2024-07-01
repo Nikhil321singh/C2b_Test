@@ -190,6 +190,54 @@ const GradePricingSheet = () => {
   };
   return (
     <div>
+      <GradePricingSheetSub
+        setsideMenu={setsideMenu}
+        sideMenu={sideMenu}
+        isTableLoading={isTableLoading}
+        uploadBox={uploadBox}
+        handleBulkSubmit={handleBulkSubmit}
+        handleExcelFileChange={handleExcelFileChange}
+        setUploadBox={setUploadBox}
+        setIsTableLoading={setIsTableLoading}
+        handleDeviceCategory={handleDeviceCategory}
+        setSearchValue={setSearchValue}
+        searchValue={searchValue}
+        handleSearchClick={handleSearchClick}
+        handleSearchClear={handleSearchClear}
+        fetchDownloadDataGradePricingSheet={fetchDownloadDataGradePricingSheet}
+        deviceCategory={deviceCategory}
+        tableData={tableData}
+        setCurrentPage={setCurrentPage}
+        currentPage={currentPage}
+        maxPages={maxPages}
+      />
+    </div>
+  );
+};
+
+const GradePricingSheetSub = ({
+  setsideMenu,
+  sideMenu,
+  isTableLoading,
+  uploadBox,
+  handleBulkSubmit,
+  handleExcelFileChange,
+  setUploadBox,
+  setIsTableLoading,
+  handleDeviceCategory,
+  setSearchValue,
+  searchValue,
+  handleSearchClick,
+  handleSearchClear,
+  fetchDownloadDataGradePricingSheet,
+  deviceCategory,
+  tableData,
+  setCurrentPage,
+  currentPage,
+  maxPages,
+}) => {
+  return (
+    <div>
       <ToastContainer />
       <div className="navbar">
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />

@@ -142,46 +142,46 @@ const Price = ({ submitdata, userToken }) => {
           />
           <PhonePhotos1
             handleChange={handleChange}
-            handleCameraButtonClick={handleCameraButtonClick}
             setPhoneFront={setPhoneFront}
-            phoneFront={phoneFront}
+            handleCameraButtonClick={handleCameraButtonClick}
             phoneFrontRef={phoneFrontRef}
-            setPhoneBack={setPhoneBack}
+            phoneFront={phoneFront}
             phoneBack={phoneBack}
-            phoneBackRef={phoneBackRef}
+            setPhoneBack={setPhoneBack}
             setPhoneBottom={setPhoneBottom}
-            phoneBottom={phoneBottom}
+            phoneBackRef={phoneBackRef}
             phoneBottomRef={phoneBottomRef}
-            setPhoneTop={setPhoneTop}
+            phoneBottom={phoneBottom}
             phoneTop={phoneTop}
-            phoneTopRef={phoneTopRef}
+            setPhoneTop={setPhoneTop}
             setPhoneLeft={setPhoneLeft}
-            phoneLeft={phoneLeft}
+            phoneTopRef={phoneTopRef}
             phoneLeftRef={phoneLeftRef}
-            setPhoneRight={setPhoneRight}
+            phoneLeft={phoneLeft}
             phoneRight={phoneRight}
+            setPhoneRight={setPhoneRight}
             phoneRightRef={phoneRightRef}
           />
           <PhonePhotos
             handleChange={handleChange}
-            handleCameraButtonClick={handleCameraButtonClick}
             setPhoneFront={setPhoneFront}
-            phoneFront={phoneFront}
+            handleCameraButtonClick={handleCameraButtonClick}
             phoneFrontRef={phoneFrontRef}
-            setPhoneBack={setPhoneBack}
+            phoneFront={phoneFront}
             phoneBack={phoneBack}
-            phoneBackRef={phoneBackRef}
+            setPhoneBack={setPhoneBack}
             setPhoneBottom={setPhoneBottom}
-            phoneBottom={phoneBottom}
+            phoneBackRef={phoneBackRef}
             phoneBottomRef={phoneBottomRef}
-            setPhoneTop={setPhoneTop}
+            phoneBottom={phoneBottom}
             phoneTop={phoneTop}
-            phoneTopRef={phoneTopRef}
+            setPhoneTop={setPhoneTop}
             setPhoneLeft={setPhoneLeft}
-            phoneLeft={phoneLeft}
+            phoneTopRef={phoneTopRef}
             phoneLeftRef={phoneLeftRef}
-            setPhoneRight={setPhoneRight}
+            phoneLeft={phoneLeft}
             phoneRight={phoneRight}
+            setPhoneRight={setPhoneRight}
             phoneRightRef={phoneRightRef}
           />
         </div>
@@ -255,8 +255,7 @@ const AdharField = ({
 
       <div className="flex inputAADHAR justify-evenly">
         <div
-          className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] 
-    relative flex flex-col border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]"
+          className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative flex flex-col border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]"
         >
           <p className="font-semibold text-center">Adhaar(Front)</p>
           <input
@@ -381,171 +380,173 @@ const PhonePhotos1 = ({
   phoneRightRef,
   setPhoneRight,
 }) => {
-  return <div className="flex flex-col adharcard mt-[10px] ">
-  <div className="flex gap-1 two">
-    <p className="text-base font-medium">3.</p>
-    <p className="text-base font-medium three">
-      {`Upload Your ${Device}'s Images`}
-    </p>
-  </div>
-  <div className="flex flex-wrap inputAADHAR justify-evenly">
-    <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-      <p className="font-semibold text-center">{`${Device} Front`}</p>
-      <input
-        type="file"
-        onChange={(e) => handleChange(setPhoneFront, e)}
-        style={{ display: "none" }}
-        ref={phoneFrontRef}
-      />
-      <button onClick={() => handleCameraButtonClick(phoneFrontRef)}>
-        {!phoneFront ? (
-          <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-            <FaCamera />
-            <span className="block tracking-tighter">Select file</span>
-          </i>
-        ) : (
-          <img
-            className="w-full h-[60px]"
-            src={URL.createObjectURL(phoneFront)}
-            alt="Uploaded file"
+  return (
+    <div className="flex flex-col adharcard mt-[10px] ">
+      <div className="flex gap-1 two">
+        <p className="text-base font-medium">3.</p>
+        <p className="text-base font-medium three">
+          {`Upload Your ${Device}'s Images`}
+        </p>
+      </div>
+      <div className="flex flex-wrap inputAADHAR justify-evenly">
+        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+          <p className="text-center font-semibold">{`${Device} Front`}</p>
+          <input
+            onChange={(e) => handleChange(setPhoneFront, e)}
+            type="file"
+            ref={phoneFrontRef}
+            style={{ display: "none" }}
           />
-        )}
-      </button>
-    </div>
-    <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-      <p className="font-semibold text-center">{`${Device} Back`}</p>
-      <input
-        type="file"
-        onChange={(e) => handleChange(setPhoneBack, e)}
-        style={{ display: "none" }}
-        ref={phoneBackRef}
-      />
-      <button onClick={() => handleCameraButtonClick(phoneBackRef)}>
-        {!phoneBack ? (
-          <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-            <FaCamera />
-            <span className="block tracking-tighter">Select file</span>
-          </i>
-        ) : (
-          <img
-            className="w-full h-[60px]"
-            src={URL.createObjectURL(phoneBack)}
-            alt="Uploaded file"
+          <button onClick={() => handleCameraButtonClick(phoneFrontRef)}>
+            {!phoneFront ? (
+              <i className="absolute flex flex-col justify-center items-center  transform -translate-x-1/2 -translate-y-1/2 fa-camera left-1/2 top-[70%]">
+                <FaCamera />
+                <span className="block tracking-tighter">Select file</span>
+              </i>
+            ) : (
+              <img
+                src={URL.createObjectURL(phoneFront)}
+                className="h-[60px] w-full"
+                alt="Uploaded file"
+              />
+            )}
+          </button>
+        </div>
+        <div className="p-1 text-center mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+          <p className="text-center font-semibold">{`${Device} Back`}</p>
+          <input
+            ref={phoneBackRef}
+            type="file"
+            style={{ display: "none" }}
+            onChange={(e) => handleChange(setPhoneBack, e)}
           />
-        )}
-      </button>
-    </div>
+          <button onClick={() => handleCameraButtonClick(phoneBackRef)}>
+            {!phoneBack ? (
+              <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
+                <FaCamera />
+                <span className="block tracking-tighter">Select file</span>
+              </i>
+            ) : (
+              <img
+                className="w-full h-[60px]"
+                alt="Uploaded file"
+                src={URL.createObjectURL(phoneBack)}
+              />
+            )}
+          </button>
+        </div>
 
-    {/* 3 */}
+        {/* 3 */}
 
-    <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
-      <p className="font-semibold tracking-tighter text-center">
-        {`${Device} Left Side`}
-      </p>
-      <input
-        type="file"
-        onChange={(e) => handleChange(setPhoneLeft, e)}
-        style={{ display: "none" }}
-        ref={phoneLeftRef}
-      />
-      <button onClick={() => handleCameraButtonClick(phoneLeftRef)}>
-        {!phoneLeft ? (
-          <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-            <FaCamera />
-            <span className="block tracking-tighter">Select file</span>
-          </i>
-        ) : (
-          <img
-            className="w-full h-[60px]"
-            src={URL.createObjectURL(phoneLeft)}
-            alt="Uploaded file"
+        <div className="text-center p-1 mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
+          <p className="text-center font-semibold tracking-tighter">
+            {`${Device} Left Side`}
+          </p>
+          <input
+            onChange={(e) => handleChange(setPhoneLeft, e)}
+            type="file"
+            style={{ display: "none" }}
+            ref={phoneLeftRef}
           />
-        )}
-      </button>
-    </div>
+          <button onClick={() => handleCameraButtonClick(phoneLeftRef)}>
+            {!phoneLeft ? (
+              <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
+                <FaCamera />
+                <span className="block tracking-tighter">Select file</span>
+              </i>
+            ) : (
+              <img
+                className="h-[60px] w-full"
+                alt="Uploaded file"
+                src={URL.createObjectURL(phoneLeft)}
+              />
+            )}
+          </button>
+        </div>
 
-    {/* 4 */}
-    <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-      <p className="font-semibold tracking-tighter text-center">
-        {`${Device} Right Side`}
-      </p>
-      <input
-        type="file"
-        onChange={(e) => handleChange(setPhoneRight, e)}
-        style={{ display: "none" }}
-        ref={phoneRightRef}
-      />
-      <button onClick={() => handleCameraButtonClick(phoneRightRef)}>
-        {!phoneRight ? (
-          <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-            <FaCamera />
-            <span className="block tracking-tighter">Select file</span>
-          </i>
-        ) : (
-          <img
-            className="w-full h-[60px]"
-            src={URL.createObjectURL(phoneRight)}
-            alt="Uploaded file"
+        {/* 4 */}
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg w-[40vw] h-[15vh] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+          <p className="text-center font-semibold tracking-tighter">
+            {`${Device} Right Side`}
+          </p>
+          <input
+            onChange={(e) => handleChange(setPhoneRight, e)}
+            type="file"
+            style={{ display: "none" }}
+            ref={phoneRightRef}
           />
-        )}
-      </button>
-    </div>
+          <button onClick={() => handleCameraButtonClick(phoneRightRef)}>
+            {!phoneRight ? (
+              <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
+                <FaCamera />
+                <span className="block tracking-tighter">Select file</span>
+              </i>
+            ) : (
+              <img
+                src={URL.createObjectURL(phoneRight)}
+                className="w-full h-[60px]"
+                alt="Uploaded file"
+              />
+            )}
+          </button>
+        </div>
 
-    {/* 5 */}
-    <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-      <p className="font-semibold tracking-tighter text-center">
-        {`${Device} Top Side`}
-      </p>
-      <input
-        type="file"
-        onChange={(e) => handleChange(setPhoneTop, e)}
-        style={{ display: "none" }}
-        ref={phoneTopRef}
-      />
-      <button onClick={() => handleCameraButtonClick(phoneTopRef)}>
-        {!phoneTop ? (
-          <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-            <FaCamera />
-            <span className="block tracking-tighter">Select file</span>
-          </i>
-        ) : (
-          <img
-            className="w-full h-[60px]"
-            src={URL.createObjectURL(phoneTop)}
-            alt="Uploaded file"
+        {/* 5 */}
+        <div className="border-2 p-1 mt-4 text-center justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+          <p className="font-semibold text-center tracking-tighter">
+            {`${Device} Top Side`}
+          </p>
+          <input
+            type="file"
+            style={{ display: "none" }}
+            onChange={(e) => handleChange(setPhoneTop, e)}
+            ref={phoneTopRef}
           />
-        )}
-      </button>
-    </div>
+          <button onClick={() => handleCameraButtonClick(phoneTopRef)}>
+            {!phoneTop ? (
+              <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
+                <FaCamera />
+                <span className="block tracking-tighter">Select file</span>
+              </i>
+            ) : (
+              <img
+                src={URL.createObjectURL(phoneTop)}
+                className="w-full h-[60px]"
+                alt="Uploaded file"
+              />
+            )}
+          </button>
+        </div>
 
-    {/* 6 */}
-    <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-      <p className="font-semibold tracking-tighter text-center">
-        {`${Device} Bottom Side`}
-      </p>
-      <input
-        type="file"
-        onChange={(e) => handleChange(setPhoneBottom, e)}
-        style={{ display: "none" }}
-        ref={phoneBottomRef}
-      />
-      <button onClick={() => handleCameraButtonClick(phoneBottomRef)}>
-        {!phoneBottom ? (
-          <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-            <FaCamera />
-            <span className="block tracking-tighter">Select file</span>
-          </i>
-        ) : (
-          <img
-            className="w-full h-[60px]"
-            src={URL.createObjectURL(phoneBottom)}
-            alt="Uploaded file"
+        {/* 6 */}
+        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+          <p className="font-semibold text-center tracking-tighter">
+            {`${Device} Bottom Side`}
+          </p>
+          <input
+            onChange={(e) => handleChange(setPhoneBottom, e)}
+            type="file"
+            style={{ display: "none" }}
+            ref={phoneBottomRef}
           />
-        )}
-      </button>
+          <button onClick={() => handleCameraButtonClick(phoneBottomRef)}>
+            {!phoneBottom ? (
+              <i className="absolute flex flex-col justify-center items-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                <FaCamera />
+                <span className="block tracking-tighter">Select file</span>
+              </i>
+            ) : (
+              <img
+              src={URL.createObjectURL(phoneBottom)}
+              alt="Uploaded file"
+              className="w-full h-[60px]"
+              />
+            )}
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  );
 }
 
 const PhonePhotos = ({
@@ -580,52 +581,52 @@ const PhonePhotos = ({
           </p>
         </div>
 
-        <div className="flex flex-wrap inputAADHAR justify-evenly">
+        <div className="flex flex-wrap justify-evenly inputAADHAR">
           {/* 1 */}
-          <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-            <p className="font-semibold text-center">{`${Device} Front`}</p>
+          <div className="text-center p-1 mt-4  border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+            <p className="text-center font-semibold">{`${Device} Front`}</p>
             <input
-              type="file"
               onChange={(e) => handleChange(setPhoneFront, e)}
               style={{ display: "none" }}
+              type="file"
               ref={phoneFrontRef}
             />
             <button onClick={() => handleCameraButtonClick(phoneFrontRef)}>
               {!phoneFront ? (
-                <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera left-1/2 top-[70%]">
                   <FaCamera />
                   <span className="block tracking-tighter">Select file</span>
                 </i>
               ) : (
                 <img
-                  className="w-full h-[60px]"
                   src={URL.createObjectURL(phoneFront)}
                   alt="Uploaded file"
+                  className="w-full h-[60px]"
                 />
               )}
             </button>
           </div>
 
           {/* 2 */}
-          <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-            <p className="font-semibold text-center">{`${Device} Back`}</p>
+          <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+            <p className="text-center font-semibold ">{`${Device} Back`}</p>
             <input
               type="file"
-              onChange={(e) => handleChange(setPhoneBack, e)}
               style={{ display: "none" }}
+              onChange={(e) => handleChange(setPhoneBack, e)}
               ref={phoneBackRef}
             />
             <button onClick={() => handleCameraButtonClick(phoneBackRef)}>
               {!phoneBack ? (
-                <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
                   <FaCamera />
                   <span className="block tracking-tighter">Select file</span>
                 </i>
               ) : (
                 <img
                   className="w-full h-[60px]"
-                  src={URL.createObjectURL(phoneBack)}
                   alt="Uploaded file"
+                  src={URL.createObjectURL(phoneBack)}
                 />
               )}
             </button>
@@ -633,26 +634,26 @@ const PhonePhotos = ({
 
           {/* 3 */}
 
-          <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
-            <p className="font-semibold tracking-tighter text-center">
+          <div className=" mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
+            <p className="font-semibold text-center tracking-tighter ">
               {`${Device} Left Side`}
             </p>
             <input
               type="file"
               onChange={(e) => handleChange(setPhoneLeft, e)}
-              style={{ display: "none" }}
               ref={phoneLeftRef}
+              style={{ display: "none" }}
             />
             <button onClick={() => handleCameraButtonClick(phoneLeftRef)}>
               {!phoneLeft ? (
-                <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2  fa-camera top-[70%] left-1/2">
                   <FaCamera />
-                  <span className="block tracking-tighter">Select file</span>
+                  <span className=" tracking-tighter block">Select file</span>
                 </i>
               ) : (
                 <img
-                  className="w-full h-[60px]"
                   src={URL.createObjectURL(phoneLeft)}
+                  className="w-full h-[60px]"
                   alt="Uploaded file"
                 />
               )}
@@ -660,80 +661,80 @@ const PhonePhotos = ({
           </div>
 
           {/* 4 */}
-          <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-            <p className="font-semibold tracking-tighter text-center">
+          <div className="p-1  text-center border-2 mt-4 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+            <p className="tracking-tighter font-semibold  text-center">
               {`${Device} Right Side`}
             </p>
             <input
               type="file"
-              onChange={(e) => handleChange(setPhoneRight, e)}
               style={{ display: "none" }}
+              onChange={(e) => handleChange(setPhoneRight, e)}
               ref={phoneRightRef}
             />
             <button onClick={() => handleCameraButtonClick(phoneRightRef)}>
               {!phoneRight ? (
-                <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                <i className="absolute flex flex-col items-center justify-center transform  -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
                   <FaCamera />
                   <span className="block tracking-tighter">Select file</span>
                 </i>
               ) : (
                 <img
-                  className="w-full h-[60px]"
                   src={URL.createObjectURL(phoneRight)}
                   alt="Uploaded file"
+                  className="w-full h-[60px]"
                 />
               )}
             </button>
           </div>
 
           {/* 5 */}
-          <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-            <p className="font-semibold tracking-tighter text-center">
+          <div className="mt-4 p-1  text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+            <p className="tracking-tighter font-semibold text-center">
               {`${Device} Top Side`}
             </p>
             <input
+              style={{ display: "none" }}
               type="file"
               onChange={(e) => handleChange(setPhoneTop, e)}
-              style={{ display: "none" }}
               ref={phoneTopRef}
             />
             <button onClick={() => handleCameraButtonClick(phoneTopRef)}>
               {!phoneTop ? (
-                <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera left-1/2 top-[70%] ">
                   <FaCamera />
-                  <span className="block tracking-tighter">Select file</span>
+                  <span className="tracking-tighter block">Select file</span>
                 </i>
               ) : (
                 <img
-                  className="w-full h-[60px]"
-                  src={URL.createObjectURL(phoneTop)}
                   alt="Uploaded file"
+                  src={URL.createObjectURL(phoneTop)}
+                  className="w-full h-[60px]"
                 />
               )}
             </button>
           </div>
 
           {/* 6 */}
-          <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-            <p className="font-semibold tracking-tighter text-center">
+          <div className="text-center p-1 mt-4  border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+            <p className="tracking-tighter  font-semibold text-center">
               {`${Device} Bottom Side`}
             </p>
             <input
               type="file"
-              onChange={(e) => handleChange(setPhoneBottom, e)}
               style={{ display: "none" }}
               ref={phoneBottomRef}
+              onChange={(e) => handleChange(setPhoneBottom, e)}
             />
             <button onClick={() => handleCameraButtonClick(phoneBottomRef)}>
               {!phoneBottom ? (
-                <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
+                <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera left-1/2 top-[70%]">
                   <FaCamera />
-                  <span className="block tracking-tighter">Select file</span>
+                  <span className=" tracking-tighter block ">Select file</span>
                 </i>
               ) : (
                 <img
-                  className="w-full h-[60px]"
                   src={URL.createObjectURL(phoneBottom)}
+                  className="w-full h-[60px]"
                   alt="Uploaded file"
                 />
               )}

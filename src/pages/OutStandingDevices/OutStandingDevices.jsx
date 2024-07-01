@@ -460,19 +460,19 @@ const OutstandingFilter = ({
           </div>
           {regionDrop && (
             <div className={`${styles.filter_drop}`}>
-              {regionData.map((elem) => (
+              {regionData.map((element) => (
                 <div
-                  key={elem}
+                  key={element}
+                  onClick={() => handleRegionChange(element)}
                   className={`${styles.filter_option}`}
-                  onClick={() => handleRegionChange(elem)}
                 >
-                  <p className="truncate">{elem}</p>
+                  <p className="truncate">{element}</p>
                 </div>
               ))}
             </div>
           )}
         </div>
-        <div className="w-[70%] relative">
+        <div className=" relative w-[70%] ">
           <div
             onClick={() => {
               setStoreDrop(!storeDrop);
@@ -482,7 +482,7 @@ const OutstandingFilter = ({
             <p className="truncate">
               {storeName === "" ? "Select Store" : storeName}
             </p>
-            <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
+            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
             <div className={`${styles.filter_drop}`}>

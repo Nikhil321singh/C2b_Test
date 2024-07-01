@@ -496,25 +496,25 @@ const StoreTable = ({
         <table className="w-full border border-[#EC2752]">
           <thead className="bg-[#EC2752] text-white">
             <tr>
-              <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Store Name</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Unique Id</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Email</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Phone Number</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Region</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Address</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Action</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Store Name</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Unique Id</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Email</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Phone Number</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Region</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Address</th>
             </tr>
           </thead>
           <tbody>
             {data.map((val, index) => (
               <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  <div className="flex flex-col gap-1">
+                <td className="text-sm p-2 text-center md:p-3 md:text-base">
+                  <div className="flex flex-col  gap-1">
                     <button
-                      className={`${styles.view_btn}`}
                       onClick={() => {
                         editHandler(val);
                       }}
+                      className={`${styles.view_btn}`}
                     >
                       Edit
                     </button>

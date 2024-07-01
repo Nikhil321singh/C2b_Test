@@ -26,7 +26,9 @@ const LeadsCompleted = () => {
   const [userEmail, setUserEmail] = useState(null);
   const [userEmailList, setUserEmailList] = useState([]);
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
-  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
+  const [toDateDup, setToDateDup] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const pageLimit = 10;
 
@@ -200,6 +202,64 @@ const LeadsCompleted = () => {
   };
 
   return (
+    <div>
+      <SubLeadsCompleted
+        loading={loading}
+        setsideMenu={setsideMenu}
+        sideMenu={sideMenu}
+        fetchDownloadData={fetchDownloadData}
+        toggleFilter={toggleFilter}
+        isFilterOpen={isFilterOpen}
+        productName={productName}
+        setProductName={setProductName}
+        customerId={customerId}
+        setCustomerId={setCustomerId}
+        customerPhone={customerPhone}
+        handleCustomerPhoneChange={handleCustomerPhoneChange}
+        setUserEmail={setUserEmail}
+        userEmail={userEmail}
+        userEmailList={userEmailList}
+        fromDate={fromDate}
+        handleFromDateChange={handleFromDateChange}
+        toDate={toDate}
+        handleToDateChange={handleToDateChange}
+        handleFilterSearch={handleFilterSearch}
+        tableData={tableData}
+        setCurrentPage={setCurrentPage}
+        currentPage={currentPage}
+        maxPages={maxPages}
+      />
+    </div>
+  );
+};
+
+const SubLeadsCompleted = ({
+  loading,
+  setsideMenu,
+  sideMenu,
+  fetchDownloadData,
+  toggleFilter,
+  isFilterOpen,
+  productName,
+  setProductName,
+  customerId,
+  setCustomerId,
+  customerPhone,
+  handleCustomerPhoneChange,
+  setUserEmail,
+  userEmail,
+  userEmailList,
+  fromDate,
+  handleFromDateChange,
+  toDate,
+  handleToDateChange,
+  handleFilterSearch,
+  tableData,
+  setCurrentPage,
+  currentPage,
+  maxPages,
+}) => {
+  return (
     <div className="overflow-y-hidden">
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
@@ -265,58 +325,60 @@ const LeadsCompleted = () => {
               Customer Mobile
             </p>
             <input
-              type="text"
               value={customerPhone}
-              onChange={(e) => handleCustomerPhoneChange(e.target.value)}
+              type="text"
               className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+              onChange={(e) => handleCustomerPhoneChange(e.target.value)}
             />
           </div>
 
           <div>
-            <p className="block text-sm font-medium text-gray-600">
+            <p className="block text-sm text-gray-600 font-medium">
               Store Filter
             </p>
             <select
-              className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
-              name=""
+              className="mt-1  w-[150px] p-2 sm:w-[250px] border rounded-md"
               id=""
+              name=""
+              value={userEmail || ""}
               onChange={(e) =>
                 setUserEmail(e.target.value === "" ? null : e.target.value)
               }
-              value={userEmail || ""}
             >
               <option value="">Select store</option>
-              {userEmailList.map((user) => (
-                <option key={user._id} value={user._id}>
-                  {user.email}
+              {userEmailList.map((particular_user) => (
+                <option key={particular_user._id} value={particular_user._id}>
+                  {particular_user.email}
                 </option>
               ))}
             </select>
           </div>
           <div>
-            <p className="block text-sm font-medium text-gray-600">From Date</p>
+            <p className=" text-sm block font-medium text-gray-600">
+              From Date
+            </p>
             <DatePicker
-              selected={fromDate}
               onChange={handleFromDateChange}
-              dateFormat="yyyy-MM-dd"
+              selected={fromDate}
               className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+              dateFormat="yyyy-MM-dd"
               placeholderText="Select from date"
             />
           </div>
           <div>
-            <p className="block text-sm font-medium text-gray-600">To Date</p>
+            <p className="font-medium block text-sm text-gray-600">To Date</p>
             <DatePicker
               selected={toDate}
-              onChange={handleToDateChange}
               dateFormat="yyyy-MM-dd"
-              className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
+              onChange={handleToDateChange}
               placeholderText="Select to date"
+              className="mt-1 p-2 w-[150px] sm:w-[250px] border rounded-md"
             />
           </div>
 
           <button
+            className="bg-[#EC2752] relative top-5 text-white font-bold rounded-md p-2 h-[40px] w-1/2 focus:outline-none"
             onClick={handleFilterSearch}
-            className="bg-[#EC2752] relative top-5 font-bold text-white rounded-md p-2 h-[40px] w-1/2 focus:outline-none"
           >
             Search
           </button>
@@ -325,26 +387,26 @@ const LeadsCompleted = () => {
 
       <LeadsCompletedTable data={tableData} />
 
-      <div className="flex justify-center mt-0 mb-4">
+      <div className="flex justify-center mb-4 mt-0">
         <button
-          onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
-          className={`mx-2 px-4 py-2 rounded-lg ${
+          onClick={() => setCurrentPage(currentPage - 1)}
+          className={`mx-2 py-2 px-4 rounded-lg ${
             currentPage === 0
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              ? "text-gray-600 bg-gray-400 cursor-not-allowed"
+              : "bg-[#EC2752] cursor-pointer text-white"
           }`}
         >
           Previous
         </button>
         <button
           onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={currentPage === maxPages - 1}
-          className={`mx-2 px-4 py-2 rounded-lg ${
+          className={`py-2 mx-2 px-4 rounded-lg ${
             currentPage === maxPages - 1
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              : "cursor-pointer bg-[#EC2752] text-white"
           }`}
+          disabled={currentPage === maxPages - 1}
         >
           Next
         </button>
