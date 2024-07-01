@@ -141,47 +141,47 @@ const Price = ({ submitdata, userToken }) => {
             phoneBill={phoneBill}
           />
           <PhonePhotos1
-            setPhoneFront={setPhoneFront}
             handleCameraButtonClick={handleCameraButtonClick}
             handleChange={handleChange}
             phoneFront={phoneFront}
-            phoneBack={phoneBack}
+            setPhoneFront={setPhoneFront}
             phoneFrontRef={phoneFrontRef}
             setPhoneBottom={setPhoneBottom}
             phoneBackRef={phoneBackRef}
-            setPhoneBack={setPhoneBack}
+            phoneBack={phoneBack}
             phoneBottom={phoneBottom}
             phoneTop={phoneTop}
             phoneBottomRef={phoneBottomRef}
             setPhoneLeft={setPhoneLeft}
-            phoneTopRef={phoneTopRef}
+            setPhoneBack={setPhoneBack}
             setPhoneTop={setPhoneTop}
             phoneLeft={phoneLeft}
             phoneRight={phoneRight}
-            phoneLeftRef={phoneLeftRef}
+            phoneTopRef={phoneTopRef}
             phoneRightRef={phoneRightRef}
             setPhoneRight={setPhoneRight}
+            phoneLeftRef={phoneLeftRef}
           />
           <PhonePhotos
-            setPhoneFront={setPhoneFront}
             handleCameraButtonClick={handleCameraButtonClick}
             handleChange={handleChange}
             phoneFront={phoneFront}
-            phoneBack={phoneBack}
+            setPhoneFront={setPhoneFront}
             phoneFrontRef={phoneFrontRef}
             setPhoneBottom={setPhoneBottom}
             phoneBackRef={phoneBackRef}
             setPhoneBack={setPhoneBack}
-            phoneBottom={phoneBottom}
+            phoneBack={phoneBack}
             phoneTop={phoneTop}
             phoneBottomRef={phoneBottomRef}
             setPhoneLeft={setPhoneLeft}
             phoneTopRef={phoneTopRef}
-            setPhoneTop={setPhoneTop}
+            phoneBottom={phoneBottom}
             phoneLeft={phoneLeft}
             phoneRight={phoneRight}
             phoneLeftRef={phoneLeftRef}
             phoneRightRef={phoneRightRef}
+            setPhoneTop={setPhoneTop}
             setPhoneRight={setPhoneRight}
           />
         </div>

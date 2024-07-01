@@ -171,7 +171,6 @@ function NewDeviceqs() {
   const { answers, setAnswers } = useQuestionContext();
   const [visible, setVisible] = useState(1);
   const [newGroupanswers, setNewGroupAnswers] = useState();
-  const navigate = useNavigate();
   const profile = useUserProfile();
   const core = useSelector((state) => state.qna.Core);
   const Cosmetics = useSelector((state) => state.qna.Cosmetics);
