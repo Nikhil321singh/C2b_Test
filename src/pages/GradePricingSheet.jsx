@@ -318,7 +318,7 @@ const GradePricingSheetSub = ({
             value={searchValue}
             placeholder="Search..."
           />
-          <IoMdSearch size={25} onClick={handleSearchClick} size={25} />
+          <IoMdSearch size={25} onClick={handleSearchClick} />
         </div>
         <div className={styles.icons_box}>
           <IoRefresh onClick={handleSearchClear} size={25} className="" />

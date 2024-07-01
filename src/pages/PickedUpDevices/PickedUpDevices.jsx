@@ -46,11 +46,11 @@ const PickedUpDevices = () => {
 
   useEffect(() => {
     if (successMod || failMod) {
-      const timeout_id = setTimeout(() => {
+      const timeoutid = setTimeout(() => {
         setSuccessMod(false);
         setFailMode(false);
       }, 5000);
-      return () => clearTimeout(timeout_id);
+      return () => clearTimeout(timeoutid);
     }
     return () => {};
   }, [failMod, successMod]);

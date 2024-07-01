@@ -141,48 +141,48 @@ const Price = ({ submitdata, userToken }) => {
             phoneBill={phoneBill}
           />
           <PhonePhotos1
-            handleChange={handleChange}
             setPhoneFront={setPhoneFront}
             handleCameraButtonClick={handleCameraButtonClick}
-            phoneFrontRef={phoneFrontRef}
+            handleChange={handleChange}
             phoneFront={phoneFront}
             phoneBack={phoneBack}
-            setPhoneBack={setPhoneBack}
+            phoneFrontRef={phoneFrontRef}
             setPhoneBottom={setPhoneBottom}
             phoneBackRef={phoneBackRef}
-            phoneBottomRef={phoneBottomRef}
+            setPhoneBack={setPhoneBack}
             phoneBottom={phoneBottom}
             phoneTop={phoneTop}
-            setPhoneTop={setPhoneTop}
+            phoneBottomRef={phoneBottomRef}
             setPhoneLeft={setPhoneLeft}
             phoneTopRef={phoneTopRef}
-            phoneLeftRef={phoneLeftRef}
+            setPhoneTop={setPhoneTop}
             phoneLeft={phoneLeft}
             phoneRight={phoneRight}
-            setPhoneRight={setPhoneRight}
+            phoneLeftRef={phoneLeftRef}
             phoneRightRef={phoneRightRef}
+            setPhoneRight={setPhoneRight}
           />
           <PhonePhotos
-            handleChange={handleChange}
             setPhoneFront={setPhoneFront}
             handleCameraButtonClick={handleCameraButtonClick}
-            phoneFrontRef={phoneFrontRef}
+            handleChange={handleChange}
             phoneFront={phoneFront}
             phoneBack={phoneBack}
-            setPhoneBack={setPhoneBack}
+            phoneFrontRef={phoneFrontRef}
             setPhoneBottom={setPhoneBottom}
             phoneBackRef={phoneBackRef}
-            phoneBottomRef={phoneBottomRef}
+            setPhoneBack={setPhoneBack}
             phoneBottom={phoneBottom}
             phoneTop={phoneTop}
-            setPhoneTop={setPhoneTop}
+            phoneBottomRef={phoneBottomRef}
             setPhoneLeft={setPhoneLeft}
             phoneTopRef={phoneTopRef}
-            phoneLeftRef={phoneLeftRef}
+            setPhoneTop={setPhoneTop}
             phoneLeft={phoneLeft}
             phoneRight={phoneRight}
-            setPhoneRight={setPhoneRight}
+            phoneLeftRef={phoneLeftRef}
             phoneRightRef={phoneRightRef}
+            setPhoneRight={setPhoneRight}
           />
         </div>
       </div>

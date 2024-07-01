@@ -349,7 +349,7 @@ const ExtComps = ({
               onClick={() => {
                 setSuccessMod(false);
               }}
-              className={"bg-green-500 text-white"}
+              className={"text-white  bg-green-500 "}
             >
               Okay
             </button>
@@ -357,16 +357,16 @@ const ExtComps = ({
         </div>
       )}
       {failMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <IoIosCloseCircle className={failTextColor} size={90} />
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
+          <div className={` ${failTextColor} ${styles.err_mod_box}`}>
+            <IoIosCloseCircle size={90} className={failTextColor} />
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
+              className={"bg-[#EC2752] text-white"}
               onClick={() => {
                 setFailMode(false);
               }}
-              className={"bg-[#EC2752] text-white"}
             >
               Okay
             </button>
