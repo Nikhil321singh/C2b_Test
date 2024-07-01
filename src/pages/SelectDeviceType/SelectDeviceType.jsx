@@ -1,10 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState, useRef } from "react";
-import { CiSearch } from "react-icons/ci";
-import { CiBarcode } from "react-icons/ci";
+import { CiSearch, CiBarcode } from "react-icons/ci";
 import { IoClose } from "react-icons/io5";
-import { IoIosArrowBack } from "react-icons/io";
-import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import AppFooter from "../../components/AppFooter";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import { useNavigate } from "react-router";
@@ -33,6 +31,7 @@ import FromDatecom from "../../components/fromdate_todate_Com/FromDatecom";
 import { toast } from "react-hot-toast";
 import { ImCancelCircle } from "react-icons/im";
 import Oppo from "../../assets/Oppo.png";
+
 export const OrderStatusBox = ({ title, figures, background }) => {
   return (
     <div
@@ -122,6 +121,16 @@ export const DeviceTypeFilter = ({
   );
 };
 
+const ImgSelectore = (ImgItem) => {
+  if (ImgItem?.phonePhotos?.front) {
+    return ImgItem?.phonePhotos?.front;
+  } else if (ImgItem?.type === "Mobile") {
+    return mobile;
+  } else {
+    return appleWatch;
+  }
+};
+
 export const TopSelling = ({ topModels }) => {
   const carContainerRef = useRef(null);
   const navigate = useNavigate();
@@ -146,7 +155,6 @@ export const TopSelling = ({ topModels }) => {
   const handleTopDeviceClick = (item) => {
     const detail = { models: item };
     sessionStorage.setItem("dataModel", JSON.stringify(detail));
-
     sessionStorage.setItem("dataModelConfig", JSON.stringify(item));
     navigate("/selectmodel");
   };
@@ -169,15 +177,7 @@ export const TopSelling = ({ topModels }) => {
             key={item._id}
             className={styles.topSell_card}
           >
-            <img
-              src={
-                item?.phonePhotos?.front
-                  ? item?.phonePhotos?.front
-                  : item.type === "Mobile"
-                  ? mobile
-                  : appleWatch
-              }
-            />
+            <img src={item?.imgSrc} />
             <p>{item?.name}</p>
           </div>
         ))}
@@ -192,19 +192,48 @@ export const TopSelling = ({ topModels }) => {
   );
 };
 
+const userToken = sessionStorage.getItem("authToken");
+
+const BrandImgSetter = ({ brandItem }) => {
+  return (
+    <React.Fragment>
+      {brandItem.name === "Apple" && (
+        <img className="mx-auto" src={apple} alt={brandItem.name} />
+      )}
+      {brandItem.name === "OnePlus" && (
+        <img className="mx-auto" src={onepluse} alt={brandItem.name} />
+      )}
+      {brandItem.name === "POCO" && (
+        <img className="mx-auto" src={poco} alt={brandItem.name} />
+      )}{" "}
+      {brandItem.name === "Realme" && (
+        <img className="mx-auto" src={real} alt={brandItem.name} />
+      )}
+      {brandItem.name === "Xiaomi" && (
+        <img className="mx-auto" src={mi} alt={brandItem.name} />
+      )}
+      {brandItem.name === "Samsung" && (
+        <img className="mx-auto" src={smasung} alt={brandItem.name} />
+      )}
+      {brandItem.name === "Vivo" && (
+        <img className="mx-auto" src={vivo} alt={brandItem.name} />
+      )}
+      {brandItem.name === "OPPO" && (
+        <img className="mx-auto" src={Oppo} alt={brandItem.name} />
+      )}
+      {brandItem.name === "More" && <p>{brandItem.name}</p>}
+    </React.Fragment>
+  );
+};
+
 export const BrandList = ({ deviceType }) => {
   const [brandList, setBrandList] = useState([]);
   const [popout, setPopout] = useState(false);
-  const [userToken, setUserToken] = useState(
-    sessionStorage.getItem("authToken")
-  );
   const navigate = useNavigate();
-
   const brandContainerRef = useRef(null);
 
   const scrollBrand = (direction) => {
     const scrollAmount = 200;
-
     if (brandContainerRef.current) {
       if (direction === "left") {
         brandContainerRef.current.scrollBy({
@@ -219,18 +248,11 @@ export const BrandList = ({ deviceType }) => {
       }
     }
   };
-
   useEffect(() => {
     axios
-      .get(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands`,
-
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
-      )
+      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands`, {
+        headers: { authorization: `${userToken}` },
+      })
       .then((res) => {
         setBrandList(res.data.data);
       })
@@ -248,9 +270,9 @@ export const BrandList = ({ deviceType }) => {
 
   const handleBrandClick = (brandItem) => {
     console.log("adasdasasfdafadf", deviceType);
-    if (deviceType == "Laptop" || deviceType == undefined) {
+    if (deviceType === "Laptop" || deviceType === undefined) {
       handleDeviceClick();
-    } else if (deviceType == "Watch" && brandItem.name != "Apple") {
+    } else if (deviceType === "Watch" && brandItem.name !== "Apple") {
       handleDeviceClick();
     } else if (
       brandItem.name === "Apple" ||
@@ -271,7 +293,6 @@ export const BrandList = ({ deviceType }) => {
   };
   const extraBrands = [{ name: "More" }];
 
-  // Concatenate the extra brands with the dynamically fetched brandList
   const allBrands = [...brandList, ...extraBrands];
   return (
     <>
@@ -315,31 +336,7 @@ export const BrandList = ({ deviceType }) => {
               onClick={() => handleBrandClick(brandItem)}
               className={`flex-shrink-0 ${styles.brand_card}`}
             >
-              {brandItem.name === "Apple" ? (
-                <img className="mx-auto" src={apple} alt={brandItem.name} />
-              ) : brandItem.name === "OnePlus" ? (
-                <img className="mx-auto" src={onepluse} alt={brandItem.name} />
-              ) : brandItem.name === "POCO" ? (
-                <img className="mx-auto" src={poco} alt={brandItem.name} />
-              ) : brandItem.name === "Realme" ? (
-                <img className="mx-auto" src={real} alt={brandItem.name} />
-              ) : brandItem.name === "Xiaomi" ? (
-                <img className="mx-auto" src={mi} alt={brandItem.name} />
-              ) : brandItem.name === "Samsung" ? (
-                <img className="mx-auto" src={smasung} alt={brandItem.name} />
-              ) : brandItem.name === "Vivo" ? (
-                <img className="mx-auto" src={vivo} alt={brandItem.name} />
-              ) : brandItem.name === "OPPO" ? (
-                <img className="mx-auto" src={Oppo} alt={brandItem.name} />
-              ) : brandItem.logo ? (
-                <img
-                  className="mx-auto"
-                  src={brandItem.logo}
-                  alt={brandItem.name}
-                />
-              ) : (
-                <p>{brandItem.name}</p>
-              )}
+              <BrandImgSetter brandItem={brandItem} />
             </div>
           ))}
         </div>
@@ -354,63 +351,113 @@ export const BrandList = ({ deviceType }) => {
   );
 };
 
+const Device = sessionStorage.getItem("DeviceType");
+const selBtn = () => {
+  if (Device === "Mobile") {
+    return "Mobiles";
+  } else if (Device === "Laptop") {
+    return "Laptops";
+  } else if (Device === "Watch") {
+    return "Watches";
+  } else {
+    return "More";
+  }
+};
+
+const searchDeviceAPI = async (val) => {
+  let brand = "";
+  let model = "";
+  await axios
+    .get(
+      `https://alpha.imeicheck.com/api/modelBrandName?imei=${val}&format=json`
+    )
+    .then((response) => {
+      console.log(response);
+      brand = response?.data?.object?.brand;
+      model = response?.data?.object?.name;
+    })
+    .catch((error) => {
+      console.error(`Error fetching data: ${error}`);
+    });
+  return { brand: brand, model: model };
+};
+
+const searchPhoneAPI = async (Sdata) => {
+  let response = {};
+  await axios
+    .post(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/user/Dashboard/search/phones`,
+      { name: Sdata },
+      { headers: { authorization: `${userToken}` } }
+    )
+    .then((res) => {
+      const updatedData = res.data.map(item => ({
+        ...item,
+        imgSrc: ImgSelectore(item)
+      }));
+      response = updatedData;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  return response;
+};
+
+const fetchDataAPI = async (days, fromDateDup, toDateDup, deviceType) => {
+  let response1;
+  let response2;
+  try {
+    response2 = await axios.get(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/user/Dashboard/order/saled?time=${days}&fromdate=${fromDateDup}&todate=${toDateDup}&datareq=${deviceType}`,
+      { headers: { authorization: `${userToken}` } }
+    );
+    response1 = await axios.get(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/leadSet/getCount?time=${days}&fromdate=${fromDateDup}&todate=${toDateDup}&datareq=${deviceType}`,
+      { headers: { authorization: `${userToken}` } }
+    );
+  } catch (error) {
+    console.error("Error fetching data: ", error);
+  }
+  return { response2: response2, response1: response1 };
+};
+
 const SelectDeviceType = () => {
-  const Device = sessionStorage.getItem("DeviceType");
-  const selBtn =
-    Device === "Mobile"
-      ? "Mobiles"
-      : Device === "Laptop"
-      ? "Laptops"
-      : Device === "Watch"
-      ? "Watches"
-      : "More";
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const { fromDateDup, setFromDateDup, toDateDup, setToDateDup, Emptydate } =
+  const { fromDateDup, setFromDateDup, toDateDup, setToDateDup } =
     useQuestionContext();
   const [showFromdate, setshowFromdate] = useState(false);
-  const [selectedBtn, setSelectedBtn] = useState(selBtn);
   const [isSearchBoxOpen, setIsSearchBoxOpen] = useState(false);
-  const [isScanOpen, setIsScanOpen] = useState(false);
   const [days, setDays] = useState("today");
   const [orderSaled, setOrderSaled] = useState(0);
   const [quoteCount, setQuoteCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
-  const [flag, setFlag] = useState(false);
   const [deviceType, setDeviceType] = useState(Device);
   const [cutomSearch, setCustomSearch] = useState(false);
-  const navigate = useNavigate();
-
   const [topModels, setTopmodels] = useState([]);
+  const [imei, setImei] = useState("");
+  const [data, setData] = useState(null);
+  const [modelsL, setModel] = useState([]);
 
   const searchBoxSwitch = () => {
     setModel([]);
     setIsSearchBoxOpen(!isSearchBoxOpen);
   };
-  const scanBoxSwitch = () => {
-    setIsScanOpen(!isScanOpen);
-  };
 
-  //for search the custom date picker
   function searchCustom() {
-    if (fromDateDup != "" && toDateDup != "") {
+    if (fromDateDup !== "" && toDateDup !== "") {
       setCustomSearch(!cutomSearch);
     } else {
       toast.error("Enter both date field");
     }
   }
-  //for hanlding iemi
 
-  const [imei, setImei] = useState("");
-  const [deviceStatus, setDeviceStatus] = useState("");
-  const [data, setData] = useState(null);
-  const [modelsL, setModel] = useState([]);
-
-  const handleInputChange = (e) => {
-    setImei(e.target.value);
-  };
-
-  //for take date for search
   const handleFromDateChange = (date, e) => {
     if (date === null) {
       setFromDate("");
@@ -422,7 +469,6 @@ const SelectDeviceType = () => {
         .toISOString()
         .split("T")[0];
       setFromDateDup(formattedDate);
-      console.log("TO data", formattedDate);
     }
   };
 
@@ -437,83 +483,28 @@ const SelectDeviceType = () => {
         .toISOString()
         .split("T")[0];
       setToDateDup(formattedDate);
-      console.log("TO data", formattedDate);
     }
   };
 
-  function searchDevice(val) {
-    axios
-      .get(
-        `https://alpha.imeicheck.com/api/modelBrandName?imei=${val}&format=json`
-      )
-      .then((response) => {
-        const brand = response.data.object.brand;
-        const model = response.data.object.name;
-        setData(`${brand} ${model}`);
-      })
-      .catch((error) => {
-        console.error(`Error fetching data: ${error}`);
-      });
-  }
-  //for seach models
+  const searchDevice = async (val) => {
+    const temp = await searchDeviceAPI(val);
+    setData(`${temp?.brand} ${temp?.model}`);
+  };
+
+  const searchPhone = async (data) => {
+    const tempRes = await searchPhoneAPI(data);
+    setModel(tempRes || []);
+  };
+
   useEffect(() => {
-    const authToken = sessionStorage.getItem("authToken");
     if (data) {
-      axios
-        .post(
-          `${
-            import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/user/Dashboard/search/phones`,
-          { name: data },
-          {
-            headers: {
-              authorization: `${authToken}`,
-            },
-          }
-        )
-        .then((response) => {
-          setModel(response.data);
-        })
-        .catch((error) => {
-          console.error(`Error fetching data: ${error}`);
-        });
+      searchPhone(data);
     }
   }, [data]);
 
-  //check emi lenght for api  call to get modela name
   useEffect(() => {
-    const nonNumeric = /\D/;
-    if (imei.length >= 15 && !nonNumeric.test(imei)) {
+    if (imei.length >= 15) {
       searchDevice(imei);
-    } else if (nonNumeric.test(imei)) {
-      // Call search phone API directly
-      if (imei.length == 0) {
-        setModel([]);
-        return;
-      }
-      const authToken = sessionStorage.getItem("authToken");
-      axios
-        .post(
-          `${
-            import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/user/Dashboard/search/phones`,
-          { name: imei },
-          {
-            headers: {
-              authorization: `${authToken}`,
-            },
-          }
-        )
-        .then((response) => {
-          setModel(response.data);
-          setFlag(false);
-        })
-        .catch((error) => {
-          console.log("no result");
-          setModel([]);
-          setFlag(true);
-          console.error(`Error fetching data: ${error}`);
-        });
     }
   }, [imei]);
 
@@ -521,98 +512,38 @@ const SelectDeviceType = () => {
     sessionStorage.setItem("DeviceType", deviceType);
   }, [deviceType]);
 
+  const fetchData = async () => {
+    const temp = await fetchDataAPI(days, fromDateDup, toDateDup, deviceType);
+    setOrderSaled(temp?.response2?.data?.count);
+    setQuoteCount(temp?.response1?.data?.data?.quoteData?.count);
+    setOrderCount(temp?.response1?.data?.data?.orderData?.count);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const authToken = sessionStorage.getItem("authToken");
-      try {
-        const response2 = await axios.get(
-          `${
-            import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/user/Dashboard/order/saled?time=${days}&fromdate=${fromDateDup}&todate=${toDateDup}&datareq=${deviceType}`,
-          {
-            headers: {
-              authorization: `${authToken}`,
-            },
-          }
-        );
-        setOrderSaled(response2.data.count);
-
-        //new count api for both order createdd && quote createdd
-
-        const response1 = await axios.get(
-          `${
-            import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/leadSet/getCount?time=${days}&fromdate=${fromDateDup}&todate=${toDateDup}&datareq=${deviceType}`,
-          {
-            headers: {
-              authorization: `${authToken}`,
-            },
-          }
-        );
-        setQuoteCount(response1?.data?.data?.quoteData?.count);
-        setOrderCount(response1?.data?.data?.orderData?.count);
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      }
-    };
-
     fetchData();
   }, [days, cutomSearch, deviceType]);
 
   useEffect(() => {
     const fetchtop = async () => {
-      const authToken = sessionStorage.getItem("authToken");
       try {
         const response = await axios.get(
           `${
             import.meta.env.VITE_REACT_APP_ENDPOINT
           }/api/user/Dashboard/get/top/sellingModels?time=${days}&deviceType=${deviceType}`,
-          {
-            headers: {
-              authorization: `${authToken}`,
-            },
-          }
+          { headers: { authorization: `${userToken}` } }
         );
-
-        setTopmodels(response.data);
-        console.log("top", response.data);
+        const updatedData = await response.data.map(item => ({
+          ...item,
+          imgSrc: ImgSelectore(item)
+        }));
+        console.log(updatedData)
+        setTopmodels(updatedData);
       } catch (err) {
         console.error(err);
       }
     };
     fetchtop();
   }, [days, deviceType]);
-
-  const addPhoneView = async (modelId) => {
-    const authToken = sessionStorage.getItem("authToken");
-    try {
-      const response = await axios.post(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/user/Dashboard/add/PhoneView?time=${days}`,
-        {
-          modelId: modelId,
-        },
-        {
-          headers: {
-            authorization: `${authToken}`,
-          },
-        }
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error adding phone view: ", error);
-    }
-  };
-
-  const handleDeviceClick = (model) => {
-    const detail = { models: model };
-    sessionStorage.setItem("dataModel", JSON.stringify(detail));
-    sessionStorage.setItem("DeviceType", model.type);
-    sessionStorage.setItem("dataModelConfig", JSON.stringify(model));
-    navigate("/selectmodel");
-    addPhoneView(model._id);
-  };
 
   const handlepick = (e) => {
     if (e.target.value === "Custom") {
@@ -627,13 +558,90 @@ const SelectDeviceType = () => {
 
   return (
     <div className={`bg-[#f9f9f9d8] bg-white ${styles.home_page_wrap}`}>
+      <SearchBox
+        isSearchBoxOpen={isSearchBoxOpen}
+        searchBoxSwitch={searchBoxSwitch}
+        setImei={setImei}
+        imei={imei}
+        modelsL={modelsL}
+        days
+      />
+      <MiddlePart
+        searchBoxSwitch={searchBoxSwitch}
+        setDeviceType={setDeviceType}
+        deviceType={deviceType}
+        handlepick={handlepick}
+        days={days}
+        orderCount={orderCount}
+        quoteCount={quoteCount}
+        orderSaled={orderSaled}
+        topModels={topModels}
+      />
+      {!isSearchBoxOpen && <AppFooter days={days} />}
+      <FromDatecom
+        showFromdate={showFromdate}
+        toDate={toDate}
+        handleToDateChange={handleToDateChange}
+        fromDate={fromDate}
+        handleFromDateChange={handleFromDateChange}
+        setshowFromdate={setshowFromdate}
+        searchCustom={searchCustom}
+      ></FromDatecom>
+    </div>
+  );
+};
+
+export default SelectDeviceType;
+
+const SearchBox = ({
+  isSearchBoxOpen,
+  searchBoxSwitch,
+  setImei,
+  imei,
+  modelsL,
+  days,
+}) => {
+  const [isScanOpen, setIsScanOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const addPhoneView = async (modelId) => {
+    const authToken = sessionStorage.getItem("authToken");
+    try {
+      await axios.post(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/user/Dashboard/add/PhoneView?time=${days}`,
+        {
+          modelId: modelId,
+        },
+        {
+          headers: {
+            authorization: `${authToken}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Error adding phone view: ", error);
+    }
+  };
+
+  const handleDeviceClick = (model) => {
+    const detail = { models: model };
+    sessionStorage.setItem("dataModel", JSON.stringify(detail));
+    sessionStorage.setItem("DeviceType", model.type);
+    sessionStorage.setItem("dataModelConfig", JSON.stringify(model));
+    navigate("/selectmodel");
+    addPhoneView(model._id);
+  };
+
+  return (
+    <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         <div className="flex items-center justify-between w-full ">
           <ProfileBox />
           <img className="w-28 " src={Grest_Logo} alt="app logo" />
         </div>
       </div>
-
       {isSearchBoxOpen && (
         <div className={`${styles.search_page} min-h-screen  `}>
           <div className={styles.search_box_wrap}>
@@ -645,20 +653,18 @@ const SelectDeviceType = () => {
                 placeholder="Search Product with Name/IMEI"
                 className="inline w-full mx-2 outline-none"
                 type="text"
-                onChange={handleInputChange}
+                onChange={(e) => setImei(e.target.value)}
                 value={imei}
                 autoFocus={true}
               />
-              <div className="flex items-center" onClick={scanBoxSwitch}>
+              <div
+                className="flex items-center"
+                onClick={() => setIsScanOpen(!isScanOpen)}
+              >
                 <CiBarcode size={20} className={"inline mr-1 text-[#EC2752]"} />
               </div>
             </div>
           </div>
-          {flag && (
-            <div>
-              <p className="mt-4 font-medium">No Device Found</p>
-            </div>
-          )}
           {imei.length > 0 && modelsL.length > 0 ? (
             <div
               className={`   mx-auto mt-4 justify-center  w-full  flex flex-wrap gap-2  max-h-screen overflow-y-scroll pb-[15vh] `}
@@ -675,13 +681,7 @@ const SelectDeviceType = () => {
                   >
                     <img
                       className="w-[50px] mb-2"
-                      src={
-                        model?.phonePhotos?.front
-                          ? model?.phonePhotos?.front
-                          : model?.type === "Watch"
-                          ? appleWatch
-                          : "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-                      }
+                      src={model.imgSrc}
                       alt=""
                     />
                     <p className="text-[11px] font-medium">{model.name}</p>
@@ -704,130 +704,133 @@ const SelectDeviceType = () => {
           )}
         </div>
       )}
-
       {isScanOpen && (
         <div className={styles.search_page}>
-          <Scanner scanBoxSwitch={scanBoxSwitch} setImei={setImei} />
+          <Scanner
+            scanBoxSwitch={() => setIsScanOpen(!isScanOpen)}
+            setImei={setImei}
+          />
         </div>
       )}
-      <div className={styles.des_main_wrap}>
-        <div className={styles.des_lr_wrap}>
-          <div className={styles.des_left_wrap}>
-            <div className={styles.search_box_wrap} onClick={searchBoxSwitch}>
-              <div
-                className={`flex items-center p-2 mb-1 w-[100%] ${styles.search_box}`}
-              >
-                <div className="flex items-center">
-                  <CiSearch size={20} className="inline ml-1" />
-                </div>
-                <input
-                  placeholder="Search Products"
-                  className="inline w-full mx-2 outline-none"
-                  type="text"
-                />
-                <div className="flex items-center">
-                  <CiBarcode size={20} className="inline mr-1 text-[#EC2752]" />
-                </div>
-              </div>
-            </div>
-            <DeviceTypeFilter
-              selectedBtn={selectedBtn}
-              setSelectedBtn={setSelectedBtn}
-              setDeviceType={setDeviceType}
-            />
-            <BrandList deviceType={deviceType} />
-            <div className="ml-3">
-              <select
-                name=""
-                id=""
-                onChange={(e) => {
-                  handlepick(e);
-                }}
-                className="p-2 border-2 rounded-lg shadow-md outline-none "
-              >
-                <option value="today">Today</option>
-                <option value="7days">7 Days</option>
-                <option value="lastmonth">Last Month</option>
-                <option value="Custom">Custom</option>
-              </select>
-            </div>
-
-            {/* //from date to date */}
-
-            <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
-              <Link className="w-[33%]" to={`/orderscreated/${days}`}>
-                <OrderStatusBox
-                  figures={orderCount}
-                  title="Order Created"
-                  background="#0275F2"
-                />
-              </Link>
-              <Link className="w-[33%]" to={`/orderscompleted/${days}`}>
-                <OrderStatusBox
-                  figures={orderSaled}
-                  title="Order Completed"
-                  background="#E94A4E"
-                />
-              </Link>
-              <Link className="w-[33%]" to={`/quotescreated/${days}`}>
-                <OrderStatusBox
-                  figures={quoteCount}
-                  title="Quotes Created"
-                  background="#FF963E"
-                />
-              </Link>
-            </div>
-            <p
-              className={`${styles.topSell_head} text-lg font-bold text-[#EC2752]`}
-            >
-              Top Selling Models
-            </p>
-            <TopSelling topModels={topModels} />
-          </div>
-          <div className={styles.des_right_wrap}>
-            <div className={styles.sellPhones_head}>
-              <p className="font-black text-9xl">SELL</p>
-              <span className="text-2xl font-medium">Used Products to Us</span>
-            </div>
-            <img className="w-[100%]" src={sellPhones} />
-          </div>
-        </div>
-        <p
-          className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#EC2752]`}
-        >
-          How GREST Works?
-        </p>
-        <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
-          <div className="flex flex-col min-w-[30%]  items-center  ">
-            <img className={`w-[50px] mb-2`} src={how1} />
-            <p className="-mb-1 text-base font-bold">Add</p>
-            <p className="text-base font-medium opacity-60">product details</p>
-          </div>
-          <div className="flex flex-col min-w-[30%] items-center  ">
-            <img className={`w-[50px] mb-2`} src={how2} />
-            <p className="-mb-1 text-base font-bold">Exchange</p>
-            <p className="text-base font-medium opacity-60">your device</p>
-          </div>
-          <div className="flex flex-col min-w-[30%] items-center  ">
-            <img className={`w-[50px] mb-2`} src={how3} />
-            <p className="-mb-1 text-base font-bold">Transfer</p>
-            <p className="text-base font-medium opacity-60">your money</p>
-          </div>
-        </div>
-      </div>
-
-      {!isSearchBoxOpen && <AppFooter days={days} />}
-      <FromDatecom
-        showFromdate={showFromdate}
-        toDate={toDate}
-        handleToDateChange={handleToDateChange}
-        fromDate={fromDate}
-        handleFromDateChange={handleFromDateChange}
-        setshowFromdate={setshowFromdate}
-        searchCustom={searchCustom}
-      ></FromDatecom>
-    </div>
+    </React.Fragment>
   );
 };
 
-export default SelectDeviceType;
+const MiddlePart = ({
+  searchBoxSwitch,
+  setDeviceType,
+  deviceType,
+  handlepick,
+  days,
+  orderCount,
+  quoteCount,
+  orderSaled,
+  topModels,
+}) => {
+  const [selectedBtn, setSelectedBtn] = useState(selBtn);
+
+  return (
+    <div className={styles.des_main_wrap}>
+      <div className={styles.des_lr_wrap}>
+        <div className={styles.des_left_wrap}>
+          <div className={styles.search_box_wrap} onClick={searchBoxSwitch}>
+            <div
+              className={`flex items-center p-2 mb-1 w-[100%] ${styles.search_box}`}
+            >
+              <div className="flex items-center">
+                <CiSearch size={20} className="inline ml-1" />
+              </div>
+              <input
+                placeholder="Search Products"
+                className="inline w-full mx-2 outline-none"
+                type="text"
+              />
+              <div className="flex items-center">
+                <CiBarcode size={20} className="inline mr-1 text-[#EC2752]" />
+              </div>
+            </div>
+          </div>
+          <DeviceTypeFilter
+            selectedBtn={selectedBtn}
+            setSelectedBtn={setSelectedBtn}
+            setDeviceType={setDeviceType}
+          />
+          <BrandList deviceType={deviceType} />
+          <div className="ml-3">
+            <select
+              name=""
+              id=""
+              onChange={(e) => {
+                handlepick(e);
+              }}
+              className="p-2 border-2 rounded-lg shadow-md outline-none "
+            >
+              <option value="today">Today</option>
+              <option value="7days">7 Days</option>
+              <option value="lastmonth">Last Month</option>
+              <option value="Custom">Custom</option>
+            </select>
+          </div>
+          <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
+            <Link className="w-[33%]" to={`/orderscreated/${days}`}>
+              <OrderStatusBox
+                figures={orderCount}
+                title="Order Created"
+                background="#0275F2"
+              />
+            </Link>
+            <Link className="w-[33%]" to={`/orderscompleted/${days}`}>
+              <OrderStatusBox
+                figures={orderSaled}
+                title="Order Completed"
+                background="#E94A4E"
+              />
+            </Link>
+            <Link className="w-[33%]" to={`/quotescreated/${days}`}>
+              <OrderStatusBox
+                figures={quoteCount}
+                title="Quotes Created"
+                background="#FF963E"
+              />
+            </Link>
+          </div>
+          <p
+            className={`${styles.topSell_head} text-lg font-bold text-[#EC2752]`}
+          >
+            Top Selling Models
+          </p>
+          <TopSelling topModels={topModels} />
+        </div>
+        <div className={styles.des_right_wrap}>
+          <div className={styles.sellPhones_head}>
+            <p className="font-black text-9xl">SELL</p>
+            <span className="text-2xl font-medium">Used Products to Us</span>
+          </div>
+          <img className="w-[100%]" src={sellPhones} />
+        </div>
+      </div>
+      <p
+        className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#EC2752]`}
+      >
+        How GREST Works?
+      </p>
+      <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
+        <div className="flex flex-col min-w-[30%]  items-center  ">
+          <img className={`w-[50px] mb-2`} src={how1} />
+          <p className="-mb-1 text-base font-bold">Add</p>
+          <p className="text-base font-medium opacity-60">product details</p>
+        </div>
+        <div className="flex flex-col min-w-[30%] items-center  ">
+          <img className={`w-[50px] mb-2`} src={how2} />
+          <p className="-mb-1 text-base font-bold">Exchange</p>
+          <p className="text-base font-medium opacity-60">your device</p>
+        </div>
+        <div className="flex flex-col min-w-[30%] items-center  ">
+          <img className={`w-[50px] mb-2`} src={how3} />
+          <p className="-mb-1 text-base font-bold">Transfer</p>
+          <p className="text-base font-medium opacity-60">your money</p>
+        </div>
+      </div>
+    </div>
+  );
+};

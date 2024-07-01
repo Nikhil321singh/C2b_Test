@@ -139,6 +139,10 @@ const initialState = {
   Functional_minor: [],
   Warranty: [],
 };
+const whiteText = "text-white";
+const blackText = "text-black";
+const pinkBg = "bg-[#EC2752]";
+const whiteBg = "bg-white";
 
 function NewDeviceqs() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -267,22 +271,6 @@ function NewDeviceqs() {
     return;
   }
 
-  //seting data in reduc
-
-  const handleChange = (event, questionIndex, group, key) => {
-    const { value } = event.target;
-
-    const updatedAnswers = [...answers];
-    updatedAnswers[questionIndex] = {
-      quetion: questions[questionIndex].quetion,
-      answer: value,
-      key,
-      group,
-    };
-
-    setAnswers(updatedAnswers);
-  };
-
   const handlepop = () => {
     setShowPopup(false);
   };
@@ -292,7 +280,6 @@ function NewDeviceqs() {
   const handlesubmit = async () => {
     setIsLoading(true);
     const token = sessionStorage.getItem("authToken");
-    const phoneNumber = sessionStorage.getItem("phoneNumber");
     let id = sessionStorage.getItem("dataModel");
     id = JSON.parse(id);
     console.log("vore", state.Core);
@@ -317,7 +304,7 @@ function NewDeviceqs() {
         },
       }
     );
-    // console.log("submit data", response.data);
+    
 
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
@@ -326,7 +313,7 @@ function NewDeviceqs() {
     );
     sessionStorage.setItem("ExactQuote", true);
     store.dispatch(setResponseData(response.data.data));
-    // console.log("clicked");
+    
     setIsLoading(false);
     navigate("/devicequote");
   };
@@ -432,11 +419,7 @@ function NewDeviceqs() {
           </div>
         </div>
 
-        {/* {visible > 1 && visible <= 6 && (
-          <div className="back" onClick={handleSubtract}>
-            <MdOutlineKeyboardBackspace size={35} />
-          </div>
-        )} */}
+        
 
         <div className="innerContainer">
           <div className={`maindata`}>
@@ -445,7 +428,7 @@ function NewDeviceqs() {
             </div>
             <div className="underline"></div>
             <div className="questionList">
-              {visible == 1 && (
+              {visible === 1 && (
                 <div className="containClass">
                   <div className="subheading">
                     <GoDotFill size={15} />
@@ -475,8 +458,8 @@ function NewDeviceqs() {
                                 }}
                                 className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                                   !core[index].selected[optionIndex]
-                                    ? "bg-white"
-                                    : "bg-[#EC2752]"
+                                    ? whiteBg
+                                    : pinkBg
                                 }`}
                               >
                                 <div className="mt-3 mb-1 rounded-md overflow-hidden">
@@ -489,8 +472,8 @@ function NewDeviceqs() {
                                   <p
                                     className={`text-xs font-medium text-center ${
                                       !core[index].selected[optionIndex]
-                                        ? "text-black"
-                                        : "text-white"
+                                        ? blackText
+                                        : whiteText
                                     }`}
                                   >
                                     {option.caption}
@@ -506,7 +489,7 @@ function NewDeviceqs() {
               )}
 
               {/* //for cosmetics */}
-              {visible == 2 && (
+              {visible === 2 && (
                 <div className="containClass">
                   <div className="subheading">
                     <GoDotFill size={20} />
@@ -536,8 +519,8 @@ function NewDeviceqs() {
                                 }}
                                 className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                                   !Cosmetics[index].selected[optionIndex]
-                                    ? "bg-white"
-                                    : "bg-[#EC2752]"
+                                    ? whiteBg
+                                    : pinkBg
                                 }`}
                               >
                                 <div className="mt-3 mb-1 rounded-md overflow-hidden">
@@ -550,8 +533,8 @@ function NewDeviceqs() {
                                   <p
                                     className={`text-xs font-medium text-center ${
                                       !Cosmetics[index].selected[optionIndex]
-                                        ? "text-black"
-                                        : "text-white"
+                                        ? blackText
+                                        : whiteText
                                     }`}
                                   >
                                     {option.caption}
@@ -568,7 +551,7 @@ function NewDeviceqs() {
 
               {/* //for display */}
 
-              {visible == 3 && (
+              {visible === 3 && (
                 <div className="containClass">
                   <div className="subheading">
                     <GoDotFill size={20} />
@@ -598,8 +581,8 @@ function NewDeviceqs() {
                                 }}
                                 className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                                   !Display[index].selected[optionIndex]
-                                    ? "bg-white"
-                                    : "bg-[#EC2752]"
+                                    ? whiteBg
+                                    : pinkBg
                                 }`}
                               >
                                 <div className="mt-3 mb-1 rounded-md overflow-hidden">
@@ -612,8 +595,8 @@ function NewDeviceqs() {
                                   <p
                                     className={`text-xs font-medium text-center ${
                                       !Display[index].selected[optionIndex]
-                                        ? "text-black"
-                                        : "text-white"
+                                        ? blackText
+                                        : whiteText
                                     }`}
                                   >
                                     {option.caption}
@@ -630,7 +613,7 @@ function NewDeviceqs() {
 
               {/* //Functional_major*/}
 
-              {visible == 4 && (
+              {visible === 4 && (
                 <div className="containClass">
                   <div className="subheading">
                     <GoDotFill size={20} />
@@ -660,8 +643,8 @@ function NewDeviceqs() {
                                 }}
                                 className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                                   !Functional_major[index].selected[optionIndex]
-                                    ? "bg-white"
-                                    : "bg-[#EC2752]"
+                                    ? whiteBg
+                                    : pinkBg
                                 }`}
                               >
                                 <div className="mt-3 mb-1 rounded-md overflow-hidden">
@@ -676,8 +659,8 @@ function NewDeviceqs() {
                                       !Functional_major[index].selected[
                                         optionIndex
                                       ]
-                                        ? "text-black"
-                                        : "text-white"
+                                        ? blackText
+                                        : whiteText
                                     }`}
                                   >
                                     {option.caption}
@@ -693,7 +676,7 @@ function NewDeviceqs() {
               )}
 
               {/* //for Functional_minor */}
-              {visible == 5 && (
+              {visible === 5 && (
                 <div className="containClass">
                   <div className="subheading">
                     <GoDotFill size={20} />
@@ -723,8 +706,8 @@ function NewDeviceqs() {
                                 }}
                                 className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                                   !Functional_minor[index].selected[optionIndex]
-                                    ? "bg-white"
-                                    : "bg-[#EC2752]"
+                                    ? whiteBg
+                                    : pinkBg
                                 }`}
                               >
                                 <div className="mt-3 mb-1 rounded-md overflow-hidden">
@@ -739,8 +722,8 @@ function NewDeviceqs() {
                                       !Functional_minor[index].selected[
                                         optionIndex
                                       ]
-                                        ? "text-black"
-                                        : "text-white"
+                                        ? blackText
+                                        : whiteText
                                     }`}
                                   >
                                     {option.caption}
@@ -756,7 +739,7 @@ function NewDeviceqs() {
               )}
 
               {/* //fro Warranty */}
-              {visible == 6 && (
+              {visible === 6 && (
                 <div className="containClass">
                   <div className="subheading">
                     <GoDotFill size={20} />
@@ -784,8 +767,8 @@ function NewDeviceqs() {
                                 }}
                                 className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                                   !Warranty[index].selected[optionIndex]
-                                    ? "bg-white"
-                                    : "bg-[#EC2752]"
+                                    ? whiteBg
+                                    : pinkBg
                                 }`}
                               >
                                 <div className="mt-3 mb-1 rounded-md overflow-hidden">
@@ -798,8 +781,8 @@ function NewDeviceqs() {
                                   <p
                                     className={`text-xs font-medium text-center ${
                                       !Warranty[index].selected[optionIndex]
-                                        ? "text-black"
-                                        : "text-white"
+                                        ? blackText
+                                        : whiteText
                                     }`}
                                   >
                                     {option.caption}
