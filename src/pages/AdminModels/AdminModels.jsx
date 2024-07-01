@@ -35,6 +35,30 @@ const getEvenRowClass = (index, selectmodel, selectstorage, selectram, val) => {
   return "";
 };
 
+const downloadExcel = (data) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+
+  const formattedData = data.map((item) => {
+    return {
+      "Brand Id": item.brandId,
+      "Brand Name": item.brandName,
+      "Model Id": item?.modelId,
+      "Model Name": item.modelName,
+      RAM: item.RAM,
+      Storage: item.storage,
+      Price: item.price,
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(formattedData);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const dataFile = new Blob([excelBuffer], { type: fileType });
+  saveAs(dataFile, "All_Models_Data" + fileExtension);
+};
+
 const getRowClass = (selectmodel, selectstorage, selectram, val) => {
   if (
     selectmodel === val.modelId &&
@@ -49,11 +73,14 @@ const getRowClass = (selectmodel, selectstorage, selectram, val) => {
 const getTextColorClass = (isSuccess) =>
   isSuccess ? "text-green-500" : "text-[#EC2752]";
 const grestTheme = "bg-[#EC2752] text-white";
+const token = sessionStorage.getItem("authToken");
+const errMsg = "";
+const selectedModel = "";
+const admincategory = sessionStorage.getItem("admincategory");
 
 const AdminModels = () => {
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [sideMenu, setsideMenu] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [selectmodel, setSelectModel] = useState("");
   const [selectstorage, setSelectstorage] = useState("");
@@ -62,35 +89,24 @@ const AdminModels = () => {
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [confBox, setConfBox] = useState(false);
-  const [uploadBox, setUploadBox] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const errMsg = "";
-  const file = null;
-  const selectedModel = "";
 
   function handleNext() {
     navigate("/adminhome");
   }
-
   const getData = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/brands/getAllBrandsModels?type=${category}`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getAllBrandsModels?type=${category}`,
       headers: { Authorization: token },
     };
-
     axios
       .request(config)
       .then((response) => {
         const responseData = response.data.data;
         const allConfigurations = [];
-
         responseData.forEach((brand) => {
           brand.models.forEach((model) => {
             model.config.forEach((conf) => {
@@ -111,38 +127,27 @@ const AdminModels = () => {
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setIsTableLoaded(false);
       });
   };
-
   const getDataBySearch = () => {
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-    const admincategory = sessionStorage.getItem("admincategory");
-    const sendData = JSON.stringify({
-      name: searchValue,
-      deviceType: admincategory,
-    });
-
     const config = {
       method: "post",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/user/Dashboard/search/phones`,
-      headers: { Authorization: token, "Content-Type": "application/json" },
-      data: sendData,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/user/Dashboard/search/phones`,
+      headers: { Authorization: token },
+      data: JSON.stringify({
+        name: searchValue,
+        deviceType: admincategory,
+      }),
     };
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data);
         const responseData = response.data;
         const allConfigurations = [];
-
         responseData.forEach((model) => {
           const brandName = model.name.split(" ")[0];
-
           model.config.forEach((conf) => {
             const newConfig = {
               brandId: model.brandId,
@@ -160,11 +165,9 @@ const AdminModels = () => {
         setIsTableLoaded(false);
       })
       .catch((error) => {
-        console.log(error);
         setIsTableLoaded(false);
       });
   };
-
   const selectHandler = (modelId, modelStorage, ram) => {
     setSelectModel(modelId);
     setSelectstorage(modelStorage);
@@ -173,20 +176,14 @@ const AdminModels = () => {
     dispatch(setStorage(modelStorage));
     dispatch(setRam(ram));
   };
-
   const deleteHandler = (userID) => {
     setIsTableLoaded(true);
-    console.log(userID);
     setIsTableLoaded(false);
   };
 
   useEffect(() => {
     getData();
   }, [category]);
-
-  const handleSearchClick = () => {
-    getDataBySearch();
-  };
 
   useEffect(() => {
     sessionStorage.setItem("admincategory", "Mobile");
@@ -197,41 +194,77 @@ const AdminModels = () => {
     getData();
   };
 
-  const downloadExcel = () => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = data.map((item) => {
-      return {
-        "Brand Id": item.brandId,
-        "Brand Name": item.brandName,
-        "Model Id": item?.modelId,
-        "Model Name": item.modelName,
-        RAM: item.RAM,
-        Storage: item.storage,
-        Price: item.price,
-      };
-    });
-
-    const ws = XLSX.utils.json_to_sheet(formattedData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const dataFile = new Blob([excelBuffer], { type: fileType });
-    saveAs(dataFile, "All_Models_Data" + fileExtension);
-  };
-
-  const handleBulkSubmit = (event) => {
-    setIsTableLoaded(true);
-    event.preventDefault();
-    const formData = new FormData();
-    formData.append("file", file);
-    setIsTableLoaded(false);
-  };
-
   return (
     <div className={`${styles.pickedup_page}`}>
-      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
+     <ExtComps
+        isTableLoaded={isTableLoaded}
+        setIsTableLoaded={setIsTableLoaded}
+        sucBox={sucBox}
+        setSucBox={setSucBox}
+        setFailBox={setFailBox}
+        failBox={failBox}
+        confBox={confBox}
+        deleteHandler={deleteHandler}
+        setConfBox={setConfBox}
+        selectedModel={selectedModel}
+        setCategory={setCategory}
+      />
+      <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
+        <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
+          <div className={`${styles.search_bar_wrap}`}>
+            <input
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="text-sm"
+              type="text"
+              placeholder="Search Model"
+              value={searchValue}
+            />
+            <IoMdSearch onClick={() => getDataBySearch()} />
+          </div>
+          <div className={styles.icons_box}>
+            <IoRefresh onClick={handleSearchClear} className="" size={25} />
+          </div>
+          <button
+            className={`${styles.bulkdown_button}`}
+            onClick={() => downloadExcel(data)}
+          >
+            <FaDownload /> Bulk Download
+          </button>
+        </div>
+      </div>
+      <div className={`${styles.pd_cont}`}>
+        <AdminModelsTable
+          grestTheme1={grestTheme}
+          data={data}
+          selectmodel={selectmodel}
+          selectstorage={selectstorage}
+          selectram={selectram}
+          selectHandler={selectHandler}
+          deleteHandler={deleteHandler}
+          category={category}
+          handleNext={handleNext}
+        />
+      </div>
+    </div>
+  );
+};
+
+const ExtComps = ({
+  isTableLoaded,
+  setIsTableLoaded,
+  sucBox,
+  setSucBox,
+  setFailBox,
+  failBox,
+  confBox,
+  deleteHandler,
+  setConfBox,
+  selectedModel,
+  setCategory,
+}) => {
+  const [sideMenu, setsideMenu] = useState(false);
+  return <React.Fragment>
+    <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         <div className="navbar">
           <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
           <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
@@ -299,45 +332,6 @@ const AdminModels = () => {
           </div>
         </div>
       )}
-      {uploadBox && (
-        <div className="fixed top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50 z-48">
-          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
-            <h6 className={`${getTextColorClass(sucBox)}`}>
-              Bulk Upload Stores
-            </h6>
-            <form className="flex flex-col gap-4" onSubmit={handleBulkSubmit}>
-              <div className="flex flex-col">
-                <p className="items-start mb-1 text-lg text-slate-500">
-                  Upload Store Data Excel
-                </p>
-                <input
-                  type="file"
-                  name="excelFile"
-                  id="excelFile"
-                  accept=".xlsx, .xls"
-                  onChange={(e) => handleExcelFileChange(e)}
-                  required={true}
-                />
-              </div>
-              <div className="flex flex-row gap-2">
-                <button type="submit" className={grestTheme}>
-                  Upload
-                </button>
-                <button
-                  type="reset"
-                  onClick={() => {
-                    setUploadBox(false);
-                    setIsTableLoaded(false);
-                  }}
-                  className="bg-white text-[#EC2752]"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
       <div className="m-2 flex  gap-2 items-center w-[100%]">
         <div className="flex gap-2">
           <p className="font-medium">Select Category</p>
@@ -363,46 +357,8 @@ const AdminModels = () => {
           </select>
         </div>
       </div>
-
-      <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
-        <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
-          <div className={`${styles.search_bar_wrap}`}>
-            <input
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="text-sm"
-              type="text"
-              placeholder="Search Model"
-              value={searchValue}
-            />
-            <IoMdSearch onClick={handleSearchClick} />
-          </div>
-          <div className={styles.icons_box}>
-            <IoRefresh onClick={handleSearchClear} className="" size={25} />
-          </div>
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={downloadExcel}
-          >
-            <FaDownload /> Bulk Download
-          </button>
-        </div>
-      </div>
-      <div className={`${styles.pd_cont}`}>
-        <AdminModelsTable
-          grestTheme1={grestTheme}
-          data={data}
-          selectmodel={selectmodel}
-          selectstorage={selectstorage}
-          selectram={selectram}
-          selectHandler={selectHandler}
-          deleteHandler={deleteHandler}
-          category={category}
-          handleNext={handleNext}
-        />
-      </div>
-    </div>
-  );
-};
+  </React.Fragment>
+}
 
 const AdminModelsTable = ({
   grestTheme1,

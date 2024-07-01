@@ -11,6 +11,54 @@ import DatePicker from "react-datepicker";
 import { FaDownload } from "react-icons/fa";
 import NavigateListing from "../../components/NavigateListing/NavigateListing";
 
+const pageLimit = 10;
+const userToken = sessionStorage.getItem("authToken");
+
+const downloadExcelLeadsompleted = (apiData) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+
+  const formattedData = apiData.map((item) => {
+    let questionsKeys = "";
+    let index = 1;
+    console.log(item?.QNA[0]);
+    for (const group in item?.QNA[0]) {
+      item?.QNA[0][group].forEach((qna) => {
+        questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
+        index++;
+      });
+    }
+    return {
+      "Date Created": new Date(item?.createdAt).toLocaleDateString("en-IN"),
+      phoneNumber: item.phoneNumber,
+      "User Email": item.userId?.email,
+      "Customer Mobile No.": item.phoneNumber,
+      "Customer Name": item.name,
+      Product: item.modelId?.name,
+      Price: item.actualPrice,
+      "Prospect Id": item.userId?._id,
+      "IMEI No.": item.documentId?.IMEI,
+      "Question/Ans": questionsKeys,
+    };
+  });
+
+  const wsLeadsCompleted = XLSX.utils.json_to_sheet(formattedData);
+  const wbLeadsCompleted = {
+    Sheets: { data: wsLeadsCompleted },
+    SheetNames: ["data"],
+  };
+  const excelBufferLeadsCompleted = XLSX.write(wbLeadsCompleted, {
+    bookType: "xlsx",
+    type: "array",
+  });
+
+  const dataFileLeadsCompleted = new Blob([excelBufferLeadsCompleted], {
+    type: fileType,
+  });
+  saveAs(dataFileLeadsCompleted, "Leads_Completed" + fileExtension);
+};
+
 const LeadsCompleted = () => {
   const [loading, setLoading] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
@@ -30,12 +78,10 @@ const LeadsCompleted = () => {
     new Date().toISOString().split("T")[0]
   );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const pageLimit = 10;
 
   function getSalesData() {
     setLoading(true);
     const queryParams = new URLSearchParams();
-    const userToken = sessionStorage.getItem("authToken");
     if (productName !== null) {
       queryParams.append("productName", productName);
     }
@@ -48,26 +94,20 @@ const LeadsCompleted = () => {
     if (userEmail !== null) {
       queryParams.append("store", userEmail);
     }
-
     const endpoint = `${
       import.meta.env.VITE_REACT_APP_ENDPOINT
     }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=${fromDateDup}&endDate=${toDateDup}&${queryParams.toString()}`;
-
     axios
       .get(endpoint, {
-        headers: {
-          authorization: `${userToken}`,
-        },
+        headers: { authorization: userToken },
       })
       .then((response) => {
         setMaxPages(Math.ceil(response.data.totalCounts / 10));
         setTableData(response.data.data);
-        console.log("sas", response.data.data);
         setTotalCount(response.data.totalCounts);
         setLoading(false);
       })
       .catch((err) => {
-        console.log("error", err);
         setLoading(false);
       });
   }
@@ -77,12 +117,9 @@ const LeadsCompleted = () => {
   }, [currentPage, pageLimit]);
 
   useEffect(() => {
-    const userToken = sessionStorage.getItem("authToken");
     axios
       .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/users/getAllUsers`, {
-        headers: {
-          authorization: `${userToken}`,
-        },
+        headers: { authorization: userToken },
       })
       .then((res) => {
         setUserEmailList(res.data.data);
@@ -103,7 +140,6 @@ const LeadsCompleted = () => {
         .toISOString()
         .split("T")[0];
       setFromDateDup(formattedDate);
-      console.log("TO data", formattedDate);
     }
   };
 
@@ -118,7 +154,6 @@ const LeadsCompleted = () => {
         .toISOString()
         .split("T")[0];
       setToDateDup(formattedDate);
-      console.log("TO data", formattedDate);
     }
   };
 
@@ -126,66 +161,19 @@ const LeadsCompleted = () => {
     e.preventDefault();
     getSalesData();
   };
-
   const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen);
   };
-
   const handleCustomerPhoneChange = (value) => {
     setCustomerPhone(value);
   };
 
-  const downloadExcelLeadsompleted = (apiData) => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = apiData.map((item) => {
-      let questionsKeys = "";
-      let index = 1;
-      console.log(item?.QNA[0]);
-      for (const group in item?.QNA[0]) {
-        item?.QNA[0][group].forEach((qna) => {
-          questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
-          index++;
-        });
-      }
-      return {
-        "Date Created": new Date(item?.createdAt).toLocaleDateString("en-IN"),
-        phoneNumber: item.phoneNumber,
-        "User Email": item.userId?.email,
-        "Customer Mobile No.": item.phoneNumber,
-        "Customer Name": item.name,
-        Product: item.modelId?.name,
-        Price: item.actualPrice,
-        "Prospect Id": item.userId?._id,
-        "IMEI No.": item.documentId?.IMEI,
-        "Question/Ans": questionsKeys,
-      };
-    });
-
-    const wsLeadsCompleted = XLSX.utils.json_to_sheet(formattedData);
-    const wbLeadsCompleted = {
-      Sheets: { data: wsLeadsCompleted },
-      SheetNames: ["data"],
-    };
-    const excelBufferLeadsCompleted = XLSX.write(wbLeadsCompleted, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    const dataFileLeadsCompleted = new Blob([excelBufferLeadsCompleted], {
-      type: fileType,
-    });
-    saveAs(dataFileLeadsCompleted, "Leads_Completed" + fileExtension);
-  };
   return (
     <div>
       <SubLeadsCompleted
         loading={loading}
         setsideMenu={setsideMenu}
         sideMenu={sideMenu}
-        downloadExcelLeadsompleted={downloadExcelLeadsompleted}
         totalCount={totalCount}
         toggleFilter={toggleFilter}
         isFilterOpen={isFilterOpen}
@@ -218,7 +206,6 @@ const SubLeadsCompleted = ({
   sideMenu,
   toggleFilter,
   isFilterOpen,
-  downloadExcelLeadsompleted,
   totalCount,
   productName,
   setProductName,
@@ -240,7 +227,6 @@ const SubLeadsCompleted = ({
   maxPages,
 }) => {
   const fetchDownloadData = () => {
-    const userToken = sessionStorage.getItem("authToken");
     axios
       .get(
         `${
@@ -343,9 +329,9 @@ const SubLeadsCompleted = ({
               }
             >
               <option value="">Select store</option>
-              {userEmailList.map((particular_user) => (
-                <option key={particular_user._id} value={particular_user._id}>
-                  {particular_user.email}
+              {userEmailList.map((particularUser) => (
+                <option key={particularUser._id} value={particularUser._id}>
+                  {particularUser.email}
                 </option>
               ))}
             </select>
