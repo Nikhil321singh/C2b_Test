@@ -9,85 +9,68 @@ import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 
+const options = {
+  Functional_major: ["F1.1", "F1.2", "F1.3"],
+  Core: ["C1", "C2"],
+  Display: ["D1", "D2", "D3"],
+  Functional_minor: ["F2.1", "F2.2", "F2.3"],
+  Cosmetics: ["A1", "A2", "A3", "A4"],
+  Warranty: ["W1", "W2"],
+  Accessories: ["A1.1", "A1.2", "A1.3"],
+  Functional: ["F", "F1.1"],
+  Physical: ["A1", "A2", "A3", "A0"],
+};
+
+const Mobile = [
+  "Functional_major",
+  "Core",
+  "Display",
+  "Functional_minor",
+  "Cosmetics",
+  "Warranty",
+];
+const Watch = ["Accessories", "Functional", "Physical", "Warranty"];
+const userToken = sessionStorage.getItem("authToken");
+const category = sessionStorage.getItem("admincategory");
+const successColorClass = "text-green-500";
+const errorColorClass = "text-[#EC2752]";
+
+function sortQuestionnaires(data) {
+  return data.sort((a, b) => {
+    if (a._id < b._id) {
+      return -1;
+    }
+    if (a._id > b._id) {
+      return 1;
+    }
+    return 0;
+  });
+}
+
+function filterQuestionnairesByType(data, typeList) {
+  return data.filter((obj) => typeList.includes(obj._id));
+}
+
 const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
-  const adminAnswer = useSelector((state) => state.adminGradePrice);
   const [confBox, setConfBox] = useState(false);
   const [selectedUser, setSelectedUser] = useState();
   const [selectedUserqs, setSelectedUserqs] = useState();
-  const [sucBox, setSucBox] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
-  const [failBox, setFailBox] = useState(false);
   const [mobiledata, setMobile] = useState([]);
   const [watchdata, setWatch] = useState([]);
-
   const dispatch = useDispatch();
-
   const [group, setGroup] = useState("");
   const [question, setQuestion] = useState("");
   const [yes, setYes] = useState("");
   const [no, setNo] = useState("");
   const [defaultOption, setDefault] = useState("");
   const [idofqs, setIdofqs] = useState("");
-
   const [qsModel, setQsmodel] = useState(false);
-
-  const options = {
-    Functional_major: ["F1.1", "F1.2", "F1.3"],
-    Core: ["C1", "C2"],
-    Display: ["D1", "D2", "D3"],
-    Functional_minor: ["F2.1", "F2.2", "F2.3"],
-    Cosmetics: ["A1", "A2", "A3", "A4"],
-    Warranty: ["W1", "W2"],
-    Accessories: ["A1.1", "A1.2", "A1.3"],
-    Functional: ["F", "F1.1"],
-    Physical: ["A1", "A2", "A3", "A0"],
-  };
-
-  const Mobile = [
-    "Functional_major",
-    "Core",
-    "Display",
-    "Functional_minor",
-    "Cosmetics",
-    "Warranty",
-  ];
-  const Watch = ["Accessories", "Functional", "Physical", "Warranty"];
-
-  console.log(adminAnswer);
 
   const deleteConfHandler = (userID, Quest) => {
     setSelectedUserqs(Quest);
     setSelectedUser(userID);
     setConfBox(true);
   };
-
-  function deleteHandler(qsid) {
-    setConfBox(false);
-
-    const userToken = sessionStorage.getItem("authToken");
-    axios
-      .delete(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/deleteById?id=${qsid}`,
-
-        {
-          headers: {
-            Authorization: `${userToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        console.log("res is ", res);
-        setSucBox(true);
-        steUpdatetable(!updateTable);
-      })
-      .catch((err) => {
-        console.log(err);
-        setFailBox(true);
-        setErrMsg("Failed to delete Question");
-      });
-  }
 
   async function handleEdit(val) {
     setQsmodel(true);
@@ -99,108 +82,179 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
     setIdofqs(val._id);
   }
 
-  function closeHandler() {
-    setQsmodel(false);
-  }
-
-  function handleSubmitedit() {
-    const data = {
-      id: idofqs,
-      group: group,
-      quetion: question,
-      yes: yes,
-      no: no,
-      default: defaultOption,
-    };
-
-    const userToken = sessionStorage.getItem("authToken");
-    axios
-      .put(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/edit`,
-        data,
-        {
-          headers: {
-            Authorization: `${userToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        toast.success("question edit successfully");
-        setQsmodel(false);
-        steUpdatetable(!updateTable);
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("error on question edit");
-      });
-  }
-
-  // function for bulk download
-
- useEffect(() => {
-   async function getQuestionnaires() {
-     const authToken = sessionStorage.getItem("authToken");
-     const admincategory = sessionStorage.getItem("admincategory");
-     try {
-       const response = await axios.get(
-         `${
-           import.meta.env.VITE_REACT_APP_ENDPOINT
-         }/api/questionnaires/questionnaireList?deviceType=${admincategory}`,
-         {
-           headers: {
-             authorization: `${authToken}`,
-           },
-         }
-       );
-       return response.data.data;
-     } catch (err) {
-       console.error(err);
-       return [];
-     }
-   }
-
-   function sortQuestionnaires(data) {
-     return data.sort((a, b) => {
-       if (a._id < b._id) {
-         return -1;
-       }
-       if (a._id > b._id) {
-         return 1;
-       }
-       return 0;
-     });
-   }
-
-   function filterQuestionnairesByType(data, typeList) {
-     return data.filter((obj) => typeList.includes(obj._id));
-   }
-
-   async function handleQuestionnaires() {
-     const data = await getQuestionnaires();
-     const sortedData = sortQuestionnaires(data);
-     const dummyMobile = filterQuestionnairesByType(sortedData, Mobile);
-     const dummyWatch = filterQuestionnairesByType(sortedData, Watch);
-     setMobile(dummyMobile);
-     setWatch(dummyWatch);
-   }
-
-   handleQuestionnaires();
- }, [updateTable]);
-
-  //for category selection
-  const [category, setCategory] = useState("");
-
   useEffect(() => {
-    const storedCategory = sessionStorage.getItem("admincategory");
-
-    setCategory(storedCategory);
-  }, []);
-
-  const successColorClass = "text-green-500";
-  const errorColorClass = "text-[#EC2752]";
+    async function getQuestionnaires() {
+      try {
+        const response = await axios.get(
+          `${
+            import.meta.env.VITE_REACT_APP_ENDPOINT
+          }/api/questionnaires/questionnaireList?deviceType=${category}`,
+          { headers: { authorization: userToken } }
+        );
+        return response.data.data;
+      } catch (err) {
+        return [];
+      }
+    }
+    async function handleQuestionnaires() {
+      const data = await getQuestionnaires();
+      const sortedData = sortQuestionnaires(data);
+      const dummyMobile = filterQuestionnairesByType(sortedData, Mobile);
+      const dummyWatch = filterQuestionnairesByType(sortedData, Watch);
+      setMobile(dummyMobile);
+      setWatch(dummyWatch);
+    }
+    handleQuestionnaires();
+  }, [updateTable]);
 
   return (
     <>
+      <ExtComps
+        confBox={confBox}
+        setConfBox={setConfBox}
+        selectedUserqs={selectedUserqs}
+        selectedUser={selectedUser}
+        steUpdatetable={steUpdatetable}
+        updateTable
+      />
+      <QSComp
+        qsModel={qsModel}
+        setQsmodel={setQsmodel}
+        group={group}
+        setGroup={setGroup}
+        yes={yes}
+        setYes={setYes}
+        no={no}
+        setNo={setNo}
+        question={question}
+        setQuestion={setQuestion}
+        defaultOption={defaultOption}
+        setDefault={setDefault}
+        updateTable={updateTable}
+        steUpdatetable={steUpdatetable}
+        idofqs={idofqs}
+      />
+      <div className="m-2  w-[90%] overflow-x-auto md:m-5">
+        <div className="min-w-max">
+          {category === "Mobile" && (
+            <table className="w-full border border-[#EC2752]">
+              <thead className="bg-[#EC2752] text-white">
+                <tr>
+                  <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
+                    Groups
+                  </th>
+                  <th className="text-left p-2 text-sm md:p-3 md:text-base w-[60%]">
+                    Parameter
+                  </th>
+                  <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
+                    Output
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {mobiledata.map((item, index) => (
+                  <tr
+                    className={index % 2 === 0 ? "bg-gray-200" : ""}
+                    key={index}
+                  >
+                    <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                      {item._id}
+                    </td>
+
+                    <td className="w-1/3 p-2 text-sm md:p-3 md:text-base">
+                      {item.data.map((value, index2) => (
+                        <React.Fragment key={index2}>
+                          <div className="di flex w-[full]" key={value?._id}>
+                            <span className="mr-1">{index2 + 1}</span>
+                            <p style={{ flexBasis: "70%" }}>-{value.quetion}</p>
+                            <MdEdit
+                              size={17}
+                              className="mr-[8px]"
+                              onClick={() => {
+                                handleEdit(value);
+                              }}
+                            />{" "}
+                            <MdDelete
+                              size={17}
+                              onClick={() => {
+                                deleteConfHandler(value?._id, value?.quetion);
+                              }}
+                            />
+                          </div>
+                          <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed "></div>
+                        </React.Fragment>
+                      ))}
+                    </td>
+                    <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                      <select
+                        onChange={(e) => {
+                          dispatch(
+                            setSelectedOptions({
+                              id: item._id,
+                              value: e.target.value,
+                            })
+                          );
+                        }}
+                        className="bg-[#F5F4F9]"
+                      >
+                        {options[item._id]?.map((value, indexV) => (
+                          <option key={indexV} value={value}>
+                            {value}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <WatchComp
+            watchdata={watchdata}
+            handleEdit={handleEdit}
+            deleteConfHandler={deleteConfHandler}
+          />
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default AdminQuestionTable;
+
+const ExtComps = ({
+  confBox,
+  setConfBox,
+  selectedUserqs,
+  selectedUser,
+  steUpdatetable,
+  updateTable,
+}) => {
+  const [sucBox, setSucBox] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
+  const [failBox, setFailBox] = useState(false);
+
+  function deleteHandler(qsid) {
+    setConfBox(false);
+    axios
+      .delete(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/questionnaires/deleteById?id=${qsid}`,
+        { headers: { Authorization: userToken } }
+      )
+      .then((res) => {
+        setSucBox(true);
+        steUpdatetable(!updateTable);
+      })
+      .catch((err) => {
+        setFailBox(true);
+        setErrMsg("Failed to delete Question");
+      });
+  }
+
+  return (
+    <React.Fragment>
       {sucBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${successColorClass}`}>
@@ -218,7 +272,6 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
           </div>
         </div>
       )}
-
       {failBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${errorColorClass}`}>
@@ -236,7 +289,6 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
           </div>
         </div>
       )}
-
       {confBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${errorColorClass}`}>
@@ -264,7 +316,54 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
           </div>
         </div>
       )}
+    </React.Fragment>
+  );
+};
 
+const QSComp = ({
+  qsModel,
+  setQsmodel,
+  group,
+  setGroup,
+  yes,
+  setYes,
+  no,
+  setNo,
+  question,
+  setQuestion,
+  defaultOption,
+  setDefault,
+  updateTable,
+  steUpdatetable,
+  idofqs,
+}) => {
+  function handleSubmitedit() {
+    const data = {
+      id: idofqs,
+      group: group,
+      quetion: question,
+      yes: yes,
+      no: no,
+      default: defaultOption,
+    };
+    axios
+      .put(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/edit`,
+        data,
+        { headers: { Authorization: userToken } }
+      )
+      .then((res) => {
+        toast.success("question edit successfully");
+        setQsmodel(false);
+        steUpdatetable(!updateTable);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("error on question edit");
+      });
+  }
+  return (
+    <React.Fragment>
       {qsModel && (
         <div
           style={{
@@ -278,14 +377,12 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
               <IoClose
                 size={35}
                 className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
-                onClick={closeHandler}
+                onClick={() => setQsmodel(false)}
               />
               <p className="text-4xl font-bold">Edit Question</p>
               <p className="text-lg">All fields marked with * are required</p>
             </div>
-
             <div className="flex flex-col gap-4 ml-10">
-              {/* //group */}
               <div>
                 <p className="block text-xl font-medium">
                   Select Question Group*
@@ -307,9 +404,6 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
                   ))}
                 </select>
               </div>
-
-              {/* //question */}
-
               <div className="flex flex-col w-[70%] gap-2">
                 <span className="text-xl font-medium">Unique Id*</span>
                 <input
@@ -321,8 +415,6 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
                   onChange={(e) => setQuestion(e.target.value)}
                 />
               </div>
-
-              {/* //yes */}
               <div>
                 <p className="block text-xl font-medium">Select Yes key*</p>
                 <select
@@ -343,9 +435,6 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
                     ))}
                 </select>
               </div>
-
-              {/* //no */}
-
               <div>
                 <p className="block text-xl font-medium">Select No key*</p>
                 <select
@@ -366,8 +455,6 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
                     ))}
                 </select>
               </div>
-
-              {/* default */}
               <div>
                 <p className="block text-xl font-medium">Select Default key*</p>
                 <select
@@ -401,156 +488,84 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
           </div>
         </div>
       )}
-
-      {/* //actul ui */}
-
-      <div className="m-2  w-[90%] overflow-x-auto md:m-5">
-        <div className="min-w-max">
-          {category === "Mobile" && (
-            <table className="w-full border border-[#EC2752]">
-              <thead className="bg-[#EC2752] text-white">
-                <tr>
-                  <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
-                    Groups
-                  </th>
-                  <th className="text-left p-2 text-sm md:p-3 md:text-base w-[60%]">
-                    Parameter
-                  </th>
-                  <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
-                    Output
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {mobiledata.map((item, index) => (
-                  <tr className={index % 2 === 0 ? "bg-gray-200" : ""}>
-                    <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                      {item._id}
-                    </td>
-
-                    <td className="w-1/3 p-2 text-sm md:p-3 md:text-base">
-                      {item.data.map((value, index2) => (
-                        <>
-                          <div className="di flex w-[full]" key={value?._id}>
-                            <span className="mr-1">{index2 + 1}</span>
-                            <p style={{ flexBasis: "70%" }}>-{value.quetion}</p>
-                            <MdEdit
-                              size={17}
-                              className="mr-[8px]"
-                              onClick={() => {
-                                handleEdit(value);
-                              }}
-                            />{" "}
-                            <MdDelete
-                              size={17}
-                              onClick={() => {
-                                deleteConfHandler(value?._id, value?.quetion);
-                              }}
-                            />
-                          </div>
-                          <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed "></div>
-                        </>
-                      ))}
-                    </td>
-                    <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                      <select
-                        onChange={(e) => {
-                          dispatch(
-                            setSelectedOptions({
-                              id: item._id,
-                              value: e.target.value,
-                            })
-                          );
-                        }}
-                        className="bg-[#F5F4F9]"
-                      >
-                        {options[item._id]?.map((value) => (
-                          <option value={value}>{value}</option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-
-          {category === "Watch" && (
-            <table className="w-full border border-[#EC2752]">
-              <thead className="bg-[#EC2752] text-white">
-                <tr>
-                  <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
-                    Groups
-                  </th>
-                  <th className="text-left p-2 text-sm md:p-3 md:text-base w-[60%]">
-                    Parameter
-                  </th>
-                  <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
-                    Output
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {watchdata.map((item, index) => (
-                  <tr className={index % 2 === 0 ? "bg-gray-200" : ""}>
-                    <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                      {item._id}
-                    </td>
-
-                    <td className="w-1/3 p-2 text-sm md:p-3 md:text-base">
-                      {item.data.map((value, itemindex) => (
-                        <>
-                          <div className="di flex w-[full]" key={value?._id}>
-                            <span className="mr-1">{itemindex + 1}</span>
-                            <p style={{ flexBasis: "70%" }}>-{value.quetion}</p>
-                            <MdEdit
-                              size={17}
-                              className="mr-[8px]"
-                              onClick={() => {
-                                handleEdit(value);
-                              }}
-                            />{" "}
-                            <MdDelete
-                              size={17}
-                              onClick={() => {
-                                deleteConfHandler(value?._id, value?.quetion);
-                              }}
-                            />
-                          </div>
-                          <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed "></div>
-                        </>
-                      ))}
-                    </td>
-                    <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                      <select
-                        onChange={(e) => {
-                          dispatch(
-                            setSelectedOptions({
-                              id: item._id,
-                              value: e.target.value,
-                            })
-                          );
-                        }}
-                        className="bg-[#F5F4F9]"
-                      >
-                        {options[item._id]?.map((value) => (
-                          <option value={value}>{value}</option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
-    </>
+    </React.Fragment>
   );
 };
 
+const WatchComp = ({ watchdata, handleEdit, deleteConfHandler }) => {
+  const dispatch = useDispatch();
 
-
-export default AdminQuestionTable;
+  return (
+    <React.Fragment>
+      {category === "Watch" && (
+        <table className="w-full border border-[#EC2752]">
+          <thead className="bg-[#EC2752] text-white">
+            <tr>
+              <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
+                Groups
+              </th>
+              <th className="text-left p-2 text-sm md:p-3 md:text-base w-[60%]">
+                Parameter
+              </th>
+              <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
+                Output
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {watchdata.map((item, index) => (
+              <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {item._id}
+                </td>
+                <td className="w-1/3 p-2 text-sm md:p-3 md:text-base">
+                  {item.data.map((value, itemindex) => (
+                    <React.Fragment key={itemindex}>
+                      <div className="di flex w-[full]" key={value?._id}>
+                        <span className="mr-1">{itemindex + 1}</span>
+                        <p style={{ flexBasis: "70%" }}>-{value.quetion}</p>
+                        <MdEdit
+                          className="mr-[8px]"
+                          size={17}
+                          onClick={() => {
+                            handleEdit(value);
+                          }}
+                        />{" "}
+                        <MdDelete
+                          onClick={() => {
+                            deleteConfHandler(value?._id, value?.quetion);
+                          }}
+                          size={17}
+                        />
+                      </div>
+                      <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed "></div>
+                    </React.Fragment>
+                  ))}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  <select
+                    className="bg-[#F5F4F9]"
+                    onChange={(e) => {
+                      dispatch(
+                        setSelectedOptions({
+                          value: e.target.value,
+                          id: item._id,
+                        })
+                      );
+                    }}
+                  >
+                    {options[item._id]?.map((value, vIndex) => (
+                      <option key={vIndex} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </React.Fragment>
+  );
+};

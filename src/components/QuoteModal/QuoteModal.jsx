@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import styles from "./QuoteModal.module.css";
 import OtpInput from "otp-input-react";
@@ -7,13 +7,18 @@ import { setOtpVerified } from "../../store/slices/otpSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { MdEdit } from "react-icons/md";
+
 const Failerr = "Failed To Save Quote";
+const quoteText = "Quote Saved Successfully";
+const leadData = JSON.parse(sessionStorage.getItem("responsedatadata"));
+const userToken = sessionStorage.getItem("authToken");
+const ExactQuote = sessionStorage.getItem("ExactQuote");
 
 const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
   const showHideClassName = show
     ? `${styles.modal} ${styles.displayBlock}`
     : ` ${styles.displayNone}`;
-  const [otp, setOtp] = useState("");
+
   const [showOtp, setShowOtp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [ph, setPh] = useState("");
@@ -26,7 +31,7 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
   const [otherReason, setOtherReason] = useState("");
   const [isOther, setIsOther] = useState(false);
   const [userData, setUserData] = useState({});
-  const quoteText = "Quote Saved Successfully";
+
   useEffect(() => {
     setShowOtp(false);
   }, [show]);
@@ -54,10 +59,6 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
 
   const onSignupDup = () => {
     setLoading(true);
-
-    const leadData = JSON.parse(sessionStorage.getItem("responsedatadata"));
-    const userToken = sessionStorage.getItem("authToken");
-    const ExactQuote = sessionStorage.getItem("ExactQuote");
     const data = {
       lead_id: leadData.id,
       phoneNumber: ph,
@@ -68,10 +69,6 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
     setUserData(data);
 
     if (ExactQuote === "true") {
-      console.log("data is ", data);
-      const formatPh = "+" + ph;
-      console.log(formatPh);
-      console.log(data);
       if (ExactQuote === "true") {
         axios
           .post(
@@ -79,11 +76,7 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
               import.meta.env.VITE_REACT_APP_ENDPOINT
             }/api/leadSet/orderCreated`,
             data,
-            {
-              headers: {
-                authorization: `${userToken}`,
-              },
-            }
+            { headers: { authorization: userToken } }
           )
           .then((res) => {
             console.log(res);
@@ -96,11 +89,7 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
           .post(
             `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/leadSet/quickQoute`,
             userData,
-            {
-              headers: {
-                authorization: `${userToken}`,
-              },
-            }
+            { headers: { authorization: userToken } }
           )
           .then((res) => {
             console.log(res);
@@ -110,33 +99,24 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
           });
       }
       toast.success(quoteText);
-
       setQuoteSaved(true);
       dispatch(setOtpVerified(true));
       setLoading(false);
-      console.log("OTP sent successfully!");
     } else {
       axios
         .post(
           `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/leadSet/quickQoute`,
           data,
-          {
-            headers: {
-              authorization: `${userToken}`,
-            },
-          }
+          { headers: { authorization: userToken } }
         )
         .then((res) => {
-          console.log(res);
           toast.success(quoteText);
           handleClose();
         })
         .catch((err) => {
-          console.log(err);
           toast.error(Failerr);
           handleClose();
         });
-
       setLoading(false);
       setQuoteSaved(true);
     }
@@ -145,33 +125,21 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
 
   const resendOTPDup = () => {
     setDisableResend(true);
-    const formatPh = "+" + ph;
-    console.log("OTP resent successfully! to - " + { formatPh });
   };
 
   const onOTPVerifyDup = () => {
     setLoading(true);
-    console.log(otp);
-    const userToken = sessionStorage.getItem("authToken");
-    const ExactQuote = sessionStorage.getItem("ExactQuote");
-    console.log(userData);
     if (ExactQuote === "true") {
       axios
         .post(
           `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/leadSet/orderCreated`,
           userData,
-          {
-            headers: {
-              authorization: `${userToken}`,
-            },
-          }
+          { headers: { authorization: userToken } }
         )
         .then((res) => {
-          console.log(res);
           setLoading(false);
         })
         .catch((err) => {
-          console.log(err);
           setLoading(false);
         });
     } else {
@@ -179,200 +147,51 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         .post(
           `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/leadSet/quickQoute`,
           userData,
-          {
-            headers: {
-              authorization: `${userToken}`,
-            },
-          }
+          { headers: { authorization: userToken } }
         )
         .then((res) => {
-          console.log(res);
           setLoading(false);
         })
         .catch((err) => {
-          console.log(err);
           setLoading(false);
         });
     }
     toast.success(quoteText);
-
     setQuoteSaved(true);
     dispatch(setOtpVerified(true));
     handleClose();
   };
 
-  const handleOther = (e) => {
-    if (e.target.id === "other" && isOther === false) {
-      setIsOther(true);
-    } else if (e.target.id !== "other") {
-      setIsOther(false);
-      if (e.target.value === 1) {
-        setReason("Quote value is too low.");
-      } else if (e.target.value === 2) {
-        setReason("Customer just wanted to know the device value.");
-      } else if (e.target.value === 3) {
-        setReason("Customer will come later.");
-      }
-    }
-  };
-
-  const handleName = (e) => {
-    setName(e.target.value);
-  };
-
-  const handleEmail = (e) => {
-    setUserEmail(e.target.value);
-  };
-
   return (
     <>
-      {/* <ToastContainer className="" /> */}
       <div className={showHideClassName}>
         <section
           className={`${styles.modalMain}  ${
             showOtp ? styles.smallHeight : ""
           }`}
         >
-          {!showOtp ? (
-            <div>
-              <p className="block text-xl font-medium display">Save Quote</p>
-              <div className="flex flex-col gap-2 pb-4 mt-4">
-                <input
-                  className="p-2 border-2 outline-none"
-                  type="text"
-                  placeholder={quoteId}
-                  value={quoteId}
-                  disabled
-                />
-                <input
-                  className="p-2 border-2 outline-none"
-                  type="text"
-                  placeholder="Name"
-                  value={name}
-                  onChange={handleName}
-                />
-                <input
-                  className="p-2 border-2 outline-none"
-                  value={ph}
-                  onChange={(e) => setPh(e.target.value)}
-                  type="number"
-                  placeholder="Mobile"
-                />
-                <input
-                  className="p-2 border-2 outline-none"
-                  type="email"
-                  placeholder="Email Id"
-                  value={userEmail}
-                  onChange={handleEmail}
-                />
-                <p className="font-medium">Please select reason</p>
-                <label className="flex items-center gap-2">
-                  <input
-                    onClick={handleOther}
-                    type="radio"
-                    value={1}
-                    name="reason"
-                  />{" "}
-                  <span>Quote value is too low.</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    onClick={handleOther}
-                    type="radio"
-                    value={2}
-                    name="reason"
-                  />{" "}
-                  <span>Customer just wanted to know the device value.</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    onClick={handleOther}
-                    type="radio"
-                    value={3}
-                    name="reason"
-                  />{" "}
-                  <span>Customer will come later.</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    onClick={handleOther}
-                    type="radio"
-                    id="other"
-                    name="reason"
-                    value={4}
-                  />{" "}
-                  <span>Other, please specify below.</span>
-                </label>
-                {isOther && (
-                  <textarea
-                    value={otherReason}
-                    onChange={(e) => {
-                      setOtherReason(e.target.value);
-                      setReason(e.target.value);
-                    }}
-                    className="outline-none border-2 p-2 h-[100px]"
-                    placeholder="Please type your reason"
-                  />
-                )}
-                <button
-                  onClick={onSignupDup}
-                  // onClick={onSignup}
-                  className="text-white bg-[#EC2752] p-2 text-xl rounded-md"
-                >
-                  Submit
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              <p className="block text-xl font-medium display">
-                Customer consent
-              </p>
-              <div className="flex flex-col gap-2 mt-4 mb-2">
-                <div className="flex tracking-tight">
-                  <p>Enter OTP sent to +91{ph}</p>
-                  <span
-                    className="text-sm font-medium text-left ml-[2px] text-[#ec2752] flex items-center tracking-tight"
-                    onClick={handleNumberEdit}
-                  >
-                    <MdEdit /> Edit no.
-                  </span>
-                </div>
-
-                <OtpInput
-                  value={otp}
-                  onChange={setOtp}
-                  OTPLength={6}
-                  otpType="number"
-                  disabled={false}
-                  autoFocus
-                  className=""
-                  inputStyles={{
-                    border: "1px solid black",
-                    borderRadius: "5px",
-                  }}
-                ></OtpInput>
-              </div>
-              <div className="flex flex-row items-center justify-center text-sm font-medium">
-                <span className="opacity-60">Didn't Receive OTP?</span>
-                <button
-                  className="ml-2 text-[#EC2752]"
-                  onClick={resendOTPDup}
-                  // onClick={resendOTP}
-                  disabled={disableResend}
-                >
-                  {disableResend ? `Resend in ${timer}` : "Resend OTP"}
-                </button>
-              </div>
-              <button
-                onClick={onOTPVerifyDup}
-                disabled={loading}
-                className="text-white mt-8 bg-[#EC2752] p-2 text-xl rounded-md"
-              >
-                Submit Otp
-              </button>
-            </div>
-          )}
+          <OTPCOmp
+            showOtp={showOtp}
+            quoteId={quoteId}
+            setName={setName}
+            name={name}
+            ph={ph}
+            setPh={setPh}
+            userEmail={userEmail}
+            setUserEmail={setUserEmail}
+            isOther={isOther}
+            setIsOther={setIsOther}
+            otherReason={otherReason}
+            setReason={setReason}
+            setOtherReason={setOtherReason}
+            onSignupDup={onSignupDup}
+            handleNumberEdit={handleNumberEdit}
+            resendOTPDup={resendOTPDup}
+            disableResend={disableResend}
+            onOTPVerifyDup={onOTPVerifyDup}
+            loading={loading}
+            timer={timer}
+          />
           <div>
             <IoCloseCircle
               onClick={() => {
@@ -396,3 +215,182 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
 };
 
 export default QuoteModal;
+
+const OTPCOmp = ({
+  showOtp,
+  quoteId,
+  setName,
+  name,
+  ph,
+  setPh,
+  userEmail,
+  setUserEmail,
+  isOther,
+  setIsOther,
+  otherReason,
+  setReason,
+  setOtherReason,
+  onSignupDup,
+  handleNumberEdit,
+  resendOTPDup,
+  disableResend,
+  onOTPVerifyDup,
+  loading,
+  timer,
+}) => {
+  const [otp, setOtp] = useState("");
+  const handleOther = (e) => {
+    if (e.target.id === "other" && isOther === false) {
+      setIsOther(true);
+    } else if (e.target.id !== "other") {
+      setIsOther(false);
+      if (e.target.value === 1) {
+        setReason("Quote value is too low.");
+      } else if (e.target.value === 2) {
+        setReason("Customer just wanted to know the device value.");
+      } else if (e.target.value === 3) {
+        setReason("Customer will come later.");
+      }
+    }
+  };
+
+  return (
+    <React.Fragment>
+      {!showOtp ? (
+        <div>
+          <p className="block text-xl font-medium display">Save Quote</p>
+          <div className="flex flex-col gap-2 pb-4 mt-4">
+            <input
+              className="p-2 border-2 outline-none"
+              type="text"
+              placeholder={quoteId}
+              value={quoteId}
+              disabled
+            />
+            <input
+              className="p-2 border-2 outline-none"
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <input
+              className="p-2 border-2 outline-none"
+              value={ph}
+              onChange={(e) => setPh(e.target.value)}
+              type="number"
+              placeholder="Mobile"
+            />
+            <input
+              className="p-2 border-2 outline-none"
+              type="email"
+              placeholder="Email Id"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+            />
+            <p className="font-medium">Please select reason</p>
+            <label className="flex items-center gap-2">
+              <input
+                onClick={handleOther}
+                type="radio"
+                value={1}
+                name="reason"
+              />{" "}
+              <span>Quote value is too low.</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                onClick={handleOther}
+                type="radio"
+                value={2}
+                name="reason"
+              />{" "}
+              <span>Customer just wanted to know the device value.</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                onClick={handleOther}
+                type="radio"
+                value={3}
+                name="reason"
+              />{" "}
+              <span>Customer will come later.</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                onClick={handleOther}
+                type="radio"
+                id="other"
+                name="reason"
+                value={4}
+              />{" "}
+              <span>Other, please specify below.</span>
+            </label>
+            {isOther && (
+              <textarea
+                value={otherReason}
+                onChange={(e) => {
+                  setOtherReason(e.target.value);
+                  setReason(e.target.value);
+                }}
+                className="outline-none border-2 p-2 h-[100px]"
+                placeholder="Please type your reason"
+              />
+            )}
+            <button
+              onClick={onSignupDup}
+              className="text-white bg-[#EC2752] p-2 text-xl rounded-md"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <p className="block text-xl font-medium display">Customer consent</p>
+          <div className="flex flex-col gap-2 mt-4 mb-2">
+            <div className="flex tracking-tight">
+              <p>Enter OTP sent to +91{ph}</p>
+              <span
+                className="text-sm font-medium text-left ml-[2px] text-[#ec2752] flex items-center tracking-tight"
+                onClick={handleNumberEdit}
+              >
+                <MdEdit /> Edit no.
+              </span>
+            </div>
+            <OtpInput
+              value={otp}
+              onChange={setOtp}
+              OTPLength={6}
+              otpType="number"
+              disabled={false}
+              autoFocus
+              className=""
+              inputStyles={{
+                border: "1px solid black",
+                borderRadius: "5px",
+              }}
+            ></OtpInput>
+          </div>
+          <div className="flex flex-row items-center justify-center text-sm font-medium">
+            <span className="opacity-60">Didn't Receive OTP?</span>
+            <button
+              className="ml-2 text-[#EC2752]"
+              onClick={resendOTPDup}
+              disabled={disableResend}
+            >
+              {disableResend ? `Resend in ${timer}` : "Resend OTP"}
+            </button>
+          </div>
+          <button
+            onClick={onOTPVerifyDup}
+            disabled={loading}
+            className="text-white mt-8 bg-[#EC2752] p-2 text-xl rounded-md"
+          >
+            Submit Otp
+          </button>
+        </div>
+      )}
+    </React.Fragment>
+  );
+};

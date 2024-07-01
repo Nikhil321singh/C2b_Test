@@ -17,6 +17,58 @@ import * as XLSX from "xlsx";
 import EditCompany from "../../components/EditCompany/EditCompany";
 import { AiOutlineFile } from "react-icons/ai";
 
+const downloadExcel = (apiData) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+
+  const formattedData = apiData.map((item) => {
+    return {
+      "Company Name": item.companyName,
+      "Unique Id": item.uniqueId,
+      "Company Code": item.companyCode,
+      Address: item.address,
+      "Contact Number": item.contactNumber,
+      "GST Number": item.gstNumber,
+      "PAN Number": item.panNumber,
+      Remarks: item.remarks,
+    };
+  });
+
+  const ws = XLSX.utils.json_to_sheet(formattedData);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
+  const dataFile = new Blob([excelBuffer], { type: fileType });
+  saveAs(dataFile, "Company_Listing" + fileExtension);
+};
+
+const handleDownload = (totalCount) => {
+  const userToken = sessionStorage.getItem("authToken");
+  axios
+    .get(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/company/findAll?page=${0}&limit=${totalCount}`,
+      {
+        headers: {
+          authorization: `${userToken}`,
+        },
+      }
+    )
+    .then((res) => {
+      downloadExcel(res.data.result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const getTextColorClass = (isSuccess) =>
+  isSuccess ? "text-green-500" : "text-[#EC2752]";
+const pageLimit = 10;
+const userToken = sessionStorage.getItem("authToken");
+
 const CompanyListingDetails = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [maxPages, setMaxPages] = useState(0);
@@ -35,36 +87,24 @@ const CompanyListingDetails = () => {
   const [editBoxOpen, setEditBoxOpen] = useState(false);
   const [editSuccess, setEditSuccess] = useState(false);
   const [viewDocsModalOpen, setViewDocsModalOpen] = useState(false);
-  const pageLimit = 10;
   const navigate = useNavigate();
-
-  const getTextColorClass = (isSuccess) =>
-    isSuccess ? "text-green-500" : "text-[#EC2752]";
-
 
   const fetchTableData = () => {
     setIsTableLoading(true);
-    const userToken = sessionStorage.getItem("authToken");
     axios
       .get(
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/company/findAll?page=${currentPage}&limit=${pageLimit}`,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
+        { headers: { Authorization: userToken } }
       )
       .then((res) => {
         setMaxPages(Math.ceil(res.data.totalCounts / 10));
         setTableData(res.data.result);
         setTotalCount(res.data.totalRecords);
-        console.log("res is", res.data);
         setIsTableLoading(false);
       })
       .catch((err) => {
-        console.log(err);
         setIsTableLoading(false);
       });
   };
@@ -73,53 +113,6 @@ const CompanyListingDetails = () => {
     fetchTableData();
   }, [currentPage, pageLimit]);
 
-  const downloadExcel = (apiData) => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
-    const formattedData = apiData.map((item) => {
-      return {
-        "Company Name": item.companyName,
-        "Unique Id": item.uniqueId,
-        "Company Code": item.companyCode,
-        Address: item.address,
-        "Contact Number": item.contactNumber,
-        "GST Number": item.gstNumber,
-        "PAN Number": item.panNumber,
-        Remarks: item.remarks,
-      };
-    });
-
-    const ws = XLSX.utils.json_to_sheet(formattedData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-
-    const dataFile = new Blob([excelBuffer], { type: fileType });
-    saveAs(dataFile, "Company_Listing" + fileExtension);
-  };
-
-  const handleDownload = () => {
-    const userToken = sessionStorage.getItem("authToken");
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/company/findAll?page=${0}&limit=${totalCount}`,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        downloadExcel(res.data.result);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   const deleteConfHandler = (conpanyId) => {
     setSelectedCompany(conpanyId);
     setConfBox(true);
@@ -127,66 +120,21 @@ const CompanyListingDetails = () => {
 
   const getDataBySearch = () => {
     setIsTableLoading(true);
-    const token = sessionStorage.getItem("authToken");
-
     const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/company/findAll?page=${0}&limit=${totalCount}&search=${searchValue}`,
-      headers: { Authorization: token },
+      headers: { Authorization: userToken },
     };
-
-    console.log(config);
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data.result);
         setTableData(response.data.result);
         setIsTableLoading(false);
       })
       .catch((error) => {
-        console.log(error);
         setErrMsg("Failed to load data");
-        setFailBox(true);
-        setIsTableLoading(false);
-      });
-  };
-
-  const deleteHandler = (companyId) => {
-    setIsTableLoading(true);
-    setConfBox(false);
-    const token = sessionStorage.getItem("authToken");
-
-    const config = {
-      method: "delete",
-      maxBodyLength: Infinity,
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/company/deleteById?id=${companyId}`,
-      headers: {
-        Authorization: token,
-        "Content-Type": "application/json",
-      },
-    };
-    axios
-      .request(config)
-      .then((response) => {
-        console.log(response.data);
-        if (searchValue === "") {
-          fetchTableData();
-        } else {
-          getDataBySearch();
-        }
-        setErrMsg(
-          "Succesfully deleted company - " + response.data.result.companyName
-        );
-        setSucBox(true);
-        setIsTableLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setErrMsg("Failed to deleted company");
         setFailBox(true);
         setIsTableLoading(false);
       });
@@ -195,10 +143,6 @@ const CompanyListingDetails = () => {
   const handleSearchClear = () => {
     setSearchValue("");
     fetchTableData();
-  };
-
-  const handleSearchClick = () => {
-    getDataBySearch();
   };
 
   useEffect(() => {
@@ -216,7 +160,6 @@ const CompanyListingDetails = () => {
   }, [editSuccess]);
 
   const editHandler = (companyData) => {
-    console.log(companyData);
     setCompanyEditData(companyData);
     setEditBoxOpen(true);
   };
@@ -227,6 +170,132 @@ const CompanyListingDetails = () => {
   };
   return (
     <div>
+      <ExtComps
+        editBoxOpen={editBoxOpen}
+        setEditBoxOpen={setEditBoxOpen}
+        companyEditData={companyEditData}
+        setEditSuccess={setEditSuccess}
+        isTableLoading={isTableLoading}
+        setIsTableLoading={setIsTableLoading}
+        sucBox={sucBox}
+        errMsg={errMsg}
+        failBox={failBox}
+        setSucBox={setSucBox}
+        setFailBox={setFailBox}
+        confBox={confBox}
+        selectedCompany={selectedCompany}
+        setConfBox={setConfBox}
+        viewDocsModalOpen={viewDocsModalOpen}
+        companyDocsData={companyDocsData}
+        setViewDocsModalOpen={setViewDocsModalOpen}
+        searchValue={searchValue}
+        fetchTableData={fetchTableData}
+        getDataBySearch={getDataBySearch}
+        setErrMsg={setErrMsg}
+      />
+      <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
+        <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
+          <button
+            className={`${styles.bulkdown_button}`}
+            onClick={() => {
+              navigate("/companylisting");
+            }}
+          >
+            <IoMdAdd size={24} /> Add Company
+          </button>
+          <div className={`${styles.search_bar_wrap}`}>
+            <input
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="text-sm"
+              placeholder="Search..."
+              value={searchValue}
+              type="text"
+            />
+            <IoMdSearch size={25} onClick={() => getDataBySearch()} />
+          </div>
+          <div className={styles.icons_box}>
+            <IoRefresh onClick={handleSearchClear} className="" size={25} />
+          </div>
+          <button
+            className={`${styles.bulkdown_button}`}
+            onClick={() => handleDownload(totalCount)}
+          >
+            <FaDownload /> Bulk Download
+          </button>
+        </div>
+      </div>
+      <CompanyTable
+        tableData={tableData}
+        editHandler={editHandler}
+        deleteConfHandler={deleteConfHandler}
+        openViewDocsModal={openViewDocsModal}
+        setCurrentPage={setCurrentPage}
+        currentPage={currentPage}
+        maxPages={maxPages}
+      />
+    </div>
+  );
+};
+
+export default CompanyListingDetails;
+
+const ExtComps = ({
+  editBoxOpen,
+  setEditBoxOpen,
+  companyEditData,
+  setEditSuccess,
+  isTableLoading,
+  setIsTableLoading,
+  sucBox,
+  errMsg,
+  failBox,
+  setSucBox,
+  setFailBox,
+  confBox,
+  selectedCompany,
+  setConfBox,
+  viewDocsModalOpen,
+  companyDocsData,
+  setViewDocsModalOpen,
+  searchValue,
+  fetchTableData,
+  getDataBySearch,
+  setErrMsg,
+}) => {
+  const [sideMenu, setsideMenu] = useState(false);
+  const deleteHandler = (companyId) => {
+    setIsTableLoading(true);
+    setConfBox(false);
+    const config = {
+      method: "delete",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/company/deleteById?id=${companyId}`,
+      headers: { Authorization: userToken },
+    };
+    axios
+      .request(config)
+      .then((response) => {
+        if (searchValue === "") {
+          fetchTableData();
+        } else {
+          getDataBySearch();
+        }
+        setErrMsg(
+          "Succesfully deleted company - " + response.data.result.companyName
+        );
+        setSucBox(true);
+        setIsTableLoading(false);
+      })
+      .catch((error) => {
+        setErrMsg("Failed to deleted company");
+        setFailBox(true);
+        setIsTableLoading(false);
+      });
+  };
+
+  return (
+    <React.Fragment>
       {editBoxOpen && (
         <div className={`${styles.edit_page}`}>
           <EditCompany
@@ -245,34 +314,37 @@ const CompanyListingDetails = () => {
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
-      {(sucBox || failBox) && (
+      {sucBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}
-          >
-            {sucBox ? (
-              <IoIosCheckmarkCircle
-                className={`${getTextColorClass(sucBox)}`}
-                size={90}
-              />
-            ) : (
-              <IoIosCloseCircle
-                className={`${getTextColorClass(sucBox)}`}
-                size={90}
-              />
-            )}
-            <h6 className={`${getTextColorClass(sucBox)}`}>
-              {sucBox ? "Success!" : "Error!"}
-            </h6>
+          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
+            <IoIosCheckmarkCircle
+              className={getTextColorClass(sucBox)}
+              size={90}
+            />
+            <h6 className={getTextColorClass(sucBox)}>Success!</h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
               onClick={() => {
                 setSucBox(false);
+              }}
+              className={"bg-green-500 text-white"}
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
+      {failBox && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
+            <IoIosCloseCircle className={getTextColorClass(sucBox)} size={90} />
+            <h6 className={getTextColorClass(sucBox)}>Error!</h6>
+            <p className="text-slate-500">{errMsg}</p>
+            <button
+              onClick={() => {
                 setFailBox(false);
               }}
-              className={
-                sucBox ? "bg-green-500 text-white" : "bg-[#EC2752] text-white"
-              }
+              className={"bg-[#EC2752] text-white"}
             >
               Okay
             </button>
@@ -281,12 +353,8 @@ const CompanyListingDetails = () => {
       )}
       {confBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}
-          >
-            <h6 className={`${getTextColorClass(sucBox)}`}>
-              Confirmation!
-            </h6>
+          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
+            <h6 className={`${getTextColorClass(sucBox)}`}>Confirmation!</h6>
             <p className="text-slate-500">
               ${`Do you want to delete store ${selectedCompany} ?`}
             </p>
@@ -310,39 +378,47 @@ const CompanyListingDetails = () => {
           </div>
         </div>
       )}
-
-      <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
-        <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={() => {
-              navigate("/companylisting");
-            }}
-          >
-            <IoMdAdd size={24} /> Add Company
-          </button>
-
-          <div className={`${styles.search_bar_wrap}`}>
-            <input
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="text-sm"
-              type="text"
-              placeholder="Search..."
-              value={searchValue}
-            />
-            <IoMdSearch onClick={handleSearchClick} size={25} />
+      {viewDocsModalOpen && (
+        <div className="fixed mx-2 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center z-50">
+          <div className="absolute top-0 left-0 w-full h-full bg-gray-800 opacity-50"></div>
+          <div className="bg-white border border-gray-300 p-6 w-96 max-w-[90%] mx-auto rounded-md z-10">
+            <p className="mb-4 text-lg font-semibold">Documents</p>
+            <div className=" flex gap-4 m-2">
+              {companyDocsData?.documents?.map((document, index) => (
+                <div key={index} className="">
+                  <a href={document} target="_blank" rel="noopener noreferrer">
+                    <p className="text-xs font-medium"> Document {index + 1}</p>
+                    <div className="flex flex-col items-center">
+                      <AiOutlineFile size={60} />
+                    </div>
+                  </a>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setViewDocsModalOpen(false)}
+              className="border border-[#EC2752] text-[#EC2752] px-4 py-2 rounded"
+            >
+              Close
+            </button>
           </div>
-          <div className={styles.icons_box}>
-            <IoRefresh onClick={handleSearchClear} className="" size={25} />
-          </div>
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={handleDownload}
-          >
-            <FaDownload /> Bulk Download
-          </button>
         </div>
-      </div>
+      )}
+    </React.Fragment>
+  );
+};
+
+const CompanyTable = ({
+  tableData,
+  editHandler,
+  deleteConfHandler,
+  openViewDocsModal,
+  setCurrentPage,
+  currentPage,
+  maxPages,
+}) => {
+  return (
+    <React.Fragment>
       <div className="m-2 overflow-x-auto md:m-5">
         <table className="w-full border border-[#EC2752]">
           <thead className="bg-[#EC2752] text-white">
@@ -363,7 +439,7 @@ const CompanyListingDetails = () => {
           </thead>
           <tbody>
             {tableData !== undefined &&
-              tableData.map((data, index) => (
+              tableData?.map((data, index) => (
                 <tr
                   key={index}
                   className={index % 2 === 0 ? "bg-gray-200" : ""}
@@ -424,32 +500,6 @@ const CompanyListingDetails = () => {
           </tbody>
         </table>
       </div>
-      {viewDocsModalOpen && (
-        <div className="fixed mx-2 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full flex items-center justify-center z-50">
-          <div className="absolute top-0 left-0 w-full h-full bg-gray-800 opacity-50"></div>
-          <div className="bg-white border border-gray-300 p-6 w-96 max-w-[90%] mx-auto rounded-md z-10">
-            <p className="mb-4 text-lg font-semibold">Documents</p>
-            <div className=" flex gap-4 m-2">
-              {companyDocsData.documents.map((document, index) => (
-                <div key={index} className="">
-                  <a href={document} target="_blank" rel="noopener noreferrer">
-                    <p className="text-xs font-medium"> Document {index + 1}</p>
-                    <div className="flex flex-col items-center">
-                      <AiOutlineFile size={60} />
-                    </div>
-                  </a>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => setViewDocsModalOpen(false)}
-              className="border border-[#EC2752] text-[#EC2752] px-4 py-2 rounded"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
       <div className="flex justify-center mt-0 mb-4">
         <button
           onClick={() => setCurrentPage(currentPage - 1)}
@@ -474,8 +524,6 @@ const CompanyListingDetails = () => {
           Next
         </button>
       </div>
-    </div>
+    </React.Fragment>
   );
 };
-
-export default CompanyListingDetails;

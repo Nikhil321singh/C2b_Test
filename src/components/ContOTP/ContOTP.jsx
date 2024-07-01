@@ -8,7 +8,13 @@ import { setOtpVerified } from "../../store/slices/otpSlice";
 import LoadingSpinner from "../LoadingSpinner";
 import { MdEdit } from "react-icons/md";
 
-const ContOTP = (props) => {
+const initOtp = {
+  name: "",
+  email: "",
+  phone: "",
+};
+
+const ContOTP = ({ setContinueOTPOpen }) => {
   const navigate = useNavigate();
   const deviceSelected = sessionStorage.getItem("DeviceType");
   console.log(deviceSelected);
@@ -19,11 +25,7 @@ const ContOTP = (props) => {
   const dispatch = useDispatch();
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
-  const [otpData, setOtpData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
+  const [otpData, setOtpData] = useState(initOtp);
 
   const handleChange = (e) => {
     setOtpData({
@@ -31,32 +33,10 @@ const ContOTP = (props) => {
       [e.target.name]: e.target.value,
     });
   };
-
-  const continueOTPHandler = () => {
-    props.setContinueOTPOpen(false);
-  };
-
   const handleNumberEdit = () => {
     setLoading(false);
     setOtpBoxOpen(!otpBoxOpen);
   };
-
-  useEffect(() => {
-    let interval;
-    if (disableResend && timer > 0) {
-      interval = setInterval(() => {
-        setTimer(timer - 1);
-      }, 1000);
-    } else if (!disableResend) {
-      setTimer(30);
-    } else if (timer === 0) {
-      setDisableResend(false);
-    }
-    return () => {
-      clearInterval(interval);
-    };
-  }, [disableResend, timer]);
-
   const onSignupDup = () => {
     setLoading(true);
     const formatPh = "+" + ph;
@@ -64,39 +44,45 @@ const ContOTP = (props) => {
     setLoading(false);
     setOtpBoxOpen(true);
     setDisableResend(true);
-    console.log("OTP sent successfully!");
   };
-
   const resendOTPDup = () => {
     setDisableResend(true);
-    const formatPh = "+" + ph;
-    console.log("OTP resent successfully! to - " + { formatPh });
   };
-
   const onOTPVerifyDup = () => {
     setLoading(true);
-    console.log(otp);
-
     if (otp === "123456") {
-      console.log("ho gya");
       dispatch(setOtpVerified(true));
       navigate("/inputnumber");
     } else {
-      console.log("wrong otp");
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    let intrvl;
+    if (disableResend && timer > 0) {
+      intrvl = setInterval(() => {
+        setTimer(timer - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setDisableResend(false);
+    } else if (!disableResend) {
+      setTimer(30);
+    }
+    return () => {
+      clearInterval(intrvl);
+    };
+  }, [disableResend, timer]);
+
+  useEffect(() => {
     localStorage.setItem("otpData", JSON.stringify(otpData));
   }, [otpData]);
 
-  console.log(ph);
   return (
     <div className={`${styles.contopt_page} z-20`}>
       <div className={` ${styles.optbox_wrap}`}>
         <div className={`${styles.optimg_wrap}`}>
-          <img onClick={continueOTPHandler} src={optImg} />
+          <img onClick={() => setContinueOTPOpen(false)} src={optImg} />
         </div>
         <div className={`${styles.opt_heading} `}>
           <p className={`font-bold text-2xl`}>OTP Verificaiton</p>
@@ -122,72 +108,16 @@ const ContOTP = (props) => {
             </span>
           )}
         </div>
-        {otpBoxOpen ? (
-          <div className={`${styles.otp_field_wrap}`}>
-            <OtpInput
-              value={otp}
-              onChange={setOtp}
-              OTPLength={6}
-              otpType="number"
-              disabled={false}
-              autoFocus
-              inputStyles={{
-                border: "2px solid #EC2752",
-                borderRadius: ".55rem",
-                outline: "none",
-                marginRight: "10px",
-              }}
-              className={styles.otp_field}
-            />
-          </div>
-        ) : (
-          <div className={`${styles.form_fields_wrap}`}>
-            <div>
-              <input
-                id="name"
-                name="name"
-                placeholder="Enter Name"
-                value={otpData.name}
-                onChange={handleChange}
-                className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
-              />
-            </div>
-            <div>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter Email"
-                value={otpData.email}
-                onChange={handleChange}
-                className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
-              />
-            </div>
-            <div className="w-[100%] flex flex-row">
-              <div className="flex   border-[#EC2752] rounded-lg border-2  w-[85%] flex-row justify-start">
-                <span className="px-3 py-1 text-gray-600 bg-gray-200 rounded-lg">
-                  +91
-                </span>
-                <input
-                  type="tel"
-                  id="phone"
-                  value={ph}
-                  maxLength="10"
-                  onChange={(e) => {
-                    setPh(e.target.value);
-                    setOtpData({
-                      ...otpData,
-                      ["phone"]: e.target.value,
-                    });
-                  }}
-                  className=""
-                  placeholder="Enter your Mobile"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
+        <OTPComp
+          otpBoxOpen={otpBoxOpen}
+          otp={otp}
+          setOtp={setOtp}
+          otpData={otpData}
+          handleChange={handleChange}
+          ph={ph}
+          setPh={setPh}
+          setOtpData={setOtpData}
+        />
         {otpBoxOpen && (
           <div className={styles.resend_otp_wrap}>
             <div className="flex flex-row gap-2  w-[300px] justify-center  text-sm font-medium">
@@ -254,3 +184,84 @@ const ContOTP = (props) => {
 };
 
 export default ContOTP;
+
+const OTPComp = ({
+  otpBoxOpen,
+  otp,
+  setOtp,
+  otpData,
+  handleChange,
+  ph,
+  setPh,
+  setOtpData,
+}) => {
+  return (
+    <React.Fragment>
+      {otpBoxOpen ? (
+        <div className={`${styles.otp_field_wrap}`}>
+          <OtpInput
+            value={otp}
+            onChange={setOtp}
+            OTPLength={6}
+            otpType="number"
+            disabled={false}
+            autoFocus
+            inputStyles={{
+              border: "2px solid #EC2752",
+              borderRadius: ".55rem",
+              outline: "none",
+              marginRight: "10px",
+            }}
+            className={styles.otp_field}
+          />
+        </div>
+      ) : (
+        <div className={`${styles.form_fields_wrap}`}>
+          <div>
+            <input
+              id="name"
+              name="name"
+              placeholder="Enter Name"
+              value={otpData?.name}
+              onChange={handleChange}
+              className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
+            />
+          </div>
+          <div>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Enter Email"
+              value={otpData?.email}
+              onChange={handleChange}
+              className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
+            />
+          </div>
+          <div className="w-[100%] flex flex-row">
+            <div className="flex   border-[#EC2752] rounded-lg border-2  w-[85%] flex-row justify-start">
+              <span className="px-3 py-1 text-gray-600 bg-gray-200 rounded-lg">
+                +91
+              </span>
+              <input
+                type="tel"
+                id="phone"
+                value={ph}
+                maxLength="10"
+                onChange={(e) => {
+                  setPh(e.target.value);
+                  setOtpData({
+                    ...otpData,
+                    ["phone"]: e.target.value,
+                  });
+                }}
+                className=""
+                placeholder="Enter your Mobile"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </React.Fragment>
+  );
+};
