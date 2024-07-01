@@ -143,10 +143,31 @@ const whiteText = "text-white";
 const blackText = "text-black";
 const pinkBg = "bg-[#EC2752]";
 const whiteBg = "bg-white";
+const userToken = sessionStorage.getItem("authToken");
+const id = JSON.parse(sessionStorage.getItem("dataModel"));
+
+const handleSkip = (visible, updateAns) => {
+  switch (visible) {
+    case 1:
+      updateAns("Core");
+      break;
+    case 2:
+      updateAns("Cosmetics");
+      break;
+    case 3:
+      updateAns("Display");
+      break;
+    case 4:
+      updateAns("Functional_major");
+      break;
+    case 5:
+      updateAns("Functional_minor");
+      break;
+  }
+};
 
 function NewDeviceqs() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [questions, setQuestions] = useState([]);
   const { answers, setAnswers } = useQuestionContext();
   const [visible, setVisible] = useState(1);
   const [newGroupanswers, setNewGroupAnswers] = useState();
@@ -155,37 +176,70 @@ function NewDeviceqs() {
   const core = useSelector((state) => state.qna.Core);
   const Cosmetics = useSelector((state) => state.qna.Cosmetics);
   const Display = useSelector((state) => state.qna.Display);
-  const Functional_major = useSelector((state) => state.qna.Functional_major);
-  const Functional_minor = useSelector((state) => state.qna.Functional_minor);
+  const FunctionalMajor = useSelector((state) => state.qna.Functional_major);
+  const FunctionalMinor = useSelector((state) => state.qna.Functional_minor);
   const Warranty = useSelector((state) => state.qna.Warranty);
   const [showPopup, setShowPopup] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [NDstate, dispatch] = useReducer(reducer, initialState);
+  const qna = useSelector((state) => state.qna);
 
   function reducer(state, action) {
-    switch (action.type) {
-      case "SET_GROUP_ANSWERS":
-        return { ...state, [action.group]: action.answers };
-      default:
-        throw new Error();
+    if (action.type === "SET_GROUP_ANSWERS") {
+      return { ...state, [action.group]: action.answers };
+    } else {
+      throw new Error();
     }
   }
-
-  useEffect(() => {
-    const userToken = sessionStorage.getItem("authToken");
-    const fetchData = async () => {
-      try {
-        const apiUrl = `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/findAll?page=0&limit=31`;
-
-        const response = await axios.get(apiUrl, {
-          headers: {
-            authorization: `${userToken}`,
-          },
+  const fetchData = async () => {
+    try {
+      const apiUrl = `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/questionnaires/findAll?page=0&limit=31`;
+      const response = await axios.get(apiUrl, {
+        headers: {
+          authorization: `${userToken}`,
+        },
+      });
+      [
+        "Core",
+        "Cosmetics",
+        "Display",
+        "Functional_major",
+        "Functional_minor",
+        "Warranty",
+      ].forEach((group) => {
+        const answersTemp = response.data.data.filter(
+          (question) => question.group === group
+        );
+        dispatch({ type: "SET_GROUP_ANSWERS", group, answers: answersTemp });
+      });
+      const newPopulateAnswers = response.data.data.map((ele) => ele.default);
+      if (answers.length === 0) {
+        const newAnswers = newPopulateAnswers.map((answer, index) => {
+          if (response.data.data[index].yes === answer) {
+            return {
+              quetion: response.data.data[index].quetion,
+              answer,
+              key: response.data.data[index].yes === answer ? "yes" : "no",
+              group: response.data.data[index].group,
+              selected: Array(response.data.data[index].options.length).fill(
+                true
+              ),
+            };
+          } else {
+            return {
+              quetion: response.data.data[index].quetion,
+              answer,
+              key: response.data.data[index].yes === answer ? "yes" : "no",
+              group: response.data.data[index].group,
+              selected: Array(response.data.data[index].options.length).fill(
+                false
+              ),
+            };
+          }
         });
-
-        //test
+        setAnswers(newAnswers);
+        setNewGroupAnswers(newAnswers);
         [
           "Core",
           "Cosmetics",
@@ -194,167 +248,32 @@ function NewDeviceqs() {
           "Functional_minor",
           "Warranty",
         ].forEach((group) => {
-          const answers = response.data.data.filter(
+          const answersTemp = newAnswers.filter(
             (question) => question.group === group
           );
-          dispatch({ type: "SET_GROUP_ANSWERS", group, answers });
+          store.dispatch(setGroupAnswers({ group, answers: answersTemp }));
         });
-
-        setQuestions(response.data.data);
-        const newPopulateAnswers = response.data.data.map((ele) => ele.default);
-
-        if (answers.length === 0) {
-          const newAnswers = newPopulateAnswers.map((answer, index) => {
-            if (response.data.data[index].yes === answer) {
-              return {
-                quetion: response.data.data[index].quetion,
-                answer,
-                key: response.data.data[index].yes === answer ? "yes" : "no",
-                group: response.data.data[index].group,
-                selected: Array(response.data.data[index].options.length).fill(
-                  true
-                ),
-              };
-            } else {
-              return {
-                quetion: response.data.data[index].quetion,
-                answer,
-                key: response.data.data[index].yes === answer ? "yes" : "no",
-                group: response.data.data[index].group,
-                selected: Array(response.data.data[index].options.length).fill(
-                  false
-                ),
-              };
-            }
-          });
-
-          setAnswers(newAnswers);
-          setNewGroupAnswers(newAnswers);
-
-          [
-            "Core",
-            "Cosmetics",
-            "Display",
-            "Functional_major",
-            "Functional_minor",
-            "Warranty",
-          ].forEach((group) => {
-            const answers = newAnswers.filter(
-              (question) => question.group === group
-            );
-            console.log(answers);
-            store.dispatch(setGroupAnswers({ group, answers }));
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-    const token = sessionStorage.getItem("authToken");
-    if (!token) {
-      navigate("/");
-    }
   }, []);
-
-  function handleADD() {
-    if (showPopup === false) {
-      setVisible(visible + 1);
-    }
-  }
-
-  function handleSubtract() {
-    if (visible > 1) {
-      setVisible(visible - 1);
-    }
-    return;
-  }
-
-  const handlepop = () => {
-    setShowPopup(false);
-  };
-
-  const qna = useSelector((state) => state.qna);
-
-  const handlesubmit = async () => {
-    setIsLoading(true);
-    const token = sessionStorage.getItem("authToken");
-    let id = sessionStorage.getItem("dataModel");
-    id = JSON.parse(id);
-    console.log("vore", state.Core);
-    console.log("vore", qna.Core);
-    const finalPayload = {
-      QNA: qna,
-      phoneNumber: id?.phoneNumber ? id?.phoneNumber : "123456789",
-      modelId: id?.models?._id,
-      storage: id?.models?.config?.storage,
-      ram: id?.models?.config?.RAM,
-
-      name: id?.customerName ? id?.customerName : profile?.name,
-    };
-    const response = await axios.post(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/questionnaires/calculatePrice`,
-      finalPayload,
-      {
-        headers: {
-          Authorization: `${token}`,
-        },
-      }
-    );
-    
-
-    sessionStorage.setItem("LeadId", response.data.data.id);
-    sessionStorage.setItem(
-      "responsedatadata",
-      JSON.stringify(response.data.data)
-    );
-    sessionStorage.setItem("ExactQuote", true);
-    store.dispatch(setResponseData(response.data.data));
-    
-    setIsLoading(false);
-    navigate("/devicequote");
-  };
-
-  const backHandler = () => {
-    navigate("/selectmodel");
-  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [visible]);
 
   const updateAns = (group) => {
-    let answers = newGroupanswers.filter(
+    const answers = newGroupanswers.filter(
       (question) => question.group === group
     );
-
     store.dispatch(setGroupAnswers({ group, answers }));
-
     if (showPopup === false) {
       setVisible(visible + 1);
-    }
-  };
-
-  const handleSkip = () => {
-    switch (visible) {
-      case 1:
-        updateAns("Core");
-        break;
-      case 2:
-        updateAns("Cosmetics");
-        break;
-      case 3:
-        updateAns("Display");
-        break;
-      case 4:
-        updateAns("Functional_major");
-        break;
-      case 5:
-        updateAns("Functional_minor");
-        break;
     }
   };
 
@@ -362,20 +281,15 @@ function NewDeviceqs() {
     <>
       <div className={`popup ${showPopup ? "show" : ""}`}>
         <img src={banner} alt="banner" />
-
         <div className="text">
-          Help us calculate your device value correctly by answering to the
-          following questions
+          Help us calculate your device value correctly by answering to the following questions
         </div>
-
-        <button onClick={handlepop}> Got it</button>
+        <button onClick={() => setShowPopup(false)}> Got it</button>
       </div>
-
       <div className="mainQContainer">
         <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-28 "
@@ -386,13 +300,12 @@ function NewDeviceqs() {
         </div>
         <div className={`${styless.quick_page_nav}`}>
           <IoIosArrowBack
-            onClick={backHandler}
+            onClick={() => navigate("/selectmodel")}
             size={25}
             className="ml-2 text-[#EC2752]"
           />
           <p className="ml-2 text-xl font-medium">Device Details</p>
         </div>
-
         <div
           className={`${styles.search_box_wrap} mt-[15px] mb-[5px] w-[90vw]`}
         >
@@ -404,7 +317,7 @@ function NewDeviceqs() {
             </div>
             <input
               placeholder="Search Question"
-              onChange={() => console.log("state is ", state)}
+              onChange={() => console.log("state is ", NDstate)}
               onClick={() => setIsSearchOpen(true)}
               className="inline w-full mx-2 bg-gray-200 outline-none"
               type="text"
@@ -412,15 +325,12 @@ function NewDeviceqs() {
             {isSearchOpen && (
               <QuestionSearch
                 setIsSearchOpen={setIsSearchOpen}
-                state={state}
+                state={NDstate}
                 dispatch={dispatch}
               />
             )}
           </div>
         </div>
-
-        
-
         <div className="innerContainer">
           <div className={`maindata`}>
             <div className="text-lg font-medium tracking-tight text-{1.325rem}">
@@ -428,439 +338,491 @@ function NewDeviceqs() {
             </div>
             <div className="underline"></div>
             <div className="questionList">
-              {visible === 1 && (
-                <div className="containClass">
-                  <div className="subheading">
-                    <GoDotFill size={15} />
-                    <h2>Basic Condition of the Device</h2>
-                  </div>
-                  <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
-                    {state.Core &&
-                      state.Core.map((data, index) => (
-                        <React.Fragment key={data._id}>
-                          {data?.options.map((option, optionIndex) => (
-                            <React.Fragment key={optionIndex}>
-                              <div
-                                onClick={(e) => {
-                                  console.log(core);
-                                  console.log("assssaaaaa", option);
-                                  console.log("assssaaaaa", data);
-                                  console.log(optionIndex + "ok");
-                                  store.dispatch(
-                                    updateCoreObject({
-                                      index: index,
-                                      yesKey: data.yes,
-                                      noKey: data.no,
-                                      newKey: "yes",
-                                      selectedIndex: optionIndex,
-                                    })
-                                  );
-                                }}
-                                className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                                  !core[index].selected[optionIndex]
-                                    ? whiteBg
-                                    : pinkBg
-                                }`}
-                              >
-                                <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                                  <img
-                                    className="scale-[1.2]"
-                                    src={imageMap[option.img]}
-                                  />
-                                </div>
-                                <div className="border-t-[1.5px] w-full py-2">
-                                  <p
-                                    className={`text-xs font-medium text-center ${
-                                      !core[index].selected[optionIndex]
-                                        ? blackText
-                                        : whiteText
-                                    }`}
-                                  >
-                                    {option.caption}
-                                  </p>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          ))}
-                        </React.Fragment>
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {/* //for cosmetics */}
+              {visible === 1 && <FirstPart NDstate={NDstate} core={core} />}
               {visible === 2 && (
-                <div className="containClass">
-                  <div className="subheading">
-                    <GoDotFill size={20} />
-                    <h2>Physical Condition of the Device</h2>
-                  </div>
-                  <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
-                    {state.Cosmetics &&
-                      state.Cosmetics.map((data, index) => (
-                        <React.Fragment key={data._id}>
-                          {data?.options.map((option, optionIndex) => (
-                            <React.Fragment key={optionIndex}>
-                              <div
-                                onClick={(e) => {
-                                  console.log(Cosmetics);
-                                  console.log("assssaaaaa", option);
-                                  console.log("assssaaaaa", data);
-                                  console.log(optionIndex + "ok");
-                                  store.dispatch(
-                                    updateCosmeticsObject({
-                                      index: index,
-                                      yesKey: data.yes,
-                                      noKey: data.no,
-                                      newKey: "yes",
-                                      selectedIndex: optionIndex,
-                                    })
-                                  );
-                                }}
-                                className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                                  !Cosmetics[index].selected[optionIndex]
-                                    ? whiteBg
-                                    : pinkBg
-                                }`}
-                              >
-                                <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                                  <img
-                                    className="scale-[1.2]"
-                                    src={imageMap[option.img]}
-                                  />
-                                </div>
-                                <div className="border-t-[1.5px] w-full py-2">
-                                  <p
-                                    className={`text-xs font-medium text-center ${
-                                      !Cosmetics[index].selected[optionIndex]
-                                        ? blackText
-                                        : whiteText
-                                    }`}
-                                  >
-                                    {option.caption}
-                                  </p>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          ))}
-                        </React.Fragment>
-                      ))}
-                  </div>
-                </div>
+                <SecondPart Cosmetics={Cosmetics} NDstate={NDstate} />
               )}
-
-              {/* //for display */}
-
               {visible === 3 && (
-                <div className="containClass">
-                  <div className="subheading">
-                    <GoDotFill size={20} />
-                    <h2>Display Condition of the Device</h2>
-                  </div>
-                  <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
-                    {state.Display &&
-                      state.Display.map((data, index) => (
-                        <React.Fragment key={data._id}>
-                          {data?.options.map((option, optionIndex) => (
-                            <React.Fragment key={optionIndex}>
-                              <div
-                                onClick={(e) => {
-                                  console.log(Display);
-                                  console.log("assssaaaaa", option);
-                                  console.log("assssaaaaa", data);
-                                  console.log(optionIndex + "ok");
-                                  store.dispatch(
-                                    updateDisplayObject({
-                                      index: index,
-                                      yesKey: data.yes,
-                                      noKey: data.no,
-                                      newKey: "yes",
-                                      selectedIndex: optionIndex,
-                                    })
-                                  );
-                                }}
-                                className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                                  !Display[index].selected[optionIndex]
-                                    ? whiteBg
-                                    : pinkBg
-                                }`}
-                              >
-                                <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                                  <img
-                                    className="scale-[1.2]"
-                                    src={imageMap[option.img]}
-                                  />
-                                </div>
-                                <div className="border-t-[1.5px] w-full py-2">
-                                  <p
-                                    className={`text-xs font-medium text-center ${
-                                      !Display[index].selected[optionIndex]
-                                        ? blackText
-                                        : whiteText
-                                    }`}
-                                  >
-                                    {option.caption}
-                                  </p>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          ))}
-                        </React.Fragment>
-                      ))}
-                  </div>
-                </div>
+                <ThirdPart Display={Display} NDstate={NDstate} />
               )}
-
-              {/* //Functional_major*/}
-
               {visible === 4 && (
-                <div className="containClass">
-                  <div className="subheading">
-                    <GoDotFill size={20} />
-                    <h2>Functional Condition of the Device</h2>
-                  </div>
-                  <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
-                    {state.Functional_major &&
-                      state.Functional_major.map((data, index) => (
-                        <React.Fragment key={data._id}>
-                          {data?.options.map((option, optionIndex) => (
-                            <React.Fragment key={optionIndex}>
-                              <div
-                                onClick={(e) => {
-                                  console.log(Functional_major);
-                                  console.log("assssaaaaa", option);
-                                  console.log("assssaaaaa", data);
-                                  console.log(optionIndex + "ok");
-                                  store.dispatch(
-                                    updateFunctionalMajorObject({
-                                      index: index,
-                                      yesKey: data.yes,
-                                      noKey: data.no,
-                                      newKey: "yes",
-                                      selectedIndex: optionIndex,
-                                    })
-                                  );
-                                }}
-                                className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                                  !Functional_major[index].selected[optionIndex]
-                                    ? whiteBg
-                                    : pinkBg
-                                }`}
-                              >
-                                <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                                  <img
-                                    className="scale-[1.2]"
-                                    src={imageMap[option.img]}
-                                  />
-                                </div>
-                                <div className="border-t-[1.5px] w-full py-2">
-                                  <p
-                                    className={`text-xs font-medium text-center ${
-                                      !Functional_major[index].selected[
-                                        optionIndex
-                                      ]
-                                        ? blackText
-                                        : whiteText
-                                    }`}
-                                  >
-                                    {option.caption}
-                                  </p>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          ))}
-                        </React.Fragment>
-                      ))}
-                  </div>
-                </div>
+                <FourthPart FunctionalMajor={FunctionalMajor} NDstate={NDstate} />
               )}
-
-              {/* //for Functional_minor */}
               {visible === 5 && (
-                <div className="containClass">
-                  <div className="subheading">
-                    <GoDotFill size={20} />
-                    <h2>Functional Condition of the Device</h2>
-                  </div>
-                  <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
-                    {state.Functional_minor &&
-                      state.Functional_minor.map((data, index) => (
-                        <React.Fragment key={data._id}>
-                          {data?.options.map((option, optionIndex) => (
-                            <React.Fragment key={optionIndex}>
-                              <div
-                                onClick={(e) => {
-                                  console.log(Functional_minor);
-                                  console.log("assssaaaaa", option);
-                                  console.log("assssaaaaa", data);
-                                  console.log(optionIndex + "ok");
-                                  store.dispatch(
-                                    updateFunctionalMinorObject({
-                                      index: index,
-                                      yesKey: data.yes,
-                                      noKey: data.no,
-                                      newKey: "yes",
-                                      selectedIndex: optionIndex,
-                                    })
-                                  );
-                                }}
-                                className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                                  !Functional_minor[index].selected[optionIndex]
-                                    ? whiteBg
-                                    : pinkBg
-                                }`}
-                              >
-                                <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                                  <img
-                                    className="scale-[1.2]"
-                                    src={imageMap[option.img]}
-                                  />
-                                </div>
-                                <div className="border-t-[1.5px] w-full py-2">
-                                  <p
-                                    className={`text-xs font-medium text-center ${
-                                      !Functional_minor[index].selected[
-                                        optionIndex
-                                      ]
-                                        ? blackText
-                                        : whiteText
-                                    }`}
-                                  >
-                                    {option.caption}
-                                  </p>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          ))}
-                        </React.Fragment>
-                      ))}
-                  </div>
-                </div>
+                <FifthPart FunctionalMinor={FunctionalMinor} NDstate={NDstate} />
               )}
-
-              {/* //fro Warranty */}
               {visible === 6 && (
-                <div className="containClass">
-                  <div className="subheading">
-                    <GoDotFill size={20} />
-                    <h2>Basic Condition of the Device</h2>
-                  </div>
-                  <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
-                    {state.Warranty &&
-                      state.Warranty.map((data, index) => (
-                        <React.Fragment key={data._id}>
-                          {data?.options.map((option, optionIndex) => (
-                            <React.Fragment key={optionIndex}>
-                              <div
-                                onClick={(e) => {
-                                  console.log(Warranty);
-                                  console.log("assssaaaaa", option);
-                                  console.log("assssaaaaa", data);
-                                  console.log(optionIndex + "ok");
-                                  store.dispatch(
-                                    updateWarrantyObject({
-                                      index: index,
-                                      newAnswer: data.yes,
-                                      newKey: "yes",
-                                    })
-                                  );
-                                }}
-                                className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                                  !Warranty[index].selected[optionIndex]
-                                    ? whiteBg
-                                    : pinkBg
-                                }`}
-                              >
-                                <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                                  <img
-                                    className="scale-[1.2]"
-                                    src={imageMap[option.img]}
-                                  />
-                                </div>
-                                <div className="border-t-[1.5px] w-full py-2">
-                                  <p
-                                    className={`text-xs font-medium text-center ${
-                                      !Warranty[index].selected[optionIndex]
-                                        ? blackText
-                                        : whiteText
-                                    }`}
-                                  >
-                                    {option.caption}
-                                  </p>
-                                </div>
-                              </div>
-                            </React.Fragment>
-                          ))}
-                        </React.Fragment>
-                      ))}
-                  </div>
-                </div>
+                <SixthPart Warranty={Warranty} NDstate={NDstate} />
               )}
             </div>
           </div>
         </div>
-
-        {visible >= 6 ? (
-          <div className="fixed bottom-0 flex justify-center w-full gap-2 p-3 bg-white border-t-2">
-            <div
-              onClick={handleSubtract}
-              className={`bg-[#EC2752] w-[20%] px-6 py-2 rounded-lg flex items-center`}
-            >
-              <ImArrowLeft color="white" size={20} />
-            </div>
-            <button
-              onClick={handleSkip}
-              disabled
-              className={` bg-slate-400  w-[30%] py-1 px-2 text-center rounded-lg cursor-not-allowed flex justify-between text-white items-center`}
-            >
-              <p className="w-full p-1 text-xl font-medium">Skip</p>
-            </button>
-            <div
-              onClick={handlesubmit}
-              className="bg-[#EC2752] w-[50%] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
-            >
-              {isLoading && (
-                <CgSpinner
-                  size={20}
-                  className="absolute left-[28%] top-[8px] mt-1 animate-spin"
-                />
-              )}
-              <p className="w-full p-1 text-xl font-medium">
-                {isLoading ? "Submitting" : "Submit"}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="fixed bottom-0 justify-center flex w-full gap-2 p-3 bg-white border-t-2">
-            {visible > 0 && visible <= 6 && (
-              <button
-                onClick={handleSubtract}
-                className={`  ${
-                  visible < 2
-                    ? "bg-slate-400 cursor-not-allowed"
-                    : "bg-[#EC2752] cursor-pointer"
-                }  w-[20%] px-6 py-2 rounded-lg flex items-center`}
-              >
-                <ImArrowLeft color="white" size={20} />
-              </button>
-            )}
-            <div
-              onClick={handleSkip}
-              className="bg-[#EC2752] w-[30%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
-            >
-              <p className="w-full p-1 text-xl font-medium">Skip</p>
-            </div>
-            <div
-              onClick={handleADD}
-              className="bg-[#EC2752] w-[50%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
-            >
-              <p className="w-full p-1 text-xl font-medium">Continue</p>
-            </div>
-          </div>
-        )}
+        <AboveSix visible={visible} setVisible={setVisible} updateAns={updateAns} 
+          showPopup={showPopup} qna={qna} profile={profile} />
       </div>
     </>
   );
 }
 
 export default NewDeviceqs;
+
+const FirstPart = ({ NDstate, core }) => {
+  return (
+    <div className="containClass">
+      <div className="subheading">
+        <GoDotFill size={15} />
+        <h2>Basic Condition of the Device</h2>
+      </div>
+      <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
+        {NDstate.Core &&
+          NDstate.Core.map((data, index) => (
+            <React.Fragment key={data._id}>
+              {data?.options.map((option, optionIndex) => (
+                <React.Fragment key={optionIndex}>
+                  <div
+                    onClick={(e) => {
+                      console.log(core);
+                      console.log("assssaaaaa", option);
+                      console.log("assssaaaaa", data);
+                      console.log(optionIndex + "ok");
+                      store.dispatch(
+                        updateCoreObject({
+                          index: index,
+                          yesKey: data.yes,
+                          noKey: data.no,
+                          newKey: "yes",
+                          selectedIndex: optionIndex,
+                        })
+                      );
+                    }}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                      !core[index].selected[optionIndex] ? whiteBg : pinkBg
+                    }`}
+                  >
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    </div>
+                    <div className="border-t-[1.5px] w-full py-2">
+                      <p
+                        className={`text-xs font-medium text-center ${
+                          !core[index].selected[optionIndex]
+                            ? blackText
+                            : whiteText
+                        }`}
+                      >
+                        {option.caption}
+                      </p>
+                    </div>
+                  </div>
+                </React.Fragment>
+              ))}
+            </React.Fragment>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+const SecondPart = ({ NDstate, Cosmetics }) => {
+  return (
+    <div className="containClass">
+      <div className="subheading">
+        <GoDotFill size={20} />
+        <h2>Physical Condition of the Device</h2>
+      </div>
+      <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
+        {NDstate.Cosmetics &&
+          NDstate.Cosmetics.map((data, index) => (
+            <React.Fragment key={data._id}>
+              {data?.options.map((option, optionIndex) => (
+                <React.Fragment key={optionIndex}>
+                  <div
+                    onClick={(e) => {
+                      console.log(Cosmetics);
+                      console.log("assssaaaaa", option);
+                      console.log("assssaaaaa", data);
+                      console.log(optionIndex + "ok");
+                      store.dispatch(
+                        updateCosmeticsObject({
+                          index: index,
+                          yesKey: data.yes,
+                          noKey: data.no,
+                          newKey: "yes",
+                          selectedIndex: optionIndex,
+                        })
+                      );
+                    }}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                      !Cosmetics[index].selected[optionIndex] ? whiteBg : pinkBg
+                    }`}
+                  >
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    </div>
+                    <div className="border-t-[1.5px] w-full py-2">
+                      <p
+                        className={`text-xs font-medium text-center ${
+                          !Cosmetics[index].selected[optionIndex]
+                            ? blackText
+                            : whiteText
+                        }`}
+                      >
+                        {option.caption}
+                      </p>
+                    </div>
+                  </div>
+                </React.Fragment>
+              ))}
+            </React.Fragment>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+const ThirdPart = ({ NDstate, Display }) => {
+  return (
+    <div className="containClass">
+      <div className="subheading">
+        <GoDotFill size={20} />
+        <h2>Display Condition of the Device</h2>
+      </div>
+      <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
+        {NDstate.Display &&
+          NDstate.Display.map((data, index) => (
+            <React.Fragment key={data._id}>
+              {data?.options.map((option, optionIndex) => (
+                <React.Fragment key={optionIndex}>
+                  <div
+                    onClick={(e) => {
+                      console.log(Display);
+                      console.log("assssaaaaa", option);
+                      console.log("assssaaaaa", data);
+                      console.log(optionIndex + "ok");
+                      store.dispatch(
+                        updateDisplayObject({
+                          index: index,
+                          yesKey: data.yes,
+                          noKey: data.no,
+                          newKey: "yes",
+                          selectedIndex: optionIndex,
+                        })
+                      );
+                    }}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                      !Display[index].selected[optionIndex] ? whiteBg : pinkBg
+                    }`}
+                  >
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    </div>
+                    <div className="border-t-[1.5px] w-full py-2">
+                      <p
+                        className={`text-xs font-medium text-center ${
+                          !Display[index].selected[optionIndex]
+                            ? blackText
+                            : whiteText
+                        }`}
+                      >
+                        {option.caption}
+                      </p>
+                    </div>
+                  </div>
+                </React.Fragment>
+              ))}
+            </React.Fragment>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+const FourthPart = ({ FunctionalMajor, NDstate }) => {
+  return (
+    <div className="containClass">
+      <div className="subheading">
+        <GoDotFill size={20} />
+        <h2>Functional Condition of the Device</h2>
+      </div>
+      <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
+        {NDstate?.Functional_major &&
+          NDstate?.Functional_major.map((data, index) => (
+            <React.Fragment key={data._id}>
+              {data?.options.map((option, optionIndex) => (
+                <React.Fragment key={optionIndex}>
+                  <div
+                    onClick={(e) => {
+                      console.log(FunctionalMajor);
+                      console.log("assssaaaaa", option);
+                      console.log("assssaaaaa", data);
+                      console.log(optionIndex + "ok");
+                      store.dispatch(
+                        updateFunctionalMajorObject({
+                          index: index,
+                          yesKey: data.yes,
+                          noKey: data.no,
+                          newKey: "yes",
+                          selectedIndex: optionIndex,
+                        })
+                      );
+                    }}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                      !FunctionalMajor[index].selected[optionIndex]
+                        ? whiteBg
+                        : pinkBg
+                    }`}
+                  >
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    </div>
+                    <div className="border-t-[1.5px] w-full py-2">
+                      <p
+                        className={`text-xs font-medium text-center ${
+                          !FunctionalMajor[index].selected[optionIndex]
+                            ? blackText
+                            : whiteText
+                        }`}
+                      >
+                        {option.caption}
+                      </p>
+                    </div>
+                  </div>
+                </React.Fragment>
+              ))}
+            </React.Fragment>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+const FifthPart = ({ FunctionalMinor, NDstate }) => {
+  return (
+    <div className="containClass">
+      <div className="subheading">
+        <GoDotFill size={20} />
+        <h2>Functional Condition of the Device</h2>
+      </div>
+      <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
+        {NDstate?.Functional_minor &&
+          NDstate?.Functional_minor.map((data, index) => (
+            <React.Fragment key={data._id}>
+              {data?.options.map((option, optionIndex) => (
+                <React.Fragment key={optionIndex}>
+                  <div
+                    onClick={(e) => {
+                      console.log(FunctionalMinor);
+                      console.log("assssaaaaa", option);
+                      console.log("assssaaaaa", data);
+                      console.log(optionIndex + "ok");
+                      store.dispatch(
+                        updateFunctionalMinorObject({
+                          index: index,
+                          yesKey: data.yes,
+                          noKey: data.no,
+                          newKey: "yes",
+                          selectedIndex: optionIndex,
+                        })
+                      );
+                    }}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                      !FunctionalMinor[index].selected[optionIndex]
+                        ? whiteBg
+                        : pinkBg
+                    }`}
+                  >
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    </div>
+                    <div className="border-t-[1.5px] w-full py-2">
+                      <p
+                        className={`text-xs font-medium text-center ${
+                          !FunctionalMinor[index].selected[optionIndex]
+                            ? blackText
+                            : whiteText
+                        }`}
+                      >
+                        {option.caption}
+                      </p>
+                    </div>
+                  </div>
+                </React.Fragment>
+              ))}
+            </React.Fragment>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+const SixthPart = ({ Warranty, NDstate }) => {
+  return (
+    <div className="containClass">
+      <div className="subheading">
+        <GoDotFill size={20} />
+        <h2>Basic Condition of the Device</h2>
+      </div>
+      <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
+        {NDstate?.Warranty &&
+          NDstate?.Warranty.map((data, index) => (
+            <React.Fragment key={data._id}>
+              {data?.options.map((option, optionIndex) => (
+                <React.Fragment key={optionIndex}>
+                  <div
+                    onClick={(e) => {
+                      console.log(Warranty);
+                      console.log("assssaaaaa", option);
+                      console.log("assssaaaaa", data);
+                      console.log(optionIndex + "ok");
+                      store.dispatch(
+                        updateWarrantyObject({
+                          index: index,
+                          newAnswer: data.yes,
+                          newKey: "yes",
+                        })
+                      );
+                    }}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                      !Warranty[index].selected[optionIndex] ? whiteBg : pinkBg
+                    }`}
+                  >
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    </div>
+                    <div className="border-t-[1.5px] w-full py-2">
+                      <p
+                        className={`text-xs font-medium text-center ${
+                          !Warranty[index].selected[optionIndex]
+                            ? blackText
+                            : whiteText
+                        }`}
+                      >
+                        {option.caption}
+                      </p>
+                    </div>
+                  </div>
+                </React.Fragment>
+              ))}
+            </React.Fragment>
+          ))}
+      </div>
+    </div>
+  );
+};
+
+const AboveSix = ({
+  visible,
+  setVisible,
+  updateAns,
+  showPopup,
+  qna,
+  profile,
+}) => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  function handleADD() {
+    if (showPopup === false) {
+      setVisible(visible + 1);
+    }
+  }
+
+  function handleSubtract() {
+    if (visible > 1) {
+      setVisible(visible - 1);
+    }
+  }
+
+  const handlesubmit = async () => {
+    setIsLoading(true);
+    console.log(id, profile)
+    const finalPayload = {
+      QNA: qna,
+      phoneNumber: id?.phoneNumber ? id?.phoneNumber : "123456789",
+      modelId: id?.models?._id,
+      storage: id?.models?.config?.storage,
+      ram: id?.models?.config?.RAM,
+      name: id?.customerName ? id?.customerName : profile?.name,
+    };
+    console.log(finalPayload);
+    const response = await axios.post(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/questionnaires/calculatePrice`,
+      finalPayload,
+      { headers: { Authorization: userToken } }
+    );
+    sessionStorage.setItem("LeadId", response.data.data.id);
+    sessionStorage.setItem(
+      "responsedatadata",
+      JSON.stringify(response.data.data)
+    );
+    sessionStorage.setItem("ExactQuote", true);
+    store.dispatch(setResponseData(response.data.data));
+    setIsLoading(false);
+    navigate("/devicequote");
+  };
+
+  return (
+    <React.Fragment>
+      {visible >= 6 ? (
+        <div className="fixed bottom-0 flex justify-center w-full gap-2 p-3 bg-white border-t-2">
+          <div
+            onClick={handleSubtract}
+            className={`bg-[#EC2752] w-[20%] px-6 py-2 rounded-lg flex items-center`}
+          >
+            <ImArrowLeft color="white" size={20} />
+          </div>
+          <button
+            onClick={() => handleSkip(visible, updateAns)}
+            disabled
+            className={` bg-slate-400  w-[30%] py-1 px-2 text-center rounded-lg cursor-not-allowed flex justify-between text-white items-center`}
+          >
+            <p className="w-full p-1 text-xl font-medium">Skip</p>
+          </button>
+          <div
+            onClick={handlesubmit}
+            className="bg-[#EC2752] w-[50%] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
+          >
+            {isLoading && (
+              <CgSpinner
+                size={20}
+                className="absolute left-[28%] top-[8px] mt-1 animate-spin"
+              />
+            )}
+            <p className="w-full p-1 text-xl font-medium">
+              {isLoading ? "Submitting" : "Submit"}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="fixed bottom-0 justify-center flex w-full gap-2 p-3 bg-white border-t-2">
+          {visible > 0 && visible <= 6 && (
+            <button
+              onClick={handleSubtract}
+              className={`  ${
+                visible < 2
+                  ? "bg-slate-400 cursor-not-allowed"
+                  : "bg-[#EC2752] cursor-pointer"
+              }  w-[20%] px-6 py-2 rounded-lg flex items-center`}
+            >
+              <ImArrowLeft color="white" size={20} />
+            </button>
+          )}
+          <div
+            onClick={() => handleSkip(visible, updateAns)}
+            className="bg-[#EC2752] w-[30%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
+          >
+            <p className="w-full p-1 text-xl font-medium">Skip</p>
+          </div>
+          <div
+            onClick={handleADD}
+            className="bg-[#EC2752] w-[50%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
+          >
+            <p className="w-full p-1 text-xl font-medium">Continue</p>
+          </div>
+        </div>
+      )}
+    </React.Fragment>
+  );
+};

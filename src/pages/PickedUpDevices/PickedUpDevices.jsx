@@ -23,6 +23,7 @@ const failTextColor = "text-[#EC2752]";
 const token = sessionStorage.getItem("authToken");
 const PendingConf = "Pending Pickup Confirmation";
 const PayrollApp = "Payroll Approval Rejected";
+const PickConf = "Pickup Confirmed";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const userRole = LoggedInUser?.role || "";
 
@@ -209,15 +210,12 @@ const ExtComps = ({
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
 
-  const statusUpdateHandler = (refID, newStatus) => {
-    setIsTableLoaded(true);
+  const statusUpdHandler = (refID, newStatus) => {
     setConfMod(false);
+    setIsTableLoaded(true);
     const config = {
       method: "post",
-      maxBodyLength: Infinity,
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/update`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pickupDevices/update`,
       headers: { Authorization: token },
       data: JSON.stringify({
         refIDs: [refID],
@@ -228,18 +226,16 @@ const ExtComps = ({
       .request(config)
       .then((response) => {
         getData();
-        setErrorMsg(
-          `Successfully updated the status of lot ${refID} to ${newStatus}`
-        );
-        if (newStatus === "Pickup Confirmed") {
-          setErrorMsg(`Pickup Confirmed for lot ${refID}, check it on history`);
+        setErrorMsg(`Successfully Updated Status of Lot ${refID} to ${newStatus}`);
+        if (newStatus === PickConf) {
+          setErrorMsg(`Pickup Confirmed for Lot ${refID}, check it on history`);
         }
-        setSuccessMod(true);
         setIsTableLoaded(false);
+        setSuccessMod(true);
       })
       .catch((error) => {
         setErrorMsg(
-          `Failed to updated the status of lot ${refID} to ${newStatus}`
+          `Failed to Updated Status of Lot ${refID} to ${newStatus}`
         );
         setFailMode(true);
         setIsTableLoaded(false);
@@ -304,7 +300,7 @@ const ExtComps = ({
             </p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => statusUpdateHandler(tempId, "Pickup Confirmed")}
+                onClick={() => statusUpdHandler(tempId, PickConf)}
                 className={"bg-[#EC2752] text-white"}
               >
                 Okay
@@ -519,7 +515,7 @@ const PickedUpDevicesTable = ({
         setErrorMsg(
           `Successfully updated the status of lot ${refID} to ${newStatus}`
         );
-        if (newStatus === "Pickup Confirmed") {
+        if (newStatus === PickConf) {
           setErrorMsg(`Pickup Confirmed for lot ${refID}, check it on history`);
         }
         setSuccessMod(true);
