@@ -24,7 +24,7 @@ const downloadExcelQuotesAdminCreated = (apiData) => {
     let questionsKeys = "";
     let index = 1;
     console.log(item?.lead?.QNA[0]);
-    for (let group in item?.lead?.QNA[0]) {
+    for (const group in item?.lead?.QNA[0]) {
       item.lead.QNA[0][group].forEach((qna) => {
         questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
         index++;
@@ -116,7 +116,7 @@ const QuotesCreatedAdmin = () => {
 
   const getStore = () => {
     setIsTableLoaded(true);
-    let config = {
+    const config = {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -210,13 +210,13 @@ const QuotesCreatedAdmin = () => {
             onChange={(e) => setSearchValue(e.target.value)}
             className="text-sm"
             type="text"
-            placeholder="Search..."
             value={searchValue}
+            placeholder="Search...."
           />
-          <IoMdSearch onClick={handleSearchClick} size={25} />
+          <IoMdSearch onClick={handleSearchClick}  size={25} />
         </div>
         <div className={styles.icons_box}>
-          <IoRefresh onClick={handleSearchClear} className="" size={25} />
+          <IoRefresh onClick={handleSearchClear} className=" " size={25} />
         </div>
         <button
           className={`${styles.bulkdown_button}`}

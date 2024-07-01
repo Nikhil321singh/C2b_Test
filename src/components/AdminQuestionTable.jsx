@@ -89,8 +89,6 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
       });
   }
 
-  //hndle Edit
-
   async function handleEdit(val) {
     setQsmodel(true);
     setGroup(val.group);

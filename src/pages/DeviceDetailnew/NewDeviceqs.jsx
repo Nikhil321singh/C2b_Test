@@ -357,7 +357,7 @@ function NewDeviceqs() {
             </div>
           </div>
         </div>
-        <AboveSix visible={visible} setVisible={setVisible} updateAns={updateAns} 
+        <AboveSix visible={visible} setVisible={setVisible} updateAns={updateAns}
           showPopup={showPopup} qna={qna} profile={profile} />
       </div>
     </>

@@ -219,7 +219,7 @@ const RegisterUser = () => {
               View Details
             </button>
           </div>
-          <UserForm formData={formData} submitHandler={submitHandler} handleChange={handleChange} 
+          <UserForm formData={formData} submitHandler={submitHandler} handleChange={handleChange}
           isGrest={isGrest} setIsGrest={setIsGrest} storeData={storeData} companyData={companyData}/>
         </div>
       </div>
@@ -316,8 +316,8 @@ const UserForm = ({ formData, submitHandler, handleChange, isGrest, setIsGrest, 
         <input
           onChange={() => setIsGrest("yes")}
           type="radio"
-          id="yes"
           value="yes"
+          id="yes"
           name="GrestUser"
           checked={isGrest === "yes"}
           className="hidden"
@@ -332,8 +332,8 @@ const UserForm = ({ formData, submitHandler, handleChange, isGrest, setIsGrest, 
         <input
           onChange={() => setIsGrest("no")}
           type="radio"
-          id="no"
           value="no"
+          id="no"
           name="GrestUser"
           checked={isGrest === "no"}
           className="hidden"
@@ -345,17 +345,17 @@ const UserForm = ({ formData, submitHandler, handleChange, isGrest, setIsGrest, 
   <label className="flex flex-col w-[70%] gap-2">
     <span className="font-medium text-xl">Company Name*</span>
     <select
-      id="companyId"
       name="companyId"
+      id="companyId"
       value={formData.companyId}
-      className="outline-none text-base border-2 px-2 py-2 rounded-lg"
+      className="outline-none text-base border-2 p-2 rounded-lg"
       onChange={handleChange}
       required
     >
       <option value="">None</option>
       {companyData.map((item) => (
-        <option key={item._id} value={item._id}>
-          {item.companyName}
+        <option key={item._id } value={item._id }>
+          {item.companyName }
         </option>
       ))}
     </select>
@@ -363,17 +363,17 @@ const UserForm = ({ formData, submitHandler, handleChange, isGrest, setIsGrest, 
   <label className="flex flex-col w-[70%] gap-2">
     <span className="font-medium text-xl">Store Name*</span>
     <select
-      id="storeId"
       name="storeId"
+      id="storeId"
       value={formData.storeId}
-      className="outline-none text-base border-2 px-2 py-2 rounded-lg"
+      className="outline-none text-base border-2 p-2 rounded-lg"
       onChange={handleChange}
       required
     >
-      <option value="">None</option>
+      <option value=""> None </option>
       {storeData.map((item) => (
         <option key={item._id} value={item._id}>
-          {`${item.storeName}, ${item.region}`}
+          {`${item.storeName }, ${item.region }`}
         </option>
       ))}
     </select>

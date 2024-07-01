@@ -228,7 +228,8 @@ const RegisterUserDetails = () => {
                 className={"bg-[#EC2752] text-white"}>Okay</button>
               <button
                 onClick={() => {
-                  setConfBox(false); setIsTableLoaded(false);
+                  setConfBox(false);
+                  setIsTableLoaded(false);
                 }} className="bg-white text-[#EC2752]">
                 Cancel
               </button>
