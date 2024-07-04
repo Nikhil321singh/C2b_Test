@@ -23,7 +23,10 @@ const failTextColor = "text-[#EC2752]";
 const token = sessionStorage.getItem("authToken");
 const PendingConf = "Pending Pickup Confirmation";
 const PayrollApp = "Payroll Approval Rejected";
-const PickConf = "Pickup Confirmed";
+const PickConf = "Pickup Confirmed";//Technican
+const PickDelivered = "Pickup Delivered At Warehouse";//Technican
+const ApprovDelivery = "Approved Delivery At Warehouse";//Admin Manager
+const FinalStatus = "Payment Confirmed";//Admin Manager
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const userRole = LoggedInUser?.role || "";
 
@@ -137,6 +140,7 @@ const PickedUpDevices = () => {
   }, [dateValue, storeName, region]);
 
   const confHandler = (id) => {
+    console.log(id)
     setTempId(id);
     setIsTableLoaded(true);
     setConfMod(true);
@@ -217,10 +221,10 @@ const ExtComps = ({
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/pickupDevices/update`,
       headers: { Authorization: token },
-      data: JSON.stringify({
+      data: {
         refIDs: [refID],
         newStatus: newStatus,
-      }),
+      },
     };
     axios
       .request(config)
@@ -229,7 +233,7 @@ const ExtComps = ({
         setErrorMsg(
           `Successfully Updated Status of Lot ${refID} to ${newStatus}`
         );
-        if (newStatus === PickConf) {
+        if (newStatus === FinalStatus) {
           setErrorMsg(`Pickup Confirmed for Lot ${refID}, check it on history`);
         }
         setIsTableLoaded(false);
@@ -300,7 +304,7 @@ const ExtComps = ({
             </p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => statusUpdHandler(tempId, PickConf)}
+                onClick={() => statusUpdHandler(tempId, FinalStatus)}
                 className={"bg-[#EC2752] text-white"}
               >
                 Okay
@@ -503,11 +507,12 @@ const PickedUpDevicesTable = ({
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/pickupDevices/update`,
       headers: { Authorization: token },
-      data: JSON.stringify({
+      data: {
         refIDs: [refID],
         newStatus: newStatus,
-      }),
+      },
     };
+    console.log(config)
     axios
       .request(config)
       .then((response) => {
@@ -518,6 +523,7 @@ const PickedUpDevicesTable = ({
         if (newStatus === PickConf) {
           setErrorMsg(`Pickup Confirmed for lot ${refID}, check it on history`);
         }
+        console.log(response);
         setSuccessMod(true);
         setIsTableLoaded(false);
       })
@@ -565,7 +571,6 @@ const PickedUpDevicesTable = ({
                       </button>
                     </div>
                   )}
-
                   {(userRole === "Super Admin" ||
                     userRole === "Admin Manager") && (
                     <div className="flex flex-col gap-1">
@@ -595,7 +600,6 @@ const PickedUpDevicesTable = ({
                           </button>
                         </div>
                       )}
-
                       {val?.status === PayrollApp && (
                         <button
                           onClick={() =>
@@ -606,7 +610,6 @@ const PickedUpDevicesTable = ({
                           Accept
                         </button>
                       )}
-
                       {val?.status === PendingConf && (
                         <button
                           onClick={() =>
@@ -617,9 +620,30 @@ const PickedUpDevicesTable = ({
                           Reject
                         </button>
                       )}
+                      {val?.status === PickDelivered && (
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() =>
+                              statusUpdateHandler(val?._id, ApprovDelivery)
+                            }
+                            className={`${styles.acpt_btn}`}
+                          >
+                            Approve Delivery
+                          </button>
+                        </div>
+                      )}
+                      {val?.status === ApprovDelivery && (
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() => confHandler(val?._id)}
+                            className={`${styles.acpt_btn}`}
+                          >
+                            Confirm Payment
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
-
                   {userRole === "Technician" && (
                     <div className="flex flex-col gap-1">
                       <button
@@ -629,12 +653,28 @@ const PickedUpDevicesTable = ({
                         View
                       </button>
                       {val?.status === PendingConf && (
-                        <button
-                          onClick={() => confHandler(val?._id)}
-                          className={`${styles.acpt_btn}`}
-                        >
-                          Pickup
-                        </button>
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() =>
+                              statusUpdateHandler(val?._id, PickConf)
+                            }
+                            className={`${styles.acpt_btn}`}
+                          >
+                            Pickup
+                          </button>
+                        </div>
+                      )}
+                      {val?.status === PickConf && (
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() =>
+                              statusUpdateHandler(val?._id, PickDelivered)
+                            }
+                            className={`${styles.acpt_btn}`}
+                          >
+                            Delivered
+                          </button>
+                        </div>
                       )}
                     </div>
                   )}
