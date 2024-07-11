@@ -492,10 +492,10 @@ const QSComp = ({
 
 const WatchComp = ({ watchdata, handleEdit, deleteConfHandler }) => {
   const dispatch = useDispatch();
-
+  const category1 = sessionStorage.getItem("admincategory");
   return (
     <React.Fragment>
-      {category === "Watch" && (
+      {category1 === "Watch" && (
         <table className="w-full border border-[#EC2752]">
           <thead className="bg-[#EC2752] text-white">
             <tr>
