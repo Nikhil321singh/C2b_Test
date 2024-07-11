@@ -264,6 +264,7 @@ const ExtComps = ({
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
   const token1 = sessionStorage.getItem("authToken");
+  const LoggedInUser1 = JSON.parse(sessionStorage.getItem("profile"));
   const reqPickupHandler = () => {
     setConfMod(false);
     const statuschk = selectedIds.every((sId) =>
@@ -296,7 +297,7 @@ const ExtComps = ({
       data: {
         deviceIDs: LDIds,
         storeid: address,
-        userid: id,
+        userid: LoggedInUser1?._id,
       },
     };
     axios
