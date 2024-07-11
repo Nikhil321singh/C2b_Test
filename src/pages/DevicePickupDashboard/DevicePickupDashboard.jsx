@@ -18,10 +18,11 @@ import { FaAngleDown, FaDownload } from "react-icons/fa6";
 import SideMenu from "../../components/SideMenu";
 import AdminNavbar from "../../components/Admin_Navbar";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
+import { useDispatch, useSelector } from "react-redux";
+import { setStoreFilter } from "../../store/slices/userSlice";
 
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
 const PickupAvail = "Available For Pickup";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const id = LoggedInUser?._id || LoggedInUser?.id;
@@ -54,6 +55,8 @@ const downloadExcel = (pendDataDown) => {
 };
 
 const DevicePickupDashboard = () => {
+  const token = sessionStorage.getItem("authToken");
+  const userProfile = useSelector((state) => state.user);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedData, setSelectedData] = useState([]);
@@ -69,31 +72,18 @@ const DevicePickupDashboard = () => {
   const [successMod, setSuccessMod] = useState(false);
   const [failMod, setFailMode] = useState(false);
   const [confMod, setConfMod] = useState(false);
-  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
-  const [region, setRegion] = useState(LoggedInUser?.region);
+  const [storeName, setStoreName] = useState(userProfile.selStore);
+  const [region, setRegion] = useState(userProfile.selRegion);
   const [storeData, setStoreData] = useState([]);
   const [regionData, setRegionData] = useState([]);
   const [allStore, setAllStore] = useState([]);
   const firsttime = useRef(true);
 
-  useEffect(() => {
-    if (failMod || successMod) {
-      const timeoutId = setTimeout(() => {
-        setFailMode(false);
-        setSuccessMod(false);
-      }, 5000);
-      return () => clearTimeout(timeoutId);
-    }
-    return () => {};
-  }, [failMod, successMod]);
-
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/all?region=${region}&storeName=${storeName}`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pendingDevices/all?region=${region}&storeName=${storeName}`,
       headers: { Authorization: token },
     };
     axios
@@ -117,9 +107,7 @@ const DevicePickupDashboard = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=0&limit=9999`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
     axios
@@ -146,9 +134,8 @@ const DevicePickupDashboard = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/search?rid=${searchValue}&date=${dateValue}&status=${statusValue}&region=${region}&storeName=${storeName}`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pendingDevices/search?rid=${
+      searchValue}&date=${dateValue}&status=${statusValue}&region=${region}&storeName=${storeName}`,
       headers: { Authorization: token },
     };
     axios
@@ -276,7 +263,7 @@ const ExtComps = ({
   setSelectedRows,
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
-
+  const token1 = sessionStorage.getItem("authToken");
   const reqPickupHandler = () => {
     setConfMod(false);
     const statuschk = selectedIds.every((sId) =>
@@ -304,13 +291,13 @@ const ExtComps = ({
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/pendingDevices/pickupreq`,
       headers: {
-        Authorization: token,
+        Authorization: token1,
       },
-      data: JSON.stringify({
+      data: {
         deviceIDs: LDIds,
         storeid: address,
         userid: id,
-      }),
+      },
     };
     axios
       .request(config)
@@ -320,7 +307,7 @@ const ExtComps = ({
         setSelectedRows([]);
         getData();
         setErrorMsg(
-          `Successfully created lot on Picked Up, RefId: ${response.data.data._id}`
+          `Successfully Created Lot. Lot No. :- ${response.data.data._id} (Check it On Picked Up)`
         );
         setSuccessMod(true);
         setIsTableLoaded(false);
@@ -440,6 +427,7 @@ const DPFilter = ({
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
+  const dispatch = useDispatch();
 
   const handleRegionChange = (value) => {
     setRegionDrop(false);
@@ -448,16 +436,18 @@ const DPFilter = ({
     const storeNamesArray = filteredStores.map((store) => store.storeName);
     setStoreData(storeNamesArray);
     setRegion(value);
+    dispatch(setStoreFilter({selStore: "", selRegion: value}));
   };
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore.filter(
+    const filteredStores = allStore?.filter(
       (store) => store.storeName === value
     );
     const newRegion = filteredStores[0].region;
     setRegion(newRegion);
     setStoreName(value);
+    dispatch(setStoreFilter({selStore: value, selRegion: newRegion}));
   };
 
   const handleSearchClear = () => {
@@ -666,6 +656,7 @@ const PDTable = ({
   setSuccessMod,
   getData,
 }) => {
+  const token2 = sessionStorage.getItem("authToken");
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {
       setErrorMsg("No device selected");
@@ -688,12 +679,12 @@ const PDTable = ({
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/pendingDevices/update`,
         headers: {
-          Authorization: token,
+          Authorization: token2,
         },
-        data: JSON.stringify({
+        data: {
           deviceIDs: selectedIds,
           newStatus: newStatus,
-        }),
+        },
       };
     } else {
       config = {
@@ -702,12 +693,12 @@ const PDTable = ({
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/pendingDevices/updatereq`,
         headers: {
-          Authorization: token,
+          Authorization: token2,
         },
-        data: JSON.stringify({
+        data: {
           deviceIDs: LDIds,
           newStatus: newStatus,
-        }),
+        },
       };
     }
     axios

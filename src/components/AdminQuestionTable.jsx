@@ -30,8 +30,6 @@ const Mobile = [
   "Warranty",
 ];
 const Watch = ["Accessories", "Functional", "Physical", "Warranty"];
-const userToken = sessionStorage.getItem("authToken");
-const category = sessionStorage.getItem("admincategory");
 const successColorClass = "text-green-500";
 const errorColorClass = "text-[#EC2752]";
 
@@ -52,6 +50,7 @@ function filterQuestionnairesByType(data, typeList) {
 }
 
 const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
+  const category = sessionStorage.getItem("admincategory");
   const [confBox, setConfBox] = useState(false);
   const [selectedUser, setSelectedUser] = useState();
   const [selectedUserqs, setSelectedUserqs] = useState();
@@ -84,6 +83,7 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
 
   useEffect(() => {
     async function getQuestionnaires() {
+      const userToken = sessionStorage.getItem("authToken");
       try {
         const response = await axios.get(
           `${
@@ -236,6 +236,7 @@ const ExtComps = ({
 
   function deleteHandler(qsid) {
     setConfBox(false);
+    const userToken = sessionStorage.getItem("authToken");
     axios
       .delete(
         `${
@@ -346,6 +347,7 @@ const QSComp = ({
       no: no,
       default: defaultOption,
     };
+    const userToken = sessionStorage.getItem("authToken");
     axios
       .put(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/edit`,

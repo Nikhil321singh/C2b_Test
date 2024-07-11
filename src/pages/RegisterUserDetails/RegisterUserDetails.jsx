@@ -19,7 +19,6 @@ import { useNavigate } from "react-router-dom";
 
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
 
 const downloadExcel = (dataDown) => {
   const fileType =
@@ -51,6 +50,7 @@ const downloadExcel = (dataDown) => {
 };
 
 const RegisterUserDetails = () => {
+  const token = sessionStorage.getItem("authToken");
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);

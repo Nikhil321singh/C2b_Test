@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
 import { useDispatch } from "react-redux";
-import { setUserProfile } from "../store/slices/userSlice";
+import { setUserProfile, setStoreFilter } from "../store/slices/userSlice";
 import "../styles/login.scss";
 import { SocialIcon } from "react-social-icons";
 import { RiLockPasswordLine } from "react-icons/ri";
@@ -47,6 +47,7 @@ const Login = () => {
           sessionStorage.setItem("DeviceType", "Mobile");
           localStorage.removeItem("formData");
           dispatch(setUserProfile(profile));
+          dispatch(setStoreFilter({selStore: profile?.storeName, selRegion: profile?.region}));
           console.log(profile.role);
 
           switch (profile.role) {

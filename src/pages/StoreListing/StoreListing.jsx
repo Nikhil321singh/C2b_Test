@@ -9,7 +9,7 @@ import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
+
 const initStoreForm = {
   storeName: "",
   region: "",
@@ -20,6 +20,7 @@ const initStoreForm = {
 };
 
 const StoreListing = () => {
+  const token = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const navigate = useNavigate();
@@ -52,7 +53,10 @@ const StoreListing = () => {
     const config = {
       method: "post",
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/create`,
-      headers: { Authorization: token },
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
       data: data,
     };
     axios

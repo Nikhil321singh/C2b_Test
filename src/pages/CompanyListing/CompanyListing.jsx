@@ -117,7 +117,7 @@ const CompanyListing = () => {
               />
             </div>
             <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Adddress</span>
+              <span className="font-medium text-xl">Address</span>
               <input
                 className="border-2 px-2 py-2 rounded-lg  outline-none"
                 type="text"

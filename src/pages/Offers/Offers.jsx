@@ -7,6 +7,8 @@ import toast from "react-hot-toast";
 const navViewOfferr = "/viewofferdetail";
 
 const storedItem = JSON.parse(sessionStorage.getItem("rowData")) || {};
+const storedUser = sessionStorage.getItem("offerUserName");
+console.log(storedUser)
 const item = storedItem;
 const authToken = sessionStorage.getItem("authToken");
 const offerArray = [
@@ -112,7 +114,7 @@ const Offers = () => {
       setPrice(item.price || 0);
       setValidFrom(`${year}-${month}-${day}` || "");
       setValidTo(`${yearto}-${monthto}-${dayto}` || "");
-      setCreatedBy(item.createdBy || "");
+      setCreatedBy(storedUser || "");
       setWarranty(item?.warranty ?? true);
     }
   }, [item]);

@@ -14,7 +14,7 @@ import { saveAs } from "file-saver";
 import { ToastContainer, toast } from "react-toastify";
 
 const pageLimit = 10;
-const userToken = sessionStorage.getItem("authToken");
+
 
 const downloadExcelGradePricingSheet = (apiData) => {
   const fileType =
@@ -57,6 +57,7 @@ const handleSampleDownload = () => {
 };
 
 const GradePricingSheet = () => {
+  const userToken = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
@@ -94,7 +95,11 @@ const GradePricingSheet = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    if (searchValue === "") {
+      fetchData();
+    } else {
+      getDataBySearch();
+    }
   }, [currentPage, pageLimit, deviceCategory]);
 
   const getDataBySearch = () => {

@@ -53,8 +53,7 @@ import {
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
 
-const token = sessionStorage.getItem("authToken");
-const userToken = sessionStorage.getItem("authToken");
+
 const initialState = {
   Functional: [],
   Physical: [],
@@ -64,6 +63,8 @@ const initialState = {
 const id = JSON.parse(sessionStorage.getItem("dataModel"));
 
 function Watchqs() {
+  const token = sessionStorage.getItem("authToken");
+  const userToken = sessionStorage.getItem("authToken");
   const { answers, setAnswers } = useQuestionContext();
   const [visible, setVisible] = useState(1);
   const navigate = useNavigate();

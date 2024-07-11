@@ -96,9 +96,10 @@ const initialDisableBtn = storedDisableBtn
 const discountAvailable = 0;
 const dataModelInfo = JSON.parse(sessionStorage.getItem("dataModel"));
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-const userToken = sessionStorage.getItem("authToken");
+
 
 const SpecialOffers = () => {
+  const userToken = sessionStorage.getItem("authToken");
   const [discountData, setDiscountData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

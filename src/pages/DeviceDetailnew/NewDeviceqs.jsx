@@ -143,7 +143,7 @@ const whiteText = "text-white";
 const blackText = "text-black";
 const pinkBg = "bg-[#EC2752]";
 const whiteBg = "bg-white";
-const userToken = sessionStorage.getItem("authToken");
+
 const id = JSON.parse(sessionStorage.getItem("dataModel"));
 
 const handleSkip = (visible, updateAns) => {
@@ -167,6 +167,7 @@ const handleSkip = (visible, updateAns) => {
 };
 
 function NewDeviceqs() {
+  const userToken = sessionStorage.getItem("authToken");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { answers, setAnswers } = useQuestionContext();
   const [visible, setVisible] = useState(1);
@@ -775,8 +776,8 @@ const AboveSix = ({
       setVisible(visible - 1);
     }
   }
-
   const handlesubmit = async () => {
+    const userToken2 = sessionStorage.getItem("authToken");
     setIsLoading(true);
     console.log(id, profile);
     const finalPayload = {
@@ -793,7 +794,7 @@ const AboveSix = ({
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/questionnaires/calculatePrice`,
       finalPayload,
-      { headers: { Authorization: userToken } }
+      { headers: { Authorization: userToken2 } }
     );
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(

@@ -8,7 +8,7 @@ import apple_watch from "../../assets/apple_watch.png";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { BeatLoader } from "react-spinners";
-import { data } from "autoprefixer";
+const data = JSON.parse(sessionStorage.getItem("dataModel"));
 
 const DeviceType = sessionStorage.getItem("DeviceType");
 console.log(DeviceType);
@@ -102,10 +102,10 @@ const SelectDevice = () => {
 
   useEffect(() => {
     setIsTableLoaded(true);
-    let config = {
+    const config = {
       method: 'post',
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getSelectedBrandModels`,
-      headers: { 
+      headers: {
         'Authorization': `${userToken}`,
       },
       data : {
@@ -128,7 +128,6 @@ const SelectDevice = () => {
   }, [seriesType]);
 
   const handleDeviceClick = (model) => {
-    const data = JSON.parse(sessionStorage.getItem("dataModel"));
     const updatedData = {
       ...data,
       models: model,

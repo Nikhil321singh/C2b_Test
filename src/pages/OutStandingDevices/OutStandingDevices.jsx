@@ -18,10 +18,11 @@ import { saveAs } from "file-saver";
 import { FaAngleDown, FaDownload } from "react-icons/fa6";
 import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
+import { useDispatch, useSelector } from "react-redux";
+import { setStoreFilter } from "../../store/slices/userSlice";
 
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const userRole = LoggedInUser?.role || "";
 const PayrollRej = "Payroll Approval Rejected";
@@ -50,6 +51,8 @@ const downloadExcel = (dataDown) => {
 };
 
 const OutStandingDevices = () => {
+  const token = sessionStorage.getItem("authToken");
+  const userProfile = useSelector((state) => state.user);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [data, setData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
@@ -58,24 +61,13 @@ const OutStandingDevices = () => {
   const [tempId, setTempId] = useState();
   const [failMod, setFailMode] = useState(false);
   const [successMod, setSuccessMod] = useState(false);
-  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
+  const [storeName, setStoreName] = useState(userProfile.selStore);
   const [confMod, setConfMod] = useState(false);
   const [storeData, setStoreData] = useState([]);
-  const [region, setRegion] = useState(LoggedInUser?.region);
+  const [region, setRegion] = useState(userProfile.selRegion);
   const [allStore, setAllStore] = useState([]);
   const [regionData, setRegionData] = useState([]);
   const firsttime = useRef(true);
-
-  useEffect(() => {
-    if (successMod || failMod) {
-      const timeoutID = setTimeout(() => {
-        setSuccessMod(false);
-        setFailMode(false);
-      }, 5000);
-      return () => clearTimeout(timeoutID);
-    }
-    return () => {};
-  }, [successMod, failMod]);
 
   const getData = () => {
     setIsTableLoaded(true);
@@ -230,7 +222,7 @@ const ExtComps = ({
   setTempId,
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
-
+  const token1 = sessionStorage.getItem("authToken");
   const forwardReqHandler = (refID, newStatus) => {
     setIsTableLoaded(true);
     setConfMod(false);
@@ -241,12 +233,12 @@ const ExtComps = ({
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/outstanding/forwardreq`,
       headers: {
-        Authorization: token,
+        Authorization: token1,
       },
-      data: JSON.stringify({
+      data: {
         refIDs: refID,
         newStatus: newStatus,
-      }),
+      },
     };
     axios
       .request(config)
@@ -367,7 +359,7 @@ const OutstandingFilter = ({
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
-
+  const dispatch = useDispatch();
   const handleRegionChange = (val) => {
     setRegionDrop(false);
     setStoreName("");
@@ -375,6 +367,7 @@ const OutstandingFilter = ({
     const storeNames = filterStores.map((store) => store.storeName);
     setStoreData(storeNames);
     setRegion(val);
+    dispatch(setStoreFilter({selStore: "", selRegion: val}));
   };
 
   const handleStoreChange = (val) => {
@@ -383,6 +376,7 @@ const OutstandingFilter = ({
     const bRnewRegion = filterStores[0].region;
     setRegion(bRnewRegion);
     setStoreName(val);
+    dispatch(setStoreFilter({selStore: val, selRegion: bRnewRegion}));
   };
 
   const handleSearchClear = () => {
@@ -514,7 +508,7 @@ const OutstandingTable = ({
 }) => {
   const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
-
+  const token2 = sessionStorage.getItem("authToken");
   const viewHandler = (refID) => {
     setViewRef(refID);
     setShowView(true);
@@ -527,13 +521,13 @@ const OutstandingTable = ({
       maxBodyLength: Infinity,
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/outstanding/update`,
       headers: {
-        Authorization: token,
+        Authorization: token2,
         "Content-Type": "application/json",
       },
-      data: JSON.stringify({
+      data: {
         refIDs: [refID],
         newStatus: newStatus,
-      }),
+      },
     };
     axios
       .request(config)

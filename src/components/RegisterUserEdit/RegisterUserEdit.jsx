@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import axios from "axios";
 import { IoClose } from "react-icons/io5";
-const token = sessionStorage.getItem("authToken");
 
 const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
+  const token = sessionStorage.getItem("authToken");
   const [isGrest, setIsGrest] = useState(userData.grestMember ? "yes" : "no");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [formData, setFormData] = useState(userData);
