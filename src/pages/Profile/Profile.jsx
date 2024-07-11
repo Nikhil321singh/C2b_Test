@@ -40,6 +40,7 @@ const Profile = () => {
       email: storedProfile?.email || "",
       phoneNumber: storedProfile?.phoneNumber || "",
     });
+    console.log(storedProfile?.profileImage)
     setProfileImage(storedProfile?.profileImage || "");
   }, []);
 
@@ -134,8 +135,7 @@ const Profile = () => {
     }
   };
 
-  const handleEditClick = (event) => {
-    event.preventDefault();
+  const handleEditClick = () => {
     setIsEditing(!isEditing);
   };
 
@@ -243,7 +243,7 @@ const ProfileDetail = ({
                 />
               </div>
               {isEditing && (
-                <div className="flex flex-col gap-2 items-baseline">
+                <div className="flex flex-col gap-2 items-baseline justify-end pb-2">
                   <button
                     onClick={handleUploadButtonClick}
                     className={styles.prof_button}
@@ -257,9 +257,10 @@ const ProfileDetail = ({
                     style={{ display: "none" }}
                     onChange={handleFileInputChange}
                   />
+                  {profileImage &&
                   <button onClick={Deleteimage} className={styles.prof_button2}>
                     Delete
-                  </button>
+                  </button>}
                 </div>
               )}
             </div>

@@ -13,7 +13,6 @@ import { IoRefresh } from "react-icons/io5";
 
 const isSelled = "true";
 const rotateCss = "rotate-180";
-const token = sessionStorage.getItem("authToken");
 const pageLimit = 10;
 
 const downloadExcelStoreWise = (apiData) => {
@@ -66,6 +65,7 @@ const fetchDownloadDataStoreWise = (deviceCategory) => {
 };
 
 const StoreWiseReport = () => {
+  const token = sessionStorage.getItem("authToken");
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [tableData, setTableData] = useState();

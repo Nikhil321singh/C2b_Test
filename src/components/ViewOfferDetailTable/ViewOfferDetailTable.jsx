@@ -8,7 +8,9 @@ const successColorClass = "text-green-500";
 const errorColorClass = "text-[#EC2752]";
 
 const ViewOfferDetailTable = ({ searchValue }) => {
+  const token = sessionStorage.getItem("authToken");
   const [data, setData] = useState([]);
+  const [users, setUsers] = useState([]);
   const [update, SetUpdate] = useState(false);
   const navigate = useNavigate();
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -18,9 +20,14 @@ const ViewOfferDetailTable = ({ searchValue }) => {
   const [confBox, setConfBox] = useState(false);
   const [selectedOffId, setSelectedOffId] = useState();
   const [selectedOffName, setSelectedOffName] = useState();
-  const handleEdit = (item) => {
+
+  const handleEdit = (item, user) => {
     item.editoffer = true;
     sessionStorage.setItem("rowData", JSON.stringify(item));
+    sessionStorage.setItem(
+      "offerUserName",
+      `${user.firstName} ${user.lastName}`
+    );
     console.log("hello");
     navigate("/offers");
   };
@@ -51,7 +58,7 @@ const ViewOfferDetailTable = ({ searchValue }) => {
         setIsTableLoaded(false);
       })
       .catch(() => {
-        setErrMsg("Failed to deleted offer");
+        setErrMsg("Failed to delete offer");
         setFailBox(true);
         setIsTableLoaded(false);
       });
@@ -67,6 +74,7 @@ const ViewOfferDetailTable = ({ searchValue }) => {
         {
           headers: {
             authorization: `${userToken}`,
+            "Content-Type": "application/json",
           },
         }
       )
@@ -76,7 +84,26 @@ const ViewOfferDetailTable = ({ searchValue }) => {
       .catch((err) => {
         console.log(err);
       });
+
+    const getData = () => {
+      const config = {
+        method: "get",
+        url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/userregistry/all`,
+        headers: { Authorization: token },
+      };
+      axios
+        .request(config)
+        .then((response) => {
+          setUsers(response.data.data);
+        })
+        .catch((error) => {
+          setErrMsg("Failed to load data");
+        });
+    };
+
+    getData();
   }, [update, searchValue]);
+
   return (
     <div>
       {(sucBox || failBox) && (
@@ -117,9 +144,7 @@ const ViewOfferDetailTable = ({ searchValue }) => {
       )}
       {confBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} ${errorColorClass}`}
-          >
+          <div className={`${styles.err_mod_box} ${errorColorClass}`}>
             <h6 className={errorColorClass}>Confirmation!</h6>
             <p className="text-slate-500">
               {`Do you want to delete offer - ${selectedOffName} ?`}
@@ -149,21 +174,41 @@ const ViewOfferDetailTable = ({ searchValue }) => {
           <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
         </div>
       )}
-      <div className="m-2 overflow-x-auto md:m-5">
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
-            <tr>
-              <th className="p-2 text-sm md:p-3 md:text-base">Offer Name</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Price</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Valid From</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Valid To</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Created By</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Warranty</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item) => (
+      <ViewOfferDetailTableSub
+        data={data}
+        users={users}
+        handleEdit={handleEdit}
+        deleteConfHandler={deleteConfHandler}
+      />
+    </div>
+  );
+};
+
+const ViewOfferDetailTableSub = ({
+  data,
+  users,
+  handleEdit,
+  deleteConfHandler,
+}) => {
+  return (
+    <div className="m-2 overflow-x-auto md:m-5">
+      <table className="w-full border border-[#EC2752]">
+        <thead className="bg-[#EC2752] text-white">
+          <tr>
+            <th className="p-2 text-sm md:p-3 md:text-base">Offer Name</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Price</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Valid From</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Valid To</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Created By</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Warranty</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((item) => {
+            const user = users.find((val) => val._id === item.createdBy);
+
+            return (
               <tr key={item._id}>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {item.offerName}
@@ -178,7 +223,7 @@ const ViewOfferDetailTable = ({ searchValue }) => {
                   {new Date(item.validTo).toLocaleDateString("en-GB")}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {item.createdBy}
+                  {`${user?.firstName} ${user?.lastName}`}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {item.warranty.toString()}
@@ -188,7 +233,7 @@ const ViewOfferDetailTable = ({ searchValue }) => {
                     className=" bg-[#F5F4F9] font-medium rounded-lg w-[100px] outline-none"
                     onChange={(e) => {
                       if (e.target.value === "Edit") {
-                        handleEdit(item);
+                        handleEdit(item, user);
                       }
                       if (e.target.value === "Delete") {
                         deleteConfHandler(item._id, item.offerName);
@@ -201,10 +246,10 @@ const ViewOfferDetailTable = ({ searchValue }) => {
                   </select>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 };

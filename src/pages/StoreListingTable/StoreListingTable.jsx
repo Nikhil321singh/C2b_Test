@@ -20,7 +20,6 @@ import { useNavigate } from "react-router-dom";
 
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
 
 const downloadExcel = (dataDown, curPage) => {
   const fileType =
@@ -52,6 +51,7 @@ const sampleDownloadHandler = () => {
 };
 
 const StoreListingTable = () => {
+  const token = sessionStorage.getItem("authToken");
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -138,8 +138,8 @@ const StoreListingTable = () => {
     setEditBoxOpen(true);
   };
 
-  const deleteConfHandler = (storeID) => {
-    setSelectedStr(storeID);
+  const deleteConfHandler = (store) => {
+    setSelectedStr(store);
     setConfBox(true);
   };
 
@@ -257,6 +257,7 @@ const ExtComps = ({
   getData,
   getDataBySearch,
 }) => {
+  const utoken = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [file, setFile] = useState(null);
   const deleteHandler = (storeID) => {
@@ -268,7 +269,7 @@ const ExtComps = ({
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/store/deleteById?id=${storeID}`,
       headers: {
-        Authorization: token,
+        Authorization: utoken,
       },
     };
     axios
@@ -306,7 +307,7 @@ const ExtComps = ({
         formData,
         {
           headers: {
-            Authorization: token,
+            Authorization: utoken,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -378,10 +379,10 @@ const ExtComps = ({
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${failTextColor}`}>
             <h6 className={failTextColor}>Confirmation!</h6>
-            <p className="text-slate-500">{`Do you want to delete store ${selectedStr} ?`}</p>
+            <p className="text-slate-500">{`Do you want to delete store ${selectedStr?.storeName} ?`}</p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => deleteHandler(selectedStr)}
+                onClick={() => deleteHandler(selectedStr?._id)}
                 className={"bg-[#EC2752] text-white"}
               >
                 Okay
@@ -521,7 +522,7 @@ const StoreTable = ({
                     <button
                       className={`${styles.acpt_btn}`}
                       onClick={() => {
-                        deleteConfHandler(val?._id);
+                        deleteConfHandler(val);
                       }}
                     >
                       Delete

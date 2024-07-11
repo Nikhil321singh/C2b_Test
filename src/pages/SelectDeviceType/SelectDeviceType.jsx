@@ -192,8 +192,6 @@ export const TopSelling = ({ topModels }) => {
   );
 };
 
-const userToken = sessionStorage.getItem("authToken");
-
 const BrandImgSetter = ({ brandItem }) => {
   return (
     <React.Fragment>
@@ -227,6 +225,7 @@ const BrandImgSetter = ({ brandItem }) => {
 };
 
 export const BrandList = ({ deviceType }) => {
+  const userToken1 = sessionStorage.getItem("authToken");
   const [brandList, setBrandList] = useState([]);
   const [popout, setPopout] = useState(false);
   const navigate = useNavigate();
@@ -251,7 +250,7 @@ export const BrandList = ({ deviceType }) => {
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands`, {
-        headers: { authorization: `${userToken}` },
+        headers: { authorization: `${userToken1}` },
       })
       .then((res) => {
         setBrandList(res.data.data);
@@ -383,6 +382,7 @@ const searchDeviceAPI = async (val) => {
 };
 
 const searchPhoneAPI = async (Sdata) => {
+  const userToken = sessionStorage.getItem("authToken");
   let response = {};
   await axios
     .post(
@@ -406,6 +406,7 @@ const searchPhoneAPI = async (Sdata) => {
 };
 
 const fetchDataAPI = async (days, fromDateDup, toDateDup, deviceType) => {
+  const userToken = sessionStorage.getItem("authToken");
   let response1;
   let response2;
   try {
@@ -428,6 +429,7 @@ const fetchDataAPI = async (days, fromDateDup, toDateDup, deviceType) => {
 };
 
 const SelectDeviceType = () => {
+  const token = sessionStorage.getItem("authToken");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const { fromDateDup, setFromDateDup, toDateDup, setToDateDup } =
@@ -530,7 +532,7 @@ const SelectDeviceType = () => {
           `${
             import.meta.env.VITE_REACT_APP_ENDPOINT
           }/api/user/Dashboard/get/top/sellingModels?time=${days}&deviceType=${deviceType}`,
-          { headers: { authorization: `${userToken}` } }
+          { headers: { authorization: `${token}` } }
         );
         const updatedData = await response.data.map(item => ({
           ...item,

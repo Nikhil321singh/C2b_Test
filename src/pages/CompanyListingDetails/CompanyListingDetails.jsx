@@ -44,6 +44,7 @@ const downloadExcel = (apiData) => {
 };
 
 const handleDownload = (totalCount) => {
+  const userToken1 = sessionStorage.getItem("authToken");
   axios
     .get(
       `${
@@ -51,7 +52,7 @@ const handleDownload = (totalCount) => {
       }/api/company/findAll?page=${0}&limit=${totalCount}`,
       {
         headers: {
-          authorization: `${userToken}`,
+          authorization: `${userToken1}`,
         },
       }
     )
@@ -66,9 +67,9 @@ const handleDownload = (totalCount) => {
 const getTextColorClass = (isSuccess) =>
   isSuccess ? "text-green-500" : "text-[#EC2752]";
 const pageLimit = 10;
-const userToken = sessionStorage.getItem("authToken");
 
 const CompanyListingDetails = () => {
+  const userToken = sessionStorage.getItem("authToken");
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [tableData, setTableData] = useState();
@@ -260,6 +261,7 @@ const ExtComps = ({
   getDataBySearch,
   setErrMsg,
 }) => {
+  const userToken2 = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const deleteHandler = (companyId) => {
     setIsTableLoading(true);
@@ -269,7 +271,7 @@ const ExtComps = ({
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/company/deleteById?id=${companyId}`,
-      headers: { Authorization: userToken },
+      headers: { Authorization: userToken2 },
     };
     axios
       .request(config)
@@ -354,11 +356,11 @@ const ExtComps = ({
           <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
             <h6 className={`${getTextColorClass(sucBox)}`}>Confirmation!</h6>
             <p className="text-slate-500">
-              ${`Do you want to delete store ${selectedCompany} ?`}
+              {`Do you want to delete store ${selectedCompany.companyName} ?`}
             </p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => deleteHandler(selectedCompany)}
+                onClick={() => deleteHandler(selectedCompany?._id)}
                 className={"bg-[#EC2752] text-white"}
               >
                 Okay
@@ -455,7 +457,7 @@ const CompanyTable = ({
                       <button
                         className={`${styles.acpt_btn}`}
                         onClick={() => {
-                          deleteConfHandler(data?._id);
+                          deleteConfHandler(data);
                         }}
                       >
                         Delete

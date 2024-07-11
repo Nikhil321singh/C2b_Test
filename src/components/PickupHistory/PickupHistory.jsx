@@ -11,10 +11,12 @@ import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import AdminNavbar from "../Admin_Navbar";
 import SideMenu from "../SideMenu";
 import ProfileBox from "../ProfileBox/ProfileBox";
+import { useDispatch, useSelector } from "react-redux";
+import { setStoreFilter } from "../../store/slices/userSlice";
 
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const userRole = LoggedInUser?.role;
-const token = sessionStorage.getItem("authToken");
+const QRole = userRole === "Technician" ? userRole : "Admin";
 
 const downloadExcel = (pickupData) => {
   console.log("data down", pickupData);
@@ -40,13 +42,16 @@ const downloadExcel = (pickupData) => {
 };
 
 const PickupHistory = () => {
+  const token = sessionStorage.getItem("authToken");
+  const dispatch = useDispatch();
+  const userProfile = useSelector((state) => state.user);
   const [pickupData, setPickupData] = useState([]);
   const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
-  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
-  const [region, setRegion] = useState(LoggedInUser?.region);
+  const [storeName, setStoreName] = useState(userProfile.selStore);
+  const [region, setRegion] = useState(userProfile.selRegion);
   const [storeData, setStoreData] = useState([]);
   const [regionData, setRegionData] = useState([]);
   const [regionDrop, setRegionDrop] = useState(false);
@@ -60,7 +65,7 @@ const PickupHistory = () => {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/history?region=${region}&storeName=${storeName}`,
+      }/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
     };
     axios
@@ -120,6 +125,7 @@ const PickupHistory = () => {
     const storeNamesArray = filterStores.map((store) => store.storeName);
     setRegion(value);
     setStoreData(storeNamesArray);
+    dispatch(setStoreFilter({selStore: "", selRegion: value}));
   };
 
   const handleStoreChange = (value) => {
@@ -128,6 +134,7 @@ const PickupHistory = () => {
     const newRegion = filterStores[0].region;
     setStoreName(value);
     setRegion(newRegion);
+    dispatch(setStoreFilter({selStore: value, selRegion: newRegion}));
   };
 
   const viewHandler = (refID) => {

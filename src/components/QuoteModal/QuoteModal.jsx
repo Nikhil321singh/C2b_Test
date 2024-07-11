@@ -11,14 +11,13 @@ import { MdEdit } from "react-icons/md";
 const Failerr = "Failed To Save Quote";
 const quoteText = "Quote Saved Successfully";
 const leadData = JSON.parse(sessionStorage.getItem("responsedatadata"));
-const userToken = sessionStorage.getItem("authToken");
 const ExactQuote = sessionStorage.getItem("ExactQuote");
 
 const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
   const showHideClassName = show
     ? `${styles.modal} ${styles.displayBlock}`
     : ` ${styles.displayNone}`;
-
+  const userToken = sessionStorage.getItem("authToken");
   const [showOtp, setShowOtp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [ph, setPh] = useState("");

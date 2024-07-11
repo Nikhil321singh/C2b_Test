@@ -12,7 +12,6 @@ import { FaDownload } from "react-icons/fa";
 import NavigateListing from "../../components/NavigateListing/NavigateListing";
 
 const pageLimit = 10;
-const userToken = sessionStorage.getItem("authToken");
 
 const downloadExcelLeadsompleted = (apiData) => {
   const fileType =
@@ -60,6 +59,7 @@ const downloadExcelLeadsompleted = (apiData) => {
 };
 
 const LeadsCompleted = () => {
+  const userToken = sessionStorage.getItem("authToken");
   const [loading, setLoading] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -227,6 +227,7 @@ const SubLeadsCompleted = ({
   maxPages,
 }) => {
   const fetchDownloadData = () => {
+    const userToken1 = sessionStorage.getItem("authToken");
     axios
       .get(
         `${
@@ -234,7 +235,7 @@ const SubLeadsCompleted = ({
         }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}`,
         {
           headers: {
-            authorization: `${userToken}`,
+            authorization: `${userToken1}`,
           },
         }
       )

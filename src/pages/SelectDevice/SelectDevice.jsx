@@ -8,7 +8,10 @@ import apple_watch from "../../assets/apple_watch.png";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { BeatLoader } from "react-spinners";
+const data = JSON.parse(sessionStorage.getItem("dataModel"));
 
+const DeviceType = sessionStorage.getItem("DeviceType");
+console.log(DeviceType);
 export const SeriesFilter = ({
   selectedBtn,
   setSelectedBtn,
@@ -53,7 +56,7 @@ export const SeriesFilter = ({
         <IoIosArrowBack size={30} />
       </button>
       <div
-        ref={categoryContainerRef}
+        ref={catContainerRef}
         className={`flex flex-shrink-0 px-1 gap-4 overflow-x-auto scroll-smooth scrollbar-hide ${styles.select_button_box}`}
       >
         {categories.map((category, index) => (
@@ -99,32 +102,32 @@ const SelectDevice = () => {
 
   useEffect(() => {
     setIsTableLoaded(true);
-    const DeviceType = sessionStorage.getItem("DeviceType");
-    axios
-      .post(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/brands/getSelectedBrandModels`,
-        { brandId: brandId, deviceType: DeviceType, search: seriesType },
-        {
-          headers: {
-            Authorization: `${userToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        console.log("asd", res.data);
-        setModelInfo(res.data);
-        setIsTableLoaded(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsTableLoaded(false);
-      });
+    const config = {
+      method: 'post',
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getSelectedBrandModels`,
+      headers: {
+        'Authorization': `${userToken}`,
+      },
+      data : {
+        "brandId": brandId,
+        "deviceType": Device,
+        "search": seriesType
+      }
+    };
+    console.log(config)
+    axios.request(config)
+    .then((res) => {
+      console.log("asd", res?.data);
+      setModelInfo(res.data);
+      setIsTableLoaded(false);
+    })
+    .catch((err) => {
+      console.log(err);
+      setIsTableLoaded(false);
+    });
   }, [seriesType]);
 
   const handleDeviceClick = (model) => {
-    const data = JSON.parse(sessionStorage.getItem("dataModel"));
     const updatedData = {
       ...data,
       models: model,

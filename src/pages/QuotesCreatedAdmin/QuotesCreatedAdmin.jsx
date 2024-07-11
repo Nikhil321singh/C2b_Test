@@ -13,8 +13,6 @@ import { BeatLoader } from "react-spinners";
 import QuotesCreatedAdminTable from "../../components/QuotesCreatedAdminTable/QuotesCreatedAdminTable";
 import * as XLSX from "xlsx";
 
-const userToken = sessionStorage.getItem("authToken");
-
 const downloadExcelQuotesAdminCreated = (apiData) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -60,6 +58,7 @@ const downloadExcelQuotesAdminCreated = (apiData) => {
 };
 
 const fetchDownloadData = () => {
+  const userToken1 = sessionStorage.getItem("authToken");
   axios
     .get(
       `${
@@ -67,7 +66,7 @@ const fetchDownloadData = () => {
       }/api/prospects/findAll/quotecreated`,
       {
         headers: {
-          authorization: `${userToken}`,
+          authorization: `${userToken1}`,
         },
       }
     )
@@ -80,6 +79,7 @@ const fetchDownloadData = () => {
 };
 
 const QuotesCreatedAdmin = () => {
+  const userToken = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [tableData, setTableData] = useState();
   const [isTableLoaded, setIsTableLoaded] = useState(false);

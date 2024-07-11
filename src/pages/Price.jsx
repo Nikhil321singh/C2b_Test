@@ -6,13 +6,14 @@ import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 
-const token = sessionStorage.getItem("authToken");
+
 const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
 const userName = "";
 const Device = sessionStorage.getItem("DeviceType");
 const savedOtpData = JSON.parse(localStorage.getItem("otpData"));
 
 const Price = ({ submitdata, userToken }) => {
+  const token = sessionStorage.getItem("authToken");
   const [file, setFile] = useState(null);
   const [idProofBack, setIdProofBack] = useState(null);
   const [phoneBill, setPhoneBill] = useState(null);

@@ -76,11 +76,12 @@ const AdminHome = () => {
 
   const downloadExcel = async () => {
     const authToken = sessionStorage.getItem("authToken");
+    const storedCategory = sessionStorage.getItem("admincategory");
     try {
       const response = await axios.get(
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/questionnaireList?deviceType=${admincategory}`,
+        }/api/questionnaires/questionnaireList?deviceType=${storedCategory}`,
         {
           headers: {
             authorization: `${authToken}`,
