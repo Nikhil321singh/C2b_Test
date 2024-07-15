@@ -22,6 +22,7 @@ import { setStoreFilter } from "../../store/slices/userSlice";
 const userRoles = ["Pickup", "Payroll"];
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
+const checkOnPkd = "Check it On Picked Up";
 
 const PendingConf = "Pending Pickup Confirmation";
 const PickConf = "Pending Delivery At Warehouse";//Technican Earlier - Pickup Confirmed
@@ -42,6 +43,8 @@ const PickedUpDevices = () => {
   const [tempId, setTempId] = useState();
   const [successMod, setSuccessMod] = useState(false);
   const [errorMsg, setErrorMsg] = useState("successfully updated status");
+  const [errorMsg1, setErrorMsg1] = useState(null);
+  const [errorMsg2, setErrorMsg2] = useState(null);
   const [confMod, setConfMod] = useState(false);
   const [failMod, setFailMode] = useState(false);
   const [region, setRegion] = useState(userProfile.selRegion);
@@ -143,6 +146,8 @@ const PickedUpDevices = () => {
       <ExtComps
         successMod={successMod}
         errorMsg={errorMsg}
+        errorMsg1={errorMsg1}
+        errorMsg2={errorMsg2}
         setSuccessMod={setSuccessMod}
         isTableLoaded={isTableLoaded}
         setIsTableLoaded={setIsTableLoaded}
@@ -151,6 +156,8 @@ const PickedUpDevices = () => {
         confMod={confMod}
         setConfMod={setConfMod}
         setErrorMsg={setErrorMsg}
+        setErrorMsg1={setErrorMsg1}
+        setErrorMsg2={setErrorMsg2}
         getData={getData}
         tempId={tempId}
       />
@@ -179,6 +186,8 @@ const PickedUpDevices = () => {
         setConfMod={setConfMod}
         getData={getData}
         setErrorMsg={setErrorMsg}
+        setErrorMsg1={setErrorMsg1}
+        setErrorMsg2={setErrorMsg2}
         setSuccessMod={setSuccessMod}
         setFailMode={setFailMode}
       />
@@ -191,6 +200,8 @@ export default PickedUpDevices;
 const ExtComps = ({
   successMod,
   errorMsg,
+  errorMsg1,
+  errorMsg2,
   setSuccessMod,
   isTableLoaded,
   setIsTableLoaded,
@@ -199,6 +210,8 @@ const ExtComps = ({
   confMod,
   setConfMod,
   setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
   getData,
   tempId,
 }) => {
@@ -226,7 +239,8 @@ const ExtComps = ({
           `Successfully Updated Status of Lot ${refID} to ${newStatus}`
         );
         if (newStatus === FinalStatus) {
-          setErrorMsg(`Pickup Confirmed for Lot ${refID}, check it on history`);
+          setErrorMsg(`Payment Confirmed for Lot ${refID}.`);
+          setErrorMsg1("Check it on history.")
         }
         setIsTableLoaded(false);
         setSuccessMod(true);
@@ -259,10 +273,14 @@ const ExtComps = ({
             <IoIosCheckmarkCircle size={90} className={succTextColor} />
             <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errorMsg}</p>
+            {errorMsg1 && <p className="text-slate-500">{errorMsg1}</p>}
+            {errorMsg2 && <p className="text-slate-500">{errorMsg2}</p>}
             <button
               className={"text-white bg-green-500 "}
               onClick={() => {
                 setSuccessMod(false);
+                setErrorMsg1(null);
+                setErrorMsg2(null);
               }}
             >
               Okay
@@ -292,7 +310,7 @@ const ExtComps = ({
           <div className={`${failTextColor} ${styles.err_mod_box} `}>
             <h6 className={failTextColor}>Confirmation!</h6>
             <p className="text-slate-500">
-              {`Confirm Pickup for lot - ${tempId} ?`}
+              {`Confirm Payment for lot - ${tempId} ?`}
             </p>
             <div className="flex flex-row gap-2">
               <button
@@ -480,6 +498,8 @@ const PickedUpDevicesTable = ({
   setConfMod,
   getData,
   setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
   setSuccessMod,
   setFailMode,
 }) => {
@@ -510,23 +530,23 @@ const PickedUpDevicesTable = ({
     axios
       .request(config)
       .then((response) => {
-        setErrorMsg(
-          `Successfully Updated Status to ${newStatus}. 
-          Lot No. :- ${refID} (Check it On Picked Up)`
-        );
+        setErrorMsg(`Successfully Updated Status to ${newStatus}`);
+        setErrorMsg1(`Lot No. :- ${refID}`);
+        setErrorMsg2(checkOnPkd);
         if (newStatus === PickConf) {
-          setErrorMsg(`Pickup Confirmed Successfully. Lot No. ${refID} status updated to
-             Pending Approval for Delivery (Check it On Picked Up)`);
+          setErrorMsg(`Pickup Confirmed Successfully, Lot No. ${refID}`);
+          setErrorMsg1(`Status Updated to Pending Approval for Delivery`);
+          setErrorMsg2(checkOnPkd);
         }
         if (newStatus === ApprovDelivery){
-          setErrorMsg(
-            `Successfully Updated Status to ${newStatus}. 
-            Lot No. :- ${refID} Pending Payment Confirmation (Check it On Picked Up)`
-          );
+          setErrorMsg(`Successfully Updated Status to ${newStatus}`);
+          setErrorMsg1(`Lot No. :- ${refID} Pending Payment Confirmation`);
+          setErrorMsg2(checkOnPkd);
         }
         if(newStatus === PickDelivered || newStatus === FinalStatus){
-          setErrorMsg(`Successfully Updated Status to ${PickDelivered}. 
-          Lot No. :- ${refID} (Check it On History)`);
+          setErrorMsg(`Successfully Updated Status to ${newStatus}`);
+          setErrorMsg1(`Lot No. :- ${refID}`);
+          setErrorMsg2("Check it On History");
         }
         console.log(response);
         setSuccessMod(true);

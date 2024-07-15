@@ -144,8 +144,6 @@ const blackText = "text-black";
 const pinkBg = "bg-[#EC2752]";
 const whiteBg = "bg-white";
 
-const id = JSON.parse(sessionStorage.getItem("dataModel"));
-
 const handleSkip = (visible, updateAns) => {
   switch (visible) {
     case 1:
@@ -777,6 +775,7 @@ const AboveSix = ({
     }
   }
   const handlesubmit = async () => {
+    const id = JSON.parse(sessionStorage.getItem("dataModel"));
     const userToken2 = sessionStorage.getItem("authToken");
     setIsLoading(true);
     console.log(id, profile);

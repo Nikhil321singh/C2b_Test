@@ -95,7 +95,7 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
   const submitHandler = (event) => {
     event.preventDefault();
     setIsTableLoaded(true);
-    const data = JSON.stringify({
+    const data = {
       userID: formData._id,
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -107,7 +107,7 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
       storeId: formData.storeId,
       city: formData.city,
       address: formData.address,
-    });
+    };
 
     const config = {
       method: "put",

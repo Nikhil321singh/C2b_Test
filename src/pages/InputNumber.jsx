@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAnswerContext } from "../components/AnswerContext";
 import useUserProfile from "../utils/useUserProfile";
 import Price from "./Price";
@@ -7,26 +7,16 @@ import OTPpage from "./OTP_page";
 import { useDispatch } from "react-redux";
 import { setResponseData } from "../store/slices/responseSlice";
 const InputNumber = () => {
+  const token = sessionStorage.getItem("authToken");
+  const id = JSON.parse(localStorage.getItem("dataModel"));
   const [number, setNumber] = useState("");
   const { filteredAnswers } = useAnswerContext();
-  const [userToken, setUserToken] = useState("");
-  const [mobileId, setMobileId] = useState("");
   const [submitdata, setSubmitData] = useState({});
-  const [storage, setStorage] = useState("");
-  const [ram, setRAM] = useState("");
   const dispatch = useDispatch();
   const profile = useUserProfile();
   const [change, setChange] = useState(false);
+  const isInitialMount = useRef(true);
   const otpVerified = true;
-  useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
-    let id = localStorage.getItem("dataModel");
-    id = JSON.parse(id);
-    setMobileId(id?.models?._id);
-    setStorage(id?.models?.config?.storage);
-    setRAM(id?.models?.config?.RAM);
-    setUserToken(token);
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,9 +27,9 @@ const InputNumber = () => {
           const data = {
             QNA: filteredAnswers,
             phoneNumber: number,
-            modelId: mobileId,
-            storage: storage,
-            ram: ram,
+            modelId: id?.models?._id,
+            storage: id?.models?.config?.storage,
+            ram: id?.models?.config?.RAM,
             name: profile.name,
           };
           const response = await axios.post(
@@ -49,7 +39,7 @@ const InputNumber = () => {
             data,
             {
               headers: {
-                Authorization: `${userToken}`,
+                Authorization: `${token}`,
               },
             }
           );
@@ -73,7 +63,7 @@ const InputNumber = () => {
   }, [change, dispatch]);
 
   return otpVerified ? (
-    <Price submitdata={submitdata} userToken={userToken} />
+    <Price submitdata={submitdata} userToken={token} />
   ) : (
     <>
       <OTPpage

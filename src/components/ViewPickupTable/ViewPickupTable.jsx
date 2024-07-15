@@ -73,7 +73,7 @@ const ViewPickupTable = ({ refNo, setShowView, fromOutStand = false }) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-row m-3 items-center">
-        <p className="font-medium opacity-70">{"Ref No: " + refNo}</p>
+        <p className="font-medium opacity-0">{"Ref No: " + refNo}</p>
         <IoClose
           size={25}
           className="absolute right-3 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500"

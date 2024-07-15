@@ -42,14 +42,14 @@ const StoreListing = () => {
   const submitHandler = (event) => {
     event.preventDefault();
     setIsTableLoaded(true);
-    const data = JSON.stringify({
+    const data = {
       storeName: formData.storeName,
       uniqueId: formData.uniqueId,
       email: formData.email,
       contactNumber: formData.contactNumber,
       region: formData.region,
       address: formData.address,
-    });
+    };
     const config = {
       method: "post",
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/create`,
