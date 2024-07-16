@@ -350,8 +350,7 @@ export const BrandList = ({ deviceType }) => {
   );
 };
 
-const Device = sessionStorage.getItem("DeviceType");
-const selBtn = () => {
+const selBtn = (Device) => {
   if (Device === "Mobile") {
     return "Mobiles";
   } else if (Device === "Laptop") {
@@ -429,6 +428,7 @@ const fetchDataAPI = async (days, fromDateDup, toDateDup, deviceType) => {
 };
 
 const SelectDeviceType = () => {
+  const Device = sessionStorage.getItem("DeviceType");
   const token = sessionStorage.getItem("authToken");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -731,7 +731,8 @@ const MiddlePart = ({
   orderSaled,
   topModels,
 }) => {
-  const [selectedBtn, setSelectedBtn] = useState(selBtn);
+  const Device1 = sessionStorage.getItem("DeviceType");
+  const [selectedBtn, setSelectedBtn] = useState(() => selBtn(Device1));
 
   return (
     <div className={styles.des_main_wrap}>

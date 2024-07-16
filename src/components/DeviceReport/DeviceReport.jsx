@@ -5,11 +5,10 @@ import { LuDot } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 
-const exactQuoteValue = sessionStorage.getItem("ExactQuote");
-const DeviceType = sessionStorage.getItem("DeviceType");
-const isWatch = DeviceType === "Watch" ? true : false;
-
 const DeviceReport = ({ setShowDeviceReport }) => {
+  const exactQuoteValue = sessionStorage.getItem("ExactQuote");
+  const DeviceType = sessionStorage.getItem("DeviceType");
+  const isWatch = DeviceType === "Watch" ? true : false;
   const navigate = useNavigate();
   let data = useSelector((state) => state.qna);
   const watchdata = useSelector((state) => state.watchQNA);
@@ -293,6 +292,7 @@ const WatchPart = ({ clickHandler, closeHandler, data }) => {
 };
 
 const CoreCosDis = ({ data, quickData }) => {
+  const exactQuoteValue = sessionStorage.getItem("ExactQuote");
   return (
     <React.Fragment>
       <div className={`${styles.ques_box}`}>

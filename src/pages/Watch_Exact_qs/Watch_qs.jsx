@@ -60,9 +60,9 @@ const initialState = {
   Accessories: [],
   Warranty: [],
 };
-const id = JSON.parse(sessionStorage.getItem("dataModel"));
 
 function Watchqs() {
+  const id = JSON.parse(sessionStorage.getItem("dataModel"));
   const token = sessionStorage.getItem("authToken");
   const userToken = sessionStorage.getItem("authToken");
   const { answers, setAnswers } = useQuestionContext();

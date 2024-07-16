@@ -8,8 +8,8 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
           <thead className="bg-[#EC2752] text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Model Details</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Updated At</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Brand</th>
+              <th className="p-2 text-sm md:p-3 md:text-base">Updated At</th>
               {deviceCategory === "Mobile" && (
                 <th className="p-2 text-sm md:p-3 md:text-base">Storage</th>
               )}

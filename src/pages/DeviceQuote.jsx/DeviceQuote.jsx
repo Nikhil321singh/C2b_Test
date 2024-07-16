@@ -9,19 +9,17 @@ import DeviceReport from "../../components/DeviceReport/DeviceReport";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import apple_watch from "../../assets/apple_watch.png";
 
-const Device = sessionStorage.getItem("DeviceType");
-const DummyImg =
-  Device === "Mobile"
-    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-    : apple_watch;
-const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-const phoneFrontPhoto =
-  phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
-const exactQuoteValue = sessionStorage.getItem("ExactQuote");
-const dataModel = JSON.parse(sessionStorage.getItem("dataModel"));
-const deviceModalInfo = dataModel;
 
 const DeviceQuote = () => {
+  const Device = sessionStorage.getItem("DeviceType");
+  const DummyImg = Device === "Mobile"
+    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
+    : apple_watch;
+  const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
+  const phoneFrontPhoto = phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
+  const exactQuoteValue = sessionStorage.getItem("ExactQuote");
+  const dataModel = JSON.parse(sessionStorage.getItem("dataModel"));
+  const deviceModalInfo = dataModel;
   const [showModal, setShowModal] = useState(false);
   const [continueOTPOpen, setContinueOTPOpen] = useState(false);
   const [showDeviceReport, setShowDeviceReport] = useState(false);

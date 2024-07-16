@@ -8,16 +8,11 @@ import store from "../../store/store";
 import { useQuestionContext } from "../../components/QuestionContext";
 import apple_watch from "../../assets/apple_watch.png";
 
-const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-const phoneFrontPhoto =
-  phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
-const Device = sessionStorage.getItem("DeviceType");
-const DummyImg =
-  Device === "Mobile"
-    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-    : apple_watch;
-
 const SelectModel = () => {
+  const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
+  const phoneFrontPhoto = phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
+  const Device = sessionStorage.getItem("DeviceType");
+  const DummyImg = Device === "Mobile" ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg" : apple_watch;
   const [modelData, setModelData] = useState();
   const { resetState } = useQuestionContext();
   const [selectedConfig, setSelectedConfig] = useState(() => {

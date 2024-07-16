@@ -5,12 +5,8 @@ const AdminFinalGradeTable = () => {
   const result = JSON.parse(sessionStorage.getItem("combinationOutput"));
   const adminModelName = sessionStorage.getItem("adminModelName");
   console.log(adminAnswer);
-  const [category, setCategory] = useState("");
+  const category = sessionStorage.getItem("admincategory")
 
-  useEffect(() => {
-    const storedCategory = sessionStorage.getItem("admincategory");
-    setCategory(storedCategory);
-  }, []);
   return (
     <div className="m-2  w-[90%] overflow-x-auto md:m-5 ">
       <table className="w-full border-2 border-[#EC2752]  ">
