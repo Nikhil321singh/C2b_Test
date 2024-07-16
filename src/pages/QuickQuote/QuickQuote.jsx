@@ -173,7 +173,7 @@ const QuickQuote = () => {
   return (
     <div className="mainQContainer">
       <div className="flex items-center w-screen py-4 h-16 border-b-2  bg-white HEADER header">
-        <div className="w-full flex items-center justify-between">
+        <div className="w-full flex items-center justify-betweenpr-2">
           <ProfileBox />
           <img
             className="w-28"

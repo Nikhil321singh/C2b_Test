@@ -8,8 +8,8 @@ const FAQ = () => {
         "Your price is calculated by determining the condition and working of your phone",
     },
     {
-      question: "Is it safe to sell my phone on Grest?",
-      answer: "Yes, it is 100% safe to sell your phone on Grest",
+      question: "Is it safe to sell my phone on SwitchKart?",
+      answer: "Yes, it is 100% safe to sell your phone on SwitchKart",
     },
   ];
 

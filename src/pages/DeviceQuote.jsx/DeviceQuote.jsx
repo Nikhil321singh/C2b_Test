@@ -55,7 +55,7 @@ const DeviceQuote = () => {
       <div
         className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}
       >
-        <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
 
           <img

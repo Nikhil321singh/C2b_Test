@@ -641,9 +641,9 @@ const SearchBox = ({
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-          <img className="w-28 " src={Grest_Logo} alt="app logo" />
+          <img className="w-28" src={Grest_Logo} alt="app logo" />
         </div>
       </div>
       {isSearchBoxOpen && (
@@ -817,7 +817,7 @@ const MiddlePart = ({
       <p
         className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#EC2752]`}
       >
-        How GREST Works?
+        How SwitchKart Works?
       </p>
       <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
         <div className="flex flex-col min-w-[30%]  items-center  ">
