@@ -6,11 +6,14 @@ import { IoClose } from "react-icons/io5";
 const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [formValues, setFormValues] = useState(companyData);
-
+  const [attachedFiles, setAttachedFiles] = useState([]);
+  const handleFileUpload = (e) => {
+    const files = e.target.files;
+    setAttachedFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
+  };
   const closeHandler = () => {
     setEditBoxOpen(false);
   };
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;
@@ -26,17 +29,12 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
         [name]: newValue,
       });
     }
-    console.log("new", formValues);
   };
-  console.log("data is", companyData);
-
   const handleSubmit = (event) => {
     event.preventDefault();
     setIsTableLoading(true);
     const token = sessionStorage.getItem("authToken");
-
     const formData = new FormData();
-
     formData.append("companyName", formValues.companyName);
     formData.append("uniqueId", formValues.uniqueId);
     formData.append("companyCode", formValues.companyCode);
@@ -46,29 +44,27 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
     formData.append("panNumber", formValues.panNumber);
     formData.append("remarks", formValues.remarks);
     formData.append("id", formValues._id);
-
+    if(attachedFiles.length){
+      attachedFiles.forEach((file, index) => {
+        formData.append("files", file, `file-${index}`);
+      });
+    }
     if (formValues.documents && formValues.documents.length > 0) {
       for (let i = 0; i < formValues.documents.length; i++) {
         formData.append("documents", formValues.documents[i]);
       }
     }
-
     axios
       .put(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/edit`,
         formData,
-        {
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
+        { headers: { Authorization: token }}
       )
       .then((res) => {
         setIsTableLoading(false);
         setEditSuccess(true);
       })
       .catch((err) => {
-        console.log(err);
         setIsTableLoading(false);
       });
   };
@@ -96,7 +92,6 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
             <p className="text-4xl font-bold">Update Company Listing</p>
             <p className="text-lg">All fields marked with * are required</p>
           </div>
-
           <form onSubmit={handleSubmit} className="ml-10 flex flex-col gap-4">
             <div className="flex flex-col w-[70%] gap-2">
               <span className="font-medium text-xl">Name*</span>
@@ -187,6 +182,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
                 className=" py-2 rounded-lg w-[250px] outline-none"
                 type="file"
                 multiple
+                onChange={handleFileUpload}
               />
             </div>
             <div className="mt-8">
@@ -203,5 +199,4 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
     </div>
   );
 };
-
 export default EditCompany;

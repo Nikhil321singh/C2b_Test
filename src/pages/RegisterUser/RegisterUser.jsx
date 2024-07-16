@@ -10,15 +10,15 @@ import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 const sucTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
 const role = ["Super Admin", "Admin Manager", "Technician", "Sale User"];
-const token = sessionStorage.getItem("authToken");
 
 const getStore = async () => {
+  const token1 = sessionStorage.getItem("authToken");
   const config = {
     method: "get",
     url: `${
       import.meta.env.VITE_REACT_APP_ENDPOINT
     }/api/store/findAll?page=0&limit=9999`,
-    headers: { Authorization: token },
+    headers: { Authorization: token1 },
   };
   let storeNamesArray = [];
   await axios
@@ -38,12 +38,13 @@ const getStore = async () => {
 };
 
 const getCompany = async () => {
+  const token1 = sessionStorage.getItem("authToken");
   const config = {
     method: "get",
     url: `${
       import.meta.env.VITE_REACT_APP_ENDPOINT
     }/api/company/findAll?page=0&limit=9999`,
-    headers: { Authorization: token },
+    headers: { Authorization: token1 },
   };
   let storeNamesArray = [];
   await axios
@@ -75,6 +76,7 @@ const initForm = {
 };
 
 const RegisterUser = () => {
+  const token = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [isGrest, setIsGrest] = useState(null);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -115,7 +117,7 @@ const RegisterUser = () => {
   const submitHandler = (event) => {
     event.preventDefault();
     setIsTableLoaded(true);
-    const data = JSON.stringify({
+    const data = {
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
@@ -127,7 +129,7 @@ const RegisterUser = () => {
       storeId: formData.storeId,
       city: formData.city,
       address: formData.address,
-    });
+    };
     const config = {
       method: "post",
       maxBodyLength: Infinity,

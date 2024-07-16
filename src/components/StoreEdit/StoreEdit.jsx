@@ -39,7 +39,7 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
       return;
     }
 
-    const data = JSON.stringify({
+    const data = {
       id: formData._id,
       storeName: formData.storeName,
       uniqueId: formData.uniqueId,
@@ -47,7 +47,7 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
       contactNumber: formData.contactNumber,
       region: formData.region,
       address: formData.address,
-    });
+    };
 
     console.log(data);
 

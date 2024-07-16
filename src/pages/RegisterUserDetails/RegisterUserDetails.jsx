@@ -137,9 +137,9 @@ const RegisterUserDetails = () => {
         Authorization: token,
         "Content-Type": "application/json",
       },
-      data: JSON.stringify({
+      data: {
         userID: userID,
-      })
+      }
     };
     axios
       .request(config)

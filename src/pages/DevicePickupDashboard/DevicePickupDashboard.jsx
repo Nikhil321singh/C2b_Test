@@ -69,6 +69,8 @@ const DevicePickupDashboard = () => {
   const [statusValue, setStatusValue] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [errorMsg, setErrorMsg] = useState("successfully updated status");
+  const [errorMsg1, setErrorMsg1] = useState(null);
+  const [errorMsg2, setErrorMsg2] = useState(null);
   const [successMod, setSuccessMod] = useState(false);
   const [failMod, setFailMode] = useState(false);
   const [confMod, setConfMod] = useState(false);
@@ -174,6 +176,8 @@ const DevicePickupDashboard = () => {
       <ExtComps
         successMod={successMod}
         errorMsg={errorMsg}
+        errorMsg1={errorMsg1}
+        errorMsg2={errorMsg2}
         setSuccessMod={setSuccessMod}
         isTableLoaded={isTableLoaded}
         setIsTableLoaded={setIsTableLoaded}
@@ -182,6 +186,8 @@ const DevicePickupDashboard = () => {
         confMod={confMod}
         setConfMod={setConfMod}
         setErrorMsg={setErrorMsg}
+        setErrorMsg1={setErrorMsg1}
+        setErrorMsg2={setErrorMsg2}
         getData={getData}
         selectedIds={selectedIds}
         pendingTableData={pendingTableData}
@@ -230,6 +236,8 @@ const DevicePickupDashboard = () => {
         selectedIds={selectedIds}
         setConfMod={setConfMod}
         setErrorMsg={setErrorMsg}
+        setErrorMsg1={setErrorMsg1}
+        setErrorMsg2={setErrorMsg2}
         setFailMode={setFailMode}
         setSelectedStatus={setSelectedStatus}
         setIsTableLoaded={setIsTableLoaded}
@@ -245,6 +253,8 @@ export default DevicePickupDashboard;
 const ExtComps = ({
   successMod,
   errorMsg,
+  errorMsg1,
+  errorMsg2,
   setSuccessMod,
   isTableLoaded,
   setIsTableLoaded,
@@ -253,6 +263,8 @@ const ExtComps = ({
   confMod,
   setConfMod,
   setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
   getData,
   selectedIds,
   pendingTableData,
@@ -307,9 +319,9 @@ const ExtComps = ({
         setSelectedData([]);
         setSelectedRows([]);
         getData();
-        setErrorMsg(
-          `Successfully Created Lot. Lot No. :- ${response.data.data._id} (Check it On Picked Up)`
-        );
+        setErrorMsg(`Successfully Created Lot`);
+        setErrorMsg1(`Lot No. :- ${response.data.data._id}`);
+        setErrorMsg2(`Check it On Picked Up`);
         setSuccessMod(true);
         setIsTableLoaded(false);
       })
@@ -333,9 +345,13 @@ const ExtComps = ({
             <IoIosCheckmarkCircle className={succTextColor} size={90} />
             <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errorMsg}</p>
+            {errorMsg1 && <p className="text-slate-500">{errorMsg1}</p>}
+            {errorMsg2 && <p className="text-slate-500">{errorMsg2}</p>}
             <button
               onClick={() => {
                 setSuccessMod(false);
+                setErrorMsg1(null);
+                setErrorMsg2(null);
               }}
               className={"text-white  bg-green-500 "}
             >
@@ -651,6 +667,8 @@ const PDTable = ({
   selectedIds,
   setConfMod,
   setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
   setFailMode,
   setSelectedStatus,
   setIsTableLoaded,
@@ -712,9 +730,9 @@ const PDTable = ({
         if (newStatus === PickupAvail || newStatus === "On Hold") {
           setErrorMsg("Successfully updated status to " + newStatus);
         } else {
-          setErrorMsg(
-            `Successfully created ${newStatus} lot on Outstanding, RefId: ${response.data.data._id}`
-          );
+          setErrorMsg(`Successfully created ${newStatus} Lot`);
+          setErrorMsg1(`Lot Id: ${response.data.data._id}`);
+          setErrorMsg2(`Check it on Outstanding`);
         }
         setSuccessMod(true);
       })

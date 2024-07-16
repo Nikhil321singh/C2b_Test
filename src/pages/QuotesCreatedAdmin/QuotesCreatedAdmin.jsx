@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
 import styles from "./QuotesCreatedAdmin.module.css";
@@ -13,6 +13,7 @@ import { BeatLoader } from "react-spinners";
 import QuotesCreatedAdminTable from "../../components/QuotesCreatedAdminTable/QuotesCreatedAdminTable";
 import * as XLSX from "xlsx";
 
+const allst = "All Stores";
 const downloadExcelQuotesAdminCreated = (apiData) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -78,6 +79,30 @@ const fetchDownloadData = () => {
     });
 };
 
+const getStore = async () => {
+  const token = sessionStorage.getItem("authToken");
+  const config = {
+    method: "get",
+    url: `${
+      import.meta.env.VITE_REACT_APP_ENDPOINT
+    }/api/store/findAll?page=0&limit=9999`,
+    headers: { Authorization: token },
+  };
+  let storeNamesArr = [];
+  await axios
+    .request(config)
+    .then((response) => {
+      storeNamesArr = response.data.result.map((store1) => ({
+        storeName: store1.storeName,
+        _id: store1._id,
+      }));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  return storeNamesArr;
+};
+
 const QuotesCreatedAdmin = () => {
   const userToken = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
@@ -85,7 +110,7 @@ const QuotesCreatedAdmin = () => {
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [storeData, setStoreData] = useState([]);
-  const [storeName, setStoreName] = useState("");
+  const [storeName, setStoreName] = useState(allst);
   const [storeDrop, setStoreDrop] = useState(false);
   const [storeId, setStoreId] = useState("");
   const [toDate, setToDate] = useState(null);
@@ -101,7 +126,7 @@ const QuotesCreatedAdmin = () => {
       .get(
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll/quotecreated?fromdate=${fromDateDup}&todate=${toDateDup}&search${searchValue}&store=${storeId}`,
+        }/api/prospects/findAll/quotecreated?fromdate=${fromDateDup}&todate=${toDateDup}&search=${searchValue}&store=${storeId}`,
         { headers: { authorization: userToken } }
       )
       .then((res) => {
@@ -114,53 +139,33 @@ const QuotesCreatedAdmin = () => {
       });
   };
 
-  const getStore = () => {
-    setIsTableLoaded(true);
-    const config = {
-      method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=0&limit=9999`,
-      headers: { Authorization: userToken },
-    };
-    axios
-      .request(config)
-      .then((response) => {
-        const storeNamesArray = response.data.result.map((store) => ({
-          storeName: store.storeName,
-          _id: store._id,
-        }));
-        setStoreData(storeNamesArray);
-        setIsTableLoaded(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsTableLoaded(false);
-      });
-  };
 
   useEffect(() => {
     getTableData();
   }, [storeId, fromDateDup, toDateDup]);
 
+  const saveStore = async () => {
+    const temparr = await getStore();
+    setStoreData(temparr);
+  };
+
   useEffect(() => {
-    getStore();
+    saveStore();
   }, []);
 
   const handleSearchClick = () => {
     getTableData();
   };
 
-  const handleSearchClear = useCallback(() => {
+  const handleSearchClear = () => {
     setSearchValue("");
     setStoreId("");
-    setStoreName("");
+    setStoreName("All Stores");
     setToDate("");
-    setToDateDup("");
+    setToDateDup(new Date().toISOString().split("T")[0]);
     setFromDate("");
-    setFromDateDup("");
-    getTableData();
-  }, []);
+    setFromDateDup("2023-01-01");
+  };
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
@@ -257,7 +262,12 @@ const QuotesCreatedAdmin = () => {
           {storeDrop && (
             <div
               className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
-            >
+            ><div
+                  onClick={() => handleStoreChange({ storeName: allst, _id: "" })}
+                  className={`${styles.filter_option}`}
+                >
+                  <p className="truncate">{allst}</p>
+                </div>
               {storeData.map((item, index) => (
                 <div
                   key={index}

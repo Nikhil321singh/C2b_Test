@@ -507,6 +507,8 @@ const SelectDeviceType = () => {
   useEffect(() => {
     if (imei.length >= 15) {
       searchDevice(imei);
+    }else if(imei.length >= 3 && !/^\d+$/.test(imei.slice(0, 3))){
+      searchPhone(imei);
     }
   }, [imei]);
 

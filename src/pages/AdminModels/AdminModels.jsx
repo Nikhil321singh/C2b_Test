@@ -150,10 +150,10 @@ const AdminModels = () => {
         Authorization: token,
         "Content-Type": "application/json",
       },
-      data: JSON.stringify({
+      data: {
         name: searchValue,
         deviceType: admincategory,
-      }),
+      },
     };
     axios
       .request(config)

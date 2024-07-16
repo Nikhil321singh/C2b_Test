@@ -136,13 +136,13 @@
 
 .err_mod_box {
   background-color: white;
-  width: 90vw;
+  width: fit-content;
   border-radius: 0.55rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px 10px;
+  padding: 20px 100px;
 }
 
 .err_mod_box h6 {
@@ -234,4 +234,17 @@
 .filter_option:hover {
   background-color: #ec2752;
   color: white;
+}
+
+@media (max-width: 768px) {
+  .err_mod_box {
+    background-color: white;
+    width: 100vw;
+    border-radius: 0.55rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 10px;
+  }
 }

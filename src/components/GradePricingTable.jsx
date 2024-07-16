@@ -8,6 +8,7 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
           <thead className="bg-[#EC2752] text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Model Details</th>
+              <th className="p-2 text-sm md:p-3 md:text-base">Updated At</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Brand</th>
               {deviceCategory === "Mobile" && (
                 <th className="p-2 text-sm md:p-3 md:text-base">Storage</th>
@@ -79,6 +80,9 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {listItem.model.name.split(" ")[0]}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {new Date(listItem.updatedAt).toLocaleDateString("en-GB")}
                 </td>
                 {deviceCategory === "Mobile" && (
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
