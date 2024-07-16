@@ -7,12 +7,10 @@ import { FaCamera } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 
 
-const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
-const userName = "";
-const Device = sessionStorage.getItem("DeviceType");
-const savedOtpData = JSON.parse(localStorage.getItem("otpData"));
-
 const Price = ({ submitdata, userToken }) => {
+  const userName = "";
+  const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
+  const savedOtpData = JSON.parse(localStorage.getItem("otpData"));
   const token = sessionStorage.getItem("authToken");
   const [file, setFile] = useState(null);
   const [idProofBack, setIdProofBack] = useState(null);
@@ -210,6 +208,7 @@ const Price = ({ submitdata, userToken }) => {
 export default Price;
 
 const ImeiField = ({ imeinumber, setImeiNumber }) => {
+  const Device = sessionStorage.getItem("DeviceType");
   return (
     <div className="flex flex-col eminumber mt-[4px]">
       <div className="flex gap-1 two">
@@ -316,6 +315,7 @@ const PhoneBill = ({
   phoneBillRef,
   phoneBill,
 }) => {
+  const Device = sessionStorage.getItem("DeviceType");
   return (
     <div className="flex flex-col adharcard mt-[10px]">
       <div className="flex gap-1 two">
@@ -381,6 +381,7 @@ const PhonePhotos1 = ({
   phoneRightRef,
   setPhoneRight,
 }) => {
+  const Device = sessionStorage.getItem("DeviceType");
   return (
     <div className="flex flex-col adharcard mt-[10px] ">
       <div className="flex gap-1 two">
@@ -572,6 +573,7 @@ const PhonePhotos = ({
   phoneRightRef,
   setPhoneRight,
 }) => {
+  const Device = sessionStorage.getItem("DeviceType");
   return (
     <React.Fragment>
       <div className="flex flex-col adharcard mt-[10px] ">
