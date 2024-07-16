@@ -81,6 +81,7 @@ const Price = ({ submitdata, userToken }) => {
     formData.append("emailId", savedOtpData?.email);
     formData.append("name", savedOtpData?.name);
     formData.append("phoneNumber", savedOtpData?.phone);
+    console.log(formData);
     try {
       await axios.post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT
