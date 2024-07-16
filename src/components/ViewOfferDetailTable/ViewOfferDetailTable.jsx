@@ -226,7 +226,7 @@ const ViewOfferDetailTableSub = ({
                   {`${user?.firstName} ${user?.lastName}`}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {item.warranty.toString()}
+                  {item.warranty === true ? "True" : "False"}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   <select
