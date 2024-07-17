@@ -76,6 +76,9 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
           )
           .then((res) => {
             console.log(res);
+            toast.success(quoteText);
+            setQuoteSaved(true);
+            dispatch(setOtpVerified(true));
           })
           .catch((err) => {
             console.log(err);
@@ -89,14 +92,14 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
           )
           .then((res) => {
             console.log(res);
+            toast.success(quoteText);
+            setQuoteSaved(true);
+            dispatch(setOtpVerified(true));
           })
           .catch((err) => {
             console.log(err);
           });
       }
-      toast.success(quoteText);
-      setQuoteSaved(true);
-      dispatch(setOtpVerified(true));
       setLoading(false);
     } else {
       axios
@@ -108,13 +111,13 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         .then((res) => {
           toast.success(quoteText);
           handleClose();
+          setQuoteSaved(true);
         })
         .catch((err) => {
           toast.error(Failerr);
           handleClose();
         });
-      setLoading(false);
-      setQuoteSaved(true);
+        setLoading(false);
     }
     handleClose();
   };
@@ -134,6 +137,10 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         )
         .then((res) => {
           setLoading(false);
+          setLoading(false);
+          toast.success(quoteText);
+          setQuoteSaved(true);
+          dispatch(setOtpVerified(true));
         })
         .catch((err) => {
           setLoading(false);
@@ -147,14 +154,14 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         )
         .then((res) => {
           setLoading(false);
+          toast.success(quoteText);
+          setQuoteSaved(true);
+          dispatch(setOtpVerified(true));
         })
         .catch((err) => {
           setLoading(false);
         });
     }
-    toast.success(quoteText);
-    setQuoteSaved(true);
-    dispatch(setOtpVerified(true));
     handleClose();
   };
 

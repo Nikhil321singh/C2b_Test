@@ -50,7 +50,7 @@ const DeviceQuote = () => {
     <div className={`bg-white min-h-screen ${styles.page_wrap}`}>
       {continueOTPOpen && <ContOTP setContinueOTPOpen={setContinueOTPOpen} />}
       {showDeviceReport && (
-        <DeviceReport setShowDeviceReport={setShowDeviceReport} />
+        <DeviceReport setShowDeviceReport={setShowDeviceReport} quoteSaved={quoteSaved}/>
       )}
       <div
         className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}

@@ -279,6 +279,7 @@ const SubSpecialOffers = ({
           price={phonePrice}
           ram={dataModelInfo?.models?.config?.RAM}
           storage={dataModelInfo?.models?.config?.storage}
+          type={dataModelInfo?.models?.type}
         />
       </div>
       <div className="flex flex-col gap-2 mt-2">

@@ -246,7 +246,7 @@ const PickupTable = ({ pickupData, viewHandler }) => {
           <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
-          <th className="p-2 text-sm md:p-3 md:text-base">Refrence No</th>
+          <th className="p-2 text-sm md:p-3 md:text-base">Lot No</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Number Of Device</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Amount</th>
         </tr>

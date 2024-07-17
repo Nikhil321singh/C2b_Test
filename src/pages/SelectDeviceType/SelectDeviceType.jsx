@@ -380,7 +380,7 @@ const searchDeviceAPI = async (val) => {
   return { brand: brand, model: model };
 };
 
-const searchPhoneAPI = async (Sdata) => {
+const searchPhoneAPI = async (Sdata, deviceType) => {
   const userToken = sessionStorage.getItem("authToken");
   let response = {};
   await axios
@@ -388,7 +388,9 @@ const searchPhoneAPI = async (Sdata) => {
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/user/Dashboard/search/phones`,
-      { name: Sdata },
+      { name: Sdata,
+        deviceType: deviceType,
+      },
       { headers: { authorization: `${userToken}` } }
     )
     .then((res) => {
@@ -493,14 +495,14 @@ const SelectDeviceType = () => {
     setData(`${temp?.brand} ${temp?.model}`);
   };
 
-  const searchPhone = async (tempData) => {
-    const tempRes = await searchPhoneAPI(tempData);
+  const searchPhone = async (tempData, deviceType) => {
+    const tempRes = await searchPhoneAPI(tempData, deviceType);
     setModel(tempRes || []);
   };
 
   useEffect(() => {
     if (data) {
-      searchPhone(data);
+      searchPhone(data, "Mobile");
     }
   }, [data]);
 
@@ -508,7 +510,7 @@ const SelectDeviceType = () => {
     if (imei.length >= 15) {
       searchDevice(imei);
     }else if(imei.length >= 3 && !/^\d+$/.test(imei.slice(0, 3))){
-      searchPhone(imei);
+      searchPhone(imei, deviceType);
     }
   }, [imei]);
 

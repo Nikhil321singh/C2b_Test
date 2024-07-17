@@ -29,7 +29,7 @@ const DevicePriceCards = (props) => {
         </div>
         <div>
           <p className="text-[#EC2752] text-lg md:text-2xl">
-            {props.ram}/{props.storage}
+            {props.type === "Mobile" && `${props.ram}/${props.storage}`}
           </p>
           {/* <select className=" rounded bg-[#F5F4F9] text-[#EC2752] w-[220px] p-[5px] focus:outline-none"></select> */}
         </div>

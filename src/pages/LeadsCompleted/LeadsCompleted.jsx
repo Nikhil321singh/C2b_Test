@@ -88,6 +88,7 @@ const downloadExcelLeadsompleted = (apiData) => {
 };
 
 const LeadsCompleted = () => {
+  const [deviceType, setDeviceType] = useState("Mobile");
   const userToken = sessionStorage.getItem("authToken");
   const [loading, setLoading] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
@@ -120,7 +121,7 @@ const LeadsCompleted = () => {
     setLoading(true);
     const endpoint = `${import.meta.env.VITE_REACT_APP_ENDPOINT
     }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=${fromDateDup
-    }&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=${search1}`;
+    }&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=${search1}&deviceType=${deviceType}`;
     axios
       .get(endpoint, {
         headers: { authorization: userToken },
@@ -157,7 +158,7 @@ const LeadsCompleted = () => {
 
   useEffect(() => {
     getSalesData();
-  }, [currentPage, pageLimit, selStoreId, fromDateDup, toDateDup, reset]);
+  }, [currentPage, pageLimit, selStoreId, fromDateDup, toDateDup, reset, deviceType]);
 
   const handleFromDateChange = (DateTemp, e) => {
     if (DateTemp === null) {
@@ -209,18 +210,20 @@ const LeadsCompleted = () => {
         storeData={storeData}
         handleSearchClear={handleSearchClear} handleStoreChange={handleStoreChange}
         getSalesData={getSalesData}
+        deviceType={deviceType} setDeviceType={setDeviceType}
+        selStoreId={selStoreId}
       />
     </div>
   );
 };
 
-const fetchDownloadData = (totalCount) => {
+const fetchDownloadData = (totalCount, deviceType, Str) => {
   const userToken1 = sessionStorage.getItem("authToken");
   axios
     .get(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}&startDate=2020-01-01&toDate=${new Date().toISOString().split("T")[0]}`,
+      }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}&deviceType=${deviceType}&startDate=2020-01-01&toDate=${new Date().toISOString().split("T")[0]}store=${Str}`,
       {
         headers: {
           authorization: `${userToken1}`,
@@ -254,8 +257,11 @@ const SubLeadsCompleted = ({
   storeName,
   storeData,
   handleSearchClear, handleStoreChange,
-  getSalesData
+  getSalesData,
+  deviceType, setDeviceType,
+  selStoreId
 }) => {
+  const [deviceDrop, setDeviceDrop] = useState(false);
   return (
     <div className="overflow-y-hidden">
       {loading && (
@@ -271,7 +277,7 @@ const SubLeadsCompleted = ({
       <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
         <button
           className={`${styles.bulkdown_button}`}
-          onClick={() => fetchDownloadData(totalCount)}
+          onClick={() => fetchDownloadData(totalCount, deviceType, selStoreId)}
         >
           <FaDownload /> Bulk Download
         </button>
@@ -322,6 +328,39 @@ const SubLeadsCompleted = ({
                   <p className="truncate">{sitem.storeName}</p>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+        <div className="w-[250px] relative">
+          <div
+            className={`${styless.filter_button}`}
+            onClick={() => setDeviceDrop(!deviceDrop)}
+          >
+            <p className="truncate">{deviceType}</p>
+            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
+          </div>
+          {deviceDrop && (
+            <div
+              className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
+            >
+              <div
+                  className={`${styless.filter_option}`}
+                  onClick={() => { 
+                    setDeviceType("Mobile");
+                    setDeviceDrop(false);
+                   }}
+                >
+                  <p className="truncate">Mobile</p>
+              </div>
+              <div
+                  className={`${styless.filter_option}`}
+                  onClick={() => { 
+                    setDeviceType("Watch");
+                    setDeviceDrop(false);
+                  }}
+                >
+                  <p className="truncate">Watch</p>
+              </div>
             </div>
           )}
         </div>

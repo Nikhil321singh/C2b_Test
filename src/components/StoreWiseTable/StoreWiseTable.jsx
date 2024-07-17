@@ -47,7 +47,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                     {data.userId?.firstName}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    NA
+                    {data.modelId?.type}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
                     {data.documentId?.IMEI}
