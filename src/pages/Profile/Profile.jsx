@@ -7,10 +7,10 @@ import axios from "axios";
 import styles from "./Profile.module.css";
 import { BeatLoader } from "react-spinners";
 
-const storedProfile = JSON.parse(sessionStorage.getItem("profile")) || {};
-const authToken = sessionStorage.getItem("authToken");
 
 const Profile = () => {
+  const storedProfile = JSON.parse(sessionStorage.getItem("profile")) || {};
+  const authToken = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [profile, setProfile] = useState({
     firstName: "",
