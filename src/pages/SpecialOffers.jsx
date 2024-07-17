@@ -11,11 +11,6 @@ import SummaryModal from "../components/SummaryModal";
 import { CgSpinner } from "react-icons/cg";
 import apple_watch from "../assets/apple_watch.png";
 
-const Device = sessionStorage.getItem("DeviceType");
-const DummyImg =
-  Device === "Mobile"
-    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-    : apple_watch;
 
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
@@ -85,20 +80,11 @@ export const DynamicCouponCard = ({
   );
 };
 
-const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-const phoneFrontPhoto =
-  phoneImg?.models?.phonePhotos?.front ||
-  phoneImg?.models?.phonePhotos?.upFront;
-const storedDisableBtn = sessionStorage.getItem("disableBtn");
-const initialDisableBtn = storedDisableBtn
-  ? JSON.parse(storedDisableBtn)
-  : false;
-const discountAvailable = 0;
-const dataModelInfo = JSON.parse(sessionStorage.getItem("dataModel"));
-const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-
 
 const SpecialOffers = () => {
+  const storedDisableBtn = sessionStorage.getItem("disableBtn");
+  const initialDisableBtn = storedDisableBtn ? JSON.parse(storedDisableBtn) : false;
+  const discountAvailable = 0;
   const userToken = sessionStorage.getItem("authToken");
   const [discountData, setDiscountData] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -253,6 +239,16 @@ const SubSpecialOffers = ({
   extraBonus,
 }) => {
   const navigate = useNavigate();
+  const Device = sessionStorage.getItem("DeviceType");
+  const DummyImg = Device === "Mobile"
+    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
+    : apple_watch;
+  const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
+  const phoneFrontPhoto =
+      phoneImg?.models?.phonePhotos?.front ||
+      phoneImg?.models?.phonePhotos?.upFront;
+  const dataModelInfo = JSON.parse(sessionStorage.getItem("dataModel"));
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
   return (
     <div>
       <div
@@ -283,6 +279,7 @@ const SubSpecialOffers = ({
           price={phonePrice}
           ram={dataModelInfo?.models?.config?.RAM}
           storage={dataModelInfo?.models?.config?.storage}
+          type={dataModelInfo?.models?.type}
         />
       </div>
       <div className="flex flex-col gap-2 mt-2">

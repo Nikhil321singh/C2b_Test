@@ -1,16 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 const AdminFinalGradeTable = () => {
   const adminAnswer = useSelector((state) => state.adminGradePrice);
   const result = JSON.parse(sessionStorage.getItem("combinationOutput"));
   const adminModelName = sessionStorage.getItem("adminModelName");
   console.log(adminAnswer);
-  const [category, setCategory] = useState("");
+  const category = sessionStorage.getItem("admincategory")
 
-  useEffect(() => {
-    const storedCategory = sessionStorage.getItem("admincategory");
-    setCategory(storedCategory);
-  }, []);
   return (
     <div className="m-2  w-[90%] overflow-x-auto md:m-5 ">
       <table className="w-full border-2 border-[#EC2752]  ">

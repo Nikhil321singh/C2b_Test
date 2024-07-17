@@ -350,8 +350,7 @@ export const BrandList = ({ deviceType }) => {
   );
 };
 
-const Device = sessionStorage.getItem("DeviceType");
-const selBtn = () => {
+const selBtn = (Device) => {
   if (Device === "Mobile") {
     return "Mobiles";
   } else if (Device === "Laptop") {
@@ -381,7 +380,7 @@ const searchDeviceAPI = async (val) => {
   return { brand: brand, model: model };
 };
 
-const searchPhoneAPI = async (Sdata) => {
+const searchPhoneAPI = async (Sdata, deviceType) => {
   const userToken = sessionStorage.getItem("authToken");
   let response = {};
   await axios
@@ -389,7 +388,9 @@ const searchPhoneAPI = async (Sdata) => {
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/user/Dashboard/search/phones`,
-      { name: Sdata },
+      { name: Sdata,
+        deviceType: deviceType,
+      },
       { headers: { authorization: `${userToken}` } }
     )
     .then((res) => {
@@ -429,6 +430,7 @@ const fetchDataAPI = async (days, fromDateDup, toDateDup, deviceType) => {
 };
 
 const SelectDeviceType = () => {
+  const Device = sessionStorage.getItem("DeviceType");
   const token = sessionStorage.getItem("authToken");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -493,14 +495,14 @@ const SelectDeviceType = () => {
     setData(`${temp?.brand} ${temp?.model}`);
   };
 
-  const searchPhone = async (tempData) => {
-    const tempRes = await searchPhoneAPI(tempData);
+  const searchPhone = async (tempData, deviceType1) => {
+    const tempRes = await searchPhoneAPI(tempData, deviceType1);
     setModel(tempRes || []);
   };
 
   useEffect(() => {
     if (data) {
-      searchPhone(data);
+      searchPhone(data, "Mobile");
     }
   }, [data]);
 
@@ -508,7 +510,7 @@ const SelectDeviceType = () => {
     if (imei.length >= 15) {
       searchDevice(imei);
     }else if(imei.length >= 3 && !/^\d+$/.test(imei.slice(0, 3))){
-      searchPhone(imei);
+      searchPhone(imei, deviceType);
     }
   }, [imei]);
 
@@ -641,9 +643,9 @@ const SearchBox = ({
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-          <img className="w-28 " src={Grest_Logo} alt="app logo" />
+          <img className="w-28" src={Grest_Logo} alt="app logo" />
         </div>
       </div>
       {isSearchBoxOpen && (
@@ -731,7 +733,8 @@ const MiddlePart = ({
   orderSaled,
   topModels,
 }) => {
-  const [selectedBtn, setSelectedBtn] = useState(selBtn);
+  const Device1 = sessionStorage.getItem("DeviceType");
+  const [selectedBtn, setSelectedBtn] = useState(() => selBtn(Device1));
 
   return (
     <div className={styles.des_main_wrap}>
@@ -816,7 +819,7 @@ const MiddlePart = ({
       <p
         className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#EC2752]`}
       >
-        How GREST Works?
+        How Grest Works?
       </p>
       <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
         <div className="flex flex-col min-w-[30%]  items-center  ">
