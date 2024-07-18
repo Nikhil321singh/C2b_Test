@@ -8,7 +8,11 @@ function SideMenu({ setsideMenu, sideMenu }) {
 
   const handleHome = () => {
     setsideMenu(!sideMenu);
-    navigate("/adminmodels");
+    if(profile.role !== "Super Admin"){
+      navigate("/customertable");
+    }else{
+      navigate("/adminmodels");
+    }
   };
 
   const handleTable = () => {
@@ -94,7 +98,6 @@ function SideMenu({ setsideMenu, sideMenu }) {
             >
               Offers
             </li>
-
             <li
               className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
               onClick={handleGrade}
@@ -178,17 +181,35 @@ function SideMenu({ setsideMenu, sideMenu }) {
             >
               Profile
             </li>
-            <li
+            {/* <li
               className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
               onClick={handleTable}
             >
               Customer Table
-            </li>
+            </li> */}
             <li
               className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
               onClick={handlpickup}
             >
               Pickup & Cancel Device
+            </li>
+            <li
+              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              onClick={handleStoreReport}
+            >
+              Store Report
+            </li>
+            <li
+              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              onClick={handleTechnician}
+            >
+              Technician Report
+            </li>
+            <li
+              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              onClick={adminDashboard}
+            >
+              Admin Dashboard
             </li>
             <li
               className="text-[22px] font-[300] cursor-pointer mb-[2vh]"

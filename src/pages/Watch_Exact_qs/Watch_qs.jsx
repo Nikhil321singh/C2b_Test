@@ -150,7 +150,10 @@ function Watchqs() {
           Authorization: `${token}`,
         },
       }
-    );
+    ).catch((error) => {
+      console.log(error)
+      setIsLoading(false);
+    });
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",

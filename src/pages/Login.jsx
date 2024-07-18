@@ -55,7 +55,7 @@ const Login = () => {
               navigate("/adminmodels");
               break;
             case "Admin Manager":
-              navigate("/adminmodels");
+              navigate("/customertable");
               break;
             case "Technician":
               navigate("/devicepickupdashboard");
