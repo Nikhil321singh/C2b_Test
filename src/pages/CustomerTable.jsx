@@ -118,10 +118,11 @@ const CustomerTable = () => {
   const [storeName, setStoreName] = useState(allStore);
   const [selStoreId, setSelStoreId] = useState("");
   const [storeData, setStoreData] = useState([]);
+  const [filFlag, setFilFlag] = useState(false);
 
   useEffect(() => {
     myordercretad();
-  }, [toDate, fromDate, selStoreId]);
+  }, [toDate, fromDate, selStoreId, filFlag]);
 
   function myordercretad() {
     setLoading(true);
@@ -154,6 +155,7 @@ const CustomerTable = () => {
     setFromDateDup("2023-01-01");
     setToDate("");
     setToDateDup(new Date().toISOString().split("T")[0]);
+    setFilFlag(!filFlag);
   };
 
   const handleFromDateChange = (date) => {

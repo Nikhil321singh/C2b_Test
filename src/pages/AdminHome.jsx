@@ -14,20 +14,21 @@ import { IoMdAddCircle } from "react-icons/io";
 import * as XLSX from "xlsx";
 const navAdminFnlGrd = "/adminfinalgrade";
 
+const options = {
+  Functional_major: ["F1.1", "F1.2", "F1.3"],
+  Core: ["C1", "C2"],
+  Display: ["D1", "D2", "D3"],
+  Functional_minor: ["F2.1", "F2.2", "F2.3"],
+  Cosmetics: ["A1", "A2", "A3", "A4"],
+  Warranty: ["W1", "W2"],
+};
+
 const AdminHome = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [qsModel, setQsmodel] = useState(false);
-
+  const storedCategory = sessionStorage.getItem("admincategory");
   const navigate = useNavigate();
   const adminAnswer = useSelector((state) => state.adminGradePrice);
-  const options = {
-    Functional_major: ["F1.1", "F1.2", "F1.3"],
-    Core: ["C1", "C2"],
-    Display: ["D1", "D2", "D3"],
-    Functional_minor: ["F2.1", "F2.2", "F2.3"],
-    Cosmetics: ["A1", "A2", "A3", "A4"],
-    Warranty: ["W1", "W2"],
-  };
   const [group, setGroup] = useState("");
   const [question, setQuestion] = useState("");
   const [yes, setYes] = useState("");
@@ -36,7 +37,6 @@ const AdminHome = () => {
   const [updateTable, steUpdatetable] = useState(false);
 
   const handleNext = () => {
-    const storedCategory = sessionStorage.getItem("admincategory");
     if (storedCategory === "Mobile" || storedCategory === "Watch") {
       const userToken = sessionStorage.getItem("authToken");
       axios
@@ -76,7 +76,6 @@ const AdminHome = () => {
 
   const downloadExcel = async () => {
     const authToken = sessionStorage.getItem("authToken");
-    const storedCategory = sessionStorage.getItem("admincategory");
     try {
       const response = await axios.get(
         `${
@@ -170,7 +169,6 @@ const AdminHome = () => {
           <CreateQuestion
             closeHandler={closeHandler}
             setGroup={setGroup}
-            options={options}
             question={question}
             setQuestion={setQuestion}
             setYes={setYes}
@@ -225,7 +223,6 @@ const AdminHome = () => {
 const CreateQuestion = ({
   closeHandler,
   setGroup,
-  options,
   question,
   setQuestion,
   setYes,

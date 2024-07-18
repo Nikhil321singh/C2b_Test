@@ -9,19 +9,17 @@ import DeviceReport from "../../components/DeviceReport/DeviceReport";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import apple_watch from "../../assets/apple_watch.png";
 
-const Device = sessionStorage.getItem("DeviceType");
-const DummyImg =
-  Device === "Mobile"
-    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-    : apple_watch;
-const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-const phoneFrontPhoto =
-  phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
-const exactQuoteValue = sessionStorage.getItem("ExactQuote");
-const dataModel = JSON.parse(sessionStorage.getItem("dataModel"));
-const deviceModalInfo = dataModel;
 
 const DeviceQuote = () => {
+  const Device = sessionStorage.getItem("DeviceType");
+  const DummyImg = Device === "Mobile"
+    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
+    : apple_watch;
+  const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
+  const phoneFrontPhoto = phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
+  const exactQuoteValue = sessionStorage.getItem("ExactQuote");
+  const dataModel = JSON.parse(sessionStorage.getItem("dataModel"));
+  const deviceModalInfo = dataModel;
   const [showModal, setShowModal] = useState(false);
   const [continueOTPOpen, setContinueOTPOpen] = useState(false);
   const [showDeviceReport, setShowDeviceReport] = useState(false);
@@ -52,12 +50,12 @@ const DeviceQuote = () => {
     <div className={`bg-white min-h-screen ${styles.page_wrap}`}>
       {continueOTPOpen && <ContOTP setContinueOTPOpen={setContinueOTPOpen} />}
       {showDeviceReport && (
-        <DeviceReport setShowDeviceReport={setShowDeviceReport} />
+        <DeviceReport setShowDeviceReport={setShowDeviceReport} quoteSaved={quoteSaved}/>
       )}
       <div
         className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}
       >
-        <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
 
           <img
@@ -82,7 +80,8 @@ const DeviceQuote = () => {
             </div>
             <div className="flex flex-col gap-[2px]">
               <p className="font-medium text-gray-700">
-                {`${deviceModalInfo.models?.name}(${deviceModalInfo.models?.config?.RAM}/${deviceModalInfo.models?.config?.storage})`}
+                {`${deviceModalInfo.models?.name}(${deviceModalInfo.models?.type === "Mobile" ?
+                deviceModalInfo.models?.config?.RAM + "/" : "" }${deviceModalInfo.models?.config?.storage})`}
               </p>
               <p className="text-[#EC2752] font-semibold">₹{Price}</p>
             </div>

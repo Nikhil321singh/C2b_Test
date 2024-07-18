@@ -8,16 +8,11 @@ import store from "../../store/store";
 import { useQuestionContext } from "../../components/QuestionContext";
 import apple_watch from "../../assets/apple_watch.png";
 
-const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-const phoneFrontPhoto =
-  phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
-const Device = sessionStorage.getItem("DeviceType");
-const DummyImg =
-  Device === "Mobile"
-    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-    : apple_watch;
-
 const SelectModel = () => {
+  const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
+  const phoneFrontPhoto = phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
+  const Device = sessionStorage.getItem("DeviceType");
+  const DummyImg = Device === "Mobile" ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg" : apple_watch;
   const [modelData, setModelData] = useState();
   const { resetState } = useQuestionContext();
   const [selectedConfig, setSelectedConfig] = useState(() => {
@@ -87,7 +82,7 @@ const SelectModel = () => {
   return (
     <div className={`bg-white min-h-screen`}>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
           <img
             onClick={() => navigate("/selectdevicetype")}

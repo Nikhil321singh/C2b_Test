@@ -23,17 +23,16 @@ const userRoles = ["Pickup", "Payroll"];
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
 const checkOnPkd = "Check it On Picked Up";
-
 const PendingConf = "Pending Pickup Confirmation";
 const PickConf = "Pending Delivery At Warehouse";//Technican Earlier - Pickup Confirmed
 const PickDelivered = "Pickup Delivered At Warehouse";//Technican
 const ApprovDelivery = "Approved Delivery At Warehouse";//Admin Manager
 const FinalStatus = "Payment Confirmed";//Admin Manager
-const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-const userRole = LoggedInUser?.role || "";
-const QRole = userRole === "Technician" ? userRole : "Admin";
 
 const PickedUpDevices = () => {
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const userRole = LoggedInUser?.role || "";
+  const QRole = userRole === "Technician" ? userRole : "Admin";
   const token = sessionStorage.getItem("authToken");
   const userProfile = useSelector((state) => state.user);
   const [data, setData] = useState([]);
@@ -217,6 +216,8 @@ const ExtComps = ({
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
   const token1 = sessionStorage.getItem("authToken");
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const userRole = LoggedInUser?.role || "";
   const statusUpdHandler = (refID, newStatus) => {
     setConfMod(false);
     setIsTableLoaded(true);
@@ -251,7 +252,6 @@ const ExtComps = ({
         setIsTableLoaded(false);
       });
   };
-
   return (
     <React.Fragment>
       <div className="flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER ">
@@ -503,6 +503,8 @@ const PickedUpDevicesTable = ({
   setSuccessMod,
   setFailMode,
 }) => {
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const userRole = LoggedInUser?.role || "";
   const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
   const token2 = sessionStorage.getItem("authToken");
@@ -560,7 +562,6 @@ const PickedUpDevicesTable = ({
         setIsTableLoaded(false);
       });
   };
-
   return (
     <div className={`${styles.pd_cont}`}>
       <div className="m-2 overflow-x-auto md:m-5">

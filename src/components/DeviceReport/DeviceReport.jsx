@@ -5,11 +5,11 @@ import { LuDot } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 
-const exactQuoteValue = sessionStorage.getItem("ExactQuote");
-const DeviceType = sessionStorage.getItem("DeviceType");
-const isWatch = DeviceType === "Watch" ? true : false;
-
-const DeviceReport = ({ setShowDeviceReport }) => {
+const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
+  console.log(quoteSaved);
+  const exactQuoteValue = sessionStorage.getItem("ExactQuote");
+  const DeviceType = sessionStorage.getItem("DeviceType");
+  const isWatch = DeviceType === "Watch" ? true : false;
   const navigate = useNavigate();
   let data = useSelector((state) => state.qna);
   const watchdata = useSelector((state) => state.watchQNA);
@@ -38,6 +38,7 @@ const DeviceReport = ({ setShowDeviceReport }) => {
     <div className={`${styles.devrep_page} z-50 select-none`}>
       {isWatch ? (
         <WatchPart
+          quoteSaved={quoteSaved}
           clickHandler={clickHandler}
           closeHandler={closeHandler}
           data={data}
@@ -48,12 +49,12 @@ const DeviceReport = ({ setShowDeviceReport }) => {
             <p className="px-2 text-xl font-medium border-r-2 border-black cursor-default">
               Device Report
             </p>
-            <p
+            {!quoteSaved &&<p
               onClick={clickHandler}
               className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
             >
               ModifyAnswers
-            </p>
+            </p>}
             <IoClose
               size={25}
               className="absolute right-2 text-[#EC2752] cursor-pointer"
@@ -191,19 +192,19 @@ const DeviceReport = ({ setShowDeviceReport }) => {
 
 export default DeviceReport;
 
-const WatchPart = ({ clickHandler, closeHandler, data }) => {
+const WatchPart = ({ clickHandler, closeHandler, data, quoteSaved }) => {
   return (
     <div className={`${styles.devrep_wrap}`}>
       <div className={`${styles.devrep_nav}`}>
         <p className="px-2 text-xl font-medium border-r-2 border-black cursor-default">
           Device Report
         </p>
-        <p
+        {!quoteSaved && <p
           onClick={clickHandler}
           className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
         >
           ModifyAnswers
-        </p>
+        </p>}
         <IoClose
           size={25}
           className="absolute right-2 text-[#EC2752] cursor-pointer"
@@ -293,6 +294,7 @@ const WatchPart = ({ clickHandler, closeHandler, data }) => {
 };
 
 const CoreCosDis = ({ data, quickData }) => {
+  const exactQuoteValue = sessionStorage.getItem("ExactQuote");
   return (
     <React.Fragment>
       <div className={`${styles.ques_box}`}>

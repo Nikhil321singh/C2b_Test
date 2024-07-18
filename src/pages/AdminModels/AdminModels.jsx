@@ -79,7 +79,7 @@ const selectedModel = "";
 
 const AdminModels = () => {
   const [admincategory, setAdminCategory] = useState(
-    sessionStorage.getItem("admincategory")
+    sessionStorage.getItem("admincategory") === "Watch" ? "Watch" : "Mobile"
   );
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -87,7 +87,7 @@ const AdminModels = () => {
   const [selectmodel, setSelectModel] = useState("");
   const [selectstorage, setSelectstorage] = useState("");
   const [selectram, setSelectram] = useState("");
-  const [category, setCategory] = useState(() => sessionStorage.getItem("admincategory") || "Mobile");
+  const [category, setCategory] = useState("Mobile");
   const token = sessionStorage.getItem("authToken");
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
@@ -97,7 +97,13 @@ const AdminModels = () => {
 
   useEffect(() => {
     sessionStorage.setItem("admincategory", category);
+    getData();
+    setAdminCategory(sessionStorage.getItem("admincategory"));
   }, [category]);
+
+  useEffect(() => {
+    sessionStorage.setItem("admincategory", "Mobile");
+  }, []);
 
   function handleNext() {
     navigate("/adminhome");
@@ -198,15 +204,6 @@ const AdminModels = () => {
     setIsTableLoaded(true);
     setIsTableLoaded(false);
   };
-
-  useEffect(() => {
-    getData();
-    setAdminCategory(sessionStorage.getItem("admincategory"));
-  }, [category]);
-
-  useEffect(() => {
-    sessionStorage.setItem("admincategory", "Mobile");
-  }, []);
 
   const handleSearchClear = () => {
     setSearchValue("");

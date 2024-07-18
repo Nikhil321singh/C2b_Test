@@ -190,6 +190,7 @@ const OutStandingDevices = () => {
         setStoreData={setStoreData}
         storeData={storeData}
         getData={getData}
+        data={data}
       />
       <OutstandingTable
         data={data}
@@ -356,6 +357,7 @@ const OutstandingFilter = ({
   setStoreData,
   storeData,
   getData,
+  data
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
@@ -567,7 +569,7 @@ const OutstandingTable = ({
               <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Request</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Refrence No</th>
+              <th className="p-2 text-sm md:p-3 md:text-base">Lot No</th>
               <th className="p-2 text-sm md:p-3 md:text-base">
                 Number Of Device
               </th>

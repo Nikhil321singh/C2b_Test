@@ -6,11 +6,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 const navViewOfferr = "/viewofferdetail";
 
-const storedItem = JSON.parse(sessionStorage.getItem("rowData")) || {};
-const storedUser = sessionStorage.getItem("offerUserName");
-console.log(storedUser)
-const item = storedItem;
-const authToken = sessionStorage.getItem("authToken");
 const offerArray = [
   { id: "GRU1000", label: "GRU1000" },
   { id: "GRU1000", label: "GRU1000" },
@@ -20,6 +15,10 @@ const offerArray = [
 ];
 
 const Offers = () => {
+  const storedItem = JSON.parse(sessionStorage.getItem("rowData")) || {};
+  const storedUser = sessionStorage.getItem("offerUserName");
+  const item = storedItem;
+  const authToken = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const navigate = useNavigate();

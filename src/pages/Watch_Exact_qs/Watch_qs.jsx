@@ -60,9 +60,9 @@ const initialState = {
   Accessories: [],
   Warranty: [],
 };
-const id = JSON.parse(sessionStorage.getItem("dataModel"));
 
 function Watchqs() {
+  const id = JSON.parse(sessionStorage.getItem("dataModel"));
   const token = sessionStorage.getItem("authToken");
   const userToken = sessionStorage.getItem("authToken");
   const { answers, setAnswers } = useQuestionContext();
@@ -253,7 +253,7 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
-        <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
           <img
             onClick={() => navigate("/selectdevicetype")}

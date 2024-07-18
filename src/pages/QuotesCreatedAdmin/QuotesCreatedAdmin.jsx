@@ -58,16 +58,15 @@ const downloadExcelQuotesAdminCreated = (apiData) => {
   saveAs(dataAdminQuotesCreatedFile, "Quotes_Created" + fileExtension);
 };
 
-const fetchDownloadData = () => {
+const fetchDownloadData = (str) => {
   const userToken1 = sessionStorage.getItem("authToken");
   axios
     .get(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll/quotecreated`,
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/prospects/findAll/quotecreated?fromdate=2020-01-01&todate=${new Date().toISOString().split("T")[0]}&search=$&store=${str}`,
       {
         headers: {
-          authorization: `${userToken1}`,
+          authorization: userToken1,
         },
       }
     )
@@ -115,6 +114,7 @@ const QuotesCreatedAdmin = () => {
   const [storeId, setStoreId] = useState("");
   const [toDate, setToDate] = useState(null);
   const [fromDate, setFromDate] = useState(null);
+  const [filFlag, setFilFlag] = useState(true);
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
   const [toDateDup, setToDateDup] = useState(
     new Date().toISOString().split("T")[0]
@@ -142,7 +142,7 @@ const QuotesCreatedAdmin = () => {
 
   useEffect(() => {
     getTableData();
-  }, [storeId, fromDateDup, toDateDup]);
+  }, [storeId, fromDateDup, toDateDup, filFlag]);
 
   const saveStore = async () => {
     const temparr = await getStore();
@@ -165,6 +165,7 @@ const QuotesCreatedAdmin = () => {
     setToDateDup(new Date().toISOString().split("T")[0]);
     setFromDate("");
     setFromDateDup("2023-01-01");
+    setFilFlag(!filFlag);
   };
 
   const handleStoreChange = (value) => {
@@ -225,7 +226,7 @@ const QuotesCreatedAdmin = () => {
         </div>
         <button
           className={`${styles.bulkdown_button}`}
-          onClick={fetchDownloadData}
+          onClick={() => fetchDownloadData(storeId)}
         >
           <FaDownload /> Bulk Download
         </button>
