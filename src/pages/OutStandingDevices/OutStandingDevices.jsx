@@ -509,8 +509,8 @@ const OutstandingTable = ({
   setFailMode,
 }) => {
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-  const userRole = LoggedInUser?.role || "";
   const [showView, setShowView] = useState(false);
+  const userRole = LoggedInUser?.role || "";
   const [viewRef, setViewRef] = useState("");
   const token2 = sessionStorage.getItem("authToken");
   const viewHandler = (refID) => {
