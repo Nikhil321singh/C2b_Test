@@ -80,8 +80,9 @@ const DeviceQuote = () => {
             </div>
             <div className="flex flex-col gap-[2px]">
               <p className="font-medium text-gray-700">
-                {`${deviceModalInfo.models?.name}(${deviceModalInfo.models?.type === "Mobile" ?
-                deviceModalInfo.models?.config?.RAM + "/" : "" }${deviceModalInfo.models?.config?.storage})`}
+                {deviceModalInfo.models?.name}
+                {deviceModalInfo.models?.type === "Mobile" ?
+                  ` (${deviceModalInfo.models?.config?.RAM}/${deviceModalInfo.models?.config?.storage})`: ""}
               </p>
               <p className="text-[#EC2752] font-semibold">₹{Price}</p>
             </div>

@@ -23,8 +23,6 @@ import { setStoreFilter } from "../../store/slices/userSlice";
 
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
-const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-const userRole = LoggedInUser?.role || "";
 const PayrollRej = "Payroll Approval Rejected";
 
 const downloadExcel = (dataDown) => {
@@ -222,6 +220,8 @@ const ExtComps = ({
   tempId,
   setTempId,
 }) => {
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const userRole = LoggedInUser?.role || "";
   const [sideMenu, setsideMenu] = useState(false);
   const token1 = sessionStorage.getItem("authToken");
   const forwardReqHandler = (refID, newStatus) => {
@@ -508,7 +508,9 @@ const OutstandingTable = ({
   setSuccessMod,
   setFailMode,
 }) => {
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
   const [showView, setShowView] = useState(false);
+  const userRole = LoggedInUser?.role || "";
   const [viewRef, setViewRef] = useState("");
   const token2 = sessionStorage.getItem("authToken");
   const viewHandler = (refID) => {
