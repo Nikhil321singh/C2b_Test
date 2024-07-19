@@ -4,7 +4,6 @@ function SideMenu({ setsideMenu, sideMenu }) {
   const navigate = useNavigate();
 
   const profile = JSON.parse(sessionStorage.getItem("profile"));
-  console.log(profile.role);
 
   const handleHome = () => {
     setsideMenu(!sideMenu);
