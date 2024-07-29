@@ -78,7 +78,7 @@ const ChangePassword = () => {
             <ProfileBox />
             <img
               onClick={() => navigate("/selectdevicetype")}
-              className="w-28 "
+              className="w-40"
               src={Grest_Logo}
               alt="app logo"
             />

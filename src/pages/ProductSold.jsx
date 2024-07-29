@@ -40,7 +40,7 @@ const ProductSold = () => {
 
           <img
             onClick={() => navigate(navtoSelDevTP)}
-            className="w-28 "
+            className="w-40"
             src={Grest_Logo}
             alt="app logo"
           />

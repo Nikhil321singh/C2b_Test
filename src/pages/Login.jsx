@@ -5,7 +5,6 @@ import Grest_Logo from "../assets/Grest_Logo.jpg";
 import { useDispatch } from "react-redux";
 import { setUserProfile, setStoreFilter } from "../store/slices/userSlice";
 import "../styles/login.scss";
-import { SocialIcon } from "react-social-icons";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdOutlineMailLock } from "react-icons/md";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -78,22 +77,18 @@ const Login = () => {
     }
   };
 
-  const handleClick = (event) => {
-    event.preventDefault();
-  };
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-white Container">
       <div className="flex flex-col items-center justify-center px-10 pb-4 secondContainer">
-        <img className="w-48 pt-4" src={Grest_Logo} alt="app logo" />
-        <h1 className="mb-2 text-2xl font-semibold sm:text-3xl">Sign in</h1>
+        <img className="w-48 pt-4 mt-2" src={Grest_Logo} alt="app logo" />
+        <h1 className="mb-2 mt-2 text-2xl font-semibold sm:text-3xl">Sign in</h1>
         <div className="underline"></div>
         {error && <p className="text-sm text-red-500 sm:text-base">{error}</p>}
         <div
           id="loginForm"
           className="flex flex-col border-b-2 pb-6 gap-4 w-[32vw] formOuter"
         >
-          <div>
+          <div className="">
             <label htmlFor="userEmail">Email</label>
             <div className="input">
               <MdOutlineMailLock
@@ -162,35 +157,6 @@ const Login = () => {
               )}
             </button>
           </Link>
-        </div>
-
-        <div className="pb-2 mediaicon">
-          <span>or sign up using</span>
-          <div className="flex gap-2 list">
-            <SocialIcon
-              className="my-icon"
-              url="https://twitter.com"
-              bgColor="#1DA1F2"
-              onClick={handleClick}
-            />
-            <SocialIcon
-              className="my-icon"
-              url="https://www.facebook.com"
-              onClick={handleClick}
-            />
-            <SocialIcon
-              className="my-icon"
-              url="https://www.instagram.com"
-              onClick={handleClick}
-            />
-            <div className="p-1 rounded-full bg-grey-400">
-              <img
-                className="w-[30px] mt-[2px]"
-                src="https://flat-icons.com/wp-content/uploads/2022/07/Gmail-Icon-Aesthetic.png"
-                alt=""
-              />
-            </div>
-          </div>
         </div>
       </div>
     </div>

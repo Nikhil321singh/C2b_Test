@@ -258,7 +258,7 @@ const ExtComps = ({
         {userRole === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-28 " src={Grest_Logo} alt="app logo" />
+            <img className="w-40" src={Grest_Logo} alt="app logo" />
           </div>
         ) : (
           <div className="navbar">

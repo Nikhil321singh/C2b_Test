@@ -64,6 +64,11 @@ const Profile = () => {
   const handleFileInputChange = async (e) => {
     setIsTableLoaded(true);
     const file = e.target.files[0];
+    if(file.size > 2 * 1024 * 1024) {
+      setErrorMsg("File size must be less than 2MB");
+      setIsTableLoaded(false);
+      return;
+   }
     const formData = new FormData();
     formData.append("Profileimage", file);
     try {
@@ -253,8 +258,8 @@ const ProfileDetail = ({
                   <input
                     id="fileInput"
                     type="file"
-                    accept="image/*"
                     style={{ display: "none" }}
+                    accept=".jpg, .jpeg, .png"
                     onChange={handleFileInputChange}
                   />
                   {profileImage &&

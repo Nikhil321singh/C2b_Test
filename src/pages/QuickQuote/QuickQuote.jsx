@@ -176,7 +176,7 @@ const QuickQuote = () => {
         <div className="w-full flex items-center justify-betweenpr-2">
           <ProfileBox />
           <img
-            className="w-28"
+            className="w-40"
             onClick={() => navigate("/selectdevicetype")}
             alt="app logo"
             src={Grest_Logo}
