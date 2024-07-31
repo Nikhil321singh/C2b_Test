@@ -3,7 +3,7 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { useNavigate, useParams } from "react-router";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import styles from "../SelectDevice/SelectDevice.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OrdersCreated from "../OrdersCreated/OrdersCreated";
 import OrdersCompleted from "../OrdersCompleted/OrdersCompleted";
 import QuotesCreated from "../QuotesCreated/QuotesCreated";
@@ -12,11 +12,16 @@ function Orders() {
   const { daysfilter } = useParams();
   const navigate = useNavigate();
   const [selectedBtn, setselectedBtn] = useState(ordCreated);
+  const [deviceTypeChanged, setDeviceTypeChanged] = useState(false);
   const buttonList = [ordCreated, "Order Completed", "Quotes Created"];
   const handleDeviceChange = (e) => {
     const val = e.target.value;
     sessionStorage.setItem("DeviceType", val);
+    setDeviceTypeChanged(prev => !prev);
   };
+  useEffect(() => {
+    console.log(deviceTypeChanged);
+  }, [deviceTypeChanged]);
   return (
     <>
       <div className={`flex flex-col pb-16 bg-[#f9f9f84d] min-h-[100vh] `}>
@@ -74,7 +79,6 @@ function Orders() {
         {selectedBtn === "Quotes Created" && (
           <QuotesCreated daysfilters={daysfilter} head={true} />
         )}
-
         <AppFooter />
       </div>
     </>

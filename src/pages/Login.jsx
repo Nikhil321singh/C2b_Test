@@ -80,9 +80,8 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white Container">
       <div className="flex flex-col items-center justify-center px-10 pb-4 secondContainer">
-        <img className="w-48 pt-4 mt-2" src={Grest_Logo} alt="app logo" />
-        <h1 className="mb-2 mt-2 text-2xl font-semibold sm:text-3xl">Sign in</h1>
-        <div className="underline"></div>
+        <img className="w-48 pt-4 mt-2 mb-4" src={Grest_Logo} alt="app logo" />
+        <h1 className="font-sans text-[#EC2752] mt-2 text-3xl font-bold sm:text-4xl">Login</h1>
         {error && <p className="text-sm text-red-500 sm:text-base">{error}</p>}
         <div
           id="loginForm"
@@ -135,7 +134,7 @@ const Login = () => {
 
           <Link to="/PasswordRecovery">
             <span className="text-right text-sm font-medium block text-[rgb(236,39,82)] forgetpass">
-              Forget Password?
+              Forgot Password?
             </span>
           </Link>
           <Link to="/" className="login_button_holder">

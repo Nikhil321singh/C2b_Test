@@ -37,7 +37,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                     {index + currentPage * 10 + 1}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {new Date(data?.createdAt).toLocaleDateString("en-IN", {
+                    {new Date(data?.updatedAt).toLocaleDateString("en-IN", {
                       day: "2-digit",
                       month: "2-digit",
                       year: "numeric",
@@ -65,7 +65,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                     {data.uniqueCode}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {data.grestReceived || "no"}
+                    {data?.grestReceived === "yes" ? "Yes": "No"}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
                     {!!data.grestRecDate

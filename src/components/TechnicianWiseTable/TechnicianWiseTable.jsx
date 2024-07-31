@@ -34,7 +34,7 @@ const TechnicianWiseTable = ({ tableData }) => {
                   {item.store?.storeName}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {item.user?.name}
+                  {item.user?.firstName} {item.user?.lastName}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {item.totalDevice}

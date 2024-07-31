@@ -53,7 +53,7 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
               onClick={clickHandler}
               className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
             >
-              ModifyAnswers
+              Modify Answers
             </p>}
             <IoClose
               size={25}
@@ -203,7 +203,7 @@ const WatchPart = ({ clickHandler, closeHandler, data, quoteSaved }) => {
           onClick={clickHandler}
           className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
         >
-          ModifyAnswers
+          Modify Answers
         </p>}
         <IoClose
           size={25}
