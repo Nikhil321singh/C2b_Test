@@ -239,8 +239,8 @@ const ExtComps = ({
         setErrorMsg(
           `Successfully Updated Status of Lot ${refID} to ${newStatus}`
         );
-        if (newStatus === FinalStatus) {
-          setErrorMsg(`Payment Confirmed for Lot ${refID}.`);
+        if (newStatus === ApprovDelivery) {
+          setErrorMsg(`Delivery Approved for Lot ${refID}.`);
           setErrorMsg1("Check it on history.")
         }
         setIsTableLoaded(false);
@@ -314,7 +314,7 @@ const ExtComps = ({
             </p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => statusUpdHandler(tempId, FinalStatus)}
+                onClick={() => statusUpdHandler(tempId, ApprovDelivery)}
                 className={"bg-[#EC2752] text-white"}
               >
                 Okay
@@ -540,12 +540,7 @@ const PickedUpDevicesTable = ({
           setErrorMsg1(`Status Updated to Pending Approval for Delivery`);
           setErrorMsg2(checkOnPkd);
         }
-        if (newStatus === ApprovDelivery){
-          setErrorMsg(`Successfully Updated Status to ${newStatus}`);
-          setErrorMsg1(`Lot No. :- ${refID} Pending Payment Confirmation`);
-          setErrorMsg2(checkOnPkd);
-        }
-        if(newStatus === PickDelivered || newStatus === FinalStatus){
+        if(newStatus === PickDelivered || newStatus === ApprovDelivery){
           setErrorMsg(`Successfully Updated Status to ${newStatus}`);
           setErrorMsg1(`Lot No. :- ${refID}`);
           setErrorMsg2("Check it On History");
@@ -606,6 +601,18 @@ const PickedUpDevicesTable = ({
                       >
                         View
                       </button>
+                      {val?.status === "Pending Payment Confirmation" && (
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() =>
+                              statusUpdateHandler(val?._id, "Pending Payroll Approval")
+                            }
+                            className={`${styles.acpt_btn}`}
+                          >
+                            Confirm Payment
+                          </button>
+                        </div>
+                      )}
                       {val?.status === "Pending Payroll Approval" && (
                         <div className="flex flex-col gap-1">
                           <button
@@ -621,20 +628,10 @@ const PickedUpDevicesTable = ({
                       {val?.status === PickDelivered && (
                         <div className="flex flex-col gap-1">
                           <button
-                            onClick={() => statusUpdateHandler(val?._id, ApprovDelivery)}
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Approve Delivery
-                          </button>
-                        </div>
-                      )}
-                      {val?.status === ApprovDelivery && (
-                        <div className="flex flex-col gap-1">
-                          <button
                             onClick={() => confHandler(val?._id)}
                             className={`${styles.acpt_btn}`}
                           >
-                            Confirm Payment
+                            Approve Delivery
                           </button>
                         </div>
                       )}
