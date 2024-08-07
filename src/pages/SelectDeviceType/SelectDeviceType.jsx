@@ -768,7 +768,7 @@ const MiddlePart = ({
             >
               <option value="today">Today</option>
               <option value="7days">7 Days</option>
-              <option value="7days">This Month</option>
+              <option value="thismonth">This Month</option>
               <option value="lastmonth">Last Month</option>
               <option value="Custom">Custom</option>
             </select>
