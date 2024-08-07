@@ -84,6 +84,7 @@ const OrdersCompleted = ({ daysfilters, head }) => {
               onClick={() => navigate("/selectdevicetype")}
               src={Grest_Logo}
               alt="app logo"
+              style={{ zIndex: 9999 }}
             />
           </div>
         </div>

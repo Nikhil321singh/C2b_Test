@@ -17,7 +17,7 @@ function Orders() {
   const handleDeviceChange = (e) => {
     const val = e.target.value;
     sessionStorage.setItem("DeviceType", val);
-    setDeviceTypeChanged(prev => !prev);
+    setDeviceTypeChanged((prev) => !prev);
   };
   useEffect(() => {
     console.log(deviceTypeChanged);
@@ -34,6 +34,7 @@ function Orders() {
               className="w-40"
               src={Grest_Logo}
               alt="app logo"
+              style={{ zIndex: 9999 }}
             />
           </div>
         </div>

@@ -62,6 +62,7 @@ const AdminLogin = () => {
             className="w-32 absolute top-6 "
             src={Grest_Logo}
             alt="app logo"
+            style={{ zIndex: 9999 }}
           />
           {error && (
             <p className="text-sm text-red-500 sm:text-base">{error}</p>

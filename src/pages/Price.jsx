@@ -6,7 +6,6 @@ import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 
-
 const Price = ({ submitdata, userToken }) => {
   const userName = "";
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
@@ -84,10 +83,11 @@ const Price = ({ submitdata, userToken }) => {
     console.log(formData);
     try {
       await axios.post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/questionnaires/upload-documents`,
         formData,
-        { headers: {Authorization: token }}
+        { headers: { Authorization: token } }
       );
       setIsLoading(false);
       navigate("/specialoffers");
@@ -109,6 +109,7 @@ const Price = ({ submitdata, userToken }) => {
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
+            style={{ zIndex: 9999 }}
           />
         </div>
       </div>
@@ -187,14 +188,48 @@ const Price = ({ submitdata, userToken }) => {
 export default Price;
 
 const ImeiField = ({ imeinumber, setImeiNumber }) => {
+  const [error, setError] = useState("");
   const Device = sessionStorage.getItem("DeviceType");
+
+  const validateImeiNumber = (value) => {
+    if (Device === "Mobile") {
+      if (value.length !== 15) {
+        setError("IMEI number must be exactly 15 digits.");
+        return false;
+      } else if (!/^\d{15}$/.test(value)) {
+        setError("IMEI number must only contain digits.");
+        return false;
+      }
+    } else if (Device === "Watch") {
+      if (value.length < 6) {
+        setError("IMEI number must be between 6 to 15 digits.");
+        return false;
+      }
+    }
+    setError("");
+    return true;
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setImeiNumber(value);
+    validateImeiNumber(value);
+  };
+
+  const handleVerify = () => {
+    if (validateImeiNumber(imeinumber)) {
+      // Handle the verify logic here
+      console.log("IMEI number is valid.");
+    }
+  };
+
   return (
     <div className="flex flex-col eminumber mt-[4px]">
       <div className="flex gap-1 two">
         <p className="text-base font-medium">1.</p>
         <p className="text-base font-medium three">
-          Enter your {Device === "Mobile" && "phone's IMEI No."}
-          {Device === "Watch" && "smartwatch's serial no."}
+          Enter your{" "}
+          {Device === "Mobile" ? "phone's IMEI No." : "smartwatch's serial no."}
         </p>
       </div>
 
@@ -204,13 +239,22 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
           className="w-auto p-2 border-2 border-gray-300 rounded"
           value={imeinumber}
           placeholder={Device === "Mobile" ? "IMEI no." : "Serial no."}
-          onChange={(e) => setImeiNumber(e.target.value)}
+          onChange={handleChange}
           maxLength={15}
         />
-        <button className="px-4 py-2 font-bold text-white bg-[#f4486dd0] rounded hover:bg-[#ec2752]">
+        <button
+          className={`px-4 py-2 font-bold text-white rounded ${
+            !error
+              ? "bg-[#f4486dd0] hover:bg-[#ec2752]"
+              : "bg-gray-400 cursor-not-allowed"
+          }`}
+          onClick={handleVerify}
+          disabled={!!error}
+        >
           Verify
         </button>
       </div>
+      {error && <p className="text-red-600 mt-2 text-sm">{error}</p>}
     </div>
   );
 };
@@ -233,9 +277,7 @@ const AdharField = ({
       </div>
 
       <div className="flex inputAADHAR justify-evenly">
-        <div
-          className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative flex flex-col border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]"
-        >
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative flex flex-col border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center">Adhaar(Front)</p>
           <input
             type="file"
@@ -518,9 +560,9 @@ const PhonePhotos1 = ({
               </i>
             ) : (
               <img
-              src={URL.createObjectURL(phoneBottom)}
-              alt="Uploaded file"
-              className="w-full h-[60px]"
+                src={URL.createObjectURL(phoneBottom)}
+                alt="Uploaded file"
+                className="w-full h-[60px]"
               />
             )}
           </button>
@@ -528,4 +570,4 @@ const PhonePhotos1 = ({
       </div>
     </div>
   );
-}
+};

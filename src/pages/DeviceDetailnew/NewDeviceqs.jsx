@@ -338,6 +338,7 @@ const MainQContainer = ({
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
+            style={{ zIndex: 9999 }}
           />
         </div>
       </div>
@@ -702,7 +703,7 @@ const SixthPart = ({ Warranty, NDstate }) => {
     <div className="containClass">
       <div className="subheading">
         <GoDotFill size={20} />
-        <h2>Basic Condition of the Device</h2>
+        <h2>Please choose the appropriate warranty period for your device.</h2>
       </div>
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate?.Warranty &&
