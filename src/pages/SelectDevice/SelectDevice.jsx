@@ -158,7 +158,7 @@ const SelectDevice = () => {
 
   return (
     <div className="flex flex-col min-h-screen pb-16 bg-white">
-      <div styel={{ width: "60%", margin: "auto" }}>
+      <div style={{ width: "60%", margin: "auto" }}>
         <SearchBox
           isSearchBoxOpen={isSearchBoxOpen}
           searchBoxSwitch={searchBoxSwitch}
