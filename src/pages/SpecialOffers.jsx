@@ -11,7 +11,6 @@ import SummaryModal from "../components/SummaryModal";
 import { CgSpinner } from "react-icons/cg";
 import apple_watch from "../assets/apple_watch.png";
 
-
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
     <div
@@ -80,10 +79,11 @@ export const DynamicCouponCard = ({
   );
 };
 
-
 const SpecialOffers = () => {
   const storedDisableBtn = sessionStorage.getItem("disableBtn");
-  const initialDisableBtn = storedDisableBtn ? JSON.parse(storedDisableBtn) : false;
+  const initialDisableBtn = storedDisableBtn
+    ? JSON.parse(storedDisableBtn)
+    : false;
   const discountAvailable = 0;
   const userToken = sessionStorage.getItem("authToken");
   const [discountData, setDiscountData] = useState([]);
@@ -240,13 +240,14 @@ const SubSpecialOffers = ({
 }) => {
   const navigate = useNavigate();
   const Device = sessionStorage.getItem("DeviceType");
-  const DummyImg = Device === "Mobile"
-    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-    : apple_watch;
+  const DummyImg =
+    Device === "Mobile"
+      ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
+      : apple_watch;
   const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
   const phoneFrontPhoto =
-      phoneImg?.models?.phonePhotos?.front ||
-      phoneImg?.models?.phonePhotos?.upFront;
+    phoneImg?.models?.phonePhotos?.front ||
+    phoneImg?.models?.phonePhotos?.upFront;
   const dataModelInfo = JSON.parse(sessionStorage.getItem("dataModel"));
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
   return (
@@ -266,6 +267,7 @@ const SubSpecialOffers = ({
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
+            style={{ zIndex: 9999 }}
           />
         </div>
       </div>

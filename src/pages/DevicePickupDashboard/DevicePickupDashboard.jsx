@@ -85,7 +85,9 @@ const DevicePickupDashboard = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pendingDevices/all?region=${region}&storeName=${storeName}`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/all?region=${region}&storeName=${storeName}`,
       headers: { Authorization: token },
     };
     axios
@@ -109,7 +111,9 @@ const DevicePickupDashboard = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll?page=0&limit=9999`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
     axios
@@ -136,8 +140,9 @@ const DevicePickupDashboard = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pendingDevices/search?rid=${
-      searchValue}&date=${dateValue}&status=${statusValue}&region=${region}&storeName=${storeName}`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/search?rid=${searchValue}&date=${dateValue}&status=${statusValue}&region=${region}&storeName=${storeName}`,
       headers: { Authorization: token },
     };
     axios
@@ -408,7 +413,12 @@ const ExtComps = ({
         {LoggedInUser?.role === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-40" src={Grest_Logo} alt="app logo" />
+            <img
+              className="w-40"
+              src={Grest_Logo}
+              alt="app logo"
+              style={{ zIndex: 9999 }}
+            />
           </div>
         ) : (
           <div className="navbar">
@@ -453,7 +463,7 @@ const DPFilter = ({
     const storeNamesArray = filteredStores.map((store) => store.storeName);
     setStoreData(storeNamesArray);
     setRegion(value);
-    dispatch(setStoreFilter({selStore: "", selRegion: value}));
+    dispatch(setStoreFilter({ selStore: "", selRegion: value }));
   };
 
   const handleStoreChange = (value) => {
@@ -464,7 +474,7 @@ const DPFilter = ({
     const newRegion = filteredStores[0].region;
     setRegion(newRegion);
     setStoreName(value);
-    dispatch(setStoreFilter({selStore: value, selRegion: newRegion}));
+    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
   };
 
   const handleSearchClear = () => {
