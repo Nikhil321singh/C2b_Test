@@ -249,7 +249,7 @@ export const BrandList = ({ deviceType }) => {
   };
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands`, {
+      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands?deviceType=${deviceType}`, {
         headers: { authorization: `${userToken1}` },
       })
       .then((res) => {
@@ -258,7 +258,7 @@ export const BrandList = ({ deviceType }) => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [deviceType]);
 
   const handleDeviceClick = () => {
     setPopout(true);

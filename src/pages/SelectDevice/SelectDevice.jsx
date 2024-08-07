@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import styles from "./SelectDevice.module.css";
 import AppFooter from "../../components/AppFooter";
@@ -16,16 +16,17 @@ export const SeriesFilter = ({
   selectedBtn,
   setSelectedBtn,
   setSeriesType,
+  seriesList
 }) => {
   const categories = [
-    { name: "All", apiType: "" },
-    { name: "SE", apiType: "SE" },
-    { name: "Series 6", apiType: "Series 6" },
-    { name: "Series 7", apiType: "Series 7" },
-    { name: "Series 8", apiType: "Series 8" },
-    { name: "Series 9", apiType: "Series 9" },
-    { name: "Ultra", apiType: "Ultra" },
-    { name: "Ultra 2", apiType: "Ultra 2" },
+    { name: "All", seriesKey: "" },
+    { name: "SE", seriesKey: "SE" },
+    { name: "Series 6", seriesKey: "Series 6" },
+    { name: "Series 7", seriesKey: "Series 7" },
+    { name: "Series 8", seriesKey: "Series 8" },
+    { name: "Series 9", seriesKey: "Series 9" },
+    { name: "Ultra", seriesKey: "Ultra" },
+    { name: "Ultra 2", seriesKey: "Ultra 2" },
   ];
   const catContainerRef = useRef(null);
 
@@ -59,17 +60,17 @@ export const SeriesFilter = ({
         ref={catContainerRef}
         className={`flex flex-shrink-0 px-1 gap-4 overflow-x-auto scroll-smooth scrollbar-hide ${styles.select_button_box}`}
       >
-        {categories.map((category, index) => (
+        {seriesList.map((category, index) => (
           <div
             className={`${
               selectedBtn === category.name
                 ? styles.button_checked
                 : styles.button_unchecked
-            } text-xs font-medium text-nowrap flex-grow flex-shrink-0 px-0 w-[70px]`}
+            } text-xs font-medium text-nowrap flex-shrink-0 px-0`}
             key={index}
             onClick={() => {
               setSelectedBtn(category.name);
-              setSeriesType(category.apiType);
+              setSeriesType(category.seriesKey);
             }}
           >
             <p className="px-0 mx-0">{category.name}</p>
@@ -92,6 +93,7 @@ const SelectDevice = () => {
   const Device = sessionStorage.getItem("DeviceType");
   const [selectedBtn, setSelectedBtn] = useState("All");
   const [seriesType, setSeriesType] = useState("");
+  const [seriesList, setSeriesList] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const DummyImg =
     Device === "Mobile"
@@ -103,28 +105,32 @@ const SelectDevice = () => {
   useEffect(() => {
     setIsTableLoaded(true);
     const config = {
-      method: 'post',
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getSelectedBrandModels`,
+      method: "post",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/brands/getSelectedBrandModels`,
       headers: {
-        'Authorization': `${userToken}`,
+        Authorization: `${userToken}`,
       },
-      data : {
-        "brandId": brandId,
-        "deviceType": Device,
-        "search": seriesType
-      }
+      data: {
+        brandId: brandId,
+        deviceType: Device,
+        series: seriesType,
+      },
     };
-    console.log(config)
-    axios.request(config)
-    .then((res) => {
-      console.log("asd", res?.data);
-      setModelInfo(res.data);
-      setIsTableLoaded(false);
-    })
-    .catch((err) => {
-      console.log(err);
-      setIsTableLoaded(false);
-    });
+    console.log(config);
+    axios
+      .request(config)
+      .then((res) => {
+        console.log("asd", res?.data);
+        setModelInfo(res.data.models);
+        setSeriesList(res.data.seriesList);
+        setIsTableLoaded(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsTableLoaded(false);
+      });
   }, [seriesType]);
 
   const handleDeviceClick = (model) => {
@@ -161,13 +167,12 @@ const SelectDevice = () => {
           <p className="text-2xl font-bold">Select Smartwatches</p>
         )}
       </div>
-      {Device === "Watch" && brandId === "653cbbeae2eb1f468a1dd7ea" && (
-        <SeriesFilter
+      {seriesList.length > 1 && <SeriesFilter
           selectedBtn={selectedBtn}
           setSelectedBtn={setSelectedBtn}
           setSeriesType={setSeriesType}
-        />
-      )}
+          seriesList={seriesList}
+        />}
       <div
         className={` ${styles.cardsContainer} m-4 shrink flex flex-wrap justify-center gap-2 md:gap-8`}
       >
