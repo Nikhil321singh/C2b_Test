@@ -85,12 +85,7 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white Container">
       <div className="flex flex-col items-center justify-center px-10 pb-4 secondContainer">
-        <img
-          className="w-48 pt-4 mt-2 mb-4"
-          src={Grest_Logo}
-          alt="app logo"
-          style={{ zIndex: 9999 }}
-        />
+        <img className="w-48 pt-4 mt-2 mb-4" src={Grest_Logo} alt="app logo" />
         <h1 className="font-sans text-[#EC2752] mt-2 text-3xl font-bold sm:text-4xl">
           Login
         </h1>

@@ -160,7 +160,9 @@ function Categories() {
   useEffect(() => {
     axios
       .get(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands?deviceType=${deviceType}`,
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/brands/getBrands?deviceType=${deviceType}`,
         {
           headers: {
             authorization: `${userToken}`,
@@ -212,7 +214,6 @@ function Categories() {
               className="w-40"
               src={Grest_Logo}
               alt="app logo"
-              style={{ zIndex: 9999 }}
             />
           </div>
         </div>
