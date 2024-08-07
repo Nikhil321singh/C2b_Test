@@ -388,15 +388,13 @@ const searchPhoneAPI = async (Sdata, deviceType) => {
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/user/Dashboard/search/phones`,
-      { name: Sdata,
-        deviceType: deviceType,
-      },
+      { name: Sdata, deviceType: deviceType },
       { headers: { authorization: `${userToken}` } }
     )
     .then((res) => {
-      const updatedData = res.data.map(item => ({
+      const updatedData = res.data.map((item) => ({
         ...item,
-        imgSrc: ImgSelectore(item)
+        imgSrc: ImgSelectore(item),
       }));
       response = updatedData;
     })
@@ -509,7 +507,7 @@ const SelectDeviceType = () => {
   useEffect(() => {
     if (imei.length >= 15) {
       searchDevice(imei);
-    }else if(imei.length >= 3 && !/^\d+$/.test(imei.slice(0, 3))){
+    } else if (imei.length >= 3 && !/^\d+$/.test(imei.slice(0, 3))) {
       searchPhone(imei, deviceType);
     }
   }, [imei]);
@@ -538,11 +536,11 @@ const SelectDeviceType = () => {
           }/api/user/Dashboard/get/top/sellingModels?time=${days}&deviceType=${deviceType}`,
           { headers: { authorization: `${token}` } }
         );
-        const updatedData = await response.data.map(item => ({
+        const updatedData = await response.data.map((item) => ({
           ...item,
-          imgSrc: ImgSelectore(item)
+          imgSrc: ImgSelectore(item),
         }));
-        console.log(updatedData)
+        console.log(updatedData);
         setTopmodels(updatedData);
       } catch (err) {
         console.error(err);
@@ -685,11 +683,7 @@ const SearchBox = ({
                     style={{ boxShadow: "0 0 10px 0 rgb(0 0 0 / 0.1)" }}
                     onClick={() => handleDeviceClick(model)}
                   >
-                    <img
-                      className="w-[50px] mb-2"
-                      src={model.imgSrc}
-                      alt=""
-                    />
+                    <img className="w-[50px] mb-2" src={model.imgSrc} alt="" />
                     <p className="text-[11px] font-medium">{model.name}</p>
                   </div>
                 ))}
@@ -774,6 +768,7 @@ const MiddlePart = ({
             >
               <option value="today">Today</option>
               <option value="7days">7 Days</option>
+              <option value="thismonth">This Month</option>
               <option value="lastmonth">Last Month</option>
               <option value="Custom">Custom</option>
             </select>
@@ -834,7 +829,7 @@ const MiddlePart = ({
         </div>
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how3} />
-          <p className="-mb-1 text-base font-bold">Transfer</p>
+          <p className="-mb-1 text-base font-bold">Get Paid</p>
           <p className="text-base font-medium opacity-60">your money</p>
         </div>
       </div>
