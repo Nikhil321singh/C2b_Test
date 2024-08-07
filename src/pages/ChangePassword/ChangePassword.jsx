@@ -35,34 +35,63 @@ const ChangePassword = () => {
 
   const passwordValidation = () => {
     const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (newPassword.length < 8 && newFocus) {
-      setErrMsg("Password Size Must Be >= 8");
+    const lCaseRegex = /[a-z]/;
+    const uCaseRegex = /[A-Z]/;
+    const numRegex = /\d/;
+    const spCharRegex = /[@$!%*?&]/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(userEmail)) {
+      setErrMsg("Please Enter a Valid Email");
+      return;
+    }else{
+      setErrMsg("");
+    }
+    if (password.length < 8) {
+      setErrMsg("Password Size Must Be More Than 8");
+      return;
+    } else {
+      setErrMsg("");
+    }
+    if (newPassword.length < 8) {
+      setErrMsg("Password Size Must Be More Than 8");
       return;
     }
-    if (!passRegex.test(newPassword) && newFocus) {
-      setErrMsg("Must Have [A - Z] & [a - b] & [0 - 9] & a Speacial Char");
+    if (!lCaseRegex.test(newPassword) && newFocus) {
+      setErrMsg("Password Must Contain a Lower Case Letter");
       return;
     }
-
-    setErrMsg("");
+    if (!uCaseRegex.test(newPassword) && newFocus) {
+      setErrMsg("Password Must Contain a Upper Case Letter");
+      return;
+    }
+    if (!numRegex.test(newPassword) && newFocus) {
+      setErrMsg("Password Must Contain a Number");
+      return;
+    }
+    if (!spCharRegex.test(newPassword) && newFocus) {
+      setErrMsg("Password Must Contain a Speacial Char [@$!%*?&]");
+      return;
+    }
+    if (newFocus) {
+      setErrMsg("");
+      return;
+    }
+    if (newPassword !== confPassword && confFocus) {
+      setErrMsg("Confirm Password Does'nt Match");
+      return;
+    }
+    if(newPassword === confPassword && newPassword.length >= 8){
+      setErrMsg("Password Matched Please Submit");
+      return;
+    }
   };
 
   useEffect(() => {
     passwordValidation();
-  }, [newPassword, confPassword, newFocus, confFocus])
+  }, [userEmail, newPassword, confPassword, newFocus, confFocus])
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(userEmail)) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
-    if (newPassword !== confPassword) {
-      toast.error("New Password and Confirm Password does'nt Match");
-      console.log(newPassword, confPassword);
-      return;
-    }
+      event.preventDefault();
       setIsLoading(true);
       const userToken = sessionStorage.getItem("authToken");
       const data = {
@@ -86,15 +115,17 @@ const ChangePassword = () => {
         .then((res) => {
           console.log("changed", res.data.msg);
           if (res.data.msg === "Successfully updated user password ") {
-            toast.success(res.data.msg);
-            navigate("/");
+            setErrMsg("Successfully Updated User Password");
+            setTimeout(() => {
+              navigate("/");
+            }, 3000);
           }
           setIsLoading(false);
         })
         .catch((err) => {
           console.log("failed", err);
           setIsLoading(false);
-          toast.error("Failed to change password");
+          setErrMsg("Failed to Change Password");
         });
   };
   return (
@@ -114,9 +145,9 @@ const ChangePassword = () => {
         <div className="flex flex-col items-center justify-center w-full h-full mt-16">
         <div className="flex flex-col items-center justify-center box">
           <div className="imgBox">
-            <img className="w-48 pt-4 mt-2 mb-4" src={Grest_Logo} />
+            <img className="w-48 pt-4 mt-2 mb-3" src={Grest_Logo} />
             <h1 className="font-sans text-[#EC2752] my-2 text-3xl font-bold sm:text-4xl">Change Password</h1>
-            <p className="text-red-500 text-sm h-[20px]">{errMsg}</p>
+            <p className="text-red-600 text-sm h-[20px]">{errMsg}</p>
           </div>
           <div className="innerbox">
             <div className="flex flex-col items-center w-full gap-6">
@@ -151,6 +182,8 @@ const ChangePassword = () => {
                       name="password"
                       type={showUserPassword2 ? "text" : "password"}
                       required
+                      minLength={8}
+                      maxLength={20}
                       placeholder="Current Password"
                       value={password}
                       onChange={handlePasswordChange}
@@ -170,21 +203,17 @@ const ChangePassword = () => {
                     <input
                       id="new-password"
                       name="newPassword"
-                      type={showUserPassword ? "text" : "password"}
+                      type={showUserPassword ? "text" : "new-password"}
                       autoComplete="new-password"
                       required
+                      minLength={8}
+                      maxLength={20}
                       placeholder="New Password"
                       value={newPassword}
                       onChange={handleNewPasswordChange}
                       onFocus={() => setNewFocus(true)}
                       onBlur={() => setNewFocus(false)}
                     />
-                    <span
-                      onClick={() => setShowUserPassword(!showUserPassword)}
-                      className="absolute transform -translate-y-1/2 cursor-pointer right-2 top-6"
-                    >
-                      {!showUserPassword ? <IoEyeOffSharp /> : <IoEye />}
-                    </span>
                   </div>
                   <div className="relative input">
                     <RiLockPasswordLine
@@ -194,8 +223,10 @@ const ChangePassword = () => {
                     <input
                       id="confirm-password"
                       name="confirmPassword"
-                      type={showUserPassword ? "text" : "password"}
+                      type={showUserPassword ? "text" : "new-password"}
                       autoComplete="new-password"
+                      minLength={8}
+                      maxLength={20}
                       required
                       placeholder="Confirm Password"
                       value={confPassword}
@@ -203,19 +234,13 @@ const ChangePassword = () => {
                       onFocus={() => setConfFocus(true)}
                       onBlur={() => setConfFocus(false)}
                     />
-                    <span
-                      onClick={() => setShowUserPassword(!showUserPassword)}
-                      className="absolute transform -translate-y-1/2 cursor-pointer right-2 top-6"
-                    >
-                      {!showUserPassword ? <IoEyeOffSharp /> : <IoEye />}
-                    </span>
                   </div>
                 </div>
                 <div className="mb-6 login_button_holder">
                   <button
                     type="submit"
-                    className={`login_button ${isLoading && "opacity-[.8]"}`}
-                    disabled={isLoading}
+                    className={`login_button ${(isLoading || (newPassword !== confPassword)) && "opacity-[.8]"}`}
+                    disabled={isLoading || (newPassword !== confPassword)}
                   >
                     {isLoading && (
                       <div className="-ml-4 spinner">
