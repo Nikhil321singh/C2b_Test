@@ -21,7 +21,7 @@ const DeviceDetails = () => {
       detail: "your device",
     },
     {
-      title: "Transfer",
+      title: "Get Paid",
       detail: "your money",
     },
   ];
