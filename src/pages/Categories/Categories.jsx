@@ -160,8 +160,7 @@ function Categories() {
   useEffect(() => {
     axios
       .get(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands`,
-
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands?deviceType=${deviceType}`,
         {
           headers: {
             authorization: `${userToken}`,
@@ -174,7 +173,7 @@ function Categories() {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [deviceType]);
 
   console.log(brandList);
 
@@ -223,7 +222,7 @@ function Categories() {
           setDeviceType={setDeviceType}
         />
         <div
-          className={` ${styles.cardsContainer}   m-4  flex flex-wrap justify-center gap-2 md:gap-8 rounded-md`}
+          className={` ${styles.cardsContainer}   m-4  flex flex-wrap justify-start gap-2 md:gap-8 rounded-md`}
         >
           {brandList &&
             brandList.map((model) => (
