@@ -112,7 +112,6 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
               className="w-40"
               src={Grest_Logo}
               alt="app logo"
-              style={{ zIndex: 9999 }}
             />
           </div>
         </div>
