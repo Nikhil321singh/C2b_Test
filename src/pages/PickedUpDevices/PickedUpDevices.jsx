@@ -24,10 +24,10 @@ const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
 const checkOnPkd = "Check it On Picked Up";
 const PendingConf = "Pending Pickup Confirmation";
-const PickConf = "Pending Delivery At Warehouse";//Technican Earlier - Pickup Confirmed
-const PickDelivered = "Pickup Delivered At Warehouse";//Technican
-const ApprovDelivery = "Approved Delivery At Warehouse";//Admin Manager
-const FinalStatus = "Payment Confirmed";//Admin Manager
+const PickConf = "Pending Delivery At Warehouse"; //Technican Earlier - Pickup Confirmed
+const PickDelivered = "Pickup Delivered At Warehouse"; //Technican
+const ApprovDelivery = "Approved Delivery At Warehouse"; //Admin Manager
+const FinalStatus = "Payment Confirmed"; //Admin Manager
 
 const PickedUpDevices = () => {
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
@@ -57,7 +57,8 @@ const PickedUpDevices = () => {
     setIsTableLoaded(true);
     const configuration = {
       method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/pickupDevices/all?region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
     };
@@ -134,7 +135,7 @@ const PickedUpDevices = () => {
   }, [dateValue, storeName, region]);
 
   const confHandler = (id) => {
-    console.log(id)
+    console.log(id);
     setTempId(id);
     setIsTableLoaded(true);
     setConfMod(true);
@@ -241,7 +242,7 @@ const ExtComps = ({
         );
         if (newStatus === ApprovDelivery) {
           setErrorMsg(`Delivery Approved for Lot ${refID}.`);
-          setErrorMsg1("Check it on history.")
+          setErrorMsg1("Check it on history.");
         }
         setIsTableLoaded(false);
         setSuccessMod(true);
@@ -371,7 +372,7 @@ const PickedUpFilter = ({
     setStoreName("");
     const filteredStores = allStore?.filter((store) => store.region === value);
     const storeNamesArray = filteredStores.map((store) => store.storeName);
-    dispatch(setStoreFilter({selStore: "", selRegion: value}));
+    dispatch(setStoreFilter({ selStore: "", selRegion: value }));
     setStoreData(storeNamesArray);
     setRegion(value);
   };
@@ -383,7 +384,7 @@ const PickedUpFilter = ({
     );
     const newRegion = filteredStores[0].region;
     setRegion(newRegion);
-    dispatch(setStoreFilter({selStore: value, selRegion: newRegion}));
+    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
     setStoreName(value);
   };
 
@@ -528,7 +529,7 @@ const PickedUpDevicesTable = ({
         newStatus: newStatus,
       },
     };
-    console.log(config)
+    console.log(config);
     axios
       .request(config)
       .then((response) => {
@@ -540,7 +541,7 @@ const PickedUpDevicesTable = ({
           setErrorMsg1(`Status Updated to Pending Approval for Delivery`);
           setErrorMsg2(checkOnPkd);
         }
-        if(newStatus === PickDelivered || newStatus === ApprovDelivery){
+        if (newStatus === PickDelivered || newStatus === ApprovDelivery) {
           setErrorMsg(`Successfully Updated Status to ${newStatus}`);
           setErrorMsg1(`Lot No. :- ${refID}`);
           setErrorMsg2("Check it On History");
@@ -605,7 +606,10 @@ const PickedUpDevicesTable = ({
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, "Pending Payroll Approval")
+                              statusUpdateHandler(
+                                val?._id,
+                                "Pending Payroll Approval"
+                              )
                             }
                             className={`${styles.acpt_btn}`}
                           >
@@ -642,31 +646,51 @@ const PickedUpDevicesTable = ({
                       <button
                         className={`${styles.view_btn}`}
                         onClick={() => viewHandler(val?._id)}
-                      >View</button>
+                      >
+                        View
+                      </button>
                       {val?.status === PendingConf && (
                         <div className="flex flex-col gap-1">
                           <button
-                            onClick={() => statusUpdateHandler(val?._id, PickConf)}
+                            onClick={() =>
+                              statusUpdateHandler(val?._id, PickConf)
+                            }
                             className={`${styles.acpt_btn}`}
-                          >Pickup</button>
+                          >
+                            Pickup
+                          </button>
                         </div>
                       )}
                       {val?.status === PickConf && (
                         <div className="flex flex-col gap-1">
                           <button
-                            onClick={() => statusUpdateHandler(val?._id, PickDelivered)}
+                            onClick={() =>
+                              statusUpdateHandler(val?._id, PickDelivered)
+                            }
                             className={`${styles.acpt_btn}`}
-                          >Pickup Delivered</button>
+                          >
+                            Pickup Delivered
+                          </button>
                         </div>
                       )}
                     </div>
                   )}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">{val?.status}</td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">{new Date(val.createdAt).toLocaleDateString("en-GB")}</td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">{val?._id}</td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">{val?.totalDevice}</td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">{val?.totalAmount}</td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {val?.status}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {new Date(val.createdAt).toLocaleDateString("en-GB")}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {val?._id}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {val?.totalDevice}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {val?.totalAmount}
+                </td>
               </tr>
             ))}
           </tbody>

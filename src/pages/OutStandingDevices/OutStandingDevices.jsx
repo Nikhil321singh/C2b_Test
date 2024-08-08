@@ -357,7 +357,7 @@ const OutstandingFilter = ({
   setStoreData,
   storeData,
   getData,
-  data
+  data,
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
@@ -369,7 +369,7 @@ const OutstandingFilter = ({
     const storeNames = filterStores.map((store) => store.storeName);
     setStoreData(storeNames);
     setRegion(val);
-    dispatch(setStoreFilter({selStore: "", selRegion: val}));
+    dispatch(setStoreFilter({ selStore: "", selRegion: val }));
   };
 
   const handleStoreChange = (val) => {
@@ -378,7 +378,7 @@ const OutstandingFilter = ({
     const bRnewRegion = filterStores[0].region;
     setRegion(bRnewRegion);
     setStoreName(val);
-    dispatch(setStoreFilter({selStore: val, selRegion: bRnewRegion}));
+    dispatch(setStoreFilter({ selStore: val, selRegion: bRnewRegion }));
   };
 
   const handleSearchClear = () => {

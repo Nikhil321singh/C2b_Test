@@ -1,4 +1,4 @@
-import React,{ useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./ContOTP.module.css";
 import optImg from "../../assets/otpLogo.svg";
 import OtpInput from "otp-input-react";

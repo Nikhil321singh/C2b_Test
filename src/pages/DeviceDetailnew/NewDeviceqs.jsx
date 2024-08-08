@@ -338,6 +338,7 @@ const MainQContainer = ({
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
+            style={{ zIndex: 9999 }}
           />
         </div>
       </div>

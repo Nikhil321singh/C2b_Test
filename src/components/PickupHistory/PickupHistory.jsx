@@ -125,7 +125,7 @@ const PickupHistory = () => {
     const storeNamesArray = filterStores.map((store) => store.storeName);
     setRegion(value);
     setStoreData(storeNamesArray);
-    dispatch(setStoreFilter({selStore: "", selRegion: value}));
+    dispatch(setStoreFilter({ selStore: "", selRegion: value }));
   };
 
   const handleStoreChange = (value) => {
@@ -134,7 +134,7 @@ const PickupHistory = () => {
     const newRegion = filterStores[0].region;
     setStoreName(value);
     setRegion(newRegion);
-    dispatch(setStoreFilter({selStore: value, selRegion: newRegion}));
+    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
   };
 
   const viewHandler = (refID) => {
@@ -153,7 +153,12 @@ const PickupHistory = () => {
         {userRole === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-40" src={Grest_Logo} alt="app logo" />
+            <img
+              className="w-40"
+              src={Grest_Logo}
+              alt="app logo"
+              style={{ zIndex: 9999 }}
+            />
           </div>
         ) : (
           <div className="navbar">
