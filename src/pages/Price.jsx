@@ -5,7 +5,7 @@ import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
-
+import { FaInfoCircle } from "react-icons/fa";
 const Price = ({ submitdata, userToken }) => {
   const userName = "";
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
@@ -41,11 +41,32 @@ const Price = ({ submitdata, userToken }) => {
   };
 
   const handleChange = (setMEthod, e) => {
-    setMEthod(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.size > 5 * 1024 * 1024) {
+      alert("File size exceeds 5MB. Please choose a smaller file.");
+      return;
+    }
+    setMEthod(file);
   };
 
   const uploadAllImages = async () => {
     setIsLoading(true);
+
+    if (
+      !imeinumber ||
+      !phoneFront ||
+      !phoneBack ||
+      !phoneLeft ||
+      !phoneRight ||
+      !phoneTop ||
+      !phoneBottom
+    ) {
+      alert(
+        "Please fill in all mandatory fields (IMEI/Serial number and device images)."
+      );
+      setIsLoading(false);
+      return;
+    }
     const formData = new FormData();
     if (file) {
       formData.append("adharFront", file);
@@ -112,9 +133,53 @@ const Price = ({ submitdata, userToken }) => {
           />
         </div>
       </div>
-      <div className="w-[90%] md:w-[90%] mx-auto  h-[auto] mb-[93px]">
-        <div className="mt-3 text-center">
+      <div className="w-[90%] md:w-[90%] mx-auto h-[auto] mb-[93px]">
+        <div className="mt-3 text-center relative">
           <h1 className="text-2xl font-semibold">Upload Documents</h1>
+          <div className="absolute top-0 right-0 group">
+            <FaInfoCircle className="text-gray-500 cursor-pointer" />
+            <div
+              class="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded p-2 right-0 mt-1 w-48"
+              style={{ zIndex: 999 }}
+            >
+              <p>
+                Upload Your device images which should include close-up shot of
+                any specific damage, dent, scratches or wear and tear. Photos
+                should be taken from an approx distance of 30 cms.
+              </p>
+
+              <p>
+                <strong>Front Side:</strong> Ensure the entire front of the
+                phone is visible in display On condition and black screen
+                background. It should include the full screen and bezels.
+              </p>
+
+              <p>
+                <strong>Back Side:</strong> Capture the entire back side of the
+                phone, including the camera, logo, and any scratches or dents.
+              </p>
+
+              <p>
+                <strong>Left Side:</strong> Show the complete left side,
+                including buttons and any port.
+              </p>
+
+              <p>
+                <strong>Right Side:</strong> Show the complete right side,
+                including buttons and any port.
+              </p>
+
+              <p>
+                <strong>Top Side:</strong> Show the full top edge of the phone,
+                including any ports or sensors.
+              </p>
+
+              <p>
+                <strong>Bottom Side:</strong> Capture the full bottom edge,
+                including any ports or speakers.
+              </p>
+            </div>
+          </div>
           <p className="mt-4 text-gray-600">
             Regulations require you to upload a national identity card. Don't
             worry, your data will stay safe and private.
@@ -168,7 +233,17 @@ const Price = ({ submitdata, userToken }) => {
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div
           onClick={() => uploadAllImages()}
-          className="bg-[#EC2752] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
+          className={`bg-[#EC2752] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
+            !imeinumber ||
+            !phoneFront ||
+            !phoneBack ||
+            !phoneLeft ||
+            !phoneRight ||
+            !phoneTop ||
+            !phoneBottom
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
         >
           {isLoading && (
             <CgSpinner
@@ -228,7 +303,8 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
         <p className="text-base font-medium">1.</p>
         <p className="text-base font-medium three">
           Enter your{" "}
-          {Device === "Mobile" ? "phone's IMEI No." : "smartwatch's serial no."}
+          {Device === "Mobile" ? "phone's IMEI No." : "smartwatch's serial no."}{" "}
+          <span className="text-red-500">*</span>
         </p>
       </div>
 
@@ -272,9 +348,13 @@ const AdharField = ({
     <div className="flex flex-col adharcard mt-[10px]">
       <div className="flex gap-1 two">
         <p className="text-base font-medium">2.</p>
-        <p className="text-base font-medium three">Upload your Aadhar Card</p>
+        <div className="flex items-center">
+          <p className="text-base font-medium three">Upload your Aadhar Card</p>
+        </div>
       </div>
-
+      <p className="mt-2 text-sm text-red-600">
+        Note: Image size should not exceed 2MB
+      </p>
       <div className="flex inputAADHAR justify-evenly">
         <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative flex flex-col border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center">Adhaar(Front)</p>
@@ -286,10 +366,7 @@ const AdharField = ({
           />
           <button onClick={() => handleCameraButtonClick(fileInputRef)}>
             {!file ? (
-              <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-                <FaCamera />
-                <span className="block tracking-tighter">Select file</span>
-              </i>
+              <FaCamera className="text-3xl text-gray-500" />
             ) : (
               <img
                 className="w-full h-[60px]"
@@ -309,10 +386,7 @@ const AdharField = ({
           />
           <button onClick={() => handleCameraButtonClick(idproofBackRef)}>
             {!idProofBack ? (
-              <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-                <FaCamera />
-                <span className="block tracking-tighter">Select file</span>
-              </i>
+              <FaCamera className="text-3xl text-gray-500" />
             ) : (
               <img
                 className="w-full h-[60px]"
@@ -339,12 +413,17 @@ const PhoneBill = ({
   return (
     <div className="flex flex-col adharcard mt-[10px]">
       <div className="flex gap-1 two">
-        <p className="text-base font-medium">2.</p>
-        <p className="text-base font-medium three">
-          Upload your {Device === "Mobile" && "phone's"}
-          {Device === "Watch" && "smartwatch's"} bill
-        </p>
+        <p className="text-base font-medium">3.</p>
+        <div className="flex items-center">
+          <p className="text-base font-medium three">
+            Upload your {Device === "Mobile" && "phone's"}
+            {Device === "Watch" && "smartwatch's"} bill
+          </p>
+        </div>
       </div>
+      <p className="mt-2 text-sm text-red-600">
+        Note: Image size should not exceed 2MB
+      </p>
 
       <div className="flex justify-start ml-3 inputAADHAR">
         {/* 1 */}
@@ -361,10 +440,7 @@ const PhoneBill = ({
           />
           <button onClick={() => handleCameraButtonClick(phoneBillRef)}>
             {!phoneBill ? (
-              <i className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-                <FaCamera />
-                <span className="block tracking-tighter">Select file</span>
-              </i>
+              <FaCamera className="text-3xl text-gray-500" />
             ) : (
               <img
                 className="w-full h-[60px]"
@@ -405,11 +481,17 @@ const PhonePhotos1 = ({
   return (
     <div className="flex flex-col adharcard mt-[10px] ">
       <div className="flex gap-1 two">
-        <p className="text-base font-medium">3.</p>
-        <p className="text-base font-medium three">
-          {`Upload Your ${Device}'s Images`}
-        </p>
+        <p className="text-base font-medium">4.</p>
+        <div className="flex items-center">
+          <p className="text-base font-medium three">
+            {`Upload Your ${Device}'s Images`}{" "}
+            <span className="text-red-500">*</span>
+          </p>
+        </div>
       </div>
+      <p className="mt-2 text-sm text-red-600">
+        Note: Image size should not exceed 2MB
+      </p>
       <div className="flex flex-wrap inputAADHAR justify-evenly">
         <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="text-center font-semibold">{`${Device} Front`}</p>
@@ -421,10 +503,7 @@ const PhonePhotos1 = ({
           />
           <button onClick={() => handleCameraButtonClick(phoneFrontRef)}>
             {!phoneFront ? (
-              <i className="absolute flex flex-col justify-center items-center  transform -translate-x-1/2 -translate-y-1/2 fa-camera left-1/2 top-[70%]">
-                <FaCamera />
-                <span className="block tracking-tighter">Select file</span>
-              </i>
+              <FaCamera className="text-3xl text-gray-500" />
             ) : (
               <img
                 src={URL.createObjectURL(phoneFront)}
@@ -444,10 +523,7 @@ const PhonePhotos1 = ({
           />
           <button onClick={() => handleCameraButtonClick(phoneBackRef)}>
             {!phoneBack ? (
-              <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
-                <FaCamera />
-                <span className="block tracking-tighter">Select file</span>
-              </i>
+              <FaCamera className="text-3xl text-gray-500" />
             ) : (
               <img
                 className="w-full h-[60px]"
@@ -472,10 +548,7 @@ const PhonePhotos1 = ({
           />
           <button onClick={() => handleCameraButtonClick(phoneLeftRef)}>
             {!phoneLeft ? (
-              <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
-                <FaCamera />
-                <span className="block tracking-tighter">Select file</span>
-              </i>
+              <FaCamera className="text-3xl text-gray-500" />
             ) : (
               <img
                 className="h-[60px] w-full"
@@ -499,10 +572,7 @@ const PhonePhotos1 = ({
           />
           <button onClick={() => handleCameraButtonClick(phoneRightRef)}>
             {!phoneRight ? (
-              <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
-                <FaCamera />
-                <span className="block tracking-tighter">Select file</span>
-              </i>
+              <FaCamera className="text-3xl text-gray-500" />
             ) : (
               <img
                 src={URL.createObjectURL(phoneRight)}
@@ -526,10 +596,7 @@ const PhonePhotos1 = ({
           />
           <button onClick={() => handleCameraButtonClick(phoneTopRef)}>
             {!phoneTop ? (
-              <i className="absolute flex flex-col items-center justify-center transform -translate-y-1/2 -translate-x-1/2 fa-camera top-[70%] left-1/2">
-                <FaCamera />
-                <span className="block tracking-tighter">Select file</span>
-              </i>
+              <FaCamera className="text-3xl text-gray-500" />
             ) : (
               <img
                 src={URL.createObjectURL(phoneTop)}
@@ -553,10 +620,7 @@ const PhonePhotos1 = ({
           />
           <button onClick={() => handleCameraButtonClick(phoneBottomRef)}>
             {!phoneBottom ? (
-              <i className="absolute flex flex-col justify-center items-center transform -translate-x-1/2 -translate-y-1/2 fa-camera top-[70%] left-1/2">
-                <FaCamera />
-                <span className="block tracking-tighter">Select file</span>
-              </i>
+              <FaCamera className="text-3xl text-gray-500" />
             ) : (
               <img
                 src={URL.createObjectURL(phoneBottom)}
