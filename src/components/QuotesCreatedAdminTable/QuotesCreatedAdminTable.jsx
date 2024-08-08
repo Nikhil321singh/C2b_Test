@@ -78,7 +78,7 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 min-w-[150px] md:text-base">
                     {data?.lead?.ram
-                      ? `${data?.lead?.storage}/${data?.lead?.ram}`
+                      ? `${data?.lead?.ram}/${data?.lead?.storage}`
                       : data?.lead?.storage}
                   </td>
                   <td className="p-2 text-sm min-w-[100px] text-center md:p-3 md:text-base">

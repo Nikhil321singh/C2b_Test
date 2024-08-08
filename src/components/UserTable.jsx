@@ -28,7 +28,7 @@ const UserTable = ({ data }) => {
 
     if (val.lead.model.type === "Mobile") {
       if (val.lead.ram) {
-        return `${val.lead.storage}/${val.lead.ram}`;
+        return `${val.lead.ram}/${val.lead.storage}`;
       }
       return val.lead.storage;
     }

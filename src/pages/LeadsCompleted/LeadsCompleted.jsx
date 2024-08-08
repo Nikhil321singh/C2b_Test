@@ -59,13 +59,13 @@ const downloadExcelLeadsompleted = (apiData) => {
     }
     return {
       "Date Created": new Date(item?.createdAt).toLocaleDateString("en-IN"),
-      phoneNumber: item.phoneNumber,
+      "Store user Mobile No.": item.phoneNumber,
       "User Email": item.userId?.email,
       "Customer Mobile No.": item.phoneNumber,
       "Customer Name": item.name,
       Product: item.modelId?.name,
       Price: item.actualPrice,
-      "Prospect Id": item.userId?._id,
+      "Order Id": item.userId?._id,
       "IMEI No.": item.documentId?.IMEI,
       "Question/Ans": questionsKeys,
     };
@@ -119,9 +119,9 @@ const LeadsCompleted = () => {
 
   function getSalesData() {
     setLoading(true);
-    const endpoint = `${import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=${fromDateDup
-    }&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=${search1}&deviceType=${deviceType}`;
+    const endpoint = `${
+      import.meta.env.VITE_REACT_APP_ENDPOINT
+    }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=${fromDateDup}&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=${search1}&deviceType=${deviceType}`;
     axios
       .get(endpoint, {
         headers: { authorization: userToken },
@@ -146,7 +146,7 @@ const LeadsCompleted = () => {
     setFromDateDup("2023-01-01");
     setToDate("");
     setToDateDup(new Date().toISOString().split("T")[0]);
-    setReset(!reset)
+    setReset(!reset);
   };
 
   const handleStoreChange = (value) => {
@@ -158,7 +158,15 @@ const LeadsCompleted = () => {
 
   useEffect(() => {
     getSalesData();
-  }, [currentPage, pageLimit, selStoreId, fromDateDup, toDateDup, reset, deviceType]);
+  }, [
+    currentPage,
+    pageLimit,
+    selStoreId,
+    fromDateDup,
+    toDateDup,
+    reset,
+    deviceType,
+  ]);
 
   const handleFromDateChange = (DateTemp, e) => {
     if (DateTemp === null) {
@@ -203,14 +211,19 @@ const LeadsCompleted = () => {
         setCurrentPage={setCurrentPage}
         currentPage={currentPage}
         maxPages={maxPages}
-        search={search} setSearch={setSearch}
-        search1={search1} setSearch1={setSearch1}
-        storeDrop={storeDrop} setStoreDrop={setStoreDrop}
+        search={search}
+        setSearch={setSearch}
+        search1={search1}
+        setSearch1={setSearch1}
+        storeDrop={storeDrop}
+        setStoreDrop={setStoreDrop}
         storeName={storeName}
         storeData={storeData}
-        handleSearchClear={handleSearchClear} handleStoreChange={handleStoreChange}
+        handleSearchClear={handleSearchClear}
+        handleStoreChange={handleStoreChange}
         getSalesData={getSalesData}
-        deviceType={deviceType} setDeviceType={setDeviceType}
+        deviceType={deviceType}
+        setDeviceType={setDeviceType}
         selStoreId={selStoreId}
       />
     </div>
@@ -223,7 +236,9 @@ const fetchDownloadData = (totalCount, deviceType, Str) => {
     .get(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}&deviceType=${deviceType}&startDate=2020-01-01&toDate=${new Date().toISOString().split("T")[0]}store=${Str}`,
+      }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}&deviceType=${deviceType}&startDate=2020-01-01&toDate=${
+        new Date().toISOString().split("T")[0]
+      }store=${Str}`,
       {
         headers: {
           authorization: `${userToken1}`,
@@ -251,15 +266,20 @@ const SubLeadsCompleted = ({
   setCurrentPage,
   currentPage,
   maxPages,
-  search, setSearch,
-  search1, setSearch1,
-  storeDrop, setStoreDrop,
+  search,
+  setSearch,
+  search1,
+  setSearch1,
+  storeDrop,
+  setStoreDrop,
   storeName,
   storeData,
-  handleSearchClear, handleStoreChange,
+  handleSearchClear,
+  handleStoreChange,
   getSalesData,
-  deviceType, setDeviceType,
-  selStoreId
+  deviceType,
+  setDeviceType,
+  selStoreId,
 }) => {
   const [deviceDrop, setDeviceDrop] = useState(false);
   return (
@@ -314,11 +334,13 @@ const SubLeadsCompleted = ({
               className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
             >
               <div
-                  className={`${styless.filter_option}`}
-                  onClick={() => handleStoreChange({ _id: "", storeName: ALLstore})}
-                >
-                  <p className="truncate">{ALLstore}</p>
-                </div>
+                className={`${styless.filter_option}`}
+                onClick={() =>
+                  handleStoreChange({ _id: "", storeName: ALLstore })
+                }
+              >
+                <p className="truncate">{ALLstore}</p>
+              </div>
               {storeData.map((sitem, index) => (
                 <div
                   key={index}
@@ -344,29 +366,29 @@ const SubLeadsCompleted = ({
               className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
             >
               <div
-                  className={`${styless.filter_option}`}
-                  onClick={() => { 
-                    setDeviceType("Mobile");
-                    setDeviceDrop(false);
-                   }}
-                >
-                  <p className="truncate">Mobile</p>
+                className={`${styless.filter_option}`}
+                onClick={() => {
+                  setDeviceType("Mobile");
+                  setDeviceDrop(false);
+                }}
+              >
+                <p className="truncate">Mobile</p>
               </div>
               <div
-                  className={`${styless.filter_option}`}
-                  onClick={() => { 
-                    setDeviceType("Watch");
-                    setDeviceDrop(false);
-                  }}
-                >
-                  <p className="truncate">Watch</p>
+                className={`${styless.filter_option}`}
+                onClick={() => {
+                  setDeviceType("Watch");
+                  setDeviceDrop(false);
+                }}
+              >
+                <p className="truncate">Watch</p>
               </div>
             </div>
           )}
         </div>
       </div>
       <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
-      <div className={`${styles.search_bar_wrap}`}>
+        <div className={`${styles.search_bar_wrap}`}>
           <input
             onChange={(e) => setSearch(e.target.value)}
             className="text-sm"
@@ -377,7 +399,11 @@ const SubLeadsCompleted = ({
           <IoMdSearch size={25} onClick={() => getSalesData()} />
         </div>
         <div className={styles.icons_box}>
-          <IoRefresh onClick={() => handleSearchClear()} className="" size={25} />
+          <IoRefresh
+            onClick={() => handleSearchClear()}
+            className=""
+            size={25}
+          />
         </div>
         <div className={`${styles.search_bar_wrap}`}>
           <input

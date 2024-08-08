@@ -249,9 +249,14 @@ export const BrandList = ({ deviceType }) => {
   };
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands?deviceType=${deviceType}`, {
-        headers: { authorization: `${userToken1}` },
-      })
+      .get(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/brands/getBrands?deviceType=${deviceType}`,
+        {
+          headers: { authorization: `${userToken1}` },
+        }
+      )
       .then((res) => {
         setBrandList(res.data.data);
       })
@@ -829,7 +834,7 @@ const MiddlePart = ({
         </div>
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how3} />
-          <p className="-mb-1 text-base font-bold">Get Paid</p>
+          <p className="-mb-1 text-base font-bold">Get Paid Instantly</p>
           <p className="text-base font-medium opacity-60">your money</p>
         </div>
       </div>

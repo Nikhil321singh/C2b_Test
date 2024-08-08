@@ -62,7 +62,7 @@ const LeadsCompletedTable = ({ data }) => {
   const getStorage = (val) => {
     if (val?.modelId?.type === "Mobile") {
       return `${
-        val?.storage && val?.ram ? `${val?.storage}/${val?.ram}` : val?.storage
+        val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
       }`;
     } else {
       return "-";
