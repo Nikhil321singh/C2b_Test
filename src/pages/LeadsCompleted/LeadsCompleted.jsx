@@ -48,15 +48,17 @@ const downloadExcelLeadsompleted = (apiData) => {
   const fileExtension = ".xlsx";
 
   const formattedData = apiData.map((item) => {
-    let questionsKeys = "";
+    const questionData = {};
     let index = 1;
-    console.log(item?.QNA[0]);
+
     for (const group in item?.QNA[0]) {
       item?.QNA[0][group].forEach((qna) => {
-        questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
+        // Create a column for each question with its answer
+        questionData[`Q${index}. ${qna?.quetion}`] = qna?.key;
         index++;
       });
     }
+
     return {
       "Date Created": new Date(item?.createdAt).toLocaleDateString("en-IN"),
       "Store user Mobile No.": item.phoneNumber,
@@ -67,7 +69,7 @@ const downloadExcelLeadsompleted = (apiData) => {
       Price: item.actualPrice,
       "Order Id": item.userId?._id,
       "IMEI No.": item.documentId?.IMEI,
-      "Question/Ans": questionsKeys,
+      ...questionData, // Spread the questionData to include in the final object
     };
   });
 
