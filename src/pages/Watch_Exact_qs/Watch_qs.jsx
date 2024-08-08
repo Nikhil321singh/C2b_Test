@@ -52,6 +52,7 @@ import {
   MdRadioButtonUnchecked,
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
+import WatchQuestionSearch from "../../components/WatchQuestionSearch";
 
 
 const initialState = {
@@ -289,7 +290,7 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
             type="text"
           />
           {isSearchOpen && (
-            <QuestionSearch
+            <WatchQuestionSearch
               setIsSearchOpen={setIsSearchOpen}
               state={WTCstate}
               dispatch={dispatch}
