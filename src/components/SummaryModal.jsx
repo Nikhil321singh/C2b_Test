@@ -24,7 +24,7 @@ const SummaryModal = ({ show, onClose, price, bonus }) => {
           <div className="font-medium mt-4 flex flex-col gap-4">
             <div className="flex justify-between">
               <p>Base Price</p>
-              <p>₹{BasePrice}</p>
+              <p>₹{price}</p>
             </div>
             <div className="flex justify-between">
               <p>Pickup Charges</p>

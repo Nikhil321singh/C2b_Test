@@ -7,15 +7,17 @@ const responseSlice = createSlice({
     price: 0,
     grade: "",
     uniqueCode: "",
+    bonus: 0,
   },
 
   reducers: {
     setResponseData: (state, action) => {
-      const { id, price, grade, uniqueCode } = action.payload;
+      const { id, price, grade, uniqueCode, bonus } = action.payload;
       state.id = id;
       state.price = price;
       state.grade = grade;
       state.uniqueCode = uniqueCode;
+        state.bonus = bonus;
     },
   },
 });

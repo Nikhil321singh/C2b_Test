@@ -162,10 +162,10 @@ const QuickQuote = () => {
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
-      JSON.stringify(response.data.data)
+      JSON.stringify({...response.data.data, bonus: 0})
     );
     sessionStorage.setItem("ExactQuote", false);
-    dispatch(setResponseData(response.data.data));
+    dispatch(setResponseData({...response.data.data, bonus: 0}));
     setIsLoading(false);
     navigate("/devicequote");
   };
