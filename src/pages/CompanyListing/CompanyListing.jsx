@@ -80,7 +80,7 @@ const CompanyListing = () => {
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <Link
               to="/companylistingdetails"
-              className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+              className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
             >
               View Detail
             </Link>
@@ -182,7 +182,7 @@ const CompanyListing = () => {
             </div>
 
             <div className="mt-8">
-              <button className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]">
+              <button className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]">
                 Submit Form
               </button>
             </div>

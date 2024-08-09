@@ -18,7 +18,7 @@ import RegisterUserEdit from "../../components/RegisterUserEdit/RegisterUserEdit
 import { useNavigate } from "react-router-dom";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
+const failTextColor = "text-[#4900A8]";
 
 const downloadExcel = (dataDown) => {
   const fileType =
@@ -139,7 +139,7 @@ const RegisterUserDetails = () => {
       },
       data: {
         userID: userID,
-      }
+      },
     };
     axios
       .request(config)
@@ -196,9 +196,13 @@ const RegisterUserDetails = () => {
             <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
-              onClick={() => {setSucBox(false)}}
+              onClick={() => {
+                setSucBox(false);
+              }}
               className={"bg-green-500 text-white"}
-            >Okay</button>
+            >
+              Okay
+            </button>
           </div>
         </div>
       )}
@@ -209,9 +213,13 @@ const RegisterUserDetails = () => {
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
-              onClick={() => {setFailBox(false)}}
-              className={"bg-[#EC2752] text-white"}
-            >Okay</button>
+              onClick={() => {
+                setFailBox(false);
+              }}
+              className={"bg-[#4900A8] text-white"}
+            >
+              Okay
+            </button>
           </div>
         </div>
       )}
@@ -225,12 +233,17 @@ const RegisterUserDetails = () => {
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => deleteHandler(selectedUser)}
-                className={"bg-[#EC2752] text-white"}>Okay</button>
+                className={"bg-[#4900A8] text-white"}
+              >
+                Okay
+              </button>
               <button
                 onClick={() => {
                   setConfBox(false);
                   setIsTableLoaded(false);
-                }} className="bg-white text-[#EC2752]">
+                }}
+                className="bg-white text-[#4900A8]"
+              >
                 Cancel
               </button>
             </div>
@@ -239,20 +252,42 @@ const RegisterUserDetails = () => {
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
-      <TableFilters setSearchValue={setSearchValue} searchValue={searchValue} handleSearchClick={handleSearchClick} getData={getData}
-        storeValue={storeValue} setRoleValue={setRoleValue} roleValue={roleValue} setStoreValue={setStoreValue} data={data}
+      <TableFilters
+        setSearchValue={setSearchValue}
+        searchValue={searchValue}
+        handleSearchClick={handleSearchClick}
+        getData={getData}
+        storeValue={storeValue}
+        setRoleValue={setRoleValue}
+        roleValue={roleValue}
+        setStoreValue={setStoreValue}
+        data={data}
       />
-      <RegisterUserTable data={data} editHandler={editHandler} deleteConfHandler={deleteConfHandler}/>
+      <RegisterUserTable
+        data={data}
+        editHandler={editHandler}
+        deleteConfHandler={deleteConfHandler}
+      />
     </div>
   );
 };
 
 export default RegisterUserDetails;
 
-const TableFilters = ({setSearchValue, searchValue, handleSearchClick, setRoleValue, roleValue, storeValue, setStoreValue, getData, data }) => {
+const TableFilters = ({
+  setSearchValue,
+  searchValue,
+  handleSearchClick,
+  setRoleValue,
+  roleValue,
+  storeValue,
+  setStoreValue,
+  getData,
+  data,
+}) => {
   const navigate = useNavigate();
   const handleSearchClear = () => {
     setSearchValue("");
@@ -261,129 +296,133 @@ const TableFilters = ({setSearchValue, searchValue, handleSearchClick, setRoleVa
     getData();
   };
 
-  return <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
-  <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
-    <button
-      className={`${styles.bulkdown_button}`}
-      onClick={() => {
-        navigate("/registeruser");
-      }}
-    >
-      <IoMdAdd /> Add User
-    </button>
-    <div className={`${styles.search_bar_wrap}`}>
-      <input
-        onChange={(e) => setSearchValue(e.target.value)}
-        className="text-sm"
-        type="text"
-        placeholder="Search Name/Email/Number/UserId"
-        value={searchValue}
-      />
-      <IoMdSearch onClick={handleSearchClick} size={25} />
+  return (
+    <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
+      <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
+        <button
+          className={`${styles.bulkdown_button}`}
+          onClick={() => {
+            navigate("/registeruser");
+          }}
+        >
+          <IoMdAdd /> Add User
+        </button>
+        <div className={`${styles.search_bar_wrap}`}>
+          <input
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="text-sm"
+            type="text"
+            placeholder="Search Name/Email/Number/UserId"
+            value={searchValue}
+          />
+          <IoMdSearch onClick={handleSearchClick} size={25} />
+        </div>
+        <div className={`${styles.search_bar_wrap}`}>
+          <input
+            onChange={(e) => setRoleValue(e.target.value)}
+            className="text-sm"
+            type="text"
+            placeholder="Search role"
+            value={roleValue}
+          />
+          <IoMdSearch onClick={handleSearchClick} size={25} />
+        </div>
+        <div className={`${styles.search_bar_wrap}`}>
+          <input
+            onChange={(e) => setStoreValue(e.target.value)}
+            className="text-sm"
+            type="text"
+            placeholder="Search Store"
+            value={storeValue}
+          />
+          <IoMdSearch onClick={handleSearchClick} size={25} />
+        </div>
+        <div className={styles.icons_box}>
+          <IoRefresh onClick={handleSearchClear} className="" size={25} />
+        </div>
+        <button
+          className={`${styles.bulkdown_button}`}
+          onClick={() => downloadExcel(data)}
+        >
+          <FaDownload /> Bulk Download
+        </button>
+      </div>
     </div>
-    <div className={`${styles.search_bar_wrap}`}>
-      <input
-        onChange={(e) => setRoleValue(e.target.value)}
-        className="text-sm"
-        type="text"
-        placeholder="Search role"
-        value={roleValue}
-      />
-      <IoMdSearch onClick={handleSearchClick} size={25} />
-    </div>
-    <div className={`${styles.search_bar_wrap}`}>
-      <input
-        onChange={(e) => setStoreValue(e.target.value)}
-        className="text-sm"
-        type="text"
-        placeholder="Search Store"
-        value={storeValue}
-      />
-      <IoMdSearch onClick={handleSearchClick} size={25} />
-    </div>
-    <div className={styles.icons_box}>
-      <IoRefresh onClick={handleSearchClear} className="" size={25} />
-    </div>
-    <button
-      className={`${styles.bulkdown_button}`}
-      onClick={() => downloadExcel(data)}
-    >
-      <FaDownload /> Bulk Download
-    </button>
-  </div>
-</div>
-}
+  );
+};
 
-const RegisterUserTable = ({data, editHandler, deleteConfHandler}) => {
-  return <div className="m-2 overflow-x-auto md:m-5">
-  <table className="w-full border border-[#EC2752]">
-    <thead className="bg-[#EC2752] text-white">
-      <tr>
-        <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
-        <th className="p-2 text-sm md:p-3 md:text-base">Name</th>
-        <th className="p-2 text-sm md:p-3 md:text-base">Email</th>
-        <th className="p-2 text-sm md:p-3 md:text-base">Phone Number</th>
-        <th className="p-2 text-sm md:p-3 md:text-base">Company</th>
-        <th className="p-2 text-sm md:p-3 md:text-base">Grest Member</th>
-        <th className="p-2 text-sm md:p-3 md:text-base">Role</th>
-        <th className="p-2 text-sm md:p-3 md:text-base">Store</th>
-        <th className="p-2 text-sm md:p-3 md:text-base">Region</th>
-        <th className="p-2 text-sm md:p-3 md:text-base">Address</th>
-      </tr>
-    </thead>
-    <tbody>
-      {data.map((val, index) => (
-        <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            <div className="flex flex-col gap-1">
-              <button
-                className={`${styles.view_btn}`}
-                onClick={() => {
-                  editHandler(val);
-                }}
-              >
-                Edit
-              </button>
-              <button
-                className={`${styles.acpt_btn}`}
-                onClick={() => {
-                  deleteConfHandler(val?._id, val?.email);
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </td>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            {`${val?.firstName} ${val?.lastName}`}
-          </td>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            {val?.email}
-          </td>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            {val?.phoneNumber}
-          </td>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            {val?.companyName}
-          </td>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            {val?.grestMember ? "Yes" : "No"}
-          </td>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            {val?.role}
-          </td>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            {val?.stores?.storeName}
-          </td>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            {val?.stores?.region}
-          </td>
-          <td className="p-2 text-sm text-center md:p-3 md:text-base">
-            {val?.address}
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
-}
+const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
+  return (
+    <div className="m-2 overflow-x-auto md:m-5">
+      <table className="w-full border border-[#4900A8]">
+        <thead className="bg-[#4900A8] text-white">
+          <tr>
+            <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Name</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Email</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Phone Number</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Company</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Grest Member</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Role</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Store</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Region</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((val, index) => (
+            <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <div className="flex flex-col gap-1">
+                  <button
+                    className={`${styles.view_btn}`}
+                    onClick={() => {
+                      editHandler(val);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className={`${styles.acpt_btn}`}
+                    onClick={() => {
+                      deleteConfHandler(val?._id, val?.email);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {`${val?.firstName} ${val?.lastName}`}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.email}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.phoneNumber}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.companyName}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.grestMember ? "Yes" : "No"}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.role}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.stores?.storeName}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.stores?.region}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.address}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};

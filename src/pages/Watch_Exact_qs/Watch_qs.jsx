@@ -54,7 +54,6 @@ import {
 } from "react-icons/md";
 import WatchQuestionSearch from "../../components/WatchQuestionSearch";
 
-
 const initialState = {
   Functional: [],
   Physical: [],
@@ -141,27 +140,29 @@ function Watchqs() {
       ram: id?.models?.config?.RAM,
       name: id?.customerName ? id?.customerName : profile?.name,
     };
-    const response = await axios.post(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/questionnaires/calculatePriceWatch`,
-      finalPayload,
-      {
-        headers: {
-          Authorization: `${token}`,
-        },
-      }
-    ).catch((error) => {
-      console.log(error)
-      setIsLoading(false);
-    });
+    const response = await axios
+      .post(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/questionnaires/calculatePriceWatch`,
+        finalPayload,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      )
+      .catch((error) => {
+        console.log(error);
+        setIsLoading(false);
+      });
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
-      JSON.stringify({...response.data.data, bonus: 0})
+      JSON.stringify({ ...response.data.data, bonus: 0 })
     );
     sessionStorage.setItem("ExactQuote", true);
-    store.dispatch(setResponseData({...response.data.data, bonus: 0}));
+    store.dispatch(setResponseData({ ...response.data.data, bonus: 0 }));
     setIsLoading(false);
     navigate("/devicequote");
   };
@@ -187,7 +188,7 @@ function Watchqs() {
           <div className="flex items-center justify-center underline underline-offset-4 pt-4 text-lg font-medium tracking-tight text-{1.325rem}">
             {visible > 1 && visible <= 3 && (
               <div
-                className="text-white rounded-[.45rem] flex flex-row justify-center items-center mr-2 bg-[#ec2752]"
+                className="text-white rounded-[.45rem] flex flex-row justify-center items-center mr-2 bg-[#4900A8]"
                 onClick={() => setVisible(visible - 1)}
               >
                 <MdOutlineKeyboardBackspace size={30} />
@@ -220,7 +221,7 @@ function Watchqs() {
           <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2">
             <div
               onClick={handlesubmit}
-              className="bg-[#EC2752] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
+              className="bg-[#4900A8] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
             >
               {isLoading && (
                 <CgSpinner
@@ -237,7 +238,7 @@ function Watchqs() {
           <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2">
             <div
               onClick={() => setVisible(visible + 1)}
-              className="bg-[#EC2752] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
+              className="bg-[#4900A8] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
             >
               <p className="w-full p-1 text-xl font-medium">Continue</p>
             </div>
@@ -271,7 +272,7 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
         <IoIosArrowBack
           onClick={() => navigate("/selectmodel")}
           size={25}
-          className="ml-2 text-[#EC2752]"
+          className="ml-2 text-[#4900A8]"
         />
         <p className="ml-2 text-xl font-medium">Device Details</p>
       </div>
@@ -377,7 +378,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[0]?.answer === WTCstate?.Physical[0]?.yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#ec2752]"
+                  className="mr-2 text-[#4900A8]"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -412,7 +413,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[1]?.answer === WTCstate?.Physical[1]?.yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#ec2752]"
+                  className="mr-2 text-[#4900A8]"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -448,7 +449,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[2]?.answer === WTCstate?.Physical[2].yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#ec2752]"
+                  className="mr-2 text-[#4900A8]"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -483,7 +484,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[3]?.answer === WTCstate?.Physical[3].yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#ec2752]"
+                  className="mr-2 text-[#4900A8]"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -571,11 +572,11 @@ const FourthPart = ({ WTCstate, Warranty }) => {
               className="max-w-[500px]  flex gap-4 ml-3 lableconatiner flex-col"
             >
               <label
-                className={`text-[#EC2752] ${
+                className={`text-[#4900A8] ${
                   styles.ansBox
                 } font-medium  justify-center w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
                   Warranty[index]?.answer === data.yes
-                    ? "bg-[#EC2752] text-white"
+                    ? "bg-[#4900A8] text-white"
                     : ""
                 }`}
               >

@@ -313,10 +313,10 @@ export const BrandList = ({ deviceType }) => {
                 size={25}
                 onClick={hanldeclose}
               />
-              <div className="text-4xl font-bold text-[#8080FF] p text-center">
+              <div className="text-4xl font-bold text-[#4900AD] p text-center">
                 Coming
               </div>
-              <div className="text-4xl font-bold text-[#8080FF] p text-center">
+              <div className="text-4xl font-bold text-[#4900AD] p text-center">
                 Soon !
               </div>
             </div>
@@ -670,7 +670,7 @@ const SearchBox = ({
                 className="flex items-center"
                 onClick={() => setIsScanOpen(!isScanOpen)}
               >
-                <CiBarcode size={20} className={"inline mr-1 text-[#8080FF]"} />
+                <CiBarcode size={20} className={"inline mr-1 text-[#4900AD]"} />
               </div>
             </div>
           </div>
@@ -697,12 +697,12 @@ const SearchBox = ({
             <div className="flex flex-col my-auto text-sm font-medium text-gray-500">
               <img className="w-[250px] mx-auto" src={searchImage} />
               <div>
-                Dial <span className="text-[#8080FF]">*#06#</span> on customer's
+                Dial <span className="text-[#4900AD]">*#06#</span> on customer's
                 old device and
               </div>
               <div>
                 Scan the IMEI using the{" "}
-                <CiBarcode className="inline text-[#8080FF]" size={20} /> on top
+                <CiBarcode className="inline text-[#4900AD]" size={20} /> on top
                 right.
               </div>
             </div>
@@ -752,7 +752,7 @@ const MiddlePart = ({
                 type="text"
               />
               <div className="flex items-center">
-                <CiBarcode size={20} className="inline mr-1 text-[#8080FF]" />
+                <CiBarcode size={20} className="inline mr-1 text-[#4900AD]" />
               </div>
             </div>
           </div>
@@ -769,15 +769,42 @@ const MiddlePart = ({
               onChange={(e) => {
                 handlepick(e);
               }}
-              className="p-2 border-2 rounded-lg shadow-md outline-none "
+              className="p-2 border-2 rounded-lg shadow-md outline-none bg-[#8080ff] text-white"
+              style={{ backgroundColor: "#8080ff", color: "white" }}
             >
-              <option value="today">Today</option>
-              <option value="7days">7 Days</option>
-              <option value="thismonth">This Month</option>
-              <option value="lastmonth">Last Month</option>
-              <option value="Custom">Custom</option>
+              <option
+                value="today"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Today
+              </option>
+              <option
+                value="7days"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                7 Days
+              </option>
+              <option
+                value="thismonth"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                This Month
+              </option>
+              <option
+                value="lastmonth"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Last Month
+              </option>
+              <option
+                value="Custom"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Custom
+              </option>
             </select>
           </div>
+
           <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
             <Link className="w-[33%]" to={`/orderscreated/${days}`}>
               <OrderStatusBox
@@ -802,7 +829,7 @@ const MiddlePart = ({
             </Link>
           </div>
           <p
-            className={`${styles.topSell_head} text-lg font-bold text-[#8080FF]`}
+            className={`${styles.topSell_head} text-lg font-bold text-[#4900AD]`}
           >
             Top Selling Models
           </p>
@@ -817,7 +844,7 @@ const MiddlePart = ({
         </div>
       </div>
       <p
-        className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#8080FF]`}
+        className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#4900AD]`}
       >
         How SwitchKart Works?
       </p>

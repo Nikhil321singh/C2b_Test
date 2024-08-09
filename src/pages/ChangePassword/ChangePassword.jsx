@@ -147,7 +147,7 @@ const ChangePassword = () => {
           <div className="flex flex-col items-center justify-center box">
             <div className="imgBox">
               <img className="w-48 pt-4 mt-2 mb-3" src={Grest_Logo} />
-              <h1 className="font-sans text-[#EC2752] my-2 text-3xl font-bold sm:text-4xl">
+              <h1 className="font-sans text-[#4900A8] my-2 text-3xl font-bold sm:text-4xl">
                 Change Password
               </h1>
               <p className="text-red-600 text-sm h-[20px]">{errMsg}</p>
@@ -163,7 +163,7 @@ const ChangePassword = () => {
                     <div className="input">
                       <MdOutlineMailLock
                         size={25}
-                        style={{ margin: "0px 10px", color: "#EC2752" }}
+                        style={{ margin: "0px 10px", color: "#4900A8" }}
                       />
                       <input
                         id="email"
@@ -178,7 +178,7 @@ const ChangePassword = () => {
                     <div className="relative input">
                       <RiLockPasswordLine
                         size={25}
-                        style={{ margin: "0px 10px", color: "#EC2752" }}
+                        style={{ margin: "0px 10px", color: "#4900A8" }}
                       />
                       <input
                         id="password"
@@ -201,7 +201,7 @@ const ChangePassword = () => {
                     <div className="relative input">
                       <RiLockPasswordLine
                         size={25}
-                        style={{ margin: "0px 10px", color: "#EC2752" }}
+                        style={{ margin: "0px 10px", color: "#4900A8" }}
                       />
                       <input
                         id="new-password"
@@ -221,7 +221,7 @@ const ChangePassword = () => {
                     <div className="relative input">
                       <RiLockPasswordLine
                         size={25}
-                        style={{ margin: "0px 10px", color: "#EC2752" }}
+                        style={{ margin: "0px 10px", color: "#4900A8" }}
                       />
                       <input
                         id="confirm-password"
