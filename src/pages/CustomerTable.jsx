@@ -40,12 +40,19 @@ const getStore = async () => {
   return storeNamesArray;
 };
 
-const fetchDownloadDataCustomerTable = (toDateDup, fromDateDup, search, selStoreId) => {
+const fetchDownloadDataCustomerTable = (
+  toDateDup,
+  fromDateDup,
+  search,
+  selStoreId
+) => {
   const userToken = sessionStorage.getItem("authToken");
   axios
-    .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT
+    .get(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/prospects/findAll/ordercreated?page=${currentSalesPage}&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
-      {headers: {authorization: userToken}}
+      { headers: { authorization: userToken } }
     )
     .then((res) => {
       downloadExcelCustomerTable(res.data.data.orderData.data);
@@ -163,7 +170,9 @@ const CustomerTable = () => {
       setFromDate(date);
       const formattedDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
+      )
+        .toISOString()
+        .split("T")[0];
       setFromDateDup(formattedDate);
     } else if (date == null) {
       setFromDate("");
@@ -175,7 +184,9 @@ const CustomerTable = () => {
       setToDate(date);
       const formattedDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
+      )
+        .toISOString()
+        .split("T")[0];
       setToDateDup(formattedDate);
     } else if (date == null) {
       setToDate("");
@@ -227,7 +238,14 @@ const CustomerTable = () => {
         </div>
         <button
           className={`${styles.bulkdown_button}`}
-          onClick={() => fetchDownloadDataCustomerTable(toDateDup, fromDateDup, search, selStoreId)}
+          onClick={() =>
+            fetchDownloadDataCustomerTable(
+              toDateDup,
+              fromDateDup,
+              search,
+              selStoreId
+            )
+          }
         >
           <FaDownload /> Bulk Download
         </button>
@@ -264,12 +282,15 @@ const CustomerTable = () => {
           {storeDrop && (
             <div
               className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
-            ><div
-                  onClick={() => handleStoreChange({ storeName: allStore, _id: "" })}
-                  className={`${styless.filter_option}`}
-                >
-                  <p className="truncate">{allStore}</p>
-                </div>
+            >
+              <div
+                onClick={() =>
+                  handleStoreChange({ storeName: allStore, _id: "" })
+                }
+                className={`${styless.filter_option}`}
+              >
+                <p className="truncate">{allStore}</p>
+              </div>
               {storeData.map((item, index) => (
                 <div
                   key={index}
