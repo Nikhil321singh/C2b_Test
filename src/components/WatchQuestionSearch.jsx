@@ -24,11 +24,12 @@ const WatchQuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
       ([groupKey, group], groupIndex) =>
         group
           .filter((question, questionIndex) => {
-            
-            return question.quetion
+            return (
+              question.quetion
                 .toLowerCase()
                 .includes(searchQuery.toLowerCase()) ||
-              groupKey.toLowerCase().includes(searchQuery.toLowerCase());
+              groupKey.toLowerCase().includes(searchQuery.toLowerCase())
+            );
           })
           .map((question, questionIndex) => ({
             ...question,
@@ -114,7 +115,7 @@ const WatchQuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
           >
             <button
               onClick={() => setIsSearchOpen(false)}
-              className="p-1 bg-[#EC2752] text-white rounded"
+              className="p-1 bg-[#4900A8] text-white rounded"
             >
               <IoClose size={30} />
             </button>
@@ -129,25 +130,24 @@ const WatchQuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
             />
             <button
               onClick={(e) => setSearchQuery("")}
-              className="py-[7px] px-2 flex flex-col items-center justify-center bg-[#EC2752] text-white rounded"
+              className="py-[7px] px-2 flex flex-col items-center justify-center bg-[#4900A8] text-white rounded"
             >
               <p className="">Clear</p>
             </button>
           </div>
           <div className="w-[90%] mx-auto mt-4 flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
             {filteredQuestions.map((data, index) => (
-            <div
-              key={data._id}
-              className={`flex flex-col justify-start items-center`}
-              onClick={() => {
-              }}
-            >
-              <img src={"temp"} className="bg-white" />
-              <p className="py-2 px-2 w-[100%] flex flex-row items-center justify-center text-xs font-medium text-balance">
-                {data.quetion}
-              </p>
-            </div>
-          ))}
+              <div
+                key={data._id}
+                className={`flex flex-col justify-start items-center`}
+                onClick={() => {}}
+              >
+                <img src={"temp"} className="bg-white" />
+                <p className="py-2 px-2 w-[100%] flex flex-row items-center justify-center text-xs font-medium text-balance">
+                  {data.quetion}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

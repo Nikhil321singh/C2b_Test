@@ -62,8 +62,11 @@ const fetchDownloadData = (str) => {
   const userToken1 = sessionStorage.getItem("authToken");
   axios
     .get(
-      `${import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll/quotecreated?fromdate=2020-01-01&todate=${new Date().toISOString().split("T")[0]}&search=$&store=${str}`,
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/prospects/findAll/quotecreated?fromdate=2020-01-01&todate=${
+        new Date().toISOString().split("T")[0]
+      }&search=$&store=${str}`,
       {
         headers: {
           authorization: userToken1,
@@ -139,7 +142,6 @@ const QuotesCreatedAdmin = () => {
       });
   };
 
-
   useEffect(() => {
     getTableData();
   }, [storeId, fromDateDup, toDateDup, filFlag]);
@@ -202,7 +204,7 @@ const QuotesCreatedAdmin = () => {
     <div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -219,7 +221,7 @@ const QuotesCreatedAdmin = () => {
             value={searchValue}
             placeholder="Search...."
           />
-          <IoMdSearch onClick={handleSearchClick}  size={25} />
+          <IoMdSearch onClick={handleSearchClick} size={25} />
         </div>
         <div className={styles.icons_box}>
           <IoRefresh onClick={handleSearchClear} className=" " size={25} />
@@ -263,12 +265,13 @@ const QuotesCreatedAdmin = () => {
           {storeDrop && (
             <div
               className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
-            ><div
-                  onClick={() => handleStoreChange({ storeName: allst, _id: "" })}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{allst}</p>
-                </div>
+            >
+              <div
+                onClick={() => handleStoreChange({ storeName: allst, _id: "" })}
+                className={`${styles.filter_option}`}
+              >
+                <p className="truncate">{allst}</p>
+              </div>
               {storeData.map((item, index) => (
                 <div
                   key={index}

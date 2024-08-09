@@ -4,8 +4,8 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
   return (
     <div className="m-2  w-[90%] md:m-5 overflow-x-auto">
       <div className="min-w-full">
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-full border border-[#4900A8]">
+          <thead className="bg-[#4900A8] text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Model Details</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Brand</th>

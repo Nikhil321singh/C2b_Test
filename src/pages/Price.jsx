@@ -185,7 +185,7 @@ const Price = ({ submitdata, userToken }) => {
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div
           onClick={() => uploadAllImages()}
-          className={`bg-[#EC2752] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
+          className={`bg-[#4900A8] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
             !imeinumber ||
             !phoneFront ||
             !phoneBack ||
@@ -272,7 +272,7 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
         <button
           className={`px-4 py-2 font-bold text-white rounded ${
             !error
-              ? "bg-[#f4486dd0] hover:bg-[#ec2752]"
+              ? "bg-[#f4486dd0] hover:bg-[#4900A8]"
               : "bg-gray-400 cursor-not-allowed"
           }`}
           onClick={handleVerify}

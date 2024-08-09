@@ -63,10 +63,10 @@ const ProfileBox = () => {
               <IoClose
                 onClick={profileHandler}
                 size={30}
-                className="absolute right-0 text-[#EC2752]"
+                className="absolute right-0 text-[#4900A8]"
               />
             </div>
-            <p className="font-medium underline text-[#EC2752]">{userEmail}</p>
+            <p className="font-medium underline text-[#4900A8]">{userEmail}</p>
             <div className={`${styles.button_wrap}`}>
               <button onClick={handlePwdChange}>Change Password</button>
             </div>
