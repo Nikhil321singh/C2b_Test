@@ -681,6 +681,11 @@ const PDTable = ({
   getData,
 }) => {
   const token2 = sessionStorage.getItem("authToken");
+  const [cancelReason, setCancelReason] = useState("");
+  const [holdReason, setHoldReason] = useState("");
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showHoldModal, setShowHoldModal] = useState(false);
+
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {
       setErrorMsg("No device selected");
@@ -696,7 +701,7 @@ const PDTable = ({
       .map((obj) => obj._id.toString());
 
     let config;
-    if (newStatus === PickupAvail || newStatus === "On Hold") {
+    if (newStatus === PickupAvail) {
       config = {
         method: "post",
         url: `${
@@ -710,6 +715,12 @@ const PDTable = ({
           newStatus: newStatus,
         },
       };
+    } else if (newStatus === "On Hold") {
+      setShowHoldModal(true);
+      return;
+    } else if (newStatus === "Cancelled") {
+      setShowCancelModal(true);
+      return;
     } else {
       config = {
         method: "post",
@@ -725,6 +736,7 @@ const PDTable = ({
         },
       };
     }
+
     axios
       .request(config)
       .then((response) => {
@@ -732,7 +744,7 @@ const PDTable = ({
         setSelectedIds([]);
         setSelectedData([]);
         setSelectedRows([]);
-        if (newStatus === PickupAvail || newStatus === "On Hold") {
+        if (newStatus === PickupAvail) {
           setErrorMsg("Successfully updated status to " + newStatus);
         } else {
           setErrorMsg(`Successfully created ${newStatus} Lot`);
@@ -747,6 +759,78 @@ const PDTable = ({
         setFailMode(true);
       });
     setSelectedStatus("");
+  };
+
+  const handleCancelSubmit = () => {
+    setIsTableLoaded(true);
+    const config = {
+      method: "post",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/update`,
+      headers: {
+        Authorization: token2,
+      },
+      data: {
+        deviceIDs: selectedIds,
+        newStatus: "Cancelled",
+        reason: cancelReason,
+      },
+    };
+    axios
+      .request(config)
+      .then((response) => {
+        getData();
+        setSelectedIds([]);
+        setSelectedData([]);
+        setSelectedRows([]);
+        setErrorMsg(`Successfully created Cancelled Lot`);
+        setErrorMsg1(`Lot Id: ${response.data.data._id}`);
+        setErrorMsg2(`Check it on Outstanding`);
+        setSuccessMod(true);
+      })
+      .catch((error) => {
+        setIsTableLoaded(false);
+        setErrorMsg("Failed to update status");
+        setFailMode(true);
+      });
+    setShowCancelModal(false);
+    setCancelReason("");
+  };
+
+  const handleHoldSubmit = () => {
+    setIsTableLoaded(true);
+    const config = {
+      method: "post",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/update`,
+      headers: {
+        Authorization: token2,
+      },
+      data: {
+        deviceIDs: selectedIds,
+        newStatus: "On Hold",
+        reason: holdReason,
+      },
+    };
+    axios
+      .request(config)
+      .then((response) => {
+        getData();
+        setSelectedIds([]);
+        setSelectedData([]);
+        setSelectedRows([]);
+        setErrorMsg(`Successfully updated status to On Hold`);
+        setSuccessMod(true);
+      })
+      .catch((error) => {
+        setIsTableLoaded(false);
+        setErrorMsg("Failed to update status");
+        setFailMode(true);
+      });
+    setShowHoldModal(false);
+    setHoldReason("");
   };
 
   const confHandler = () => {
@@ -788,6 +872,66 @@ const PDTable = ({
           Request For Pickup
         </button>
       </div>
+
+      {showCancelModal && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+            <h6 className={failTextColor}>Cancellation Reason</h6>
+            <input
+              type="text"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="border-2 border-[#EC2752] rounded-md px-4 py-2 mb-4 w-full"
+              placeholder="Enter Reason for Cancellation"
+            />
+            <div className="flex flex-row gap-2">
+              <button
+                onClick={handleCancelSubmit}
+                className={"bg-[#EC2752] text-white"}
+              >
+                Okay
+              </button>
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="bg-white text-[#EC2752]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showHoldModal && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+            <h6 className={failTextColor}>Hold Reason</h6>
+            <input
+              type="text"
+              value={holdReason}
+              onChange={(e) => setHoldReason(e.target.value)}
+              className="border-2 border-[#EC2752] rounded-md px-4 py-2 mb-4 w-full"
+              placeholder="Enter Reason for Hold"
+            />
+            <div className="flex flex-row gap-2">
+              <button
+                onClick={handleHoldSubmit}
+                className={"bg-[#EC2752] text-white"}
+              >
+                Okay
+              </button>
+              <button
+                onClick={() => {
+                  setShowHoldModal(false);
+                }}
+                className="bg-white text-[#EC2752]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </React.Fragment>
   );
 };

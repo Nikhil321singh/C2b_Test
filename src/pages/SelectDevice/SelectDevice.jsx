@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import styles from "./SelectDevice.module.css";
 import AppFooter from "../../components/AppFooter";
@@ -8,7 +8,6 @@ import apple_watch from "../../assets/apple_watch.png";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io";
 import { BeatLoader } from "react-spinners";
-import { CiBarcode, CiSearch } from "react-icons/ci";
 const data = JSON.parse(sessionStorage.getItem("dataModel"));
 
 const DeviceType = sessionStorage.getItem("DeviceType");
@@ -93,7 +92,7 @@ const SelectDevice = () => {
   const { brandId } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchModels = () => {
     setIsTableLoaded(true);
     const config = {
       method: "post",
@@ -107,7 +106,7 @@ const SelectDevice = () => {
         brandId: brandId,
         deviceType: Device,
         series: seriesType,
-        search: searchModel
+        search: searchModel,
       },
     };
     console.log(config);
@@ -123,7 +122,11 @@ const SelectDevice = () => {
         console.log(err);
         setIsTableLoaded(false);
       });
-  }, [seriesType, searchModel]);
+  };
+
+  useEffect(() => {
+    fetchModels();
+  }, [seriesType]);
 
   const handleDeviceClick = (model) => {
     const updatedData = {
@@ -134,12 +137,13 @@ const SelectDevice = () => {
     sessionStorage.setItem("dataModelConfig", JSON.stringify(model));
     navigate("/selectmodel");
   };
+
   return (
     <div className="flex flex-col min-h-screen pb-16 bg-white">
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         {isTableLoaded && (
           <div className="fixed top-0 left-0 z-100 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-            <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+            <BeatLoader color={"#8080FF"} loading={isTableLoaded} size={15} />
           </div>
         )}
         <div className="flex items-center justify-between w-full pr-2">
@@ -183,7 +187,10 @@ const SelectDevice = () => {
           className="inline w-full ml-4 mr-2 my-2 outline-none bg-transparent"
           type="text"
         />
-        <div className="flex items-center justify-center bg-[#EC2752] h-[40px] w-[50px]">
+        <div
+          className="flex items-center justify-center bg-[#8080FF] h-[40px] w-[50px] cursor-pointer"
+          onClick={fetchModels}
+        >
           <IoMdSearch size={25} className="inline text-white" />
         </div>
       </div>

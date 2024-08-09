@@ -42,10 +42,6 @@ const Price = ({ submitdata, userToken }) => {
 
   const handleChange = (setMEthod, e) => {
     const file = e.target.files[0];
-    if (file && file.size > 5 * 1024 * 1024) {
-      alert("File size exceeds 5MB. Please choose a smaller file.");
-      return;
-    }
     setMEthod(file);
   };
 
@@ -136,50 +132,6 @@ const Price = ({ submitdata, userToken }) => {
       <div className="w-[90%] md:w-[90%] mx-auto h-[auto] mb-[93px]">
         <div className="mt-3 text-center relative">
           <h1 className="text-2xl font-semibold">Upload Documents</h1>
-          <div className="absolute top-0 right-0 group">
-            <FaInfoCircle className="text-gray-500 cursor-pointer" />
-            <div
-              class="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded p-2 right-0 mt-1 w-48"
-              style={{ zIndex: 999 }}
-            >
-              <p>
-                Upload Your device images which should include close-up shot of
-                any specific damage, dent, scratches or wear and tear. Photos
-                should be taken from an approx distance of 30 cms.
-              </p>
-
-              <p>
-                <strong>Front Side:</strong> Ensure the entire front of the
-                phone is visible in display On condition and black screen
-                background. It should include the full screen and bezels.
-              </p>
-
-              <p>
-                <strong>Back Side:</strong> Capture the entire back side of the
-                phone, including the camera, logo, and any scratches or dents.
-              </p>
-
-              <p>
-                <strong>Left Side:</strong> Show the complete left side,
-                including buttons and any port.
-              </p>
-
-              <p>
-                <strong>Right Side:</strong> Show the complete right side,
-                including buttons and any port.
-              </p>
-
-              <p>
-                <strong>Top Side:</strong> Show the full top edge of the phone,
-                including any ports or sensors.
-              </p>
-
-              <p>
-                <strong>Bottom Side:</strong> Capture the full bottom edge,
-                including any ports or speakers.
-              </p>
-            </div>
-          </div>
           <p className="mt-4 text-gray-600">
             Regulations require you to upload a national identity card. Don't
             worry, your data will stay safe and private.
@@ -478,6 +430,9 @@ const PhonePhotos1 = ({
   setPhoneRight,
 }) => {
   const Device = sessionStorage.getItem("DeviceType");
+  const [showHoldModal, setShowHoldModal] = useState(false);
+  const [holdReason, setHoldReason] = useState("");
+
   return (
     <div className="flex flex-col adharcard mt-[10px] ">
       <div className="flex gap-1 two">
@@ -487,6 +442,10 @@ const PhonePhotos1 = ({
             {`Upload Your ${Device}'s Images`}{" "}
             <span className="text-red-500">*</span>
           </p>
+          <FaInfoCircle
+            className="ml-2 cursor-pointer"
+            onClick={() => setShowHoldModal(true)}
+          />
         </div>
       </div>
       <p className="mt-2 text-sm text-red-600">
@@ -631,6 +590,54 @@ const PhonePhotos1 = ({
           </button>
         </div>
       </div>
+      {showHoldModal && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div
+            className="bg-white text-black text-sm rounded p-6 w-64 shadow-lg"
+            style={{ lineHeight: "1.5" }}
+          >
+            <p>
+              Upload your device images, including close-up shots of any
+              specific damage, dents, scratches, or wear and tear. Photos should
+              be taken from approximately 30 cm away.
+            </p>
+            <p className="mt-2">
+              <strong>Front Side:</strong> Ensure the entire front of the phone
+              is visible with the display on and a black screen background.
+              Include the full screen and bezels.
+            </p>
+            <p className="mt-2">
+              <strong>Back Side:</strong> Capture the entire back side,
+              including the camera, logo, and any scratches or dents.
+            </p>
+            <p className="mt-2">
+              <strong>Left Side:</strong> Show the complete left side, including
+              buttons and any ports.
+            </p>
+            <p className="mt-2">
+              <strong>Right Side:</strong> Show the complete right side,
+              including buttons and any ports.
+            </p>
+            <p className="mt-2">
+              <strong>Top Side:</strong> Show the full top edge of the phone,
+              including any ports or sensors.
+            </p>
+            <p className="mt-2">
+              <strong>Bottom Side:</strong> Capture the full bottom edge,
+              including any ports or speakers.
+            </p>
+
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => setShowHoldModal(false)}
+                className="bg-white text-[#FF0000] px-4 py-2 rounded-md"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
