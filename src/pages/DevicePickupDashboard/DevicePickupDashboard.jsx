@@ -892,7 +892,10 @@ const PDTable = ({
                 Okay
               </button>
               <button
-                onClick={() => setShowCancelModal(false)}
+                onClick={() => {
+                  setShowCancelModal(false);
+                  setIsTableLoaded(false);
+                }}
                 className="bg-white text-[#EC2752]"
               >
                 Cancel
@@ -923,6 +926,7 @@ const PDTable = ({
               <button
                 onClick={() => {
                   setShowHoldModal(false);
+                  setIsTableLoaded(false);
                 }}
                 className="bg-white text-[#EC2752]"
               >
