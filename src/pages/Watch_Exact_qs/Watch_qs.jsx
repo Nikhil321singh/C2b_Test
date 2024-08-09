@@ -52,6 +52,7 @@ import {
   MdRadioButtonUnchecked,
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
+import WatchQuestionSearch from "../../components/WatchQuestionSearch";
 
 
 const initialState = {
@@ -157,10 +158,10 @@ function Watchqs() {
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
-      JSON.stringify(response.data.data)
+      JSON.stringify({...response.data.data, bonus: 0})
     );
     sessionStorage.setItem("ExactQuote", true);
-    store.dispatch(setResponseData(response.data.data));
+    store.dispatch(setResponseData({...response.data.data, bonus: 0}));
     setIsLoading(false);
     navigate("/devicequote");
   };
@@ -289,7 +290,7 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
             type="text"
           />
           {isSearchOpen && (
-            <QuestionSearch
+            <WatchQuestionSearch
               setIsSearchOpen={setIsSearchOpen}
               state={WTCstate}
               dispatch={dispatch}

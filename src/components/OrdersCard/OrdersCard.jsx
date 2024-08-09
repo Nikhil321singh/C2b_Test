@@ -104,6 +104,7 @@ const OrdersCard = ({
         id: itemData.lead_id,
         price: price,
         uniqueCode: quoteId,
+        bonus: 0,
       };
       dispatch(setResponseData(responseData));
       sessionStorage.setItem("LeadId", itemData?.lead_id);
@@ -124,8 +125,9 @@ const OrdersCard = ({
       const responseData = {
         grade: "",
         id: itemData.lead_id,
-        price: price,
+        price: Number(itemData.lead?.price) - Number(itemData.lead?.bonusPrice),
         uniqueCode: quoteId,
+        bonus: Number(itemData.lead?.bonusPrice),
       };
 
       dispatch(setResponseData(responseData));

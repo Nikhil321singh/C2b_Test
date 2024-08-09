@@ -11,7 +11,7 @@ import { MdEdit } from "react-icons/md";
 const Failerr = "Failed To Save Quote";
 const quoteText = "Quote Saved Successfully";
 
-const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
+const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId, bonusPrice }) => {
   const leadData = JSON.parse(sessionStorage.getItem("responsedatadata"));
   const ExactQuote = sessionStorage.getItem("ExactQuote");
   const showHideClassName = show ? `${styles.modal} ${styles.displayBlock}` : ` ${styles.displayNone}`;
@@ -61,9 +61,10 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
       name: name,
       emailId: userEmail,
       reason: reason,
+      bonusPrice: bonusPrice,
     };
     setUserData(data);
-
+    console.log(data);
     if (ExactQuote === "true") {
       if (ExactQuote === "true") {
         axios
