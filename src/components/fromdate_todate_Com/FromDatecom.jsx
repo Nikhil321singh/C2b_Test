@@ -26,7 +26,7 @@ function FromDatecom({
         <IoCloseCircle
           onClick={onClose}
           size={24}
-          className="text-[#EC2752] absolute top-5 right-4"
+          className="text-[#4900A8] absolute top-5 right-4"
         />
         <div className="flex flex-col w-full h-full content">
           <h2 className="text-2xl font-bold text-center mb-[15px]">
@@ -74,7 +74,7 @@ function FromDatecom({
             <div className="b flex items-center justify-center">
               <div
                 onClick={searchCustom}
-                className="bg-[#EC2752] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center mt-1"
+                className="bg-[#4900A8] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center mt-1"
               >
                 <p className="w-full p-1 text-xl font-medium">Search</p>
               </div>

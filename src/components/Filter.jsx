@@ -128,7 +128,7 @@ const Filter = ({ data, setTableDataDup }) => {
         <div className="md:col-span-2 text-center">
           <button
             onClick={handleSearch}
-            className="bg-[#EC2752] font-bold text-white rounded-md p-2 w-1/2 mx-auto focus:outline-none"
+            className="bg-[#4900A8] font-bold text-white rounded-md p-2 w-1/2 mx-auto focus:outline-none"
           >
             Search
           </button>

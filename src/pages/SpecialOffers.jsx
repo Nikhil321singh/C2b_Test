@@ -169,7 +169,7 @@ const SpecialOffers = () => {
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/questionnaires/item-purchased`,
         { id: LeadId, bonusPrice: responseData.bonus },
-        { headers: { Authorization: userIdToken }}
+        { headers: { Authorization: userIdToken } }
       )
       .then((response) => {
         setAnswers([]);
@@ -289,14 +289,14 @@ const SubSpecialOffers = ({
           <p className="text-xl">₹{Number(phonePrice)}</p>
           <p
             onClick={handleViewSummary}
-            className="text-[#EC2752] cursor-pointer"
+            className="text-[#4900A8] cursor-pointer"
           >
             View Summary
           </p>
         </div>
         <div
           onClick={handleSubmit}
-          className="bg-[#EC2752] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
+          className="bg-[#4900A8] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
         >
           {isLoading && (
             <CgSpinner

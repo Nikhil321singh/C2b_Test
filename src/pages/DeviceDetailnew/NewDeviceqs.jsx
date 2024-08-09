@@ -141,7 +141,7 @@ const initialState = {
 };
 const whiteText = "text-white";
 const blackText = "text-black";
-const pinkBg = "bg-[#EC2752]";
+const pinkBg = "bg-[#4900A8]";
 const whiteBg = "bg-white";
 
 const handleSkip = (visible, updateAns) => {
@@ -345,7 +345,7 @@ const MainQContainer = ({
         <IoIosArrowBack
           onClick={() => navigate("/selectmodel")}
           size={25}
-          className="ml-2 text-[#EC2752]"
+          className="ml-2 text-[#4900A8]"
         />
         <p className="ml-2 text-xl font-medium">Device Details</p>
       </div>
@@ -881,10 +881,10 @@ const AboveSix = ({
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
-      JSON.stringify({...response.data.data, bonus: 0})
+      JSON.stringify({ ...response.data.data, bonus: 0 })
     );
     sessionStorage.setItem("ExactQuote", true);
-    store.dispatch(setResponseData({...response.data.data, bonus: 0}));
+    store.dispatch(setResponseData({ ...response.data.data, bonus: 0 }));
     setIsLoading(false);
     navigate("/devicequote");
   };
@@ -895,7 +895,7 @@ const AboveSix = ({
         <div className="fixed bottom-0 flex justify-center w-full gap-2 p-3 bg-white border-t-2">
           <div
             onClick={handleSubtract}
-            className={`bg-[#EC2752] w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
+            className={`bg-[#4900A8] w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
           >
             <ImArrowLeft color="white" size={20} />
           </div>
@@ -908,7 +908,7 @@ const AboveSix = ({
             </button> */}
           <div
             onClick={handlesubmit}
-            className="bg-[#EC2752] w-[70%] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
+            className="bg-[#4900A8] w-[70%] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
           >
             {isLoading && (
               <CgSpinner
@@ -929,7 +929,7 @@ const AboveSix = ({
               className={`  ${
                 visible < 2
                   ? "bg-slate-400 cursor-not-allowed"
-                  : "bg-[#EC2752] cursor-pointer"
+                  : "bg-[#4900A8] cursor-pointer"
               }  w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
             >
               <ImArrowLeft color="white" size={20} />
@@ -937,13 +937,13 @@ const AboveSix = ({
           )}
           {/* <div
             onClick={() => handleSkip(visible, updateAns)}
-            className="bg-[#EC2752] w-[30%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
+            className="bg-[#4900A8] w-[30%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
           >
             <p className="w-full p-1 text-xl font-medium">Skip</p>
           </div> */}
           <div
             onClick={handleADD}
-            className="bg-[#EC2752] w-[70%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
+            className="bg-[#4900A8] w-[70%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
           >
             <p className="w-full p-1 text-xl font-medium">Continue</p>
           </div>

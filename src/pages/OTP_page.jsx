@@ -162,7 +162,7 @@ function OTPpage({ setChange, change, setNumber }) {
                   Phone number: +91-{ph}{" "}
                   <span
                     onClick={handleNumberEdit}
-                    className="text-[#EC2752] cursor-pointer"
+                    className="text-[#4900A8] cursor-pointer"
                   >
                     Edit
                   </span>

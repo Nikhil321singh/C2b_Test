@@ -15,7 +15,6 @@ import { ToastContainer, toast } from "react-toastify";
 
 const pageLimit = 10;
 
-
 const downloadExcelGradePricingSheet = (apiData) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -251,7 +250,7 @@ const GradePricingSheetSub = ({
       {/* <Searchbar /> */}
       {isTableLoading && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoading} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoading} size={15} />
         </div>
       )}
 
@@ -273,7 +272,7 @@ const GradePricingSheetSub = ({
                 />
               </div>
               <div className="flex flex-row gap-2">
-                <button type="submit" className={"bg-[#EC2752] text-white"}>
+                <button type="submit" className={"bg-[#4900A8] text-white"}>
                   Upload
                 </button>
                 <button
@@ -282,7 +281,7 @@ const GradePricingSheetSub = ({
                     setUploadBox(false);
                     setIsTableLoading(false);
                   }}
-                  className="bg-white text-[#EC2752]"
+                  className="bg-white text-[#4900A8]"
                 >
                   Cancel
                 </button>
@@ -298,17 +297,17 @@ const GradePricingSheetSub = ({
           <select
             name=""
             id=""
-            className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
+            className="bg-[#4900A8] text-white rounded-lg outline-none px-2 py-1"
             onChange={handleDeviceCategory}
           >
             <option
-              className="bg-white text-[#EC2752] font-medium"
+              className="bg-white text-[#4900A8] font-medium"
               value="Mobile"
             >
               Mobile
             </option>
             <option
-              className="bg-white text-[#EC2752] hover:bg-[#EC2752] font-medium"
+              className="bg-white text-[#4900A8] hover:bg-[#4900A8] font-medium"
               value="Watch"
             >
               Watch
@@ -362,7 +361,7 @@ const GradePricingSheetSub = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
               ? " text-gray-600 cursor-not-allowed bg-gray-400"
-              : " text-white cursor-pointer bg-[#EC2752]"
+              : " text-white cursor-pointer bg-[#4900A8]"
           }`}
         >
           Previous
@@ -372,7 +371,7 @@ const GradePricingSheetSub = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
               ? "text-gray-600 bg-gray-400  cursor-not-allowed"
-              : "bg-[#EC2752]  cursor-pointer text-white"
+              : "bg-[#4900A8]  cursor-pointer text-white"
           }`}
           onClick={() => setCurrentPage(currentPage + 1)}
         >

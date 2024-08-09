@@ -46,14 +46,12 @@ const DeviceQuote = () => {
       price: 0,
       bonus: 0,
       uniqueCode: ResponseData.uniqueCode,
-      id: ResponseData.id
-    }
+      id: ResponseData.id,
+    };
     resData.price = Number(ResponseData.price);
     resData.bonus = Number(bonus);
     console.log(resData);
-    sessionStorage.setItem(
-      "responsedatadata",
-      JSON.stringify(resData));
+    sessionStorage.setItem("responsedatadata", JSON.stringify(resData));
     dispatch(setResponseData(resData));
     setContinueOTPOpen(!continueOTPOpen);
   };
@@ -87,6 +85,7 @@ const DeviceQuote = () => {
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
+            style={{ zIndex: 9999 }}
           />
         </div>
       </div>
@@ -114,7 +113,12 @@ const DeviceQuote = () => {
                     : ""
                 }`}
               </p>
-              <p className="text-[#EC2752] font-semibold">₹{savedBonus ? Number(Price) - Number(savedBonus) : Number(Price)}</p>
+              <p className="text-[#4900A8] font-semibold">
+                ₹
+                {savedBonus
+                  ? Number(Price) - Number(savedBonus)
+                  : Number(Price)}
+              </p>
             </div>
           </div>
           <QuoteModal
@@ -124,39 +128,43 @@ const DeviceQuote = () => {
             quoteId={quoteId}
             bonusPrice={bonus}
           ></QuoteModal>
-          {quoteSaved === false && exactQuoteValue === "true" && 
-          <div className="flex flex-row items-center justify-between px-2 my-2">
-            <div className="w-[40%] font-medium text-gray-700">
-              Bonus Amount :
+          {quoteSaved === false && exactQuoteValue === "true" && (
+            <div className="flex flex-row items-center justify-between px-2 my-2">
+              <div className="w-[40%] font-medium text-gray-700">
+                Bonus Amount :
+              </div>
+              <div className="rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-[#4900A8] flex flex-col items-center justify-center">
+                <input
+                  className="bg-transparent outline-none my-auto text-center font-medium text-[#4900A8]"
+                  name="bonus"
+                  id="bonus"
+                  type="number"
+                  placeholder="Enter Bonus Amount"
+                  value={bonus}
+                  maxLength={6}
+                  onKeyDown={(e) => {
+                    if (
+                      e.key === "-" ||
+                      e.key === "+" ||
+                      e.key === "e" ||
+                      e.key === "." ||
+                      e.key === "E"
+                    ) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(e) => {
+                    if (
+                      Number(e.target.value) >= 0 &&
+                      Number(e.target.value) < 100001
+                    ) {
+                      setBonus(e.target.value);
+                    }
+                  }}
+                />
+              </div>
             </div>
-            <div className="rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-[#EC2752] flex flex-col items-center justify-center">
-              <input
-                className="bg-transparent outline-none my-auto text-center font-medium text-[#EC2752]"
-                name="bonus"
-                id="bonus"
-                type="number"
-                placeholder="Enter Bonus Amount"
-                value={bonus}
-                maxLength={6}
-                onKeyDown={(e) => {
-                  if (
-                    e.key === "-" ||
-                    e.key === "+" ||
-                    e.key === "e" ||
-                    e.key === "." ||
-                    e.key === "E"
-                  ) {
-                    e.preventDefault();
-                  }
-                }}
-                onChange={(e) => {
-                  if (Number(e.target.value) >= 0 && Number(e.target.value) < 100001) {
-                    setBonus(e.target.value);
-                  }
-                }}
-              />
-            </div>
-          </div>}
+          )}
           <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed "></div>
           <div className="flex items-center justify-between">
             <p
@@ -167,7 +175,7 @@ const DeviceQuote = () => {
             </p>
             {quoteSaved === false && (
               <button
-                className="text-[#EC2752] border-2 border-[#EC2752] text-sm font-medium p-2 rounded-md "
+                className="text-[#4900A8] border-2 border-[#4900A8] text-sm font-medium p-2 rounded-md "
                 onClick={toggleModal}
               >
                 Save Quote
@@ -187,7 +195,7 @@ const DeviceQuote = () => {
             />
             <p className="font-medium">
               I agree to the
-              <span className="text-[#EC2752] cursor-pointer">
+              <span className="text-[#4900A8] cursor-pointer">
                 {" "}
                 Terms & Conditions
               </span>
@@ -196,13 +204,18 @@ const DeviceQuote = () => {
         )}
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-col w-1/2 text-xl font-medium">
-            <p>₹{savedBonus ? Number(Price) + Number(bonus) - Number(savedBonus) : Number(Price) + Number(bonus)}</p>
+            <p>
+              ₹
+              {savedBonus
+                ? Number(Price) + Number(bonus) - Number(savedBonus)
+                : Number(Price) + Number(bonus)}
+            </p>
           </div>
           {quoteSaved === false && exactQuoteValue === "true" && (
             <div
               onClick={termsChecked ? continueOTPHandler : undefined}
               className={`${
-                termsChecked ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
+                termsChecked ? "bg-[#4900A8]" : "bg-gray-400 cursor-not-allowed"
               } py-1 rounded-lg cursor-pointer w-1/2 sm:max-w-[200px]  flex justify-between px-2 text-white items-center`}
             >
               <p className="font-medium mx-auto text-xl p-[6px] ">Continue</p>
@@ -211,7 +224,7 @@ const DeviceQuote = () => {
           {quoteSaved === false && exactQuoteValue === "false" && (
             <div
               onClick={() => navigate("/device/Qestions")}
-              className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
+              className="bg-[#4900A8] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
             >
               <p className="p-2 mx-auto text-lg font-medium ">
                 Get Exact Value
@@ -221,7 +234,7 @@ const DeviceQuote = () => {
           {quoteSaved === true && (
             <div
               onClick={() => navigate("/selectdevicetype")}
-              className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
+              className="bg-[#4900A8] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
             >
               <p className="p-2 mx-auto text-lg font-medium ">Return To Home</p>
             </div>

@@ -12,7 +12,7 @@ const DeleteConfirmationModal = ({ isOpen, onConfirm, onCancel }) => {
         </p>
         <div className="mt-4 flex justify-end space-x-3">
           <button
-            className="px-4 py-2 bg-[#EC2752] text-white rounded hover:bg-red-600"
+            className="px-4 py-2 bg-[#4900A8] text-white rounded hover:bg-red-600"
             onClick={onConfirm}
           >
             Yes

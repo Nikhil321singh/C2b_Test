@@ -60,7 +60,7 @@ function DownloadFilter({
     <>
       <button
         onClick={fetchData}
-        className="bg-[#EC2752] relative top-5 font-bold text-white rounded-md p-2 h-[40px] w-1/2 focus:outline-none"
+        className="bg-[#4900A8] relative top-5 font-bold text-white rounded-md p-2 h-[40px] w-1/2 focus:outline-none"
       >
         Download
       </button>

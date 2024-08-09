@@ -189,10 +189,10 @@ function Categories() {
               size={25}
               onClick={hanldeclose}
             />
-            <div className="text-4xl font-bold text-[#EC2752] p text-center">
+            <div className="text-4xl font-bold text-[#4900A8] p text-center">
               Coming
             </div>
-            <div className="text-4xl font-bold text-[#EC2752] p text-center">
+            <div className="text-4xl font-bold text-[#4900A8] p text-center">
               Soon !
             </div>
           </div>

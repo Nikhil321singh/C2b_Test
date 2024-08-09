@@ -72,7 +72,7 @@ const OrdersCompleted = ({ daysfilters, head }) => {
     <div className="min-h-screen">
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
-          <BeatLoader loading={loading} color={"#EC2752"} size={15} />
+          <BeatLoader loading={loading} color={"#4900A8"} size={15} />
         </div>
       )}
       {head === undefined && (
@@ -102,7 +102,7 @@ const OrdersCompleted = ({ daysfilters, head }) => {
           value={serachval}
           onChange={(e) => setSerachval(e.target.value)}
         />
-        <div className="bg-[#EC2752] text-center px-2 py-1 rounded-lg">
+        <div className="bg-[#4900A8] text-center px-2 py-1 rounded-lg">
           <button onClick={handleSeachSubmit} className="text-white ">
             Search
           </button>

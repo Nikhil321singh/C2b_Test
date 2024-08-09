@@ -139,7 +139,7 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
     <div style={{ height: "100vh", overflowY: "auto" }}>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <RegisterUserEditForm
@@ -208,7 +208,7 @@ const RegisterUserEditSub = ({
         <IoClose
           size={35}
           onClick={closeHandler}
-          className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500"
+          className="absolute right-0 text-[#4900A8] transition ease hover:rotate-[360deg] duration-500"
         />
         <p className="text-4xl font-bold">Update User Details</p>
         <p className="text-lg">All fields marked with * are required</p>
@@ -271,8 +271,8 @@ const RegisterUserEditSub = ({
           <span className="font-medium text-xl">Is Grest Member?*</span>
           <div className="flex gap-4">
             <div
-              className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${
-                isGrest === "yes" ? "bg-[#EC2752] text-white" : ""
+              className={`w-[100px] text-center border-2 border-[#4900A8] p-2 rounded ${
+                isGrest === "yes" ? "bg-[#4900A8] text-white" : ""
               }`}
             >
               <input
@@ -287,8 +287,8 @@ const RegisterUserEditSub = ({
               <label htmlFor="yes">Yes</label>
             </div>
             <div
-              className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${
-                isGrest === "no" ? "bg-[#EC2752] text-white" : ""
+              className={`w-[100px] text-center border-2 border-[#4900A8] p-2 rounded ${
+                isGrest === "no" ? "bg-[#4900A8] text-white" : ""
               } `}
             >
               <input
@@ -379,11 +379,11 @@ const RegisterUserEditSub = ({
         <div className="mt-8">
           <button
             type="submit"
-            className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+            className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
           >
             Update Details
           </button>
-          <p className="text-[#EC2752]">{response}</p>
+          <p className="text-[#4900A8]">{response}</p>
         </div>
       </form>
     </div>

@@ -79,7 +79,7 @@
 .form_fields_wrap input {
   width: 85%;
   /* padding: 7px;
-  border: 2px solid #ec2752; */
+  border: 2px solid #4900A8; */
   display: flex;
   /* text-align: center; */
   font-size: medium;
@@ -97,7 +97,7 @@
 .resend_otp_wrap button {
   transition: all 0.5s ease;
   cursor: pointer;
-  color: #ec2752;
+  color: #4900a8;
   opacity: 1;
 }
 
@@ -122,7 +122,7 @@
   border-radius: 0.55rem;
   font-weight: 500;
   transition: all 0.5s ease;
-  background-color: #ec2752;
+  background-color: #4900a8;
   color: white;
 }
 
@@ -132,11 +132,10 @@
 
 .spinner {
   scale: 0.4;
-}  
-.form_fields_wrap div div{
+}
+.form_fields_wrap div div {
   display: flex;
   flex-direction: row;
-  
 }
 
 @media screen and (max-width: 767px) {
@@ -150,7 +149,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 30px;
+    gap: 17px;
   }
 
   .optimg_wrap {
@@ -192,21 +191,19 @@
     justify-content: center;
     align-items: center;
   }
-  .form_fields_wrap div div{
+  .form_fields_wrap div div {
     display: flex;
     flex-direction: row;
-    
   }
 
   .form_fields_wrap input {
     width: 85%;
-    /* border-bottom: 2px solid #ec2752; */
+    /* border-bottom: 2px solid #4900A8; */
     display: flex;
     /* text-align: center; */
     font-size: medium;
     font-weight: 500;
     outline: none;
-
   }
 
   .otp_button_wrap {
@@ -232,9 +229,8 @@
   }
 }
 
-
 @media screen and (max-width: 360px) {
-.Editresponsive{
-  flex-direction: column;
-}
+  .Editresponsive {
+    flex-direction: column;
+  }
 }
