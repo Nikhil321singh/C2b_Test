@@ -9,7 +9,7 @@ import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 
 const sucTextColor = "text-green-500";
 const failTextColor = "text-[#4900A8]";
-const role = ["Super Admin", "Admin Manager", "Technician", "Sale User"];
+const role = ["Admin Manager", "Technician", "Sale User"];
 
 const getStore = async () => {
   const token1 = sessionStorage.getItem("authToken");
@@ -67,8 +67,6 @@ const initForm = {
   email: "",
   password: "",
   phoneNumber: "",
-  companyId: "",
-  grestMember: false,
   role: "",
   storeId: "",
   city: "",
@@ -123,8 +121,6 @@ const RegisterUser = () => {
       email: formData.email,
       password: formData.password,
       phoneNumber: formData.phoneNumber,
-      companyId: formData.companyId,
-      grestMember: formData.grestMember,
       role: formData.role,
       storeId: formData.storeId,
       city: formData.city,
@@ -225,10 +221,8 @@ const RegisterUser = () => {
             formData={formData}
             submitHandler={submitHandler}
             handleChange={handleChange}
-            isGrest={isGrest}
             setIsGrest={setIsGrest}
             storeData={storeData}
-            companyData={companyData}
           />
         </div>
       </div>
@@ -242,10 +236,7 @@ const UserForm = ({
   formData,
   submitHandler,
   handleChange,
-  isGrest,
-  setIsGrest,
   storeData,
-  companyData,
 }) => {
   return (
     <form
@@ -322,61 +313,6 @@ const UserForm = ({
           type="tel"
           required
         />
-      </label>
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Is Grest Member?*</span>
-        <div className="flex gap-4">
-          <div
-            className={`w-[100px] text-center border-2 border-[#4900A8] p-2 rounded ${
-              isGrest === "yes" ? "bg-[#4900A8] text-white" : ""
-            } `}
-          >
-            <input
-              onChange={() => setIsGrest("yes")}
-              type="radio"
-              value="yes"
-              id="yes"
-              name="GrestUser"
-              checked={isGrest === "yes"}
-              className="hidden"
-            />
-            <label htmlFor="yes">Yes</label>
-          </div>
-          <div
-            className={`w-[100px] text-center border-2 border-[#4900A8] p-2 rounded ${
-              isGrest === "no" ? "bg-[#4900A8] text-white" : ""
-            } `}
-          >
-            <input
-              onChange={() => setIsGrest("no")}
-              type="radio"
-              value="no"
-              id="no"
-              name="GrestUser"
-              checked={isGrest === "no"}
-              className="hidden"
-            />
-            <label htmlFor="no">No</label>
-          </div>
-        </div>
-      </label>
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Company Name*</span>
-        <select
-          name="companyId"
-          id="companyId"
-          value={formData.companyId}
-          className="outline-none text-base border-2 p-2 rounded-lg"
-          onChange={handleChange}
-          required
-        >
-          <option value="">None</option>
-          {companyData.map((item) => (
-            <option key={item._id} value={item._id}>
-              {item.companyName}
-            </option>
-          ))}
-        </select>
       </label>
       <label className="flex flex-col w-[70%] gap-2">
         <span className="font-medium text-xl">Store Name*</span>

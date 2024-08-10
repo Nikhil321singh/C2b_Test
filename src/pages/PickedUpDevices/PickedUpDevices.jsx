@@ -514,7 +514,7 @@ const PickedUpDevicesTable = ({
     setShowView(true);
   };
 
-  const statusUpdateHandler = (refID, newStatus) => {
+  const statusUpdateHandler = (refID, newStatus, uniqueCode) => {
     setIsTableLoaded(true);
     setConfMod(false);
     const config = {
@@ -534,16 +534,16 @@ const PickedUpDevicesTable = ({
       .request(config)
       .then((response) => {
         setErrorMsg(`Successfully Updated Status to ${newStatus}`);
-        setErrorMsg1(`Lot No. :- ${refID}`);
+        setErrorMsg1(`Lot No. :- ${uniqueCode}`);
         setErrorMsg2(checkOnPkd);
         if (newStatus === PickConf) {
-          setErrorMsg(`Pickup Confirmed Successfully, Lot No. ${refID}`);
+          setErrorMsg(`Pickup Confirmed Successfully, Lot No. ${uniqueCode}`);
           setErrorMsg1(`Status Updated to Pending Approval for Delivery`);
           setErrorMsg2(checkOnPkd);
         }
         if (newStatus === PickDelivered || newStatus === ApprovDelivery) {
           setErrorMsg(`Successfully Updated Status to ${newStatus}`);
-          setErrorMsg1(`Lot No. :- ${refID}`);
+          setErrorMsg1(`Lot No. :- ${uniqueCode}`);
           setErrorMsg2("Check it On History");
         }
         console.log(response);
@@ -552,7 +552,7 @@ const PickedUpDevicesTable = ({
       })
       .catch((error) => {
         setErrorMsg(
-          `Failed to updated the status of lot ${refID} to ${newStatus}`
+          `Failed to updated the status of lot ${uniqueCode} to ${newStatus}`
         );
         setFailMode(true);
         setIsTableLoaded(false);
@@ -608,7 +608,8 @@ const PickedUpDevicesTable = ({
                             onClick={() =>
                               statusUpdateHandler(
                                 val?._id,
-                                "Pending Payroll Approval"
+                                "Pending Admin Approval",
+                                val?.uniqueCode
                               )
                             }
                             className={`${styles.acpt_btn}`}
@@ -617,11 +618,11 @@ const PickedUpDevicesTable = ({
                           </button>
                         </div>
                       )}
-                      {val?.status === "Pending Payroll Approval" && (
+                      {val?.status === "Pending Admin Approval" && (
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, PendingConf)
+                              statusUpdateHandler(val?._id, PendingConf, val?.uniqueCode)
                             }
                             className={`${styles.acpt_btn}`}
                           >
@@ -653,7 +654,7 @@ const PickedUpDevicesTable = ({
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, PickConf)
+                              statusUpdateHandler(val?._id, PickConf, val?.uniqueCode)
                             }
                             className={`${styles.acpt_btn}`}
                           >
@@ -665,7 +666,7 @@ const PickedUpDevicesTable = ({
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, PickDelivered)
+                              statusUpdateHandler(val?._id, PickDelivered, val?.uniqueCode)
                             }
                             className={`${styles.acpt_btn}`}
                           >
@@ -683,7 +684,7 @@ const PickedUpDevicesTable = ({
                   {new Date(val.createdAt).toLocaleDateString("en-GB")}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?._id}
+                  {val?.uniqueCode || val?._id}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {val?.totalDevice}

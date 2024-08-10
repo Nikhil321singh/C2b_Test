@@ -26,7 +26,7 @@ const downloadExcel = (pickupData) => {
 
   const formattedData = pickupData.map((item) => {
     return {
-      "Lot Id": item._id,
+      "Lot Id": item.uniqueCode || item._id,
       Date: new Date(item.createdAt).toLocaleDateString("en-GB"),
       Status: item.status,
       "Total Amount": item.totalAmount,
@@ -269,7 +269,7 @@ const PickupTable = ({ pickupData, viewHandler }) => {
               {new Date(val.createdAt).toLocaleDateString("en-GB")}
             </td>
             <td className="text-center p-2 text-sm md:p-3 md:text-base">
-              {val?._id}
+              {val?.uniqueCode || val?._id}
             </td>
             <td className="p-2 text-center text-sm md:p-3 md:text-base">
               {val?.totalDevice}

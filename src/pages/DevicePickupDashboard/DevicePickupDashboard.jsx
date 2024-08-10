@@ -325,7 +325,7 @@ const ExtComps = ({
         setSelectedRows([]);
         getData();
         setErrorMsg(`Successfully Created Lot`);
-        setErrorMsg1(`Lot No. :- ${response.data.data._id}`);
+        setErrorMsg1(`Lot No. :- ${response.data.data.uniqueCode}`);
         setErrorMsg2(`Check it On Picked Up`);
         setSuccessMod(true);
         setIsTableLoaded(false);

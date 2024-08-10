@@ -18,6 +18,7 @@ const ChangePassword = () => {
   const [newFocus, setNewFocus] = useState(false);
   const [confFocus, setConfFocus] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isValid, setIsValid] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showUserPassword, setShowUserPassword] = useState(false);
   const [showUserPassword2, setShowUserPassword2] = useState(false);
@@ -41,54 +42,71 @@ const ChangePassword = () => {
     const numRegex = /\d/;
     const spCharRegex = /[@$!%*?&]/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
     if (!emailRegex.test(userEmail)) {
       setErrMsg("Please Enter a Valid Email");
+      setIsValid(false);
       return;
     } else {
       setErrMsg("");
     }
+
     if (password.length < 8) {
       setErrMsg("Password Size Must Be More Than 8");
+      setIsValid(false);
       return;
     } else {
       setErrMsg("");
     }
+
     if (newPassword.length < 8) {
       setErrMsg("Password Size Must Be More Than 8");
+      setIsValid(false);
       return;
     }
     if (!lCaseRegex.test(newPassword) && newFocus) {
       setErrMsg("Password Must Contain a Lower Case Letter");
+      setIsValid(false);
       return;
     }
     if (!uCaseRegex.test(newPassword) && newFocus) {
       setErrMsg("Password Must Contain a Upper Case Letter");
+      setIsValid(false);
       return;
     }
     if (!numRegex.test(newPassword) && newFocus) {
       setErrMsg("Password Must Contain a Number");
+      setIsValid(false);
       return;
     }
     if (!spCharRegex.test(newPassword) && newFocus) {
       setErrMsg("Password Must Contain a Speacial Char [@$!%*?&]");
       return;
     }
-    if (newFocus) {
-      setErrMsg("");
-      return;
-    }
-    if (newPassword !== confPassword && confFocus) {
+    if (newPassword !== confPassword) {
       setErrMsg("Confirm Password Does'nt Match");
+      setIsValid(false);
       return;
     }
-    if (newPassword === confPassword && newPassword.length >= 8) {
+    if (
+      newPassword === confPassword &&
+      newPassword.length >= 8 &&
+      lCaseRegex.test(newPassword) &&
+      uCaseRegex.test(newPassword) &&
+      numRegex.test(newPassword) &&
+      spCharRegex.test(newPassword)
+    ) {
+      setIsValid(true);
       setErrMsg("Password Matched Please Submit");
       return;
+    }else{
+      setIsValid(false);
     }
   };
 
   useEffect(() => {
     passwordValidation();
+    console.log(isValid);
   }, [userEmail, newPassword, confPassword, newFocus, confFocus]);
 
   const handleSubmit = (event) => {
@@ -150,7 +168,7 @@ const ChangePassword = () => {
               <h1 className="font-sans text-[#4900A8] my-2 text-3xl font-bold sm:text-4xl">
                 Change Password
               </h1>
-              <p className="text-red-600 text-sm h-[20px]">{errMsg}</p>
+              <p className={`${isValid ? "text-[#8080FF]": "text-red-600"} text-sm h-[20px]`}>{errMsg}</p>
             </div>
             <div className="innerbox">
               <div className="flex flex-col items-center w-full gap-6">
@@ -243,10 +261,10 @@ const ChangePassword = () => {
                     <button
                       type="submit"
                       className={`login_button ${
-                        (isLoading || newPassword !== confPassword) &&
+                        (isLoading || !isValid) &&
                         "opacity-[.8]"
                       }`}
-                      disabled={isLoading || newPassword !== confPassword}
+                      disabled={isLoading || !isValid}
                     >
                       {isLoading && (
                         <div className="-ml-4 spinner">

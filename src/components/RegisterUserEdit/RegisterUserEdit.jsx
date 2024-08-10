@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import axios from "axios";
 import { IoClose } from "react-icons/io5";
+const role = ["Admin Manager", "Technician", "Sale User"];
 
 const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
   const token = sessionStorage.getItem("authToken");
@@ -268,61 +269,6 @@ const RegisterUserEditSub = ({
           />
         </label>
         <label className="flex flex-col w-[70%] gap-2">
-          <span className="font-medium text-xl">Is Grest Member?*</span>
-          <div className="flex gap-4">
-            <div
-              className={`w-[100px] text-center border-2 border-[#4900A8] p-2 rounded ${
-                isGrest === "yes" ? "bg-[#4900A8] text-white" : ""
-              }`}
-            >
-              <input
-                onChange={() => setIsGrest("yes")}
-                type="radio"
-                id="yes"
-                value="yes"
-                name="GrestUser"
-                checked={isGrest === "yes"}
-                className="hidden"
-              />
-              <label htmlFor="yes">Yes</label>
-            </div>
-            <div
-              className={`w-[100px] text-center border-2 border-[#4900A8] p-2 rounded ${
-                isGrest === "no" ? "bg-[#4900A8] text-white" : ""
-              } `}
-            >
-              <input
-                onChange={() => setIsGrest("no")}
-                type="radio"
-                id="no"
-                value="no"
-                name="GrestUser"
-                checked={isGrest === "no"}
-                className="hidden"
-              />
-              <label htmlFor="no">No</label>
-            </div>
-          </div>
-        </label>
-        <label className="flex flex-col w-[70%] gap-2">
-          <span className="font-medium text-xl">Company Name*</span>
-          <select
-            id="companyId"
-            name="companyId"
-            value={formData.companyId}
-            className="outline-none text-base border-2 px-2 py-2 rounded-lg"
-            onChange={handleChange}
-            required
-          >
-            <option value="">None</option>
-            {companyData.map((item) => (
-              <option key={item._id} value={item._id}>
-                {item.companyName}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col w-[70%] gap-2">
           <span className="font-medium text-xl">Store Name*</span>
           <select
             id="storeId"
@@ -341,17 +287,23 @@ const RegisterUserEditSub = ({
           </select>
         </label>
         <label className="flex flex-col w-[70%] gap-2">
-          <span className="font-medium text-xl">Role*</span>
-          <input
-            name="role"
-            id="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="border-2 px-2 py-2 rounded-lg  outline-none"
-            type="text"
-            required
-          />
-        </label>
+        <span className="font-medium text-xl">Role*</span>
+        <select
+          id="role"
+          name="role"
+          value={formData.role}
+          className="outline-none text-base border-2 px-2 py-2 rounded-lg"
+          onChange={handleChange}
+          required
+        >
+          <option value="">None</option>
+          {role.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+      </label>
         <label className="flex flex-col w-[70%] gap-2">
           <span className="font-medium text-xl">City</span>
           <input

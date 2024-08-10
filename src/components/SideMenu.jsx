@@ -7,10 +7,12 @@ function SideMenu({ setsideMenu, sideMenu }) {
 
   const handleHome = () => {
     setsideMenu(!sideMenu);
-    if(profile.role !== "Super Admin"){
-      navigate("/customertable");
-    }else{
+    if(profile.role === "Super Admin"){
       navigate("/adminmodels");
+    }else if(profile.role === "Admin Manager"){
+      navigate("/customertable");
+    }else if(profile.role === "Technician"){
+      navigate("/devicepickupdashboard");
     }
   };
 
@@ -71,7 +73,7 @@ function SideMenu({ setsideMenu, sideMenu }) {
   return (
     <>
       {/* //new for change  */}
-      {profile.role === "Super Admin" ? (
+      {profile.role === "Super Admin" && (
         <div
           className={
             "menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center transition-all duration-950 ease-in " +
@@ -160,7 +162,8 @@ function SideMenu({ setsideMenu, sideMenu }) {
             </li>
           </ul>
         </div>
-      ) : (
+      )}
+      {profile.role === "Admin Manager" && (
         <div
           className={
             "menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center justify-center transition-all duration-950 ease-in " +
@@ -188,6 +191,12 @@ function SideMenu({ setsideMenu, sideMenu }) {
             </li> */}
             <li
               className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleRegister}
+            >
+              Register User
+            </li>
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handlpickup}
             >
               Pickup & Cancel Device
@@ -209,6 +218,35 @@ function SideMenu({ setsideMenu, sideMenu }) {
               onClick={adminDashboard}
             >
               Admin Dashboard
+            </li>
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleLogout}
+            >
+              Logout
+            </li>
+          </ul>
+        </div>
+      )}
+      {profile.role === "Technician" && (
+        <div
+          className={
+            "menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center justify-center transition-all duration-950 ease-in " +
+            (sideMenu && "left-[0]")
+          }
+        >
+          <ul className="list-none flex flex-col h-full pl-[6%] pt-[10%] justify-start gap-[2vh]">
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleHome}
+            >
+              Home
+            </li>
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleProfile}
+            >
+              Profile
             </li>
             <li
               className="text-[20px] font-[300] cursor-pointer "

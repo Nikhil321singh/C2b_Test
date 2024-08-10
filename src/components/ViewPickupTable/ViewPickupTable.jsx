@@ -130,7 +130,7 @@ const ViewPickupTable = ({ refNo, setShowView, fromOutStand = false }) => {
                   {
                     val?.ramConfig.filter(
                       (i) => i.storage === val.leadsData.storage
-                    )[0].RAM
+                    )[0]?.RAM
                   }
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">

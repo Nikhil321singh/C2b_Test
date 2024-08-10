@@ -259,6 +259,7 @@ export const BrandList = ({ deviceType }) => {
       )
       .then((res) => {
         setBrandList(res.data.data);
+        console.log(res.data.data);
       })
       .catch((err) => {
         console.log(err);
@@ -295,9 +296,8 @@ export const BrandList = ({ deviceType }) => {
       handleDeviceClick();
     }
   };
-  const extraBrands = [{ name: "More" }];
 
-  const allBrands = [...brandList, ...extraBrands];
+  const allBrands = [...brandList];
   return (
     <>
       {popout && (
@@ -338,9 +338,9 @@ export const BrandList = ({ deviceType }) => {
             <div
               key={index}
               onClick={() => handleBrandClick(brandItem)}
-              className={`flex-shrink-0 ${styles.brand_card}`}
+              className={`flex-shrink-0  ${styles.brand_card} px-[20px] py-[10px]`}
             >
-              <BrandImgSetter brandItem={brandItem} />
+              <img className=" w-[50px]" src={brandItem.logo} alt={brandItem.name} />
             </div>
           ))}
         </div>
@@ -852,17 +852,17 @@ const MiddlePart = ({
         <div className="flex flex-col min-w-[30%]  items-center  ">
           <img className={`w-[50px] mb-2`} src={how1} />
           <p className="-mb-1 text-base font-bold">Add</p>
-          <p className="text-base font-medium opacity-60">product details</p>
+          <p className="text-sm font-medium opacity-60">Product Details</p>
         </div>
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how2} />
           <p className="-mb-1 text-base font-bold">Exchange</p>
-          <p className="text-base font-medium opacity-60">your device</p>
+          <p className="text-sm font-medium opacity-60">Instantly</p>
         </div>
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how3} />
           <p className="-mb-1 text-base font-bold">Get Paid Instantly</p>
-          <p className="text-base font-medium opacity-60">your money</p>
+          <p className="text-sm font-medium opacity-60">Your Money</p>
         </div>
       </div>
     </div>

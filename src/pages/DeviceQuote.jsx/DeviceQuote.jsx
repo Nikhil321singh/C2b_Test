@@ -79,13 +79,11 @@ const DeviceQuote = () => {
       >
         <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-
           <img
             onClick={() => navigate("/selectdevicetype")}
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
-            style={{ zIndex: 9999 }}
           />
         </div>
       </div>

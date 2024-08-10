@@ -185,7 +185,7 @@ const Price = ({ submitdata, userToken }) => {
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div
           onClick={() => uploadAllImages()}
-          className={`bg-[#4900A8] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
+          className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
             !imeinumber ||
             !phoneFront ||
             !phoneBack ||
@@ -193,8 +193,8 @@ const Price = ({ submitdata, userToken }) => {
             !phoneRight ||
             !phoneTop ||
             !phoneBottom
-              ? "opacity-50 cursor-not-allowed"
-              : ""
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-[#4900A8]"
           }`}
         >
           {isLoading && (
@@ -214,7 +214,7 @@ const Price = ({ submitdata, userToken }) => {
 export default Price;
 
 const ImeiField = ({ imeinumber, setImeiNumber }) => {
-  const [error, setError] = useState("");
+  const [error, setError] = useState(true);
   const Device = sessionStorage.getItem("DeviceType");
 
   const validateImeiNumber = (value) => {
@@ -272,7 +272,7 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
         <button
           className={`px-4 py-2 font-bold text-white rounded ${
             !error
-              ? "bg-[#f4486dd0] hover:bg-[#4900A8]"
+              ? "bg-[#4900A8]"
               : "bg-gray-400 cursor-not-allowed"
           }`}
           onClick={handleVerify}
@@ -281,7 +281,7 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
           Verify
         </button>
       </div>
-      {error && <p className="text-red-600 mt-2 text-sm">{error}</p>}
+      {error && <p className="text-[#8080FF] mt-2 text-sm">{error}</p>}
     </div>
   );
 };
@@ -301,14 +301,16 @@ const AdharField = ({
       <div className="flex gap-1 two">
         <p className="text-base font-medium">2.</p>
         <div className="flex items-center">
-          <p className="text-base font-medium three">Upload your Aadhar Card</p>
+          <p className="text-base font-medium three">{"Upload your Aadhar Card"}{" "}
+          <span className="text-red-500">*</span>
+          </p>
         </div>
       </div>
-      <p className="mt-2 text-sm text-red-600">
+      <p className="mt-2 text-sm text-[#8080FF]">
         Note: Image size should not exceed 2MB
       </p>
       <div className="flex inputAADHAR justify-evenly">
-        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative flex flex-col border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#4900A8] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center">Adhaar(Front)</p>
           <input
             type="file"
@@ -328,7 +330,7 @@ const AdharField = ({
             )}
           </button>
         </div>
-        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#4900A8] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center">Adhaar(Back)</p>
           <input
             type="file"
@@ -373,13 +375,13 @@ const PhoneBill = ({
           </p>
         </div>
       </div>
-      <p className="mt-2 text-sm text-red-600">
+      <p className="mt-2 text-sm text-[#8080FF]">
         Note: Image size should not exceed 2MB
       </p>
 
       <div className="flex justify-start ml-3 inputAADHAR">
         {/* 1 */}
-        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#4900A8] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center">
             {Device === "Mobile" && "Phone"}
             {Device === "Watch" && "Smartwatch"} Bill
@@ -448,11 +450,11 @@ const PhonePhotos1 = ({
           />
         </div>
       </div>
-      <p className="mt-2 text-sm text-red-600">
+      <p className="mt-2 text-sm text-[#8080FF]">
         Note: Image size should not exceed 2MB
       </p>
       <div className="flex flex-wrap inputAADHAR justify-evenly">
-        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#4900A8] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="text-center font-semibold">{`${Device} Front`}</p>
           <input
             onChange={(e) => handleChange(setPhoneFront, e)}
@@ -472,7 +474,7 @@ const PhonePhotos1 = ({
             )}
           </button>
         </div>
-        <div className="p-1 text-center mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 text-center mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#4900A8] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="text-center font-semibold">{`${Device} Back`}</p>
           <input
             ref={phoneBackRef}
@@ -495,7 +497,7 @@ const PhonePhotos1 = ({
 
         {/* 3 */}
 
-        <div className="text-center p-1 mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
+        <div className="text-center p-1 mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#4900A8] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
           <p className="text-center font-semibold tracking-tighter">
             {`${Device} Left Side`}
           </p>
@@ -519,7 +521,7 @@ const PhonePhotos1 = ({
         </div>
 
         {/* 4 */}
-        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg w-[40vw] h-[15vh] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg w-[40vw] h-[15vh] relative border-[#4900A8] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="text-center font-semibold tracking-tighter">
             {`${Device} Right Side`}
           </p>
@@ -543,7 +545,7 @@ const PhonePhotos1 = ({
         </div>
 
         {/* 5 */}
-        <div className="border-2 p-1 mt-4 text-center justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="border-2 p-1 mt-4 text-center justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#4900A8] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center tracking-tighter">
             {`${Device} Top Side`}
           </p>
@@ -567,7 +569,7 @@ const PhonePhotos1 = ({
         </div>
 
         {/* 6 */}
-        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#ff4176] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#4900A8] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center tracking-tighter">
             {`${Device} Bottom Side`}
           </p>
@@ -593,7 +595,7 @@ const PhonePhotos1 = ({
       {showHoldModal && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div
-            className="bg-white text-black text-sm rounded p-6 w-64 shadow-lg"
+            className="bg-white text-black text-sm rounded w-full py-6 px-4 shadow-lg"
             style={{ lineHeight: "1.5" }}
           >
             <p>
@@ -630,7 +632,7 @@ const PhonePhotos1 = ({
             <div className="flex justify-end mt-4">
               <button
                 onClick={() => setShowHoldModal(false)}
-                className="bg-white text-[#FF0000] px-4 py-2 rounded-md"
+                className="bg-white text-[#4900AB] px-4 py-2 rounded-md"
               >
                 Close
               </button>

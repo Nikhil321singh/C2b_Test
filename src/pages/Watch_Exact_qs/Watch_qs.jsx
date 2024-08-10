@@ -346,6 +346,9 @@ const FirstPart = ({ WTCstate, Functional }) => {
             </div>
           ))}
       </div>
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+          Continue, If you don't have any Above-Mentioned Issues.
+      </div>
     </div>
   );
 };
@@ -502,6 +505,9 @@ const SecondPart = ({ WTCstate, Physical }) => {
           </div>
         </div>
       )}
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+          Continue, If you don't have any Above-Mentioned Issues.
+      </div>
     </div>
   );
 };
@@ -549,6 +555,9 @@ const ThirdPart = ({ WTCstate, Accessories }) => {
             </div>
           ))}
       </div>
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+          Continue, If you don't have any Above-Mentioned Issues.
+      </div>
     </div>
   );
 };
@@ -569,7 +578,7 @@ const FourthPart = ({ WTCstate, Warranty }) => {
           WTCstate?.Warranty.map((data, index) => (
             <div
               key={index}
-              className="max-w-[500px]  flex gap-4 ml-3 lableconatiner flex-col"
+              className="max-w-[500px]  flex gap-4 ml-3 flex-col"
             >
               <label
                 className={`text-[#4900A8] ${
@@ -583,6 +592,7 @@ const FourthPart = ({ WTCstate, Warranty }) => {
                 <input
                   type="radio"
                   value={data.yes}
+                  className="hidden"
                   onChange={(e) => {
                     store.dispatch(
                       updateWatchWarrantyObject({

@@ -362,7 +362,6 @@ const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
             <th className="p-2 text-sm md:p-3 md:text-base">Email</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Phone Number</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Company</th>
-            <th className="p-2 text-sm md:p-3 md:text-base">Grest Member</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Role</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Store</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Region</th>
@@ -393,7 +392,7 @@ const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
                 </div>
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {`${val?.firstName} ${val?.lastName}`}
+                {`${val?.firstName} ${val?.lastName ? val?.lastName : ""}`}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.email}
@@ -403,9 +402,6 @@ const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.companyName}
-              </td>
-              <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {val?.grestMember ? "Yes" : "No"}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.role}
