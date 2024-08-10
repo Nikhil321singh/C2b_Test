@@ -857,12 +857,12 @@ const MiddlePart = ({
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how2} />
           <p className="-mb-1 text-base font-bold">Exchange</p>
-          <p className="text-sm font-medium opacity-60">Instantly</p>
+          <p className="text-sm font-medium opacity-60">Your Device</p>
         </div>
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how3} />
-          <p className="-mb-1 text-base font-bold">Get Paid Instantly</p>
-          <p className="text-sm font-medium opacity-60">Your Money</p>
+          <p className="-mb-1 text-base font-bold">Get Paid</p>
+          <p className="text-sm font-medium opacity-60">Instantly</p>
         </div>
       </div>
     </div>
