@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import axios from "axios";
 import { IoClose } from "react-icons/io5";
-const token = sessionStorage.getItem("authToken");
+const role = ["Admin Manager", "Technician", "Sale User"];
 
 const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
+  const token = sessionStorage.getItem("authToken");
   const [isGrest, setIsGrest] = useState(userData.grestMember ? "yes" : "no");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [formData, setFormData] = useState(userData);
@@ -95,7 +96,7 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
   const submitHandler = (event) => {
     event.preventDefault();
     setIsTableLoaded(true);
-    const data = JSON.stringify({
+    const data = {
       userID: formData._id,
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -107,7 +108,7 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
       storeId: formData.storeId,
       city: formData.city,
       address: formData.address,
-    });
+    };
 
     const config = {
       method: "put",
@@ -139,7 +140,7 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
     <div style={{ height: "100vh", overflowY: "auto" }}>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <RegisterUserEditForm
@@ -208,7 +209,7 @@ const RegisterUserEditSub = ({
         <IoClose
           size={35}
           onClick={closeHandler}
-          className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500"
+          className="absolute right-0 text-[#4900A8] transition ease hover:rotate-[360deg] duration-500"
         />
         <p className="text-4xl font-bold">Update User Details</p>
         <p className="text-lg">All fields marked with * are required</p>
@@ -268,61 +269,6 @@ const RegisterUserEditSub = ({
           />
         </label>
         <label className="flex flex-col w-[70%] gap-2">
-          <span className="font-medium text-xl">Is Grest Member?*</span>
-          <div className="flex gap-4">
-            <div
-              className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${
-                isGrest === "yes" ? "bg-[#EC2752] text-white" : ""
-              }`}
-            >
-              <input
-                onChange={() => setIsGrest("yes")}
-                type="radio"
-                id="yes"
-                value="yes"
-                name="GrestUser"
-                checked={isGrest === "yes"}
-                className="hidden"
-              />
-              <label htmlFor="yes">Yes</label>
-            </div>
-            <div
-              className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${
-                isGrest === "no" ? "bg-[#EC2752] text-white" : ""
-              } `}
-            >
-              <input
-                onChange={() => setIsGrest("no")}
-                type="radio"
-                id="no"
-                value="no"
-                name="GrestUser"
-                checked={isGrest === "no"}
-                className="hidden"
-              />
-              <label htmlFor="no">No</label>
-            </div>
-          </div>
-        </label>
-        <label className="flex flex-col w-[70%] gap-2">
-          <span className="font-medium text-xl">Company Name*</span>
-          <select
-            id="companyId"
-            name="companyId"
-            value={formData.companyId}
-            className="outline-none text-base border-2 px-2 py-2 rounded-lg"
-            onChange={handleChange}
-            required
-          >
-            <option value="">None</option>
-            {companyData.map((item) => (
-              <option key={item._id} value={item._id}>
-                {item.companyName}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col w-[70%] gap-2">
           <span className="font-medium text-xl">Store Name*</span>
           <select
             id="storeId"
@@ -341,17 +287,23 @@ const RegisterUserEditSub = ({
           </select>
         </label>
         <label className="flex flex-col w-[70%] gap-2">
-          <span className="font-medium text-xl">Role*</span>
-          <input
-            name="role"
-            id="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="border-2 px-2 py-2 rounded-lg  outline-none"
-            type="text"
-            required
-          />
-        </label>
+        <span className="font-medium text-xl">Role*</span>
+        <select
+          id="role"
+          name="role"
+          value={formData.role}
+          className="outline-none text-base border-2 px-2 py-2 rounded-lg"
+          onChange={handleChange}
+          required
+        >
+          <option value="">None</option>
+          {role.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+      </label>
         <label className="flex flex-col w-[70%] gap-2">
           <span className="font-medium text-xl">City</span>
           <input
@@ -379,11 +331,11 @@ const RegisterUserEditSub = ({
         <div className="mt-8">
           <button
             type="submit"
-            className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+            className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
           >
             Update Details
           </button>
-          <p className="text-[#EC2752]">{response}</p>
+          <p className="text-[#4900A8]">{response}</p>
         </div>
       </form>
     </div>

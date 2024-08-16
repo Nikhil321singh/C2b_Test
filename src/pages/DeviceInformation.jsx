@@ -112,9 +112,9 @@ const DeviceInformation = () => {
       sessionStorage.setItem("LeadId", response.data.data.id);
       sessionStorage.setItem(
         "responsedatadata",
-        JSON.stringify(response.data.data)
+        JSON.stringify({ ...response.data.data, bonus: 0 })
       );
-      dispatch(setResponseData(response.data.data));
+      dispatch(setResponseData({ ...response.data.data, bonus: 0 }));
       console.log("clicked");
       navigate("/inputnumber");
     } else {
@@ -134,14 +134,14 @@ const DeviceInformation = () => {
 
           <img
             onClick={() => navigate("/selectdevicetype")}
-            className="w-28 "
+            className="w-40"
             src={Grest_Logo}
             alt="app logo"
           />
         </div>
       </div>
       <div className="w-[90%] md:w-[70%]  mx-auto">
-        <h1 className="text-[#EC2752] font-semibold text-lg my-4">
+        <h1 className="text-[#4900A8] font-semibold text-lg my-4">
           Tell Us More About Your Device
         </h1>
         <div className="my-4">
@@ -155,9 +155,9 @@ const DeviceInformation = () => {
                   </div>
                   <div className="max-w-[500px] flex gap-4 ml-3">
                     <label
-                      className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                      className={`text-[#4900A8] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                         answers[index].answer === data.yes
-                          ? "bg-[#EC2752] text-white"
+                          ? "bg-[#4900A8] text-white"
                           : ""
                       }`}
                     >
@@ -173,9 +173,9 @@ const DeviceInformation = () => {
                       Yes
                     </label>
                     <label
-                      className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                      className={`text-[#4900A8] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                         answers[index].answer === data.no
-                          ? "bg-[#EC2752] text-white"
+                          ? "bg-[#4900A8] text-white"
                           : ""
                       }`}
                     >

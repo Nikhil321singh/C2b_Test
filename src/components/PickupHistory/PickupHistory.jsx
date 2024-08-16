@@ -11,10 +11,12 @@ import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import AdminNavbar from "../Admin_Navbar";
 import SideMenu from "../SideMenu";
 import ProfileBox from "../ProfileBox/ProfileBox";
+import { useDispatch, useSelector } from "react-redux";
+import { setStoreFilter } from "../../store/slices/userSlice";
 
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const userRole = LoggedInUser?.role;
-const token = sessionStorage.getItem("authToken");
+const QRole = userRole === "Technician" ? userRole : "Admin";
 
 const downloadExcel = (pickupData) => {
   console.log("data down", pickupData);
@@ -24,7 +26,7 @@ const downloadExcel = (pickupData) => {
 
   const formattedData = pickupData.map((item) => {
     return {
-      "Lot Id": item._id,
+      "Lot Id": item.uniqueCode || item._id,
       Date: new Date(item.createdAt).toLocaleDateString("en-GB"),
       Status: item.status,
       "Total Amount": item.totalAmount,
@@ -40,13 +42,16 @@ const downloadExcel = (pickupData) => {
 };
 
 const PickupHistory = () => {
+  const token = sessionStorage.getItem("authToken");
+  const dispatch = useDispatch();
+  const userProfile = useSelector((state) => state.user);
   const [pickupData, setPickupData] = useState([]);
   const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
-  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
-  const [region, setRegion] = useState(LoggedInUser?.region);
+  const [storeName, setStoreName] = useState(userProfile.selStore);
+  const [region, setRegion] = useState(userProfile.selRegion);
   const [storeData, setStoreData] = useState([]);
   const [regionData, setRegionData] = useState([]);
   const [regionDrop, setRegionDrop] = useState(false);
@@ -60,7 +65,7 @@ const PickupHistory = () => {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/history?region=${region}&storeName=${storeName}`,
+      }/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
     };
     axios
@@ -120,6 +125,7 @@ const PickupHistory = () => {
     const storeNamesArray = filterStores.map((store) => store.storeName);
     setRegion(value);
     setStoreData(storeNamesArray);
+    dispatch(setStoreFilter({ selStore: "", selRegion: value }));
   };
 
   const handleStoreChange = (value) => {
@@ -128,6 +134,7 @@ const PickupHistory = () => {
     const newRegion = filterStores[0].region;
     setStoreName(value);
     setRegion(newRegion);
+    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
   };
 
   const viewHandler = (refID) => {
@@ -139,14 +146,14 @@ const PickupHistory = () => {
     <div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
         {userRole === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-28 " src={Grest_Logo} alt="app logo" />
+            <img className="w-40" src={Grest_Logo} alt="app logo" />
           </div>
         ) : (
           <div className="navbar">
@@ -233,13 +240,13 @@ const PickupHistory = () => {
 
 const PickupTable = ({ pickupData, viewHandler }) => {
   return (
-    <table className="w-full border border-[#EC2752]">
-      <thead className="bg-[#EC2752] text-white">
+    <table className="w-full border border-[#4900A8]">
+      <thead className="bg-[#4900A8] text-white">
         <tr>
           <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
-          <th className="p-2 text-sm md:p-3 md:text-base">Refrence No</th>
+          <th className="p-2 text-sm md:p-3 md:text-base">Lot No</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Number Of Device</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Amount</th>
         </tr>
@@ -262,7 +269,7 @@ const PickupTable = ({ pickupData, viewHandler }) => {
               {new Date(val.createdAt).toLocaleDateString("en-GB")}
             </td>
             <td className="text-center p-2 text-sm md:p-3 md:text-base">
-              {val?._id}
+              {val?.uniqueCode || val?._id}
             </td>
             <td className="p-2 text-center text-sm md:p-3 md:text-base">
               {val?.totalDevice}

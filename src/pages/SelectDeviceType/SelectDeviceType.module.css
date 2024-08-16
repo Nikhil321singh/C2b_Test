@@ -87,7 +87,7 @@
   box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158),
     0px 0px 0px 0px rgba(0, 0, 0, 0.034);
   cursor: pointer;
-  background-color: whitesmoke;
+  background-color: #f5f5f5;
 }
 
 .search_box input {
@@ -117,10 +117,10 @@
   width: 100px;
   padding: 7px 10px;
   color: white;
-  background-color: #ec2752;
+  background-color: #4900ad;
   outline: none;
   border-radius: 0.75rem;
-  filter: drop-shadow(1px 2px 2px #ec2752ac);
+  filter: drop-shadow(1px 2px 2px #4900adac);
   cursor: pointer;
   transition: all 0.5s ease;
 }
@@ -145,9 +145,9 @@
 }
 
 .button_unchecked:hover {
-  background-color: #ec2752;
+  background-color: #4900ad;
   color: white;
-  filter: drop-shadow(1px 2px 2px #ec2752ac);
+  filter: drop-shadow(1px 2px 2px #4900adac);
   scale: 1.03;
 }
 
@@ -178,7 +178,6 @@
   justify-content: center;
   align-items: center;
   border-radius: 0.55rem;
-  padding: 30px;
   height: 80px;
   box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158),
     0px 0px 0px 0px rgba(0, 0, 0, 0.034);
@@ -186,9 +185,6 @@
   transition: all 0.5s ease;
 }
 
-.brand_card img {
-  width: 40px;
-}
 .brand_card:hover {
   scale: 1.05;
 }
@@ -236,7 +232,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #ec275284;
+  color: #4900ad84;
   background-color: white;
   height: 20px;
   width: 20px;
@@ -363,14 +359,6 @@
     width: 100%;
     padding: 7px 0;
     justify-content: flex-start;
-  }
-
-  .brand_card {
-    padding: 10px 20px;
-  }
-
-  .brand_card img {
-    width: 40px;
   }
 
   .info_wrap {

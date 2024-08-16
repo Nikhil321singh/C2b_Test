@@ -80,7 +80,7 @@ const CompanyListing = () => {
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <Link
               to="/companylistingdetails"
-              className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+              className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
             >
               View Detail
             </Link>
@@ -117,7 +117,7 @@ const CompanyListing = () => {
               />
             </div>
             <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Adddress</span>
+              <span className="font-medium text-xl">Address</span>
               <input
                 className="border-2 px-2 py-2 rounded-lg  outline-none"
                 type="text"
@@ -182,7 +182,7 @@ const CompanyListing = () => {
             </div>
 
             <div className="mt-8">
-              <button className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]">
+              <button className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]">
                 Submit Form
               </button>
             </div>

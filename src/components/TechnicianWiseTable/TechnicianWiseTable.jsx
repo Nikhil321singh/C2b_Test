@@ -1,4 +1,3 @@
-
 const TechnicianWiseTable = ({ tableData }) => {
   function reverseDate(itemDate) {
     const dateArr = itemDate.split("-");
@@ -7,8 +6,8 @@ const TechnicianWiseTable = ({ tableData }) => {
   return (
     <div className="">
       <div className="m-2 w-full  md:m-5 ">
-        <table className="border border-[#EC2752] w-[130vh]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="border border-[#4900A8] w-[130vh]">
+          <thead className="bg-[#4900A8] text-white">
             <tr className="">
               <th className="p-2 min-w-[100px] text-sm md:p-3 md:text-base  ">
                 Date
@@ -34,7 +33,7 @@ const TechnicianWiseTable = ({ tableData }) => {
                   {item.store?.storeName}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {item.user?.name}
+                  {item.user?.firstName} {item.user?.lastName}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {item.totalDevice}

@@ -30,10 +30,8 @@ const Mobile = [
   "Warranty",
 ];
 const Watch = ["Accessories", "Functional", "Physical", "Warranty"];
-const userToken = sessionStorage.getItem("authToken");
-const category = sessionStorage.getItem("admincategory");
 const successColorClass = "text-green-500";
-const errorColorClass = "text-[#EC2752]";
+const errorColorClass = "text-[#4900A8]";
 
 function sortQuestionnaires(data) {
   return data.sort((a, b) => {
@@ -52,6 +50,7 @@ function filterQuestionnairesByType(data, typeList) {
 }
 
 const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
+  const category = sessionStorage.getItem("admincategory");
   const [confBox, setConfBox] = useState(false);
   const [selectedUser, setSelectedUser] = useState();
   const [selectedUserqs, setSelectedUserqs] = useState();
@@ -84,6 +83,7 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
 
   useEffect(() => {
     async function getQuestionnaires() {
+      const userToken = sessionStorage.getItem("authToken");
       try {
         const response = await axios.get(
           `${
@@ -137,8 +137,8 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
       <div className="m-2  w-[90%] overflow-x-auto md:m-5">
         <div className="min-w-max">
           {category === "Mobile" && (
-            <table className="w-full border border-[#EC2752]">
-              <thead className="bg-[#EC2752] text-white">
+            <table className="w-full border border-[#4900A8]">
+              <thead className="bg-[#4900A8] text-white">
                 <tr>
                   <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
                     Groups
@@ -236,6 +236,7 @@ const ExtComps = ({
 
   function deleteHandler(qsid) {
     setConfBox(false);
+    const userToken = sessionStorage.getItem("authToken");
     axios
       .delete(
         `${
@@ -282,7 +283,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailBox(false);
               }}
-              className={"bg-[#EC2752] text-white"}
+              className={"bg-[#4900A8] text-white"}
             >
               Okay
             </button>
@@ -300,7 +301,7 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => deleteHandler(selectedUser)}
-                className={"bg-[#EC2752] text-white"}
+                className={"bg-[#4900A8] text-white"}
               >
                 Okay
               </button>
@@ -308,7 +309,7 @@ const ExtComps = ({
                 onClick={() => {
                   setConfBox(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-[#4900A8]"
               >
                 Cancel
               </button>
@@ -346,6 +347,7 @@ const QSComp = ({
       no: no,
       default: defaultOption,
     };
+    const userToken = sessionStorage.getItem("authToken");
     axios
       .put(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/edit`,
@@ -376,7 +378,7 @@ const QSComp = ({
             <div className="relative flex flex-col gap-2 pb-2 mb-6 ml-10 mr-10 border-b-2">
               <IoClose
                 size={35}
-                className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
+                className="absolute right-0 text-[#4900A8] transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
                 onClick={() => setQsmodel(false)}
               />
               <p className="text-4xl font-bold">Edit Question</p>
@@ -445,7 +447,7 @@ const QSComp = ({
                   <option value="">Select No Key</option>
                   {group &&
                     options[group].map((option, optionkey) => (
-                      <option  value={option} key={optionkey}>
+                      <option value={option} key={optionkey}>
                         {option}
                       </option>
                     ))}
@@ -474,7 +476,7 @@ const QSComp = ({
 
               <div className="mt-8">
                 <button
-                  className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+                  className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
                   onClick={handleSubmitedit}
                 >
                   Update Details
@@ -490,12 +492,12 @@ const QSComp = ({
 
 const WatchComp = ({ watchdata, handleEdit, deleteConfHandler }) => {
   const dispatch = useDispatch();
-
+  const category1 = sessionStorage.getItem("admincategory");
   return (
     <React.Fragment>
-      {category === "Watch" && (
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+      {category1 === "Watch" && (
+        <table className="w-full border border-[#4900A8]">
+          <thead className="bg-[#4900A8] text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
                 Groups

@@ -13,7 +13,6 @@ import { IoRefresh } from "react-icons/io5";
 
 const isSelled = "true";
 const rotateCss = "rotate-180";
-const token = sessionStorage.getItem("authToken");
 const pageLimit = 10;
 
 const downloadExcelStoreWise = (apiData) => {
@@ -66,6 +65,7 @@ const fetchDownloadDataStoreWise = (deviceCategory) => {
 };
 
 const StoreWiseReport = () => {
+  const token = sessionStorage.getItem("authToken");
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [tableData, setTableData] = useState();
@@ -80,7 +80,9 @@ const StoreWiseReport = () => {
   const [fromDate, setFromDate] = useState("");
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
   const [toDate, setToDate] = useState("");
-  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
+  const [toDateDup, setToDateDup] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [grestRec, setGrestRec] = useState("");
   const [allUser, setAllUser] = useState([]);
   const [techId, setTechId] = useState("");
@@ -90,9 +92,10 @@ const StoreWiseReport = () => {
   const fetchStoreData = () => {
     setIsTableLoaded(true);
     axios
-      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll?page=${currentPage
-        }&limit=${pageLimit}&is_selled=${isSelled}&store=${storeId}&rid=${searchValue}&grestRec=${grestRec
-        }&endDate=${toDateDup}&startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
+      .get(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/prospects/findAll?page=${currentPage}&limit=${pageLimit}&is_selled=${isSelled}&store=${storeId}&rid=${searchValue}&grestRec=${grestRec}&endDate=${toDateDup}&startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
         { headers: { Authorization: token } }
       )
       .then((res) => {
@@ -163,7 +166,15 @@ const StoreWiseReport = () => {
 
   useEffect(() => {
     fetchStoreData();
-  }, [currentPage, pageLimit, grestRec, fromDateDup, toDateDup, techId, deviceCategory]);
+  }, [
+    currentPage,
+    pageLimit,
+    grestRec,
+    fromDateDup,
+    toDateDup,
+    techId,
+    deviceCategory,
+  ]);
 
   useEffect(() => {
     if (storeId) {
@@ -178,11 +189,15 @@ const StoreWiseReport = () => {
       setFromDate(date);
       const formattedDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
+      )
+        .toISOString()
+        .split("T")[0];
       const today = new Date();
       const formattedToday = new Date(
         today.getTime() - today.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
+      )
+        .toISOString()
+        .split("T")[0];
       if (toDate === "") {
         setToDateDup(formattedToday);
       }
@@ -196,14 +211,21 @@ const StoreWiseReport = () => {
       setToDate(date);
       const formattedDate = new Date(
         date.getTime() - date.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
+      )
+        .toISOString()
+        .split("T")[0];
       setToDateDup(formattedDate);
       if (fromDate === "") {
         const fromDateOneYearBefore = new Date(date);
-        fromDateOneYearBefore.setFullYear(fromDateOneYearBefore.getFullYear() - 1);
+        fromDateOneYearBefore.setFullYear(
+          fromDateOneYearBefore.getFullYear() - 1
+        );
         const formattedFromDate = new Date(
-          fromDateOneYearBefore.getTime() - fromDateOneYearBefore.getTimezoneOffset() * 60000
-        ).toISOString().split("T")[0];
+          fromDateOneYearBefore.getTime() -
+            fromDateOneYearBefore.getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .split("T")[0];
         setFromDateDup(formattedFromDate);
       }
     }
@@ -279,7 +301,7 @@ const UpperFilter = ({
     <React.Fragment>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -292,17 +314,17 @@ const UpperFilter = ({
           <select
             name=""
             id=""
-            className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
+            className="bg-[#4900A8] text-white rounded-lg outline-none px-2 py-1"
             onChange={(e) => setDeviceCategory(e.target.value)}
           >
             <option
-              className="bg-white text-[#EC2752] font-medium"
+              className="bg-white text-[#4900A8] font-medium"
               value="Mobile"
             >
               Mobile
             </option>
             <option
-              className="bg-white text-[#EC2752] hover:bg-[#EC2752] font-medium"
+              className="bg-white text-[#4900A8] hover:bg-[#4900A8] font-medium"
               value="Watch"
             >
               Watch
@@ -612,7 +634,7 @@ const TableCont = ({ currentPage, tableData, setCurrentPage, maxPages }) => {
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              : "bg-[#4900A8] text-white cursor-pointer"
           }`}
         >
           Previous
@@ -623,7 +645,7 @@ const TableCont = ({ currentPage, tableData, setCurrentPage, maxPages }) => {
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              : "bg-[#4900A8] text-white cursor-pointer"
           }`}
         >
           Next

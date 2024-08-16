@@ -10,15 +10,20 @@ import { MdEdit } from "react-icons/md";
 
 const Failerr = "Failed To Save Quote";
 const quoteText = "Quote Saved Successfully";
-const leadData = JSON.parse(sessionStorage.getItem("responsedatadata"));
-const userToken = sessionStorage.getItem("authToken");
-const ExactQuote = sessionStorage.getItem("ExactQuote");
 
-const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
+const QuoteModal = ({
+  show,
+  handleClose,
+  setQuoteSaved,
+  quoteId,
+  bonusPrice,
+}) => {
+  const leadData = JSON.parse(sessionStorage.getItem("responsedatadata"));
+  const ExactQuote = sessionStorage.getItem("ExactQuote");
   const showHideClassName = show
     ? `${styles.modal} ${styles.displayBlock}`
     : ` ${styles.displayNone}`;
-
+  const userToken = sessionStorage.getItem("authToken");
   const [showOtp, setShowOtp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [ph, setPh] = useState("");
@@ -35,7 +40,6 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
   useEffect(() => {
     setShowOtp(false);
   }, [show]);
-
   const handleNumberEdit = () => {
     setLoading(false);
     setShowOtp(false);
@@ -65,9 +69,10 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
       name: name,
       emailId: userEmail,
       reason: reason,
+      bonusPrice: bonusPrice,
     };
     setUserData(data);
-
+    console.log(data);
     if (ExactQuote === "true") {
       if (ExactQuote === "true") {
         axios
@@ -80,6 +85,9 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
           )
           .then((res) => {
             console.log(res);
+            toast.success(quoteText);
+            setQuoteSaved(true);
+            dispatch(setOtpVerified(true));
           })
           .catch((err) => {
             console.log(err);
@@ -93,14 +101,14 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
           )
           .then((res) => {
             console.log(res);
+            toast.success(quoteText);
+            setQuoteSaved(true);
+            dispatch(setOtpVerified(true));
           })
           .catch((err) => {
             console.log(err);
           });
       }
-      toast.success(quoteText);
-      setQuoteSaved(true);
-      dispatch(setOtpVerified(true));
       setLoading(false);
     } else {
       axios
@@ -112,13 +120,13 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         .then((res) => {
           toast.success(quoteText);
           handleClose();
+          setQuoteSaved(true);
         })
         .catch((err) => {
           toast.error(Failerr);
           handleClose();
         });
       setLoading(false);
-      setQuoteSaved(true);
     }
     handleClose();
   };
@@ -138,6 +146,10 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         )
         .then((res) => {
           setLoading(false);
+          setLoading(false);
+          toast.success(quoteText);
+          setQuoteSaved(true);
+          dispatch(setOtpVerified(true));
         })
         .catch((err) => {
           setLoading(false);
@@ -151,14 +163,14 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
         )
         .then((res) => {
           setLoading(false);
+          toast.success(quoteText);
+          setQuoteSaved(true);
+          dispatch(setOtpVerified(true));
         })
         .catch((err) => {
           setLoading(false);
         });
     }
-    toast.success(quoteText);
-    setQuoteSaved(true);
-    dispatch(setOtpVerified(true));
     handleClose();
   };
 
@@ -204,7 +216,7 @@ const QuoteModal = ({ show, handleClose, setQuoteSaved, quoteId }) => {
                 handleClose();
               }}
               size={24}
-              className="text-[#EC2752] absolute top-5 right-4"
+              className="text-[#4900A8] absolute top-5 right-4"
             />
           </div>
         </section>
@@ -239,21 +251,6 @@ const OTPCOmp = ({
   timer,
 }) => {
   const [otp, setOtp] = useState("");
-  const handleOther = (e) => {
-    if (e.target.id === "other" && isOther === false) {
-      setIsOther(true);
-    } else if (e.target.id !== "other") {
-      setIsOther(false);
-      if (e.target.value === 1) {
-        setReason("Quote value is too low.");
-      } else if (e.target.value === 2) {
-        setReason("Customer just wanted to know the device value.");
-      } else if (e.target.value === 3) {
-        setReason("Customer will come later.");
-      }
-    }
-  };
-
   return (
     <React.Fragment>
       {!showOtp ? (
@@ -291,7 +288,10 @@ const OTPCOmp = ({
             <p className="font-medium">Please select reason</p>
             <label className="flex items-center gap-2">
               <input
-                onClick={handleOther}
+                onClick={() => {
+                  setReason("Quote value is too low.");
+                  setIsOther(false);
+                }}
                 type="radio"
                 value={1}
                 name="reason"
@@ -300,7 +300,10 @@ const OTPCOmp = ({
             </label>
             <label className="flex items-center gap-2">
               <input
-                onClick={handleOther}
+                onClick={() => {
+                  setReason("Customer just wanted to know the device value.");
+                  setIsOther(false);
+                }}
                 type="radio"
                 value={2}
                 name="reason"
@@ -309,7 +312,10 @@ const OTPCOmp = ({
             </label>
             <label className="flex items-center gap-2">
               <input
-                onClick={handleOther}
+                onClick={() => {
+                  setReason("Customer will come later.");
+                  setIsOther(false);
+                }}
                 type="radio"
                 value={3}
                 name="reason"
@@ -318,7 +324,7 @@ const OTPCOmp = ({
             </label>
             <label className="flex items-center gap-2">
               <input
-                onClick={handleOther}
+                onClick={() => setIsOther(true)}
                 type="radio"
                 id="other"
                 name="reason"
@@ -339,7 +345,7 @@ const OTPCOmp = ({
             )}
             <button
               onClick={onSignupDup}
-              className="text-white bg-[#EC2752] p-2 text-xl rounded-md"
+              className="text-white bg-[#4900A8] p-2 text-xl rounded-md"
             >
               Submit
             </button>
@@ -352,7 +358,7 @@ const OTPCOmp = ({
             <div className="flex tracking-tight">
               <p>Enter OTP sent to +91{ph}</p>
               <span
-                className="text-sm font-medium text-left ml-[2px] text-[#ec2752] flex items-center tracking-tight"
+                className="text-sm font-medium text-left ml-[2px] text-[#4900A8] flex items-center tracking-tight"
                 onClick={handleNumberEdit}
               >
                 <MdEdit /> Edit no.
@@ -375,7 +381,7 @@ const OTPCOmp = ({
           <div className="flex flex-row items-center justify-center text-sm font-medium">
             <span className="opacity-60">Didn't Receive OTP?</span>
             <button
-              className="ml-2 text-[#EC2752]"
+              className="ml-2 text-[#4900A8]"
               onClick={resendOTPDup}
               disabled={disableResend}
             >
@@ -385,7 +391,7 @@ const OTPCOmp = ({
           <button
             onClick={onOTPVerifyDup}
             disabled={loading}
-            className="text-white mt-8 bg-[#EC2752] p-2 text-xl rounded-md"
+            className="text-white mt-8 bg-[#4900A8] p-2 text-xl rounded-md"
           >
             Submit Otp
           </button>

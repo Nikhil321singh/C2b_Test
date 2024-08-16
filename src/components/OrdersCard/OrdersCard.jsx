@@ -14,13 +14,13 @@ export const DeleteModal = ({ onCancel, onConfirm }) => {
         <div className="flex justify-end">
           <button
             onClick={onConfirm}
-            className="bg-[#EC2752] text-white px-4 py-2 rounded mr-2"
+            className="bg-[#4900A8] text-white px-4 py-2 rounded mr-2"
           >
             Yes
           </button>
           <button
             onClick={onCancel}
-            className="border border-[#EC2752] text-[#EC2752] px-4 py-2 rounded"
+            className="border border-[#4900A8] text-[#4900A8] px-4 py-2 rounded"
           >
             No
           </button>
@@ -51,7 +51,6 @@ const OrdersCard = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const deviceSelected = sessionStorage.getItem("DeviceType");
-  console.log(deviceSelected);
 
   const formatDateTime = (dateTimeString) => {
     const options = {
@@ -67,11 +66,31 @@ const OrdersCard = ({
       new Date(dateTimeString)
     );
   };
+
   useEffect(() => {
     console.log("card");
   }, []);
 
+  const isExpired = () => {
+    const createdDate = new Date(dateTime);
+    const currentDate = new Date();
+    const timeDiff = currentDate - createdDate;
+
+    const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+    const threeDays = 3 * oneDay; // 3 days in milliseconds
+
+    if (title === "Quote Saved") {
+      return timeDiff > oneDay;
+    } else if (title === "Lead Saved") {
+      return timeDiff > threeDays;
+    } else {
+      return false;
+    }
+  };
+
   const handleInitiate = () => {
+    if (isExpired()) return;
+
     if (title === "Quote Saved") {
       const detail = {
         models: itemData.lead?.model,
@@ -79,13 +98,13 @@ const OrdersCard = ({
         status: "Quote Saved",
         customerName: customerName,
       };
-      console.log("asas", detail);
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
       const responseData = {
         grade: "",
         id: itemData.lead_id,
         price: price,
         uniqueCode: quoteId,
+        bonus: 0,
       };
       dispatch(setResponseData(responseData));
       sessionStorage.setItem("LeadId", itemData?.lead_id);
@@ -102,13 +121,13 @@ const OrdersCard = ({
         models: itemData.lead?.model,
         customerName: customerName,
       };
-      console.log("asas", detail);
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
       const responseData = {
         grade: "",
         id: itemData.lead_id,
-        price: price,
+        price: Number(itemData.lead?.price) - Number(itemData.lead?.bonusPrice),
         uniqueCode: quoteId,
+        bonus: Number(itemData.lead?.bonusPrice),
       };
 
       dispatch(setResponseData(responseData));
@@ -125,18 +144,24 @@ const OrdersCard = ({
 
   const handleDeleteConfirmed = () => {
     setShowDeleteModal(false);
-    // Call the actual delete function
     handleDelete(itemData._id);
   };
 
   const handleDeleteCancelled = () => {
     setShowDeleteModal(false);
-    // Optionally, perform any other action when delete is cancelled
   };
+
   return (
-    <div className="p-2 mx-2 bg-white rounded-lg">
+    <div className="p-2 mx-2 bg-white rounded-lg relative">
+      {isExpired() && (
+        <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 bg-white">
+          <div className="text-[#4900A8] text-2xl font-bold border-4 border-[#8080FF] px-4 py-2 rounded-md">
+            Expired
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between p-2 border-b-2 border-gray-300 border-dashed">
-        <div className="flex items-center py-1 px-2 text-[#EC2752]  bg-[#ec275271] rounded-xl">
+        <div className="flex items-center py-1 px-2 text-[#4900A8]  bg-[#8080FF] rounded-xl">
           <p className="text-sm font-medium">{title}</p>
         </div>
         <div className="">
@@ -159,7 +184,7 @@ const OrdersCard = ({
             {deviceName}
             {deviceSelected === "Mobile" && `(${deviceRam}/${deviceStorage})`}
           </p>
-          <p className="text-[#EC2752]">₹{price}</p>
+          <p className="text-[#4900A8]">₹{price}</p>
         </div>
       </div>
 
@@ -181,13 +206,14 @@ const OrdersCard = ({
           <p>{savedBy}</p>
         </div>
       </div>
+
       {showDeleteModal && (
         <DeleteModal
           onCancel={handleDeleteCancelled}
           onConfirm={handleDeleteConfirmed}
         />
       )}
-      {title !== "Lead Completed" && (
+      {title !== "Lead Completed" && !isExpired() && (
         <div className="flex items-center justify-between gap-2 p-2 font-medium">
           <div
             onClick={handleDeleteConfirmation}
@@ -197,7 +223,7 @@ const OrdersCard = ({
               <RiDeleteBin6Line size={20} />
             </button>
           </div>
-          <div className="w-[80%] text-center bg-[#EC2752] py-2 rounded-lg">
+          <div className="w-[80%] text-center bg-[#4900A8] py-2 rounded-lg">
             <button onClick={handleInitiate} className="text-white ">
               Initiate Order
             </button>

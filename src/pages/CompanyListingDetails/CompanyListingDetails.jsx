@@ -44,6 +44,7 @@ const downloadExcel = (apiData) => {
 };
 
 const handleDownload = (totalCount) => {
+  const userToken1 = sessionStorage.getItem("authToken");
   axios
     .get(
       `${
@@ -51,7 +52,7 @@ const handleDownload = (totalCount) => {
       }/api/company/findAll?page=${0}&limit=${totalCount}`,
       {
         headers: {
-          authorization: `${userToken}`,
+          authorization: `${userToken1}`,
         },
       }
     )
@@ -64,11 +65,11 @@ const handleDownload = (totalCount) => {
 };
 
 const getTextColorClass = (isSuccess) =>
-  isSuccess ? "text-green-500" : "text-[#EC2752]";
+  isSuccess ? "text-green-500" : "text-[#4900A8]";
 const pageLimit = 10;
-const userToken = sessionStorage.getItem("authToken");
 
 const CompanyListingDetails = () => {
+  const userToken = sessionStorage.getItem("authToken");
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [tableData, setTableData] = useState();
@@ -260,6 +261,7 @@ const ExtComps = ({
   getDataBySearch,
   setErrMsg,
 }) => {
+  const userToken2 = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const deleteHandler = (companyId) => {
     setIsTableLoading(true);
@@ -269,7 +271,7 @@ const ExtComps = ({
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/company/deleteById?id=${companyId}`,
-      headers: { Authorization: userToken },
+      headers: { Authorization: userToken2 },
     };
     axios
       .request(config)
@@ -305,7 +307,7 @@ const ExtComps = ({
       )}
       {isTableLoading && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoading} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoading} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -342,7 +344,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailBox(false);
               }}
-              className={"bg-[#EC2752] text-white"}
+              className={"bg-[#4900A8] text-white"}
             >
               Okay
             </button>
@@ -354,12 +356,12 @@ const ExtComps = ({
           <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
             <h6 className={`${getTextColorClass(sucBox)}`}>Confirmation!</h6>
             <p className="text-slate-500">
-              ${`Do you want to delete store ${selectedCompany} ?`}
+              {`Do you want to delete store ${selectedCompany.companyName} ?`}
             </p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => deleteHandler(selectedCompany)}
-                className={"bg-[#EC2752] text-white"}
+                onClick={() => deleteHandler(selectedCompany?._id)}
+                className={"bg-[#4900A8] text-white"}
               >
                 Okay
               </button>
@@ -368,7 +370,7 @@ const ExtComps = ({
                   setConfBox(false);
                   setIsTableLoading(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-[#4900A8]"
               >
                 Cancel
               </button>
@@ -395,7 +397,7 @@ const ExtComps = ({
             </div>
             <button
               onClick={() => setViewDocsModalOpen(false)}
-              className="border border-[#EC2752] text-[#EC2752] px-4 py-2 rounded"
+              className="border border-[#4900A8] text-[#4900A8] px-4 py-2 rounded"
             >
               Close
             </button>
@@ -418,8 +420,8 @@ const CompanyTable = ({
   return (
     <React.Fragment>
       <div className="m-2 overflow-x-auto md:m-5">
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-full border border-[#4900A8]">
+          <thead className="bg-[#4900A8] text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Company Name</th>
@@ -455,7 +457,7 @@ const CompanyTable = ({
                       <button
                         className={`${styles.acpt_btn}`}
                         onClick={() => {
-                          deleteConfHandler(data?._id);
+                          deleteConfHandler(data);
                         }}
                       >
                         Delete
@@ -503,7 +505,7 @@ const CompanyTable = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              : "bg-[#4900A8] text-white cursor-pointer"
           }`}
           onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
@@ -514,7 +516,7 @@ const CompanyTable = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              : "bg-[#4900A8] text-white cursor-pointer"
           }`}
           onClick={() => setCurrentPage(currentPage + 1)}
           disabled={currentPage === maxPages - 1}

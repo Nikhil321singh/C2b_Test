@@ -14,20 +14,21 @@ import { IoMdAddCircle } from "react-icons/io";
 import * as XLSX from "xlsx";
 const navAdminFnlGrd = "/adminfinalgrade";
 
+const options = {
+  Functional_major: ["F1.1", "F1.2", "F1.3"],
+  Core: ["C1", "C2"],
+  Display: ["D1", "D2", "D3"],
+  Functional_minor: ["F2.1", "F2.2", "F2.3"],
+  Cosmetics: ["A1", "A2", "A3", "A4"],
+  Warranty: ["W1", "W2"],
+};
+
 const AdminHome = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [qsModel, setQsmodel] = useState(false);
-
+  const storedCategory = sessionStorage.getItem("admincategory");
   const navigate = useNavigate();
   const adminAnswer = useSelector((state) => state.adminGradePrice);
-  const options = {
-    Functional_major: ["F1.1", "F1.2", "F1.3"],
-    Core: ["C1", "C2"],
-    Display: ["D1", "D2", "D3"],
-    Functional_minor: ["F2.1", "F2.2", "F2.3"],
-    Cosmetics: ["A1", "A2", "A3", "A4"],
-    Warranty: ["W1", "W2"],
-  };
   const [group, setGroup] = useState("");
   const [question, setQuestion] = useState("");
   const [yes, setYes] = useState("");
@@ -36,7 +37,6 @@ const AdminHome = () => {
   const [updateTable, steUpdatetable] = useState(false);
 
   const handleNext = () => {
-    const storedCategory = sessionStorage.getItem("admincategory");
     if (storedCategory === "Mobile" || storedCategory === "Watch") {
       const userToken = sessionStorage.getItem("authToken");
       axios
@@ -80,7 +80,7 @@ const AdminHome = () => {
       const response = await axios.get(
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/questionnaireList?deviceType=${admincategory}`,
+        }/api/questionnaires/questionnaireList?deviceType=${storedCategory}`,
         {
           headers: {
             authorization: `${authToken}`,
@@ -210,7 +210,7 @@ const AdminHome = () => {
         <div className="flex justify-center mb-2">
           <button
             onClick={handleNext}
-            className="text-center  mx-2 px-4 py-2 rounded-lg bg-[#EC2752] text-white cursor-pointer"
+            className="text-center  mx-2 px-4 py-2 rounded-lg bg-[#4900A8] text-white cursor-pointer"
           >
             Next
           </button>
@@ -238,7 +238,7 @@ const CreateQuestion = ({
       <div className="relative flex flex-col gap-2 pb-2 mb-6 ml-10 mr-10 border-b-2">
         <IoClose
           size={35}
-          className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
+          className="absolute right-0 text-[#4900A8] transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
           onClick={closeHandler}
         />
         <p className="text-4xl font-bold">Add New Question</p>
@@ -336,7 +336,7 @@ const CreateQuestion = ({
 
         <div className="mt-8">
           <button
-            className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+            className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
             onClick={handleSubmit}
           >
             Create

@@ -18,10 +18,11 @@ import { FaAngleDown, FaDownload } from "react-icons/fa6";
 import SideMenu from "../../components/SideMenu";
 import AdminNavbar from "../../components/Admin_Navbar";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
+import { useDispatch, useSelector } from "react-redux";
+import { setStoreFilter } from "../../store/slices/userSlice";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
+const failTextColor = "text-[#4900A8]";
 const PickupAvail = "Available For Pickup";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const id = LoggedInUser?._id || LoggedInUser?.id;
@@ -54,6 +55,8 @@ const downloadExcel = (pendDataDown) => {
 };
 
 const DevicePickupDashboard = () => {
+  const token = sessionStorage.getItem("authToken");
+  const userProfile = useSelector((state) => state.user);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedData, setSelectedData] = useState([]);
@@ -66,26 +69,17 @@ const DevicePickupDashboard = () => {
   const [statusValue, setStatusValue] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [errorMsg, setErrorMsg] = useState("successfully updated status");
+  const [errorMsg1, setErrorMsg1] = useState(null);
+  const [errorMsg2, setErrorMsg2] = useState(null);
   const [successMod, setSuccessMod] = useState(false);
   const [failMod, setFailMode] = useState(false);
   const [confMod, setConfMod] = useState(false);
-  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
-  const [region, setRegion] = useState(LoggedInUser?.region);
+  const [storeName, setStoreName] = useState(userProfile.selStore);
+  const [region, setRegion] = useState(userProfile.selRegion);
   const [storeData, setStoreData] = useState([]);
   const [regionData, setRegionData] = useState([]);
   const [allStore, setAllStore] = useState([]);
   const firsttime = useRef(true);
-
-  useEffect(() => {
-    if (failMod || successMod) {
-      const timeoutId = setTimeout(() => {
-        setFailMode(false);
-        setSuccessMod(false);
-      }, 5000);
-      return () => clearTimeout(timeoutId);
-    }
-    return () => {};
-  }, [failMod, successMod]);
 
   const getData = () => {
     setIsTableLoaded(true);
@@ -187,6 +181,8 @@ const DevicePickupDashboard = () => {
       <ExtComps
         successMod={successMod}
         errorMsg={errorMsg}
+        errorMsg1={errorMsg1}
+        errorMsg2={errorMsg2}
         setSuccessMod={setSuccessMod}
         isTableLoaded={isTableLoaded}
         setIsTableLoaded={setIsTableLoaded}
@@ -195,6 +191,8 @@ const DevicePickupDashboard = () => {
         confMod={confMod}
         setConfMod={setConfMod}
         setErrorMsg={setErrorMsg}
+        setErrorMsg1={setErrorMsg1}
+        setErrorMsg2={setErrorMsg2}
         getData={getData}
         selectedIds={selectedIds}
         pendingTableData={pendingTableData}
@@ -205,7 +203,7 @@ const DevicePickupDashboard = () => {
         setSelectedRows={setSelectedRows}
       />
       <NavigateTable />
-      <div className="flex flex-row justify-end items-center py-1 px-2 font-medium text-sm text-[#EC2752]">
+      <div className="flex flex-row justify-end items-center py-1 px-2 font-medium text-sm text-[#4900A8]">
         Total Device : {devicesCount} | Total Amount :{" "}
         {new Intl.NumberFormat("en-IN", {
           style: "currency",
@@ -243,6 +241,8 @@ const DevicePickupDashboard = () => {
         selectedIds={selectedIds}
         setConfMod={setConfMod}
         setErrorMsg={setErrorMsg}
+        setErrorMsg1={setErrorMsg1}
+        setErrorMsg2={setErrorMsg2}
         setFailMode={setFailMode}
         setSelectedStatus={setSelectedStatus}
         setIsTableLoaded={setIsTableLoaded}
@@ -258,6 +258,8 @@ export default DevicePickupDashboard;
 const ExtComps = ({
   successMod,
   errorMsg,
+  errorMsg1,
+  errorMsg2,
   setSuccessMod,
   isTableLoaded,
   setIsTableLoaded,
@@ -266,6 +268,8 @@ const ExtComps = ({
   confMod,
   setConfMod,
   setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
   getData,
   selectedIds,
   pendingTableData,
@@ -276,7 +280,8 @@ const ExtComps = ({
   setSelectedRows,
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
-
+  const token1 = sessionStorage.getItem("authToken");
+  const LoggedInUser1 = JSON.parse(sessionStorage.getItem("profile"));
   const reqPickupHandler = () => {
     setConfMod(false);
     const statuschk = selectedIds.every((sId) =>
@@ -304,13 +309,13 @@ const ExtComps = ({
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/pendingDevices/pickupreq`,
       headers: {
-        Authorization: token,
+        Authorization: token1,
       },
-      data: JSON.stringify({
+      data: {
         deviceIDs: LDIds,
         storeid: address,
-        userid: id,
-      }),
+        userid: LoggedInUser1?._id,
+      },
     };
     axios
       .request(config)
@@ -319,9 +324,9 @@ const ExtComps = ({
         setSelectedData([]);
         setSelectedRows([]);
         getData();
-        setErrorMsg(
-          `Successfully created lot on Picked Up, RefId: ${response.data.data._id}`
-        );
+        setErrorMsg(`Successfully Created Lot`);
+        setErrorMsg1(`Lot No. :- ${response.data.data.uniqueCode}`);
+        setErrorMsg2(`Check it On Picked Up`);
         setSuccessMod(true);
         setIsTableLoaded(false);
       })
@@ -336,7 +341,7 @@ const ExtComps = ({
     <React.Fragment>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
       {successMod && (
@@ -345,9 +350,13 @@ const ExtComps = ({
             <IoIosCheckmarkCircle className={succTextColor} size={90} />
             <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errorMsg}</p>
+            {errorMsg1 && <p className="text-slate-500">{errorMsg1}</p>}
+            {errorMsg2 && <p className="text-slate-500">{errorMsg2}</p>}
             <button
               onClick={() => {
                 setSuccessMod(false);
+                setErrorMsg1(null);
+                setErrorMsg2(null);
               }}
               className={"text-white  bg-green-500 "}
             >
@@ -363,7 +372,7 @@ const ExtComps = ({
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
-              className={"bg-[#EC2752] text-white"}
+              className={"bg-[#4900A8] text-white"}
               onClick={() => {
                 setFailMode(false);
               }}
@@ -383,7 +392,7 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={reqPickupHandler}
-                className={"bg-[#EC2752] text-white"}
+                className={"bg-[#4900A8] text-white"}
               >
                 Okay
               </button>
@@ -392,7 +401,7 @@ const ExtComps = ({
                   setConfMod(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-[#4900A8]"
               >
                 Cancel
               </button>
@@ -404,7 +413,7 @@ const ExtComps = ({
         {LoggedInUser?.role === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-28 " src={Grest_Logo} alt="app logo" />
+            <img className="w-40" src={Grest_Logo} alt="app logo" />
           </div>
         ) : (
           <div className="navbar">
@@ -440,6 +449,7 @@ const DPFilter = ({
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
+  const dispatch = useDispatch();
 
   const handleRegionChange = (value) => {
     setRegionDrop(false);
@@ -448,16 +458,18 @@ const DPFilter = ({
     const storeNamesArray = filteredStores.map((store) => store.storeName);
     setStoreData(storeNamesArray);
     setRegion(value);
+    dispatch(setStoreFilter({ selStore: "", selRegion: value }));
   };
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore.filter(
+    const filteredStores = allStore?.filter(
       (store) => store.storeName === value
     );
     const newRegion = filteredStores[0].region;
     setRegion(newRegion);
     setStoreName(value);
+    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
   };
 
   const handleSearchClear = () => {
@@ -500,7 +512,7 @@ const DPFilter = ({
           <input
             type="date"
             id="datepicker"
-            style={{ color: "#EC2752" }}
+            style={{ color: "#4900A8" }}
             className=""
             value={dateValue}
             onChange={dateChangeHandler}
@@ -660,12 +672,20 @@ const PDTable = ({
   selectedIds,
   setConfMod,
   setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
   setFailMode,
   setSelectedStatus,
   setIsTableLoaded,
   setSuccessMod,
   getData,
 }) => {
+  const token2 = sessionStorage.getItem("authToken");
+  const [cancelReason, setCancelReason] = useState("");
+  const [holdReason, setHoldReason] = useState("");
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showHoldModal, setShowHoldModal] = useState(false);
+
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {
       setErrorMsg("No device selected");
@@ -681,20 +701,26 @@ const PDTable = ({
       .map((obj) => obj._id.toString());
 
     let config;
-    if (newStatus === PickupAvail || newStatus === "On Hold") {
+    if (newStatus === PickupAvail) {
       config = {
         method: "post",
         url: `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/pendingDevices/update`,
         headers: {
-          Authorization: token,
+          Authorization: token2,
         },
-        data: JSON.stringify({
+        data: {
           deviceIDs: selectedIds,
           newStatus: newStatus,
-        }),
+        },
       };
+    } else if (newStatus === "On Hold") {
+      setShowHoldModal(true);
+      return;
+    } else if (newStatus === "Cancelled") {
+      setShowCancelModal(true);
+      return;
     } else {
       config = {
         method: "post",
@@ -702,14 +728,15 @@ const PDTable = ({
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/pendingDevices/updatereq`,
         headers: {
-          Authorization: token,
+          Authorization: token2,
         },
-        data: JSON.stringify({
+        data: {
           deviceIDs: LDIds,
           newStatus: newStatus,
-        }),
+        },
       };
     }
+
     axios
       .request(config)
       .then((response) => {
@@ -717,12 +744,12 @@ const PDTable = ({
         setSelectedIds([]);
         setSelectedData([]);
         setSelectedRows([]);
-        if (newStatus === PickupAvail || newStatus === "On Hold") {
+        if (newStatus === PickupAvail) {
           setErrorMsg("Successfully updated status to " + newStatus);
         } else {
-          setErrorMsg(
-            `Successfully created ${newStatus} lot on Outstanding, RefId: ${response.data.data._id}`
-          );
+          setErrorMsg(`Successfully created ${newStatus} Lot`);
+          setErrorMsg1(`Lot Id: ${response.data.data._id}`);
+          setErrorMsg2(`Check it on Outstanding`);
         }
         setSuccessMod(true);
       })
@@ -732,6 +759,78 @@ const PDTable = ({
         setFailMode(true);
       });
     setSelectedStatus("");
+  };
+
+  const handleCancelSubmit = () => {
+    setIsTableLoaded(true);
+    const config = {
+      method: "post",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/update`,
+      headers: {
+        Authorization: token2,
+      },
+      data: {
+        deviceIDs: selectedIds,
+        newStatus: "Cancelled",
+        reason: cancelReason,
+      },
+    };
+    axios
+      .request(config)
+      .then((response) => {
+        getData();
+        setSelectedIds([]);
+        setSelectedData([]);
+        setSelectedRows([]);
+        setErrorMsg(`Successfully created Cancelled Lot`);
+        setErrorMsg1(`Lot Id: ${response.data.data._id}`);
+        setErrorMsg2(`Check it on Outstanding`);
+        setSuccessMod(true);
+      })
+      .catch((error) => {
+        setIsTableLoaded(false);
+        setErrorMsg("Failed to update status");
+        setFailMode(true);
+      });
+    setShowCancelModal(false);
+    setCancelReason("");
+  };
+
+  const handleHoldSubmit = () => {
+    setIsTableLoaded(true);
+    const config = {
+      method: "post",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/update`,
+      headers: {
+        Authorization: token2,
+      },
+      data: {
+        deviceIDs: selectedIds,
+        newStatus: "On Hold",
+        reason: holdReason,
+      },
+    };
+    axios
+      .request(config)
+      .then((response) => {
+        getData();
+        setSelectedIds([]);
+        setSelectedData([]);
+        setSelectedRows([]);
+        setErrorMsg(`Successfully updated status to On Hold`);
+        setSuccessMod(true);
+      })
+      .catch((error) => {
+        setIsTableLoaded(false);
+        setErrorMsg("Failed to update status");
+        setFailMode(true);
+      });
+    setShowHoldModal(false);
+    setHoldReason("");
   };
 
   const confHandler = () => {
@@ -757,7 +856,7 @@ const PDTable = ({
       />
       <div className="mx-2 flex gap-2">
         <select
-          className="border-2 w-1/2 outline-none border-[#EC2752] bg-[#EC2752] text-white text-[12px] px-4 py-2 rounded"
+          className="border-2 w-1/2 outline-none border-[#4900A8] bg-[#4900A8] text-white text-[12px] px-4 py-2 rounded"
           value={selectedStatus}
           onChange={handleStatusUpdate}
         >
@@ -768,11 +867,75 @@ const PDTable = ({
         </select>
         <button
           onClick={confHandler}
-          className="border-2 w-1/2 border-[#EC2752] bg-[#EC2752] text-white text-[12px] px-4 py-2 rounded"
+          className="border-2 w-1/2 border-[#4900A8] bg-[#4900A8] text-white text-[12px] px-4 py-2 rounded"
         >
           Request For Pickup
         </button>
       </div>
+
+      {showCancelModal && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+            <h6 className={failTextColor}>Cancellation Reason</h6>
+            <input
+              type="text"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="border-2 border-[#4900A8] rounded-md px-4 py-2 mb-4 w-full"
+              placeholder="Enter Reason for Cancellation"
+            />
+            <div className="flex flex-row gap-2">
+              <button
+                onClick={handleCancelSubmit}
+                className={"bg-[#4900A8] text-white"}
+              >
+                Okay
+              </button>
+              <button
+                onClick={() => {
+                  setShowCancelModal(false);
+                  setIsTableLoaded(false);
+                }}
+                className="bg-white text-[#4900A8]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showHoldModal && (
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+            <h6 className={failTextColor}>Hold Reason</h6>
+            <input
+              type="text"
+              value={holdReason}
+              onChange={(e) => setHoldReason(e.target.value)}
+              className="border-2 border-[#4900A8] rounded-md px-4 py-2 mb-4 w-full"
+              placeholder="Enter Reason for Hold"
+            />
+            <div className="flex flex-row gap-2">
+              <button
+                onClick={handleHoldSubmit}
+                className={"bg-[#4900A8] text-white"}
+              >
+                Okay
+              </button>
+              <button
+                onClick={() => {
+                  setShowHoldModal(false);
+                  setIsTableLoaded(false);
+                }}
+                className="bg-white text-[#4900A8]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </React.Fragment>
   );
 };

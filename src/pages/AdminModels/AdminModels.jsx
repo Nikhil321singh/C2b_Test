@@ -20,6 +20,7 @@ import {
   setRam,
   setStorage,
 } from "../../store/slices/newAdminGrade";
+import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
 
 const getEvenRowClass = (index, selectmodel, selectstorage, selectram, val) => {
   if (index % 2 === 0) {
@@ -71,14 +72,15 @@ const getRowClass = (selectmodel, selectstorage, selectram, val) => {
 };
 
 const getTextColorClass = (isSuccess) =>
-  isSuccess ? "text-green-500" : "text-[#EC2752]";
-const grestTheme = "bg-[#EC2752] text-white";
-const token = sessionStorage.getItem("authToken");
+  isSuccess ? "text-green-500" : "text-[#4900A8]";
+const grestTheme = "bg-[#4900A8] text-white";
 const errMsg = "";
 const selectedModel = "";
-const admincategory = sessionStorage.getItem("admincategory");
 
 const AdminModels = () => {
+  const [admincategory, setAdminCategory] = useState(
+    sessionStorage.getItem("admincategory") === "Watch" ? "Watch" : "Mobile"
+  );
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -86,11 +88,22 @@ const AdminModels = () => {
   const [selectstorage, setSelectstorage] = useState("");
   const [selectram, setSelectram] = useState("");
   const [category, setCategory] = useState("Mobile");
+  const token = sessionStorage.getItem("authToken");
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [confBox, setConfBox] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    sessionStorage.setItem("admincategory", category);
+    getData();
+    setAdminCategory(sessionStorage.getItem("admincategory"));
+  }, [category]);
+
+  useEffect(() => {
+    sessionStorage.setItem("admincategory", "Mobile");
+  }, []);
 
   function handleNext() {
     navigate("/adminhome");
@@ -99,7 +112,9 @@ const AdminModels = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getAllBrandsModels?type=${category}`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/brands/getAllBrandsModels?type=${category}`,
       headers: { Authorization: token },
     };
     axios
@@ -134,12 +149,17 @@ const AdminModels = () => {
     setIsTableLoaded(true);
     const config = {
       method: "post",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/user/Dashboard/search/phones`,
-      headers: { Authorization: token },
-      data: JSON.stringify({
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/user/Dashboard/search/phones`,
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+      data: {
         name: searchValue,
         deviceType: admincategory,
-      }),
+      },
     };
     axios
       .request(config)
@@ -168,7 +188,14 @@ const AdminModels = () => {
         setIsTableLoaded(false);
       });
   };
-  const selectHandler = (modelId, modelStorage, ram) => {
+  const selectHandler = (modelId, modelStorage, ram, modelName) => {
+    sessionStorage.setItem(
+      "adminModelName",
+      `${modelName} (${ram}/${modelStorage})`
+    );
+    if (category === "Watch") {
+      sessionStorage.setItem("adminModelName", modelName);
+    }
     setSelectModel(modelId);
     setSelectstorage(modelStorage);
     setSelectram(ram);
@@ -181,14 +208,6 @@ const AdminModels = () => {
     setIsTableLoaded(false);
   };
 
-  useEffect(() => {
-    getData();
-  }, [category]);
-
-  useEffect(() => {
-    sessionStorage.setItem("admincategory", "Mobile");
-  }, []);
-
   const handleSearchClear = () => {
     setSearchValue("");
     getData();
@@ -196,7 +215,7 @@ const AdminModels = () => {
 
   return (
     <div className={`${styles.pickedup_page}`}>
-     <ExtComps
+      <ExtComps
         isTableLoaded={isTableLoaded}
         setIsTableLoaded={setIsTableLoaded}
         sucBox={sucBox}
@@ -205,6 +224,7 @@ const AdminModels = () => {
         failBox={failBox}
         confBox={confBox}
         deleteHandler={deleteHandler}
+        category={category}
         setConfBox={setConfBox}
         setCategory={setCategory}
       />
@@ -258,11 +278,13 @@ const ExtComps = ({
   confBox,
   deleteHandler,
   setConfBox,
+  category,
   setCategory,
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
-  return <React.Fragment>
-    <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
+  return (
+    <React.Fragment>
+      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         <div className="navbar">
           <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
           <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
@@ -270,7 +292,7 @@ const ExtComps = ({
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
       {(sucBox || failBox) && (
@@ -322,7 +344,7 @@ const ExtComps = ({
                   setConfBox(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-[#4900A8]"
               >
                 Cancel
               </button>
@@ -334,20 +356,18 @@ const ExtComps = ({
         <div className="flex gap-2">
           <p className="font-medium">Select Category</p>
           <select
-            className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
-            onChange={(e) => {
-              setCategory(e.target.value);
-              sessionStorage.setItem("admincategory", e.target.value);
-            }}
+            className="bg-[#4900A8] text-white rounded-lg outline-none px-2 py-1"
+            onChange={(e) => setCategory(e.target.value)}
+            value={category}
           >
             <option
-              className="bg-white text-[#EC2752] font-medium"
+              className="bg-white text-[#4900A8] font-medium"
               value="Mobile"
             >
               Mobile
             </option>
             <option
-              className="bg-white text-[#EC2752] font-medium"
+              className="bg-white text-[#4900A8] font-medium"
               value="Watch"
             >
               Watch
@@ -355,8 +375,9 @@ const ExtComps = ({
           </select>
         </div>
       </div>
-  </React.Fragment>
-}
+    </React.Fragment>
+  );
+};
 
 const AdminModelsTable = ({
   grestTheme1,
@@ -369,9 +390,28 @@ const AdminModelsTable = ({
   category,
   handleNext,
 }) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const openDeleteModal = (item) => {
+    setItemToDelete(item);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      deleteHandler(itemToDelete); // Make sure deleteHandler is defined
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
+
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#EC2752]">
+      <table className="w-full border border-[#4900A8]">
         <thead className={grestTheme1}>
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
@@ -399,16 +439,19 @@ const AdminModelsTable = ({
                   <button
                     className={`${styles.view_btn}`}
                     onClick={() => {
-                      selectHandler(val.modelId, val.storage, val?.RAM);
+                      selectHandler(
+                        val.modelId,
+                        val.storage,
+                        val?.RAM,
+                        val.modelName
+                      );
                     }}
                   >
                     Select
                   </button>
                   <button
                     className={`${styles.acpt_btn}`}
-                    onClick={() => {
-                      deleteHandler(val);
-                    }}
+                    onClick={() => openDeleteModal(val)}
                   >
                     Delete
                   </button>
@@ -436,11 +479,16 @@ const AdminModelsTable = ({
       <div className="flex justify-center mb-2">
         <button
           onClick={handleNext}
-          className="text-center  mx-2 px-4 py-2 rounded-lg bg-[#EC2752] text-white cursor-pointer mt-3"
+          className="text-center  mx-2 px-4 py-2 rounded-lg bg-[#4900A8] text-white cursor-pointer mt-3"
         >
           Next
         </button>
       </div>
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onConfirm={confirmDelete}
+        onCancel={closeDeleteModal}
+      />
     </div>
   );
 };

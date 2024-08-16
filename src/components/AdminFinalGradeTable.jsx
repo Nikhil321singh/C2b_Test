@@ -3,17 +3,14 @@ import { useSelector } from "react-redux";
 const AdminFinalGradeTable = () => {
   const adminAnswer = useSelector((state) => state.adminGradePrice);
   const result = JSON.parse(sessionStorage.getItem("combinationOutput"));
-  console.log(result);
-  const [category, setCategory] = useState("");
+  const adminModelName = sessionStorage.getItem("adminModelName");
+  console.log(adminAnswer);
+  const category = sessionStorage.getItem("admincategory");
 
-  useEffect(() => {
-    const storedCategory = sessionStorage.getItem("admincategory");
-    setCategory(storedCategory);
-  }, []);
   return (
     <div className="m-2  w-[90%] overflow-x-auto md:m-5 ">
-      <table className="w-full border-2 border-[#EC2752]  ">
-        <thead className="bg-[#EC2752] text-white ">
+      <table className="w-full border-2 border-[#4900A8]  ">
+        <thead className="text-white bg-[#4900A8]">
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Groups</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Values</th>
@@ -23,10 +20,18 @@ const AdminFinalGradeTable = () => {
           <tbody>
             <tr className="bg-gray-200 ">
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                Model Name
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {adminModelName}
+              </td>
+            </tr>
+            <tr className="bg-gray-200 ">
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 Warranty
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {adminAnswer.Warranty}
+                {adminAnswer?.Warranty}
               </td>
             </tr>
             <tr>
@@ -34,7 +39,7 @@ const AdminFinalGradeTable = () => {
                 Core
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {adminAnswer.Core}
+                {adminAnswer?.Core}
               </td>
             </tr>
             <tr className="bg-gray-200">
@@ -42,7 +47,7 @@ const AdminFinalGradeTable = () => {
                 Display
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {adminAnswer.Display}
+                {adminAnswer?.Display}
               </td>
             </tr>
             <tr>
@@ -50,7 +55,7 @@ const AdminFinalGradeTable = () => {
                 Major Functions
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {adminAnswer.Functional_major}
+                {adminAnswer?.Functional_major}
               </td>
             </tr>
             <tr className="bg-gray-200">
@@ -58,7 +63,7 @@ const AdminFinalGradeTable = () => {
                 Minor Functions
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {adminAnswer.Functional_minor}
+                {adminAnswer?.Functional_minor}
               </td>
             </tr>
             <tr>
@@ -66,7 +71,7 @@ const AdminFinalGradeTable = () => {
                 Cosmetics
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {adminAnswer.Cosmetics}
+                {adminAnswer?.Cosmetics}
               </td>
             </tr>
             <tr className="bg-gray-200">
@@ -74,7 +79,7 @@ const AdminFinalGradeTable = () => {
                 Final Grade
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {result.grade}
+                {result?.grade}
               </td>
             </tr>
             <tr>
@@ -82,13 +87,21 @@ const AdminFinalGradeTable = () => {
                 Pricing
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {result.price}
+                {result?.price}
               </td>
             </tr>
           </tbody>
         )}
         {category === "Watch" && (
           <tbody>
+            <tr className="bg-gray-200 ">
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                Model Name
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {adminModelName}
+              </td>
+            </tr>
             <tr className="bg-gray-200 ">
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 Accessories
@@ -126,7 +139,7 @@ const AdminFinalGradeTable = () => {
                 Final Grade
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {result.grade}
+                {result?.grade}
               </td>
             </tr>
             <tr className="">
@@ -134,7 +147,7 @@ const AdminFinalGradeTable = () => {
                 Pricing
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {result.price}
+                {result?.price}
               </td>
             </tr>
           </tbody>

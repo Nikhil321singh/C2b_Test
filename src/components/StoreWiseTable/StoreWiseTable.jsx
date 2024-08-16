@@ -4,8 +4,8 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
   return (
     <div>
       <div className="m-2 overflow-x-scroll  md:m-5 ">
-        <table className="w-[220vh]  border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-[220vh]  border border-[#4900A8]">
+          <thead className="bg-[#4900A8] text-white">
             <tr className="">
               <th className="p-2  text-sm  ">Sr. No.</th>
               <th className="p-2 text-sm  ">Purchase In Date</th>
@@ -37,7 +37,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                     {index + currentPage * 10 + 1}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {new Date(data?.createdAt).toLocaleDateString("en-IN", {
+                    {new Date(data?.updatedAt).toLocaleDateString("en-IN", {
                       day: "2-digit",
                       month: "2-digit",
                       year: "numeric",
@@ -47,7 +47,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                     {data.userId?.firstName}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    NA
+                    {data.modelId?.type}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
                     {data.documentId?.IMEI}
@@ -65,7 +65,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                     {data.uniqueCode}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {data.grestReceived || "no"}
+                    {data?.grestReceived === "yes" ? "Yes" : "No"}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
                     {!!data.grestRecDate

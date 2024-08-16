@@ -44,8 +44,8 @@ const PendingDevicesTable = ({
   };
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#EC2752]">
-        <thead className="bg-[#EC2752] text-white">
+      <table className="w-full border border-[#4900A8]">
+        <thead className="bg-[#4900A8] text-white">
           <tr>
             <th className="p-2 min-w-[50px] text-sm md:p-3 md:text-base">
               <input
@@ -77,6 +77,9 @@ const PendingDevicesTable = ({
             </th>
             <th className="p-2 min-w-[100px] text-sm md:p-3 md:text-base">
               Status
+            </th>
+            <th className="p-2 min-w-[100px] text-sm md:p-3 md:text-base">
+              Reason
             </th>
           </tr>
         </thead>
@@ -118,6 +121,9 @@ const PendingDevicesTable = ({
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.status}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.status === "On Hold" || val?.status === "Cancelled" ? val?.reason : ""}
               </td>
             </tr>
           ))}

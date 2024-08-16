@@ -4,11 +4,16 @@ function SideMenu({ setsideMenu, sideMenu }) {
   const navigate = useNavigate();
 
   const profile = JSON.parse(sessionStorage.getItem("profile"));
-  console.log(profile.role);
 
   const handleHome = () => {
     setsideMenu(!sideMenu);
-    navigate("/adminmodels");
+    if(profile.role === "Super Admin"){
+      navigate("/adminmodels");
+    }else if(profile.role === "Admin Manager"){
+      navigate("/customertable");
+    }else if(profile.role === "Technician"){
+      navigate("/devicepickupdashboard");
+    }
   };
 
   const handleTable = () => {
@@ -68,130 +73,183 @@ function SideMenu({ setsideMenu, sideMenu }) {
   return (
     <>
       {/* //new for change  */}
-      {profile.role === "Super Admin" ? (
+      {profile.role === "Super Admin" && (
         <div
           className={
-            "menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center justify-center transition-all duration-950 ease-in " +
+            "menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center transition-all duration-950 ease-in " +
             (sideMenu && "left-[0]")
           }
         >
-          <ul className="list-none pl-[6%] pt-[6%]">
+          <ul className="list-none flex flex-col h-full pl-[6%] pt-[10%] justify-start gap-[2vh]">
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh] "
+              className="text-[20px] font-[300] cursor-pointer"
               onClick={handleHome}
             >
               Home
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh] "
+              className="text-[20px] font-[300] cursor-pointer  "
               onClick={handleProfile}
             >
               Profile
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh] "
+              className="text-[20px] font-[300] cursor-pointer  "
               onClick={handleOffer}
             >
               Offers
             </li>
-
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleGrade}
             >
               Grade Pricing
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleRegister}
             >
               Register User
             </li>
 
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleStoreListing}
             >
               Store Listing
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleStoreReport}
             >
               Store Report
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleTable}
             >
               Customer Table
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleCompanyListing}
             >
               Company Listing
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handlpickup}
             >
               Pickup & Cancel Device
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleTechnician}
             >
               Technician Report
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={adminDashboard}
             >
               Admin Dashboard
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleLogout}
             >
               Logout
             </li>
           </ul>
         </div>
-      ) : (
+      )}
+      {profile.role === "Admin Manager" && (
         <div
           className={
             "menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center justify-center transition-all duration-950 ease-in " +
             (sideMenu && "left-[0]")
           }
         >
-          <ul className="list-none">
+          <ul className="list-none flex flex-col h-full pl-[6%] pt-[10%] justify-start gap-[2vh]">
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleHome}
             >
               Home
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleProfile}
             >
               Profile
             </li>
-            <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+            {/* <li
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleTable}
             >
               Customer Table
+            </li> */}
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleRegister}
+            >
+              Register User
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handlpickup}
             >
               Pickup & Cancel Device
             </li>
             <li
-              className="text-[22px] font-[300] cursor-pointer mb-[2vh]"
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleStoreReport}
+            >
+              Store Report
+            </li>
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleTechnician}
+            >
+              Technician Report
+            </li>
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={adminDashboard}
+            >
+              Admin Dashboard
+            </li>
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleLogout}
+            >
+              Logout
+            </li>
+          </ul>
+        </div>
+      )}
+      {profile.role === "Technician" && (
+        <div
+          className={
+            "menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center justify-center transition-all duration-950 ease-in " +
+            (sideMenu && "left-[0]")
+          }
+        >
+          <ul className="list-none flex flex-col h-full pl-[6%] pt-[10%] justify-start gap-[2vh]">
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleHome}
+            >
+              Home
+            </li>
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
+              onClick={handleProfile}
+            >
+              Profile
+            </li>
+            <li
+              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleLogout}
             >
               Logout

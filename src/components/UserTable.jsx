@@ -28,7 +28,7 @@ const UserTable = ({ data }) => {
 
     if (val.lead.model.type === "Mobile") {
       if (val.lead.ram) {
-        return `${val.lead.storage}/${val.lead.ram}`;
+        return `${val.lead.ram}/${val.lead.storage}`;
       }
       return val.lead.storage;
     }
@@ -48,14 +48,15 @@ const UserTable = ({ data }) => {
 
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#EC2752]">
-        <thead className="bg-[#EC2752] text-white">
+      <table className="w-full border border-[#4900A8]">
+        <thead className="bg-[#4900A8] text-white">
           <tr className="align-top">
             <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Username</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Category</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Product name</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Variant</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Price</th>
             <th className="p-2 text-sm md:p-3 md:text-base min-w-[160px]">
               Final Price Offered to Customer
             </th>
@@ -90,6 +91,9 @@ const UserTable = ({ data }) => {
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base min-w-[170px]">
                 {getDeviceDetails(val)}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.lead?.actualPrice}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.lead?.price}

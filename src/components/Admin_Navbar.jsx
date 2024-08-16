@@ -4,7 +4,7 @@ import Grest_Logo from "../assets/Grest_Logo.jpg";
 function AdminNavbar({ setsideMenu, sideMenu }) {
   return (
     <>
-      <div className="flex items-center justify-between w-screen h-20 p-4 bg-white">
+      <div className="flex items-center justify-between w-screen h-20 px-4 py-0 bg-white">
         <div
           className={
             "flex justify-between hamburger flex-col w-[32px] h-[25px] cursor-pointer z-[100] ease-in-out duration-300 " +
@@ -38,7 +38,7 @@ function AdminNavbar({ setsideMenu, sideMenu }) {
             <span>admin</span>
           </div>
 
-          <img className="w-28" src={Grest_Logo} alt="" />
+          <img className="w-40" src={Grest_Logo} alt="" />
         </div>
       </div>
     </>

@@ -8,8 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
+const failTextColor = "text-[#4900A8]";
+
 const initStoreForm = {
   storeName: "",
   region: "",
@@ -20,6 +20,7 @@ const initStoreForm = {
 };
 
 const StoreListing = () => {
+  const token = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const navigate = useNavigate();
@@ -41,18 +42,21 @@ const StoreListing = () => {
   const submitHandler = (event) => {
     event.preventDefault();
     setIsTableLoaded(true);
-    const data = JSON.stringify({
+    const data = {
       storeName: formData.storeName,
       uniqueId: formData.uniqueId,
       email: formData.email,
       contactNumber: formData.contactNumber,
       region: formData.region,
       address: formData.address,
-    });
+    };
     const config = {
       method: "post",
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/create`,
-      headers: { Authorization: token },
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
       data: data,
     };
     axios
@@ -78,7 +82,7 @@ const StoreListing = () => {
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full bg-black bg-opacity-50 h-full">
-          <BeatLoader color={"#EC2752"} size={15} loading={isTableLoaded} />
+          <BeatLoader color={"#4900A8"} size={15} loading={isTableLoaded} />
         </div>
       )}
       {(sucBox || failBox) && (
@@ -109,7 +113,7 @@ const StoreListing = () => {
                 setFailBox(false);
               }}
               className={
-                sucBox ? "bg-green-500 text-white" : "bg-[#EC2752] text-white"
+                sucBox ? "bg-green-500 text-white" : "bg-[#4900A8] text-white"
               }
             >
               Okay
@@ -132,7 +136,7 @@ const StoreListing = () => {
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <button
               onClick={() => navigate("/storelistingtable")}
-              className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+              className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
             >
               View Detail
             </button>
@@ -228,7 +232,7 @@ const StoreListingForm = ({ submitHandler, formData, handleChange }) => {
       <div className="mt-8">
         <button
           type="submit"
-          className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+          className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
         >
           Submit Form
         </button>

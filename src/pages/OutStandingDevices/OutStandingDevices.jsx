@@ -18,12 +18,11 @@ import { saveAs } from "file-saver";
 import { FaAngleDown, FaDownload } from "react-icons/fa6";
 import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
+import { useDispatch, useSelector } from "react-redux";
+import { setStoreFilter } from "../../store/slices/userSlice";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
-const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-const userRole = LoggedInUser?.role || "";
+const failTextColor = "text-[#4900A8]";
 const PayrollRej = "Payroll Approval Rejected";
 
 const downloadExcel = (dataDown) => {
@@ -50,6 +49,8 @@ const downloadExcel = (dataDown) => {
 };
 
 const OutStandingDevices = () => {
+  const token = sessionStorage.getItem("authToken");
+  const userProfile = useSelector((state) => state.user);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [data, setData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
@@ -58,24 +59,13 @@ const OutStandingDevices = () => {
   const [tempId, setTempId] = useState();
   const [failMod, setFailMode] = useState(false);
   const [successMod, setSuccessMod] = useState(false);
-  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
+  const [storeName, setStoreName] = useState(userProfile.selStore);
   const [confMod, setConfMod] = useState(false);
   const [storeData, setStoreData] = useState([]);
-  const [region, setRegion] = useState(LoggedInUser?.region);
+  const [region, setRegion] = useState(userProfile.selRegion);
   const [allStore, setAllStore] = useState([]);
   const [regionData, setRegionData] = useState([]);
   const firsttime = useRef(true);
-
-  useEffect(() => {
-    if (successMod || failMod) {
-      const timeoutID = setTimeout(() => {
-        setSuccessMod(false);
-        setFailMode(false);
-      }, 5000);
-      return () => clearTimeout(timeoutID);
-    }
-    return () => {};
-  }, [successMod, failMod]);
 
   const getData = () => {
     setIsTableLoaded(true);
@@ -198,6 +188,7 @@ const OutStandingDevices = () => {
         setStoreData={setStoreData}
         storeData={storeData}
         getData={getData}
+        data={data}
       />
       <OutstandingTable
         data={data}
@@ -229,8 +220,10 @@ const ExtComps = ({
   tempId,
   setTempId,
 }) => {
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const userRole = LoggedInUser?.role || "";
   const [sideMenu, setsideMenu] = useState(false);
-
+  const token1 = sessionStorage.getItem("authToken");
   const forwardReqHandler = (refID, newStatus) => {
     setIsTableLoaded(true);
     setConfMod(false);
@@ -241,12 +234,12 @@ const ExtComps = ({
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/outstanding/forwardreq`,
       headers: {
-        Authorization: token,
+        Authorization: token1,
       },
-      data: JSON.stringify({
+      data: {
         refIDs: refID,
         newStatus: newStatus,
-      }),
+      },
     };
     axios
       .request(config)
@@ -270,7 +263,7 @@ const ExtComps = ({
         {userRole === "Technician" ? (
           <div className="w-full flex items-center justify-between">
             <ProfileBox />
-            <img src={Grest_Logo} className="w-28 " alt="app logo" />
+            <img src={Grest_Logo} className="w-40" alt="app logo" />
           </div>
         ) : (
           <div className="navbar">
@@ -303,7 +296,7 @@ const ExtComps = ({
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
-              className={"text-white bg-[#EC2752] "}
+              className={"text-white bg-[#4900A8] "}
               onClick={() => {
                 setFailMode(false);
               }}
@@ -323,12 +316,12 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => forwardReqHandler(tempId, "Request Forwarded")}
-                className={"text-white bg-[#EC2752]"}
+                className={"text-white bg-[#4900A8]"}
               >
                 Okay
               </button>
               <button
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-[#4900A8]"
                 onClick={() => {
                   setConfMod(false);
                   setIsTableLoaded(false);
@@ -342,7 +335,7 @@ const ExtComps = ({
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} size={15} loading={isTableLoaded} />
+          <BeatLoader color={"#4900A8"} size={15} loading={isTableLoaded} />
         </div>
       )}
     </React.Fragment>
@@ -364,10 +357,11 @@ const OutstandingFilter = ({
   setStoreData,
   storeData,
   getData,
+  data,
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
-
+  const dispatch = useDispatch();
   const handleRegionChange = (val) => {
     setRegionDrop(false);
     setStoreName("");
@@ -375,6 +369,7 @@ const OutstandingFilter = ({
     const storeNames = filterStores.map((store) => store.storeName);
     setStoreData(storeNames);
     setRegion(val);
+    dispatch(setStoreFilter({ selStore: "", selRegion: val }));
   };
 
   const handleStoreChange = (val) => {
@@ -383,6 +378,7 @@ const OutstandingFilter = ({
     const bRnewRegion = filterStores[0].region;
     setRegion(bRnewRegion);
     setStoreName(val);
+    dispatch(setStoreFilter({ selStore: val, selRegion: bRnewRegion }));
   };
 
   const handleSearchClear = () => {
@@ -428,7 +424,7 @@ const OutstandingFilter = ({
               id="datepicker"
               type="date"
               className=""
-              style={{ color: "#EC2752" }}
+              style={{ color: "#4900A8" }}
               onChange={dateChangeHandler}
               value={dateValue}
             />
@@ -512,9 +508,11 @@ const OutstandingTable = ({
   setSuccessMod,
   setFailMode,
 }) => {
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const userRole = LoggedInUser?.role || "";
   const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
-
+  const token2 = sessionStorage.getItem("authToken");
   const viewHandler = (refID) => {
     setViewRef(refID);
     setShowView(true);
@@ -527,13 +525,13 @@ const OutstandingTable = ({
       maxBodyLength: Infinity,
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/outstanding/update`,
       headers: {
-        Authorization: token,
+        Authorization: token2,
         "Content-Type": "application/json",
       },
-      data: JSON.stringify({
+      data: {
         refIDs: [refID],
         newStatus: newStatus,
-      }),
+      },
     };
     axios
       .request(config)
@@ -566,14 +564,14 @@ const OutstandingTable = ({
             />
           </div>
         )}
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-full border border-[#4900A8]">
+          <thead className="bg-[#4900A8] text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Request</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Refrence No</th>
+              <th className="p-2 text-sm md:p-3 md:text-base">Lot No</th>
               <th className="p-2 text-sm md:p-3 md:text-base">
                 Number Of Device
               </th>

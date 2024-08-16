@@ -8,16 +8,16 @@ import store from "../../store/store";
 import { useQuestionContext } from "../../components/QuestionContext";
 import apple_watch from "../../assets/apple_watch.png";
 
-const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-const phoneFrontPhoto =
-  phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
-const Device = sessionStorage.getItem("DeviceType");
-const DummyImg =
-  Device === "Mobile"
-    ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
-    : apple_watch;
-
 const SelectModel = () => {
+  const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
+  const phoneFrontPhoto =
+    phoneImg?.models?.phonePhotos?.front ||
+    phoneImg?.models?.phonePhotos?.upFront;
+  const Device = sessionStorage.getItem("DeviceType");
+  const DummyImg =
+    Device === "Mobile"
+      ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
+      : apple_watch;
   const [modelData, setModelData] = useState();
   const { resetState } = useQuestionContext();
   const [selectedConfig, setSelectedConfig] = useState(() => {
@@ -87,11 +87,11 @@ const SelectModel = () => {
   return (
     <div className={`bg-white min-h-screen`}>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
           <img
             onClick={() => navigate("/selectdevicetype")}
-            className="w-28 "
+            className="w-40"
             src={Grest_Logo}
             alt="app logo"
           />
@@ -116,7 +116,7 @@ const SelectModel = () => {
 
               <div>
                 <p>Get Upto</p>
-                <p className="font-bold text-2xl md:text-4xl text-[#EC2752]">
+                <p className="font-bold text-2xl md:text-4xl text-[#4900A8]">
                   {selectedConfig?.price ? `₹${selectedConfig.price}` : "₹6000"}
                 </p>
               </div>
@@ -147,14 +147,14 @@ const SelectModel = () => {
             {Device === "Mobile" && (
               <button
                 onClick={handleQuickQuote}
-                className="border-2 border-[#EC2752] w-[48%] bg-white text-[#EC2752]  text-[12px]  px-4 py-2 rounded"
+                className="border-2 border-[#4900A8] w-[48%] bg-white text-[#4900A8]  text-[12px]  px-4 py-2 rounded"
               >
                 Quick Quote
               </button>
             )}
             <button
               onClick={handleExactValue}
-              className={`border-2 border-[#EC2752] bg-[#EC2752] text-white text-[12px] px-4 py-2 rounded ${
+              className={`border-2 border-[#4900A8] bg-[#4900A8] text-white text-[12px] px-4 py-2 rounded ${
                 Device === "Watch" ? "w-full" : "w-[48%]"
               }`}
             >
@@ -170,7 +170,7 @@ const SelectModel = () => {
           </div>
 
           <div className="mx-2 mt-2">
-            <div className="text-[#EC2752] font-semibold text-2xl mb-2">
+            <div className="text-[#4900A8] font-semibold text-2xl mb-2">
               FAQ's
             </div>
             <FAQ />

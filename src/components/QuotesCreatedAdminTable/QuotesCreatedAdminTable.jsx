@@ -29,8 +29,8 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
   return (
     <div>
       <div className="m-2  md:m-5 overflow-x-auto">
-        <table className="w-[220vh]  border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-[220vh]  border border-[#4900A8]">
+          <thead className="bg-[#4900A8] text-white">
             <tr className="align-top">
               <th className="p-2 text-sm md:p-3 md:text-base align-top">
                 Date
@@ -78,7 +78,7 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 min-w-[150px] md:text-base">
                     {data?.lead?.ram
-                      ? `${data?.lead?.storage}/${data?.lead?.ram}`
+                      ? `${data?.lead?.ram}/${data?.lead?.storage}`
                       : data?.lead?.storage}
                   </td>
                   <td className="p-2 text-sm min-w-[100px] text-center md:p-3 md:text-base">

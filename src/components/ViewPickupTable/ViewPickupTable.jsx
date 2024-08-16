@@ -73,24 +73,24 @@ const ViewPickupTable = ({ refNo, setShowView, fromOutStand = false }) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-row m-3 items-center">
-        <p className="font-medium opacity-70">{"Ref No: " + refNo}</p>
+        <p className="font-medium opacity-0">{"Ref No: " + refNo}</p>
         <IoClose
           size={25}
-          className="absolute right-3 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500"
+          className="absolute right-3 text-[#4900A8] transition ease hover:rotate-[360deg] duration-500"
           onClick={closeHandler}
         />
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <button className={`${styles.bulkdown_button}`} onClick={downloadExcel}>
         <FaDownload /> Bulk Download
       </button>
       <div className="overflow-x-auto m-1">
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-full border border-[#4900A8]">
+          <thead className="bg-[#4900A8] text-white">
             <tr>
               <th className="p-2 min-w-[100px] text-sm md:p-3 md:text-base">
                 Date
@@ -130,7 +130,7 @@ const ViewPickupTable = ({ refNo, setShowView, fromOutStand = false }) => {
                   {
                     val?.ramConfig.filter(
                       (i) => i.storage === val.leadsData.storage
-                    )[0].RAM
+                    )[0]?.RAM
                   }
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">

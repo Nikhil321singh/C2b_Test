@@ -40,6 +40,29 @@ const getStore = async () => {
   return storeNamesArray;
 };
 
+const fetchDownloadDataCustomerTable = (
+  toDateDup,
+  fromDateDup,
+  search,
+  selStoreId
+) => {
+  const userToken = sessionStorage.getItem("authToken");
+  axios
+    .get(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/prospects/findAll/ordercreated?page=${currentSalesPage}&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
+      { headers: { authorization: userToken } }
+    )
+    .then((res) => {
+      downloadExcelCustomerTable(res.data.data.orderData.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+const allStore = "All Stores";
+
 const downloadExcelCustomerTable = (apiData) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -86,14 +109,13 @@ const downloadExcelCustomerTable = (apiData) => {
   saveAs(dataFileCustomerTable, "Leads_Created" + fileEx);
 };
 
+const salesPageSize = 10;
+const currentSalesPage = 0;
 const CustomerTable = () => {
   const [tableDataDup, setTableDataDup] = useState([]);
   const [loading, setLoading] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
-  const currentSalesPage = 0;
-  const salesPageSize = 10;
   const [search, setSearch] = useState("");
-  const store = "";
   const [fromDate, setFromDate] = useState("");
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
   const [toDate, setToDate] = useState("");
@@ -101,21 +123,23 @@ const CustomerTable = () => {
     new Date().toISOString().split("T")[0]
   );
   const [storeDrop, setStoreDrop] = useState(false);
-  const [storeName, setStoreName] = useState("");
+  const [storeName, setStoreName] = useState(allStore);
+  const [selStoreId, setSelStoreId] = useState("");
   const [storeData, setStoreData] = useState([]);
+  const [filFlag, setFilFlag] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
     myordercretad();
-  }, [search, toDate, fromDate]);
+  }, [toDate, fromDate, selStoreId, filFlag]);
 
   function myordercretad() {
+    setLoading(true);
     const userToken = sessionStorage.getItem("authToken");
     axios
       .get(
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll/ordercreated?page=${currentSalesPage}&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${store}`,
+        }/api/prospects/findAll/ordercreated?page=${currentSalesPage}&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
         {
           headers: {
             authorization: `${userToken}`,
@@ -127,13 +151,19 @@ const CustomerTable = () => {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
         setLoading(false);
       });
   }
 
   const handleSearchClear = () => {
     setSearch("");
+    setStoreName(allStore);
+    setSelStoreId("");
+    setFromDate("");
+    setFromDateDup("2023-01-01");
+    setToDate("");
+    setToDateDup(new Date().toISOString().split("T")[0]);
+    setFilFlag(!filFlag);
   };
 
   const handleFromDateChange = (date) => {
@@ -149,7 +179,6 @@ const CustomerTable = () => {
       setFromDate("");
       setFromDateDup("");
     }
-    console.log("from", date);
   };
   const handleToDateChange = (date) => {
     if (date !== null) {
@@ -160,36 +189,16 @@ const CustomerTable = () => {
         .toISOString()
         .split("T")[0];
       setToDateDup(formattedDate);
-      console.log("to", formattedDate);
     } else if (date == null) {
       setToDate("");
       setToDateDup("");
     }
-    console.log("to", date);
   };
 
-  const fetchDownloadDataCustomerTable = () => {
-    const userToken = sessionStorage.getItem("authToken");
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll/ordercreated?page=${currentSalesPage}&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${store}`,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        downloadExcelCustomerTable(res.data.data.orderData.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
   const handleStoreChange = (value) => {
     setStoreDrop(false);
+    console.log(value._id);
+    setSelStoreId(value._id);
     setStoreName(value.storeName);
   };
 
@@ -206,7 +215,7 @@ const CustomerTable = () => {
     <div>
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={loading} size={15} />
+          <BeatLoader color={"#4900A8"} loading={loading} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -223,14 +232,21 @@ const CustomerTable = () => {
             placeholder="Search..."
             value={search}
           />
-          <IoMdSearch size={25} />
+          <IoMdSearch size={25} onClick={() => myordercretad()} />
         </div>
         <div className={styles.icons_box}>
           <IoRefresh onClick={handleSearchClear} className="" size={25} />
         </div>
         <button
           className={`${styles.bulkdown_button}`}
-          onClick={fetchDownloadDataCustomerTable}
+          onClick={() =>
+            fetchDownloadDataCustomerTable(
+              toDateDup,
+              fromDateDup,
+              search,
+              selStoreId
+            )
+          }
         >
           <FaDownload /> Bulk Download
         </button>
@@ -260,7 +276,7 @@ const CustomerTable = () => {
             }}
           >
             <p className="truncate">
-              {storeName === "" ? "Select Store" : storeName}
+              {storeName === allStore ? "Select Store" : storeName}
             </p>
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
@@ -268,6 +284,14 @@ const CustomerTable = () => {
             <div
               className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
             >
+              <div
+                onClick={() =>
+                  handleStoreChange({ storeName: allStore, _id: "" })
+                }
+                className={`${styless.filter_option}`}
+              >
+                <p className="truncate">{allStore}</p>
+              </div>
               {storeData.map((item, index) => (
                 <div
                   key={index}

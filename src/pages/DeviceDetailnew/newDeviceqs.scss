@@ -1,5 +1,5 @@
 .popup {
-  height: 49vh;
+  height: 52vh;
   width: 75vw;
   position: fixed;
   top: 50%;
@@ -19,13 +19,13 @@
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(5px);
-  border-radius: 35px;
+  border-radius: 0.55rem;
   background: #ffffff;
   box-shadow: -50px 50px 100px #636363, 50px -50px 100px #ffffff;
 
   @media only screen and (max-width: 600px) {
     .popup {
-      border-radius: 53px;
+      border-radius: 0.55rem;
       background: linear-gradient(225deg, #ffffff, #e6e6e6);
       box-shadow: -18px 18px 36px #858585, 18px -18px 36px #ffffff;
     }
@@ -52,11 +52,12 @@
     color: #fff;
     width: 8.5em;
     height: 2.9em;
-    border: #ec2752 0.2em solid;
+    border: #4900a8 0.2em solid;
     border-radius: 11px;
     text-align: right;
     transition: all 0.6s ease;
-    background-color: #ec2752;
+    background-color: #4900a8;
+    margin-top: 10px;
 
     &:hover {
       background-color: #ff0037;
@@ -126,11 +127,17 @@
         .containClass {
           .subheading {
             display: flex;
-
-            align-items: center;
+            align-items: flex-start;
+            svg {
+              margin-top: 5px;
+              width: 5%;
+            }
             h2 {
+              width: 95%;
+              margin-left: 5px;
+              margin-top: 5px;
+              margin-bottom: 10px;
               font-size: 15px;
-              line-height: 5vh;
               font-weight: 500;
             }
           }
@@ -149,10 +156,14 @@
               label {
                 display: flex;
                 justify-content: center;
-                box-shadow: -5px 3px 7px #ad2542, -3px 2px 6px #ff4176;
+                cursor: pointer;
+                box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.158), 1px 1px 0px 0px rgba(0, 0, 0, 0.034);
                 input {
                   display: none;
                 }
+                transition: all ease 0.5s;
+              }:hover{
+                scale: 1.03;
               }
             }
           }
@@ -168,11 +179,11 @@
               color: #fff;
               width: 8.5em;
               height: 2.9em;
-              border: #ec2752 0.2em solid;
+              border: #4900a8 0.2em solid;
               border-radius: 11px;
               text-align: right;
               transition: all 0.6s ease;
-              background-color: #ec2752;
+              background-color: #4900a8;
 
               &:hover {
                 background-color: #f5093c;
@@ -204,14 +215,14 @@
               color: #fff;
               width: 8.5em;
               height: 2.9em;
-              border: #ec2752 0.2em solid;
+              border: #4900a8 0.2em solid;
               border-radius: 11px;
               text-align: right;
               transition: all 0.6s ease;
               background-color: #f898ad;
 
               &:hover {
-                background-color: #ec2752;
+                background-color: #4900a8;
                 cursor: pointer;
 
                 .svg {

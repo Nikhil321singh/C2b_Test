@@ -19,8 +19,7 @@ import StoreEdit from "../../components/StoreEdit/StoreEdit";
 import { useNavigate } from "react-router-dom";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
+const failTextColor = "text-[#4900A8]";
 
 const downloadExcel = (dataDown, curPage) => {
   const fileType =
@@ -52,6 +51,7 @@ const sampleDownloadHandler = () => {
 };
 
 const StoreListingTable = () => {
+  const token = sessionStorage.getItem("authToken");
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -138,8 +138,8 @@ const StoreListingTable = () => {
     setEditBoxOpen(true);
   };
 
-  const deleteConfHandler = (storeID) => {
-    setSelectedStr(storeID);
+  const deleteConfHandler = (store) => {
+    setSelectedStr(store);
     setConfBox(true);
   };
 
@@ -257,6 +257,7 @@ const ExtComps = ({
   getData,
   getDataBySearch,
 }) => {
+  const utoken = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [file, setFile] = useState(null);
   const deleteHandler = (storeID) => {
@@ -268,7 +269,7 @@ const ExtComps = ({
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/store/deleteById?id=${storeID}`,
       headers: {
-        Authorization: token,
+        Authorization: utoken,
       },
     };
     axios
@@ -306,7 +307,7 @@ const ExtComps = ({
         formData,
         {
           headers: {
-            Authorization: token,
+            Authorization: utoken,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -367,7 +368,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailBox(false);
               }}
-              className={"text-white bg-[#EC2752]"}
+              className={"text-white bg-[#4900A8]"}
             >
               Okay
             </button>
@@ -378,11 +379,11 @@ const ExtComps = ({
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${failTextColor}`}>
             <h6 className={failTextColor}>Confirmation!</h6>
-            <p className="text-slate-500">{`Do you want to delete store ${selectedStr} ?`}</p>
+            <p className="text-slate-500">{`Do you want to delete store ${selectedStr?.storeName} ?`}</p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => deleteHandler(selectedStr)}
-                className={"bg-[#EC2752] text-white"}
+                onClick={() => deleteHandler(selectedStr?._id)}
+                className={"bg-[#4900A8] text-white"}
               >
                 Okay
               </button>
@@ -391,7 +392,7 @@ const ExtComps = ({
                   setConfBox(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-[#4900A8]"
               >
                 Cancel
               </button>
@@ -409,7 +410,7 @@ const ExtComps = ({
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
     </React.Fragment>
@@ -441,7 +442,7 @@ const BulkUploadBox = ({
             />
           </div>
           <div className="flex flex-row gap-2">
-            <button type="submit" className={"bg-[#EC2752] text-white"}>
+            <button type="submit" className={"bg-[#4900A8] text-white"}>
               Upload
             </button>
             <button
@@ -450,7 +451,7 @@ const BulkUploadBox = ({
                 setUploadBox(false);
                 setIsTableLoaded(false);
               }}
-              className="bg-white text-[#EC2752]"
+              className="bg-white text-[#4900A8]"
             >
               Cancel
             </button>
@@ -493,8 +494,8 @@ const StoreTable = ({
   return (
     <div className={`${styles.pd_cont}`}>
       <div className="m-2 overflow-x-auto md:m-5">
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-full border border-[#4900A8]">
+          <thead className="bg-[#4900A8] text-white">
             <tr>
               <th className="text-sm p-2 md:p-3 md:text-base">Action</th>
               <th className="text-sm p-2 md:p-3 md:text-base">Store Name</th>
@@ -521,7 +522,7 @@ const StoreTable = ({
                     <button
                       className={`${styles.acpt_btn}`}
                       onClick={() => {
-                        deleteConfHandler(val?._id);
+                        deleteConfHandler(val);
                       }}
                     >
                       Delete

@@ -192,8 +192,6 @@ export const TopSelling = ({ topModels }) => {
   );
 };
 
-const userToken = sessionStorage.getItem("authToken");
-
 const BrandImgSetter = ({ brandItem }) => {
   return (
     <React.Fragment>
@@ -227,6 +225,7 @@ const BrandImgSetter = ({ brandItem }) => {
 };
 
 export const BrandList = ({ deviceType }) => {
+  const userToken1 = sessionStorage.getItem("authToken");
   const [brandList, setBrandList] = useState([]);
   const [popout, setPopout] = useState(false);
   const navigate = useNavigate();
@@ -250,16 +249,22 @@ export const BrandList = ({ deviceType }) => {
   };
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands`, {
-        headers: { authorization: `${userToken}` },
-      })
+      .get(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/brands/getBrands?deviceType=${deviceType}`,
+        {
+          headers: { authorization: `${userToken1}` },
+        }
+      )
       .then((res) => {
         setBrandList(res.data.data);
+        console.log(res.data.data);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [deviceType]);
 
   const handleDeviceClick = () => {
     setPopout(true);
@@ -291,9 +296,8 @@ export const BrandList = ({ deviceType }) => {
       handleDeviceClick();
     }
   };
-  const extraBrands = [{ name: "More" }];
 
-  const allBrands = [...brandList, ...extraBrands];
+  const allBrands = [...brandList];
   return (
     <>
       {popout && (
@@ -309,10 +313,10 @@ export const BrandList = ({ deviceType }) => {
                 size={25}
                 onClick={hanldeclose}
               />
-              <div className="text-4xl font-bold text-[#EC2752] p text-center">
+              <div className="text-4xl font-bold text-[#4900AD] p text-center">
                 Coming
               </div>
-              <div className="text-4xl font-bold text-[#EC2752] p text-center">
+              <div className="text-4xl font-bold text-[#4900AD] p text-center">
                 Soon !
               </div>
             </div>
@@ -334,9 +338,9 @@ export const BrandList = ({ deviceType }) => {
             <div
               key={index}
               onClick={() => handleBrandClick(brandItem)}
-              className={`flex-shrink-0 ${styles.brand_card}`}
+              className={`flex-shrink-0  ${styles.brand_card} px-[20px] py-[10px]`}
             >
-              <BrandImgSetter brandItem={brandItem} />
+              <img className=" w-[50px]" src={brandItem.logo} alt={brandItem.name} />
             </div>
           ))}
         </div>
@@ -351,8 +355,7 @@ export const BrandList = ({ deviceType }) => {
   );
 };
 
-const Device = sessionStorage.getItem("DeviceType");
-const selBtn = () => {
+const selBtn = (Device) => {
   if (Device === "Mobile") {
     return "Mobiles";
   } else if (Device === "Laptop") {
@@ -382,20 +385,21 @@ const searchDeviceAPI = async (val) => {
   return { brand: brand, model: model };
 };
 
-const searchPhoneAPI = async (Sdata) => {
+const searchPhoneAPI = async (Sdata, deviceType) => {
+  const userToken = sessionStorage.getItem("authToken");
   let response = {};
   await axios
     .post(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/user/Dashboard/search/phones`,
-      { name: Sdata },
+      { name: Sdata, deviceType: deviceType },
       { headers: { authorization: `${userToken}` } }
     )
     .then((res) => {
-      const updatedData = res.data.map(item => ({
+      const updatedData = res.data.map((item) => ({
         ...item,
-        imgSrc: ImgSelectore(item)
+        imgSrc: ImgSelectore(item),
       }));
       response = updatedData;
     })
@@ -406,6 +410,7 @@ const searchPhoneAPI = async (Sdata) => {
 };
 
 const fetchDataAPI = async (days, fromDateDup, toDateDup, deviceType) => {
+  const userToken = sessionStorage.getItem("authToken");
   let response1;
   let response2;
   try {
@@ -428,6 +433,8 @@ const fetchDataAPI = async (days, fromDateDup, toDateDup, deviceType) => {
 };
 
 const SelectDeviceType = () => {
+  const Device = sessionStorage.getItem("DeviceType");
+  const token = sessionStorage.getItem("authToken");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const { fromDateDup, setFromDateDup, toDateDup, setToDateDup } =
@@ -491,20 +498,22 @@ const SelectDeviceType = () => {
     setData(`${temp?.brand} ${temp?.model}`);
   };
 
-  const searchPhone = async (tempData) => {
-    const tempRes = await searchPhoneAPI(tempData);
+  const searchPhone = async (tempData, deviceType) => {
+    const tempRes = await searchPhoneAPI(tempData, deviceType);
     setModel(tempRes || []);
   };
 
   useEffect(() => {
     if (data) {
-      searchPhone(data);
+      searchPhone(data, "Mobile");
     }
   }, [data]);
 
   useEffect(() => {
     if (imei.length >= 15) {
       searchDevice(imei);
+    } else if (imei.length >= 3 && !/^\d+$/.test(imei.slice(0, 3))) {
+      searchPhone(imei, deviceType);
     }
   }, [imei]);
 
@@ -530,13 +539,13 @@ const SelectDeviceType = () => {
           `${
             import.meta.env.VITE_REACT_APP_ENDPOINT
           }/api/user/Dashboard/get/top/sellingModels?time=${days}&deviceType=${deviceType}`,
-          { headers: { authorization: `${userToken}` } }
+          { headers: { authorization: `${token}` } }
         );
-        const updatedData = await response.data.map(item => ({
+        const updatedData = await response.data.map((item) => ({
           ...item,
-          imgSrc: ImgSelectore(item)
+          imgSrc: ImgSelectore(item),
         }));
-        console.log(updatedData)
+        console.log(updatedData);
         setTopmodels(updatedData);
       } catch (err) {
         console.error(err);
@@ -637,9 +646,9 @@ const SearchBox = ({
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-          <img className="w-28 " src={Grest_Logo} alt="app logo" />
+          <img className="w-40" src={Grest_Logo} alt="app logo" />
         </div>
       </div>
       {isSearchBoxOpen && (
@@ -661,7 +670,7 @@ const SearchBox = ({
                 className="flex items-center"
                 onClick={() => setIsScanOpen(!isScanOpen)}
               >
-                <CiBarcode size={20} className={"inline mr-1 text-[#EC2752]"} />
+                <CiBarcode size={20} className={"inline mr-1 text-[#4900AD]"} />
               </div>
             </div>
           </div>
@@ -679,11 +688,7 @@ const SearchBox = ({
                     style={{ boxShadow: "0 0 10px 0 rgb(0 0 0 / 0.1)" }}
                     onClick={() => handleDeviceClick(model)}
                   >
-                    <img
-                      className="w-[50px] mb-2"
-                      src={model.imgSrc}
-                      alt=""
-                    />
+                    <img className="w-[50px] mb-2" src={model.imgSrc} alt="" />
                     <p className="text-[11px] font-medium">{model.name}</p>
                   </div>
                 ))}
@@ -692,12 +697,12 @@ const SearchBox = ({
             <div className="flex flex-col my-auto text-sm font-medium text-gray-500">
               <img className="w-[250px] mx-auto" src={searchImage} />
               <div>
-                Dial <span className="text-[#EC2752]">*#06#</span> on customer's
+                Dial <span className="text-[#4900AD]">*#06#</span> on customer's
                 old device and
               </div>
               <div>
                 Scan the IMEI using the{" "}
-                <CiBarcode className="inline text-[#EC2752]" size={20} /> on top
+                <CiBarcode className="inline text-[#4900AD]" size={20} /> on top
                 right.
               </div>
             </div>
@@ -727,7 +732,8 @@ const MiddlePart = ({
   orderSaled,
   topModels,
 }) => {
-  const [selectedBtn, setSelectedBtn] = useState(selBtn);
+  const Device1 = sessionStorage.getItem("DeviceType");
+  const [selectedBtn, setSelectedBtn] = useState(() => selBtn(Device1));
 
   return (
     <div className={styles.des_main_wrap}>
@@ -746,7 +752,7 @@ const MiddlePart = ({
                 type="text"
               />
               <div className="flex items-center">
-                <CiBarcode size={20} className="inline mr-1 text-[#EC2752]" />
+                <CiBarcode size={20} className="inline mr-1 text-[#4900AD]" />
               </div>
             </div>
           </div>
@@ -763,14 +769,42 @@ const MiddlePart = ({
               onChange={(e) => {
                 handlepick(e);
               }}
-              className="p-2 border-2 rounded-lg shadow-md outline-none "
+              className="p-2 border-2 rounded-lg shadow-md outline-none bg-[#8080ff] text-white"
+              style={{ backgroundColor: "#8080ff", color: "white" }}
             >
-              <option value="today">Today</option>
-              <option value="7days">7 Days</option>
-              <option value="lastmonth">Last Month</option>
-              <option value="Custom">Custom</option>
+              <option
+                value="today"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Today
+              </option>
+              <option
+                value="7days"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                7 Days
+              </option>
+              <option
+                value="thismonth"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                This Month
+              </option>
+              <option
+                value="lastmonth"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Last Month
+              </option>
+              <option
+                value="Custom"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Custom
+              </option>
             </select>
           </div>
+
           <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
             <Link className="w-[33%]" to={`/orderscreated/${days}`}>
               <OrderStatusBox
@@ -795,7 +829,7 @@ const MiddlePart = ({
             </Link>
           </div>
           <p
-            className={`${styles.topSell_head} text-lg font-bold text-[#EC2752]`}
+            className={`${styles.topSell_head} text-lg font-bold text-[#4900AD]`}
           >
             Top Selling Models
           </p>
@@ -810,25 +844,25 @@ const MiddlePart = ({
         </div>
       </div>
       <p
-        className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#EC2752]`}
+        className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#4900AD]`}
       >
-        How GREST Works?
+        How SwitchKart Works?
       </p>
       <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
         <div className="flex flex-col min-w-[30%]  items-center  ">
           <img className={`w-[50px] mb-2`} src={how1} />
           <p className="-mb-1 text-base font-bold">Add</p>
-          <p className="text-base font-medium opacity-60">product details</p>
+          <p className="text-sm font-medium opacity-60">Product Details</p>
         </div>
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how2} />
           <p className="-mb-1 text-base font-bold">Exchange</p>
-          <p className="text-base font-medium opacity-60">your device</p>
+          <p className="text-sm font-medium opacity-60">Your Device</p>
         </div>
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how3} />
-          <p className="-mb-1 text-base font-bold">Transfer</p>
-          <p className="text-base font-medium opacity-60">your money</p>
+          <p className="-mb-1 text-base font-bold">Get Paid</p>
+          <p className="text-sm font-medium opacity-60">Instantly</p>
         </div>
       </div>
     </div>

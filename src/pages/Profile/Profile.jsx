@@ -7,10 +7,9 @@ import axios from "axios";
 import styles from "./Profile.module.css";
 import { BeatLoader } from "react-spinners";
 
-const storedProfile = JSON.parse(sessionStorage.getItem("profile")) || {};
-const authToken = sessionStorage.getItem("authToken");
-
 const Profile = () => {
+  const storedProfile = JSON.parse(sessionStorage.getItem("profile")) || {};
+  const authToken = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
   const [profile, setProfile] = useState({
     firstName: "",
@@ -40,6 +39,7 @@ const Profile = () => {
       email: storedProfile?.email || "",
       phoneNumber: storedProfile?.phoneNumber || "",
     });
+    console.log(storedProfile?.profileImage);
     setProfileImage(storedProfile?.profileImage || "");
   }, []);
 
@@ -63,6 +63,11 @@ const Profile = () => {
   const handleFileInputChange = async (e) => {
     setIsTableLoaded(true);
     const file = e.target.files[0];
+    if (file.size > 2 * 1024 * 1024) {
+      setErrorMsg("File size must be less than 2MB");
+      setIsTableLoaded(false);
+      return;
+    }
     const formData = new FormData();
     formData.append("Profileimage", file);
     try {
@@ -134,8 +139,7 @@ const Profile = () => {
     }
   };
 
-  const handleEditClick = (event) => {
-    event.preventDefault();
+  const handleEditClick = () => {
     setIsEditing(!isEditing);
   };
 
@@ -184,7 +188,7 @@ const Profile = () => {
     <div className="min-h-screen  pb-8 bg-[#F5F4F9] ">
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -230,7 +234,7 @@ const ProfileDetail = ({
       <div>
         <div className="flex flex-col justify-center items-center">
           <p className="text-4xl font-bold">Profile</p>
-          <p className="font-medium text-[#EC2752]">{errorMsg}</p>
+          <p className="font-medium text-[#4900A8]">{errorMsg}</p>
         </div>
         <form className="w-[800px]  flex flex-col gap-2">
           <div className="flex justify-between ">
@@ -243,7 +247,7 @@ const ProfileDetail = ({
                 />
               </div>
               {isEditing && (
-                <div className="flex flex-col gap-2 items-baseline">
+                <div className="flex flex-col gap-2 items-baseline justify-end pb-2">
                   <button
                     onClick={handleUploadButtonClick}
                     className={styles.prof_button}
@@ -253,13 +257,18 @@ const ProfileDetail = ({
                   <input
                     id="fileInput"
                     type="file"
-                    accept="image/*"
                     style={{ display: "none" }}
+                    accept=".jpg, .jpeg, .png"
                     onChange={handleFileInputChange}
                   />
-                  <button onClick={Deleteimage} className={styles.prof_button2}>
-                    Delete
-                  </button>
+                  {profileImage && (
+                    <button
+                      onClick={Deleteimage}
+                      className={styles.prof_button2}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
               )}
             </div>

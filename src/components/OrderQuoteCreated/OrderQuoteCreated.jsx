@@ -40,23 +40,25 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
         }
       )
       .then((res) => {
-        const modifiedDataArray = res.data?.data?.[orderType]?.data.map((leadSetItem) => {
-          const storageValue = leadSetItem.lead?.storage;
-          const filteredConfig = leadSetItem.lead?.model?.config.filter(
-            (configItem) => configItem.storage === storageValue
-          );
+        const modifiedDataArray = res.data?.data?.[orderType]?.data.map(
+          (leadSetItem) => {
+            const storageValue = leadSetItem.lead?.storage;
+            const filteredConfig = leadSetItem.lead?.model?.config.filter(
+              (configItem) => configItem.storage === storageValue
+            );
 
-          return {
-            ...leadSetItem,
-            lead: {
-              ...leadSetItem.lead,
-              model: {
-                ...leadSetItem.lead.model,
-                config: filteredConfig.length ? filteredConfig[0] : null,
+            return {
+              ...leadSetItem,
+              lead: {
+                ...leadSetItem.lead,
+                model: {
+                  ...leadSetItem.lead.model,
+                  config: filteredConfig.length ? filteredConfig[0] : null,
+                },
               },
-            },
-          };
-        });
+            };
+          }
+        );
         setData(modifiedDataArray);
         setLoading(false);
       })
@@ -98,7 +100,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
     <div className="min-h-screen">
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={loading} size={15} />
+          <BeatLoader color={"#4900A8"} loading={loading} size={15} />
         </div>
       )}
       {head === undefined && (
@@ -107,7 +109,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
             <ProfileBox />
             <img
               onClick={() => navigate("/selectdevicetype")}
-              className="w-28 "
+              className="w-40"
               src={Grest_Logo}
               alt="app logo"
             />
@@ -128,7 +130,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
           value={serachval}
           onChange={(e) => setSerachval(e.target.value)}
         />
-        <div className=" text-center bg-[#EC2752] px-2  py-1 rounded-lg">
+        <div className=" text-center bg-[#4900A8] px-2  py-1 rounded-lg">
           <button className="text-white " onClick={handleSeachSubmit}>
             Search
           </button>

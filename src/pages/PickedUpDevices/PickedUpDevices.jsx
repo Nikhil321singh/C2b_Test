@@ -16,21 +16,25 @@ import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
 import { BsCalendarDate } from "react-icons/bs";
 import { BeatLoader } from "react-spinners";
+import { useDispatch, useSelector } from "react-redux";
+import { setStoreFilter } from "../../store/slices/userSlice";
 
 const userRoles = ["Pickup", "Payroll"];
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
-const token = sessionStorage.getItem("authToken");
+const failTextColor = "text-[#4900A8]";
+const checkOnPkd = "Check it On Picked Up";
 const PendingConf = "Pending Pickup Confirmation";
-const PayrollApp = "Payroll Approval Rejected";
-const PickConf = "Pickup Confirmed";//Technican
-const PickDelivered = "Pickup Delivered At Warehouse";//Technican
-const ApprovDelivery = "Approved Delivery At Warehouse";//Admin Manager
-const FinalStatus = "Payment Confirmed";//Admin Manager
-const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-const userRole = LoggedInUser?.role || "";
+const PickConf = "Pending Delivery At Warehouse"; //Technican Earlier - Pickup Confirmed
+const PickDelivered = "Pickup Delivered At Warehouse"; //Technican
+const ApprovDelivery = "Approved Delivery At Warehouse"; //Admin Manager
+const FinalStatus = "Payment Confirmed"; //Admin Manager
 
 const PickedUpDevices = () => {
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const userRole = LoggedInUser?.role || "";
+  const QRole = userRole === "Technician" ? userRole : "Admin";
+  const token = sessionStorage.getItem("authToken");
+  const userProfile = useSelector((state) => state.user);
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [dateValue, setDateValue] = useState("");
@@ -38,25 +42,16 @@ const PickedUpDevices = () => {
   const [tempId, setTempId] = useState();
   const [successMod, setSuccessMod] = useState(false);
   const [errorMsg, setErrorMsg] = useState("successfully updated status");
+  const [errorMsg1, setErrorMsg1] = useState(null);
+  const [errorMsg2, setErrorMsg2] = useState(null);
   const [confMod, setConfMod] = useState(false);
   const [failMod, setFailMode] = useState(false);
-  const [region, setRegion] = useState(LoggedInUser?.region);
-  const [storeName, setStoreName] = useState(LoggedInUser?.storeName);
+  const [region, setRegion] = useState(userProfile.selRegion);
+  const [storeName, setStoreName] = useState(userProfile.selStore);
   const [regionData, setRegionData] = useState([]);
   const [storeData, setStoreData] = useState([]);
   const firsttime = useRef(true);
   const [allStore, setAllStore] = useState([]);
-
-  useEffect(() => {
-    if (successMod || failMod) {
-      const timeoutid = setTimeout(() => {
-        setSuccessMod(false);
-        setFailMode(false);
-      }, 5000);
-      return () => clearTimeout(timeoutid);
-    }
-    return () => {};
-  }, [failMod, successMod]);
 
   const getData = () => {
     setIsTableLoaded(true);
@@ -64,7 +59,7 @@ const PickedUpDevices = () => {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/all?region=${region}&storeName=${storeName}`,
+      }/api/pickupDevices/all?region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
     };
     axios
@@ -113,7 +108,7 @@ const PickedUpDevices = () => {
       method: "get",
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/search?rid=${searchValue}&date=${dateValue}&region=${region}&storeName=${storeName}`,
+      }/api/pickupDevices/search?rid=${searchValue}&date=${dateValue}&region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
     };
     axios
@@ -140,7 +135,7 @@ const PickedUpDevices = () => {
   }, [dateValue, storeName, region]);
 
   const confHandler = (id) => {
-    console.log(id)
+    console.log(id);
     setTempId(id);
     setIsTableLoaded(true);
     setConfMod(true);
@@ -151,6 +146,8 @@ const PickedUpDevices = () => {
       <ExtComps
         successMod={successMod}
         errorMsg={errorMsg}
+        errorMsg1={errorMsg1}
+        errorMsg2={errorMsg2}
         setSuccessMod={setSuccessMod}
         isTableLoaded={isTableLoaded}
         setIsTableLoaded={setIsTableLoaded}
@@ -159,6 +156,8 @@ const PickedUpDevices = () => {
         confMod={confMod}
         setConfMod={setConfMod}
         setErrorMsg={setErrorMsg}
+        setErrorMsg1={setErrorMsg1}
+        setErrorMsg2={setErrorMsg2}
         getData={getData}
         tempId={tempId}
       />
@@ -187,6 +186,8 @@ const PickedUpDevices = () => {
         setConfMod={setConfMod}
         getData={getData}
         setErrorMsg={setErrorMsg}
+        setErrorMsg1={setErrorMsg1}
+        setErrorMsg2={setErrorMsg2}
         setSuccessMod={setSuccessMod}
         setFailMode={setFailMode}
       />
@@ -199,6 +200,8 @@ export default PickedUpDevices;
 const ExtComps = ({
   successMod,
   errorMsg,
+  errorMsg1,
+  errorMsg2,
   setSuccessMod,
   isTableLoaded,
   setIsTableLoaded,
@@ -207,11 +210,15 @@ const ExtComps = ({
   confMod,
   setConfMod,
   setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
   getData,
   tempId,
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
-
+  const token1 = sessionStorage.getItem("authToken");
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const userRole = LoggedInUser?.role || "";
   const statusUpdHandler = (refID, newStatus) => {
     setConfMod(false);
     setIsTableLoaded(true);
@@ -220,7 +227,7 @@ const ExtComps = ({
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/pickupDevices/update`,
-      headers: { Authorization: token },
+      headers: { Authorization: token1 },
       data: {
         refIDs: [refID],
         newStatus: newStatus,
@@ -233,8 +240,9 @@ const ExtComps = ({
         setErrorMsg(
           `Successfully Updated Status of Lot ${refID} to ${newStatus}`
         );
-        if (newStatus === FinalStatus) {
-          setErrorMsg(`Pickup Confirmed for Lot ${refID}, check it on history`);
+        if (newStatus === ApprovDelivery) {
+          setErrorMsg(`Delivery Approved for Lot ${refID}.`);
+          setErrorMsg1("Check it on history.");
         }
         setIsTableLoaded(false);
         setSuccessMod(true);
@@ -245,14 +253,13 @@ const ExtComps = ({
         setIsTableLoaded(false);
       });
   };
-
   return (
     <React.Fragment>
       <div className="flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER ">
         {userRole === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-28 " src={Grest_Logo} alt="app logo" />
+            <img className="w-40" src={Grest_Logo} alt="app logo" />
           </div>
         ) : (
           <div className="navbar">
@@ -267,10 +274,14 @@ const ExtComps = ({
             <IoIosCheckmarkCircle size={90} className={succTextColor} />
             <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errorMsg}</p>
+            {errorMsg1 && <p className="text-slate-500">{errorMsg1}</p>}
+            {errorMsg2 && <p className="text-slate-500">{errorMsg2}</p>}
             <button
               className={"text-white bg-green-500 "}
               onClick={() => {
                 setSuccessMod(false);
+                setErrorMsg1(null);
+                setErrorMsg2(null);
               }}
             >
               Okay
@@ -288,7 +299,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailMode(false);
               }}
-              className={"bg-[#EC2752] text-white"}
+              className={"bg-[#4900A8] text-white"}
             >
               Okay
             </button>
@@ -300,12 +311,12 @@ const ExtComps = ({
           <div className={`${failTextColor} ${styles.err_mod_box} `}>
             <h6 className={failTextColor}>Confirmation!</h6>
             <p className="text-slate-500">
-              {`Confirm Pickup for lot - ${tempId} ?`}
+              {`Confirm Payment for lot - ${tempId} ?`}
             </p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => statusUpdHandler(tempId, FinalStatus)}
-                className={"bg-[#EC2752] text-white"}
+                onClick={() => statusUpdHandler(tempId, ApprovDelivery)}
+                className={"bg-[#4900A8] text-white"}
               >
                 Okay
               </button>
@@ -314,7 +325,7 @@ const ExtComps = ({
                   setConfMod(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-[#4900A8]"
               >
                 Cancel
               </button>
@@ -324,7 +335,7 @@ const ExtComps = ({
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
         </div>
       )}
     </React.Fragment>
@@ -349,7 +360,7 @@ const PickedUpFilter = ({
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
-
+  const dispatch = useDispatch();
   const handleSearchClear = () => {
     setSearchValue("");
     setDateValue("");
@@ -361,6 +372,7 @@ const PickedUpFilter = ({
     setStoreName("");
     const filteredStores = allStore?.filter((store) => store.region === value);
     const storeNamesArray = filteredStores.map((store) => store.storeName);
+    dispatch(setStoreFilter({ selStore: "", selRegion: value }));
     setStoreData(storeNamesArray);
     setRegion(value);
   };
@@ -372,6 +384,7 @@ const PickedUpFilter = ({
     );
     const newRegion = filteredStores[0].region;
     setRegion(newRegion);
+    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
     setStoreName(value);
   };
 
@@ -403,7 +416,7 @@ const PickedUpFilter = ({
         >
           <input
             id="datepicker"
-            style={{ color: "#EC2752" }}
+            style={{ color: "#4900A8" }}
             type="date"
             value={dateValue}
             onChange={dateChangeHandler}
@@ -486,18 +499,22 @@ const PickedUpDevicesTable = ({
   setConfMod,
   getData,
   setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
   setSuccessMod,
   setFailMode,
 }) => {
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const userRole = LoggedInUser?.role || "";
   const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
-
+  const token2 = sessionStorage.getItem("authToken");
   const viewHandler = (refID) => {
     setViewRef(refID);
     setShowView(true);
   };
 
-  const statusUpdateHandler = (refID, newStatus) => {
+  const statusUpdateHandler = (refID, newStatus, uniqueCode) => {
     setIsTableLoaded(true);
     setConfMod(false);
     const config = {
@@ -506,36 +523,41 @@ const PickedUpDevicesTable = ({
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/pickupDevices/update`,
-      headers: { Authorization: token },
+      headers: { Authorization: token2 },
       data: {
         refIDs: [refID],
         newStatus: newStatus,
       },
     };
-    console.log(config)
+    console.log(config);
     axios
       .request(config)
       .then((response) => {
-        getData();
-        setErrorMsg(
-          `Successfully updated the status of lot ${refID} to ${newStatus}`
-        );
+        setErrorMsg(`Successfully Updated Status to ${newStatus}`);
+        setErrorMsg1(`Lot No. :- ${uniqueCode}`);
+        setErrorMsg2(checkOnPkd);
         if (newStatus === PickConf) {
-          setErrorMsg(`Pickup Confirmed for lot ${refID}, check it on history`);
+          setErrorMsg(`Pickup Confirmed Successfully, Lot No. ${uniqueCode}`);
+          setErrorMsg1(`Status Updated to Pending Approval for Delivery`);
+          setErrorMsg2(checkOnPkd);
+        }
+        if (newStatus === PickDelivered || newStatus === ApprovDelivery) {
+          setErrorMsg(`Successfully Updated Status to ${newStatus}`);
+          setErrorMsg1(`Lot No. :- ${uniqueCode}`);
+          setErrorMsg2("Check it On History");
         }
         console.log(response);
         setSuccessMod(true);
-        setIsTableLoaded(false);
+        getData();
       })
       .catch((error) => {
         setErrorMsg(
-          `Failed to updated the status of lot ${refID} to ${newStatus}`
+          `Failed to updated the status of lot ${uniqueCode} to ${newStatus}`
         );
         setFailMode(true);
         setIsTableLoaded(false);
       });
   };
-
   return (
     <div className={`${styles.pd_cont}`}>
       <div className="m-2 overflow-x-auto md:m-5">
@@ -544,13 +566,13 @@ const PickedUpDevicesTable = ({
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
           </div>
         )}
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-full border border-[#4900A8]">
+          <thead className="bg-[#4900A8] text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Refrence No</th>
+              <th className="p-2 text-sm md:p-3 md:text-base">Lot Number</th>
               <th className="p-2 text-sm md:p-3 md:text-base">
                 Number Of Device
               </th>
@@ -580,65 +602,41 @@ const PickedUpDevicesTable = ({
                       >
                         View
                       </button>
-                      {val?.status === "Pending Payroll Approval" && (
+                      {val?.status === "Pending Payment Confirmation" && (
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, PendingConf)
+                              statusUpdateHandler(
+                                val?._id,
+                                "Pending Admin Approval",
+                                val?.uniqueCode
+                              )
+                            }
+                            className={`${styles.acpt_btn}`}
+                          >
+                            Confirm Payment
+                          </button>
+                        </div>
+                      )}
+                      {val?.status === "Pending Admin Approval" && (
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() =>
+                              statusUpdateHandler(val?._id, PendingConf, val?.uniqueCode)
                             }
                             className={`${styles.acpt_btn}`}
                           >
                             Accept
                           </button>
-                          <button
-                            onClick={() =>
-                              statusUpdateHandler(val?._id, PayrollApp)
-                            }
-                            className={`${styles.rjct_btn}`}
-                          >
-                            Reject
-                          </button>
                         </div>
-                      )}
-                      {val?.status === PayrollApp && (
-                        <button
-                          onClick={() =>
-                            statusUpdateHandler(val?._id, PendingConf)
-                          }
-                          className={`${styles.acpt_btn}`}
-                        >
-                          Accept
-                        </button>
-                      )}
-                      {val?.status === PendingConf && (
-                        <button
-                          onClick={() =>
-                            statusUpdateHandler(val?._id, PayrollApp)
-                          }
-                          className={`${styles.rjct_btn}`}
-                        >
-                          Reject
-                        </button>
                       )}
                       {val?.status === PickDelivered && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() =>
-                              statusUpdateHandler(val?._id, ApprovDelivery)
-                            }
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Approve Delivery
-                          </button>
-                        </div>
-                      )}
-                      {val?.status === ApprovDelivery && (
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() => confHandler(val?._id)}
                             className={`${styles.acpt_btn}`}
                           >
-                            Confirm Payment
+                            Approve Delivery
                           </button>
                         </div>
                       )}
@@ -656,7 +654,7 @@ const PickedUpDevicesTable = ({
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, PickConf)
+                              statusUpdateHandler(val?._id, PickConf, val?.uniqueCode)
                             }
                             className={`${styles.acpt_btn}`}
                           >
@@ -668,11 +666,11 @@ const PickedUpDevicesTable = ({
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, PickDelivered)
+                              statusUpdateHandler(val?._id, PickDelivered, val?.uniqueCode)
                             }
                             className={`${styles.acpt_btn}`}
                           >
-                            Delivered
+                            Pickup Delivered
                           </button>
                         </div>
                       )}
@@ -686,7 +684,7 @@ const PickedUpDevicesTable = ({
                   {new Date(val.createdAt).toLocaleDateString("en-GB")}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?._id}
+                  {val?.uniqueCode || val?._id}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {val?.totalDevice}

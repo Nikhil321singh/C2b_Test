@@ -22,7 +22,7 @@ import { CgSpinner } from "react-icons/cg";
 import useUserProfile from "../../utils/useUserProfile";
 import { setResponseData } from "../../store/slices/responseSlice";
 
-const PinkBgWhText = "bg-[#EC2752] text-white";
+const PinkBgWhText = "bg-[#4900A8] text-white";
 
 const initialState = {
   Core: [],
@@ -162,10 +162,10 @@ const QuickQuote = () => {
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
-      JSON.stringify(response.data.data)
+      JSON.stringify({ ...response.data.data, bonus: 0 })
     );
     sessionStorage.setItem("ExactQuote", false);
-    dispatch(setResponseData(response.data.data));
+    dispatch(setResponseData({ ...response.data.data, bonus: 0 }));
     setIsLoading(false);
     navigate("/devicequote");
   };
@@ -173,10 +173,10 @@ const QuickQuote = () => {
   return (
     <div className="mainQContainer">
       <div className="flex items-center w-screen py-4 h-16 border-b-2  bg-white HEADER header">
-        <div className="w-full flex items-center justify-between">
+        <div className="w-full flex items-center justify-between pr-2">
           <ProfileBox />
           <img
-            className="w-28"
+            className="w-40"
             onClick={() => navigate("/selectdevicetype")}
             alt="app logo"
             src={Grest_Logo}
@@ -185,7 +185,7 @@ const QuickQuote = () => {
       </div>
       <div className={`${styless.quick_page_nav}`}>
         <IoIosArrowBack
-          className="ml-2 text-[#EC2752]"
+          className="ml-2 text-[#4900A8]"
           size={25}
           onClick={backHandler}
         />
@@ -214,7 +214,7 @@ const QuickQuote = () => {
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2">
         <div
           onClick={handlesubmit}
-          className="bg-[#EC2752] text-center relative  py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
+          className="bg-[#4900A8] text-center relative  py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
         >
           {isLoading && (
             <CgSpinner
@@ -303,7 +303,7 @@ const QuestionList = ({
                 className="max-w-[500px] flex gap-4 ml-3 lableconatiner flex-col"
               >
                 <label
-                  className={`text-[#EC2752] font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
+                  className={`text-[#4900A8] font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
                     Warranty[index].answer === data.yes ? PinkBgWhText : ""
                   }`}
                 >
@@ -345,7 +345,7 @@ const QuestionsElement = ({ State, Task, dispatch, currentIndex, taskFun }) => {
             </div>
             <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
               <label
-                className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                className={`text-[#4900A8] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                   Task[index].answer === data.yes ? PinkBgWhText : ""
                 }`}
               >
@@ -367,7 +367,7 @@ const QuestionsElement = ({ State, Task, dispatch, currentIndex, taskFun }) => {
                 Yes
               </label>
               <label
-                className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                className={`text-[#4900A8] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                   Task[index].answer === data.no ? PinkBgWhText : ""
                 }`}
               >
