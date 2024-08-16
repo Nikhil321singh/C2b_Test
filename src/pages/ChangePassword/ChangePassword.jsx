@@ -70,7 +70,7 @@ const ChangePassword = () => {
       },
     ];
 
-    for (let validation of validations) {
+    for (const validation of validations) {
       if (validation.condition) {
         setErrMsg(validation.message);
         setIsValid(false);
