@@ -47,7 +47,7 @@ const ProductSold = () => {
         </div>
       </div>
       <div className="flex flex-col items-center justify-center gap-2 h-[70vh]">
-        <BsCartCheckFill size={84} color="#4900A8" />
+        <BsCartCheckFill size={84} color="#EC2752" />
         <p className="font-medium text-2xl">
           {message.length > 0 ? message : ""}
         </p>
@@ -55,7 +55,7 @@ const ProductSold = () => {
       <div className="fixed bottom-0 w-full ">
         <div
           onClick={handleReturn}
-          className=" bg-[#4900A8] mb-20 text-center p-3 mx-2 text-lg rounded-lg cursor-pointer flex justify-between  text-white items-center"
+          className=" bg-[#EC2752] mb-20 text-center p-3 mx-2 text-lg rounded-lg cursor-pointer flex justify-between  text-white items-center"
         >
           <p className="font-medium  text-2xl flex-1 mx-4">Return to Home</p>
         </div>

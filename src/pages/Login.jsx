@@ -86,7 +86,7 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-white Container">
       <div className="flex flex-col items-center justify-center px-10 pb-4 secondContainer">
         <img className="w-48 pt-4 mt-2 mb-4" src={Grest_Logo} alt="app logo" />
-        <h1 className="font-sans text-[#4900A8] mt-2 text-3xl font-bold sm:text-4xl">
+        <h1 className="font-sans text-[#EC2752] mt-2 text-3xl font-bold sm:text-4xl">
           Login
         </h1>
         {error && <p className="text-sm text-red-500 sm:text-base">{error}</p>}
@@ -99,7 +99,7 @@ const Login = () => {
             <div className="input">
               <MdOutlineMailLock
                 size={25}
-                style={{ margin: "0px 10px", color: "#4900A8" }}
+                style={{ margin: "0px 10px", color: "#EC2752" }}
               />
               <input
                 type="text"
@@ -118,7 +118,7 @@ const Login = () => {
             <div className="relative input">
               <RiLockPasswordLine
                 size={25}
-                style={{ margin: "0px 10px", color: "#4900A8" }}
+                style={{ margin: "0px 10px", color: "#EC2752" }}
               />
               <input
                 type={showUserPassword ? "text" : "password"}
@@ -140,7 +140,7 @@ const Login = () => {
           </div>
 
           <Link to="/PasswordRecovery">
-            <span className="text-right text-sm font-medium block text-[#4900A8] forgetpass">
+            <span className="text-right text-sm font-medium block text-[#EC2752] forgetpass">
               Forgot Password?
             </span>
           </Link>

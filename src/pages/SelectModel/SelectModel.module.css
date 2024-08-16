@@ -44,10 +44,10 @@
   /* width: 120px; */
   padding: 5px 10px;
   color: white;
-  background-color: #4900a8;
+  background-color: #ec2752;
   outline: none;
   border-radius: 0.55rem;
-  box-shadow: #4900a865 0px 1px 4px, #4900a8c0 0px 2px 8px;
+  box-shadow: #ec275265 0px 1px 4px, #ec2752c0 0px 2px 8px;
   cursor: pointer;
   transition: all 0.5s ease;
 }
@@ -67,7 +67,7 @@
   /* width: 120px; */
   padding: 5px 10px;
   color: black;
-  /* background-color: #4900A8; */
+  /* background-color: #EC2752; */
   outline: none;
   border-radius: 0.55rem;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 4px, rgba(0, 0, 0, 0.16) 0px 2px 8px;
@@ -76,8 +76,8 @@
 }
 
 .button_unchecked:hover {
-  background-color: #4900a8;
-  box-shadow: #4900a865 0px 1px 4px, #4900a8c0 0px 2px 8px;
+  background-color: #ec2752;
+  box-shadow: #ec275265 0px 1px 4px, #ec2752c0 0px 2px 8px;
   /* scale: 1.03; */
 }
 

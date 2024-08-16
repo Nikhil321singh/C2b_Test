@@ -22,11 +22,13 @@ import poco from "../../assets/POCO.png";
 import real from "../../assets/real-logo.png";
 
 const brandImages = {
-  Apple: (logo) => <img className="w-[80px] mb-2" src={logo} alt="Apple"/>,
+  Apple: (logo) => <img className="w-[80px] mb-2" src={logo} alt="Apple" />,
   OnePlus: (logo) => <img className="w-[80px] mb-2" src={logo} alt="OnePlus" />,
   POCO: (logo) => <img className="mx-auto" src={logo} alt="POCO" />,
   Realme: (logo) => <img className="mx-auto" src={logo} alt="Realme" />,
-  Xiaomi: (logo) => <img className="mx-auto w-[50px]" src={logo} alt="Xiaomi" />,
+  Xiaomi: (logo) => (
+    <img className="mx-auto w-[50px]" src={logo} alt="Xiaomi" />
+  ),
   Samsung: () => <img className="mx-auto" src={smasung} alt="Samsung" />,
   Vivo: () => <img className="mx-auto" src={vivo} alt="Vivo" />,
   OPPO: () => <img className="mx-auto" src={Oppo} alt="OPPO" />,
@@ -189,10 +191,10 @@ function Categories() {
               size={25}
               onClick={hanldeclose}
             />
-            <div className="text-4xl font-bold text-[#4900A8] p text-center">
+            <div className="text-4xl font-bold text-[#EC2752] p text-center">
               Coming
             </div>
-            <div className="text-4xl font-bold text-[#4900A8] p text-center">
+            <div className="text-4xl font-bold text-[#EC2752] p text-center">
               Soon !
             </div>
           </div>
@@ -233,7 +235,11 @@ function Categories() {
                 onClick={() => handleBrandClick(model)}
               >
                 <div className="imagecont h-[60px] w-[80px] flex items-center justify-center">
-                  <img className="w-[60px] mb-2" src={model?.logo} alt="Apple"/>
+                  <img
+                    className="w-[60px] mb-2"
+                    src={model?.logo}
+                    alt="Apple"
+                  />
                 </div>
                 <p className="text-[14px] font-medium">{model.name}</p>
               </div>

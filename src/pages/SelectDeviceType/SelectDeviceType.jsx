@@ -313,10 +313,10 @@ export const BrandList = ({ deviceType }) => {
                 size={25}
                 onClick={hanldeclose}
               />
-              <div className="text-4xl font-bold text-[#4900AD] p text-center">
+              <div className="text-4xl font-bold text-[#EC2752] p text-center">
                 Coming
               </div>
-              <div className="text-4xl font-bold text-[#4900AD] p text-center">
+              <div className="text-4xl font-bold text-[#EC2752] p text-center">
                 Soon !
               </div>
             </div>
@@ -340,7 +340,11 @@ export const BrandList = ({ deviceType }) => {
               onClick={() => handleBrandClick(brandItem)}
               className={`flex-shrink-0  ${styles.brand_card} px-[20px] py-[10px]`}
             >
-              <img className=" w-[50px]" src={brandItem.logo} alt={brandItem.name} />
+              <img
+                className=" w-[50px]"
+                src={brandItem.logo}
+                alt={brandItem.name}
+              />
             </div>
           ))}
         </div>
@@ -670,7 +674,7 @@ const SearchBox = ({
                 className="flex items-center"
                 onClick={() => setIsScanOpen(!isScanOpen)}
               >
-                <CiBarcode size={20} className={"inline mr-1 text-[#4900AD]"} />
+                <CiBarcode size={20} className={"inline mr-1 text-[#EC2752]"} />
               </div>
             </div>
           </div>
@@ -697,12 +701,12 @@ const SearchBox = ({
             <div className="flex flex-col my-auto text-sm font-medium text-gray-500">
               <img className="w-[250px] mx-auto" src={searchImage} />
               <div>
-                Dial <span className="text-[#4900AD]">*#06#</span> on customer's
+                Dial <span className="text-[#EC2752]">*#06#</span> on customer's
                 old device and
               </div>
               <div>
                 Scan the IMEI using the{" "}
-                <CiBarcode className="inline text-[#4900AD]" size={20} /> on top
+                <CiBarcode className="inline text-[#EC2752]" size={20} /> on top
                 right.
               </div>
             </div>
@@ -752,7 +756,7 @@ const MiddlePart = ({
                 type="text"
               />
               <div className="flex items-center">
-                <CiBarcode size={20} className="inline mr-1 text-[#4900AD]" />
+                <CiBarcode size={20} className="inline mr-1 text-[#EC2752]" />
               </div>
             </div>
           </div>
@@ -769,8 +773,8 @@ const MiddlePart = ({
               onChange={(e) => {
                 handlepick(e);
               }}
-              className="p-2 border-2 rounded-lg shadow-md outline-none bg-[#8080ff] text-white"
-              style={{ backgroundColor: "#8080ff", color: "white" }}
+              className="p-2 border-2 rounded-lg shadow-md outline-none bg-[#EC275271] text-white"
+              style={{ backgroundColor: "#ec275271", color: "white" }}
             >
               <option
                 value="today"
@@ -829,7 +833,7 @@ const MiddlePart = ({
             </Link>
           </div>
           <p
-            className={`${styles.topSell_head} text-lg font-bold text-[#4900AD]`}
+            className={`${styles.topSell_head} text-lg font-bold text-[#EC2752]`}
           >
             Top Selling Models
           </p>
@@ -844,7 +848,7 @@ const MiddlePart = ({
         </div>
       </div>
       <p
-        className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#4900AD]`}
+        className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#EC2752]`}
       >
         How SwitchKart Works?
       </p>

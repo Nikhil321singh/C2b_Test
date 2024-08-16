@@ -49,7 +49,7 @@ const Register = () => {
             value={userDetails.name}
             onChange={handleChange}
             required
-            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#4900A8] focus:outline-none pl-1"
+            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#EC2752] focus:outline-none pl-1"
           />
           <label htmlFor="email" className="block">
             Email:
@@ -61,7 +61,7 @@ const Register = () => {
             value={userDetails.email}
             onChange={handleChange}
             required
-            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#4900A8] focus:outline-none pl-1"
+            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#EC2752] focus:outline-none pl-1"
           />
 
           <label htmlFor="phoneNumber" className="block">
@@ -74,7 +74,7 @@ const Register = () => {
             required
             value={userDetails.phoneNumber}
             onChange={handleChange}
-            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#4900A8] focus:outline-none pl-1"
+            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#EC2752] focus:outline-none pl-1"
           />
 
           <label htmlFor="state" className="block">
@@ -87,7 +87,7 @@ const Register = () => {
             required
             value={userDetails.state}
             onChange={handleChange}
-            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#4900A8] focus:outline-none pl-1"
+            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#EC2752] focus:outline-none pl-1"
           />
           <label htmlFor="city" className="block">
             City:
@@ -99,7 +99,7 @@ const Register = () => {
             required
             value={userDetails.city}
             onChange={handleChange}
-            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#4900A8] focus:outline-none pl-1"
+            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#EC2752] focus:outline-none pl-1"
           />
 
           <label htmlFor="password" className="block">
@@ -112,20 +112,20 @@ const Register = () => {
             required
             value={userDetails.password}
             onChange={handleChange}
-            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#4900A8] focus:outline-none pl-1"
+            className="block w-60 h-10 border rounded-lg focus:ring focus:ring-[#EC2752] focus:outline-none pl-1"
           />
 
           <button
             onClick={userRegister}
             type="button"
-            className="block w-60 h-12 bg-[#4900A8] text-white rounded-lg mt-1"
+            className="block w-60 h-12 bg-[#EC2752] text-white rounded-lg mt-1"
           >
             Register
           </button>
 
           <span>
             Already have an account.{" "}
-            <Link className="cursor-pointer text-[#4900A8]" to="/">
+            <Link className="cursor-pointer text-[#EC2752]" to="/">
               Login
             </Link>
           </span>

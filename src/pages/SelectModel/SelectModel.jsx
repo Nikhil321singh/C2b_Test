@@ -116,7 +116,7 @@ const SelectModel = () => {
 
               <div>
                 <p>Get Upto</p>
-                <p className="font-bold text-2xl md:text-4xl text-[#4900A8]">
+                <p className="font-bold text-2xl md:text-4xl text-[#EC2752]">
                   {selectedConfig?.price ? `₹${selectedConfig.price}` : "₹6000"}
                 </p>
               </div>
@@ -147,14 +147,14 @@ const SelectModel = () => {
             {Device === "Mobile" && (
               <button
                 onClick={handleQuickQuote}
-                className="border-2 border-[#4900A8] w-[48%] bg-white text-[#4900A8]  text-[12px]  px-4 py-2 rounded"
+                className="border-2 border-[#EC2752] w-[48%] bg-white text-[#EC2752]  text-[12px]  px-4 py-2 rounded"
               >
                 Quick Quote
               </button>
             )}
             <button
               onClick={handleExactValue}
-              className={`border-2 border-[#4900A8] bg-[#4900A8] text-white text-[12px] px-4 py-2 rounded ${
+              className={`border-2 border-[#EC2752] bg-[#EC2752] text-white text-[12px] px-4 py-2 rounded ${
                 Device === "Watch" ? "w-full" : "w-[48%]"
               }`}
             >
@@ -170,7 +170,7 @@ const SelectModel = () => {
           </div>
 
           <div className="mx-2 mt-2">
-            <div className="text-[#4900A8] font-semibold text-2xl mb-2">
+            <div className="text-[#EC2752] font-semibold text-2xl mb-2">
               FAQ's
             </div>
             <FAQ />

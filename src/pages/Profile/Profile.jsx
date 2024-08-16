@@ -188,7 +188,7 @@ const Profile = () => {
     <div className="min-h-screen  pb-8 bg-[#F5F4F9] ">
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -234,7 +234,7 @@ const ProfileDetail = ({
       <div>
         <div className="flex flex-col justify-center items-center">
           <p className="text-4xl font-bold">Profile</p>
-          <p className="font-medium text-[#4900A8]">{errorMsg}</p>
+          <p className="font-medium text-[#EC2752]">{errorMsg}</p>
         </div>
         <form className="w-[800px]  flex flex-col gap-2">
           <div className="flex justify-between ">

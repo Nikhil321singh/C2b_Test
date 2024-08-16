@@ -122,13 +122,13 @@ const CustomerImageDetails = ({ imageData, closeModal }) => {
         </div>
         <button
           onClick={closeModal}
-          className="mt-4 px-4 py-2 bg-[#4900A8] text-white rounded hover:bg-[#D7203D] focus:outline-none"
+          className="mt-4 px-4 py-2 bg-[#EC2752] text-white rounded hover:bg-[#D7203D] focus:outline-none"
         >
           Close
         </button>
         <button
           onClick={downloadAllImages}
-          className="ml-4 mt-4 px-4 py-2 bg-[#4900A8] text-white rounded hover:bg-[#D7203D] focus:outline-none"
+          className="ml-4 mt-4 px-4 py-2 bg-[#EC2752] text-white rounded hover:bg-[#D7203D] focus:outline-none"
         >
           Download Images
         </button>

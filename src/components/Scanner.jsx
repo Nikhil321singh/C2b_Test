@@ -68,7 +68,7 @@ const Scanner = (props) => {
         </div>
         <div
           id="interactive"
-          className={`border-2 ${status === "steady" && "border-[#4900A8]"} ${
+          className={`border-2 ${status === "steady" && "border-[#EC2752]"} ${
             status === "success" && "border-green-300"
           } ${status === "error" && "border-red-500"}`}
         ></div>

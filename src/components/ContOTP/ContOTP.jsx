@@ -81,18 +81,16 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   }, [otpData]);
 
   return (
-    <div className={`${styles.contopt_page}`}
-    style={{ zIndex: 9999 }}
-    >
+    <div className={`${styles.contopt_page}`} style={{ zIndex: 9999 }}>
       <div className="absolute top-4 md:top-0 bg-white flex items-center justify-between w-full pr-2 py-2 rounded-md">
-          <ProfileBox />
-          <img
-            onClick={() => navigate("/selectdevicetype")}
-            className="w-40"
-            src={Grest_Logo}
-            alt="app logo"
-          />
-        </div>
+        <ProfileBox />
+        <img
+          onClick={() => navigate("/selectdevicetype")}
+          className="w-40"
+          src={Grest_Logo}
+          alt="app logo"
+        />
+      </div>
       <div className={` ${styles.optbox_wrap}`}>
         <div className={`${styles.optimg_wrap}`}>
           <img onClick={() => setContinueOTPOpen(false)} src={optImg} />
@@ -105,7 +103,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
                 OTP sent to
               </span>
               <span
-                className="text-sm font-medium text-left ml-[2px] text-[#4900A8] flex items-center"
+                className="text-sm font-medium text-left ml-[2px] text-[#EC2752] flex items-center"
                 onClick={handleNumberEdit}
               >
                 <span className="text-sm font-medium opacity-60 text-[#000000]">
@@ -220,7 +218,7 @@ const OTPComp = ({
             disabled={false}
             autoFocus
             inputStyles={{
-              border: "2px solid #4900A8",
+              border: "2px solid #EC2752",
               borderRadius: ".55rem",
               outline: "none",
               marginRight: "10px",
@@ -237,7 +235,7 @@ const OTPComp = ({
               placeholder="Enter Name"
               value={otpData?.name}
               onChange={handleChange}
-              className="border-2 border-[#4900A8] py-1 rounded-lg pl-[12px]"
+              className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
             />
           </div>
           <div>
@@ -248,11 +246,11 @@ const OTPComp = ({
               placeholder="Enter Email"
               value={otpData?.email}
               onChange={handleChange}
-              className="border-2 border-[#4900A8] py-1 rounded-lg pl-[12px]"
+              className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
             />
           </div>
           <div className="w-[100%] flex flex-row">
-            <div className="flex   border-[#4900A8] rounded-lg border-2  w-[85%] flex-row justify-start">
+            <div className="flex   border-[#EC2752] rounded-lg border-2  w-[85%] flex-row justify-start">
               <span className="px-3 py-1 text-gray-600 bg-gray-200 rounded-lg">
                 +91
               </span>

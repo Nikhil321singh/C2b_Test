@@ -204,7 +204,7 @@ const QuotesCreatedAdmin = () => {
     <div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="navbar">

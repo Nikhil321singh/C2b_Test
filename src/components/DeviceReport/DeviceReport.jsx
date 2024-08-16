@@ -52,14 +52,14 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
             {!quoteSaved && (
               <p
                 onClick={clickHandler}
-                className="cursor-pointer pl-2 text-sm font-medium text-[#4900A8] underline underline-offset-2 hover:underline-offset-4"
+                className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
               >
                 Modify Answers
               </p>
             )}
             <IoClose
               size={25}
-              className="absolute right-2 text-[#4900A8] cursor-pointer"
+              className="absolute right-2 text-[#EC2752] cursor-pointer"
               onClick={closeHandler}
             />
           </div>
@@ -75,7 +75,7 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
                       key={item.index}
                       className="flex flex-row items-center w-full"
                     >
-                      <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                      <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                       <div className="flex justify-between w-[85%] questionkey">
                         <p className="text-sm font-medium opacity-60">
                           {item.quetion}
@@ -91,7 +91,7 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
                       key={item.index}
                       className="flex flex-row items-center w-full"
                     >
-                      <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                      <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                       <div className="flex justify-between w-[85%] questionkey">
                         <p className="text-sm font-medium opacity-60">
                           {item.quetion}
@@ -115,7 +115,7 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
                       key={item.index}
                       className="flex flex-row items-center w-full"
                     >
-                      <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                      <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                       <div className="flex justify-between w-[85%] questionkey">
                         <p className="text-sm font-medium opacity-60">
                           {item.quetion}
@@ -131,7 +131,7 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
                       key={item.index}
                       className="flex flex-row items-center w-full"
                     >
-                      <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                      <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                       <div className="flex justify-between w-[85%] questionkey">
                         <p className="text-sm font-medium opacity-60">
                           {item.quetion}
@@ -149,7 +149,7 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
               Warranty
             </p>
             <div className="flex div">
-              <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+              <LuDot size={25} className="shrink-0 text-[#EC2752]" />
               <p className="text-sm font-medium opacity-[0.8]">
                 What is your phone's age?
               </p>
@@ -204,14 +204,14 @@ const WatchPart = ({ clickHandler, closeHandler, data, quoteSaved }) => {
         {!quoteSaved && (
           <p
             onClick={clickHandler}
-            className="cursor-pointer pl-2 text-sm font-medium text-[#4900A8] underline underline-offset-2 hover:underline-offset-4"
+            className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
           >
             Modify Answers
           </p>
         )}
         <IoClose
           size={25}
-          className="absolute right-2 text-[#4900A8] cursor-pointer"
+          className="absolute right-2 text-[#EC2752] cursor-pointer"
           onClick={closeHandler}
         />
       </div>
@@ -222,7 +222,7 @@ const WatchPart = ({ clickHandler, closeHandler, data, quoteSaved }) => {
         <div className={`${styles.ques_wrap}`}>
           {data?.Accessories.map((item) => (
             <div key={item.index} className="flex flex-row items-center w-full">
-              <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+              <LuDot size={25} className="shrink-0 text-[#EC2752]" />
               <div className="flex justify-between w-[85%] questionkey">
                 <p className="text-sm font-medium opacity-60">{item.quetion}</p>
                 <p className="ml-2 text-base font-medium uppercase">
@@ -240,7 +240,7 @@ const WatchPart = ({ clickHandler, closeHandler, data, quoteSaved }) => {
         <div className={`${styles.ques_wrap}`}>
           {data?.Functional.map((item) => (
             <div key={item.index} className="flex flex-row items-center w-full">
-              <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+              <LuDot size={25} className="shrink-0 text-[#EC2752]" />
               <div className="flex justify-between w-[85%] questionkey">
                 <p className="text-sm font-medium opacity-60">{item.quetion}</p>
                 <p className="ml-2 text-base font-medium uppercase">
@@ -256,7 +256,7 @@ const WatchPart = ({ clickHandler, closeHandler, data, quoteSaved }) => {
         <div className={`${styles.ques_wrap}`}>
           {data?.Physical.map((item, ItemIndex) => (
             <div key={ItemIndex} className="flex flex-row w-full items-center">
-              <LuDot className="shrink-0 text-[#4900A8]" size={25} />
+              <LuDot className="shrink-0 text-[#EC2752]" size={25} />
               <div className="flex justify-between w-[85%] questionkey">
                 <p className="text-sm  opacity-60 font-medium">
                   {item.quetion}
@@ -279,7 +279,7 @@ const WatchPart = ({ clickHandler, closeHandler, data, quoteSaved }) => {
                   key={item.index}
                   className="flex flex-row items-center w-full"
                 >
-                  <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                  <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                   <div className="flex justify-between w-[85%] questionkey">
                     <p className="text-sm font-medium opacity-60">
                       {item.quetion}
@@ -310,7 +310,7 @@ const CoreCosDis = ({ data, quickData }) => {
                   key={item.index}
                   className="flex flex-row items-center w-full"
                 >
-                  <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                  <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                   <div className="flex justify-between w-[85%] questionkey">
                     <p className="text-sm font-medium opacity-60">
                       {item.quetion}
@@ -326,7 +326,7 @@ const CoreCosDis = ({ data, quickData }) => {
                   key={item.index}
                   className="flex flex-row items-center w-full"
                 >
-                  <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                  <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                   <div className="flex justify-between w-[85%] questionkey">
                     <p className="text-sm font-medium opacity-60">
                       {item.quetion}
@@ -348,7 +348,7 @@ const CoreCosDis = ({ data, quickData }) => {
                   key={item.index}
                   className="flex flex-row items-center w-full"
                 >
-                  <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                  <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                   <div className="flex justify-between w-[85%] questionkey">
                     <p className="text-sm font-medium opacity-60">
                       {item.quetion}
@@ -364,7 +364,7 @@ const CoreCosDis = ({ data, quickData }) => {
                   key={item.index}
                   className="flex flex-row items-center w-full"
                 >
-                  <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                  <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                   <div className="flex justify-between w-[85%] questionkey">
                     <p className="text-sm font-medium opacity-60">
                       {item.quetion}
@@ -386,7 +386,7 @@ const CoreCosDis = ({ data, quickData }) => {
                   key={item.index}
                   className="flex flex-row items-center w-full"
                 >
-                  <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                  <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                   <div className="flex justify-between w-[85%] questionkey">
                     <p className="text-sm font-medium opacity-60">
                       {item.quetion}
@@ -402,7 +402,7 @@ const CoreCosDis = ({ data, quickData }) => {
                   key={item.index}
                   className="flex flex-row items-center w-full"
                 >
-                  <LuDot size={25} className="shrink-0 text-[#4900A8]" />
+                  <LuDot size={25} className="shrink-0 text-[#EC2752]" />
                   <div className="flex justify-between w-[85%] questionkey">
                     <p className="text-sm font-medium opacity-60">
                       {item.quetion}

@@ -216,7 +216,7 @@ const QuoteModal = ({
                 handleClose();
               }}
               size={24}
-              className="text-[#4900A8] absolute top-5 right-4"
+              className="text-[#EC2752] absolute top-5 right-4"
             />
           </div>
         </section>
@@ -345,7 +345,7 @@ const OTPCOmp = ({
             )}
             <button
               onClick={onSignupDup}
-              className="text-white bg-[#4900A8] p-2 text-xl rounded-md"
+              className="text-white bg-[#EC2752] p-2 text-xl rounded-md"
             >
               Submit
             </button>
@@ -358,7 +358,7 @@ const OTPCOmp = ({
             <div className="flex tracking-tight">
               <p>Enter OTP sent to +91{ph}</p>
               <span
-                className="text-sm font-medium text-left ml-[2px] text-[#4900A8] flex items-center tracking-tight"
+                className="text-sm font-medium text-left ml-[2px] text-[#EC2752] flex items-center tracking-tight"
                 onClick={handleNumberEdit}
               >
                 <MdEdit /> Edit no.
@@ -381,7 +381,7 @@ const OTPCOmp = ({
           <div className="flex flex-row items-center justify-center text-sm font-medium">
             <span className="opacity-60">Didn't Receive OTP?</span>
             <button
-              className="ml-2 text-[#4900A8]"
+              className="ml-2 text-[#EC2752]"
               onClick={resendOTPDup}
               disabled={disableResend}
             >
@@ -391,7 +391,7 @@ const OTPCOmp = ({
           <button
             onClick={onOTPVerifyDup}
             disabled={loading}
-            className="text-white mt-8 bg-[#4900A8] p-2 text-xl rounded-md"
+            className="text-white mt-8 bg-[#EC2752] p-2 text-xl rounded-md"
           >
             Submit Otp
           </button>

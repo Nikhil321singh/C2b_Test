@@ -57,7 +57,7 @@ const CustomerUploadExcel = ({ closeModal }) => {
           />
           {loading && (
             <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-              <BeatLoader color={"#4900A8"} loading={loading} size={15} />
+              <BeatLoader color={"#EC2752"} loading={loading} size={15} />
             </div>
           )}
 
@@ -84,13 +84,13 @@ const CustomerUploadExcel = ({ closeModal }) => {
           </form>
           <button
             onClick={closeModal}
-            className="mt-4 px-4 py-2 bg-[#4900A8] text-white rounded hover:bg-[#D7203D] focus:outline-none"
+            className="mt-4 px-4 py-2 bg-[#EC2752] text-white rounded hover:bg-[#D7203D] focus:outline-none"
           >
             Close
           </button>
           <button
             onClick={handleSubmit}
-            className="mt-4 ml-2 px-4 py-2 bg-[#4900A8] text-white rounded hover:bg-[#D7203D] focus:outline-none"
+            className="mt-4 ml-2 px-4 py-2 bg-[#EC2752] text-white rounded hover:bg-[#D7203D] focus:outline-none"
           >
             Apply
           </button>

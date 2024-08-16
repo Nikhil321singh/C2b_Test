@@ -143,7 +143,7 @@ const SelectDevice = () => {
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         {isTableLoaded && (
           <div className="fixed top-0 left-0 z-100 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-            <BeatLoader color={"#4900AD"} loading={isTableLoaded} size={15} />
+            <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
           </div>
         )}
         <div className="flex items-center justify-between w-full pr-2">
@@ -188,7 +188,7 @@ const SelectDevice = () => {
           type="text"
         />
         <div
-          className="flex items-center justify-center bg-[#4900AD] h-[40px] w-[50px] cursor-pointer"
+          className="flex items-center justify-center bg-[#EC2752] h-[40px] w-[50px] cursor-pointer"
           onClick={fetchModels}
         >
           <IoMdSearch size={25} className="inline text-white" />

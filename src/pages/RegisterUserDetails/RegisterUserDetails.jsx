@@ -18,7 +18,7 @@ import RegisterUserEdit from "../../components/RegisterUserEdit/RegisterUserEdit
 import { useNavigate } from "react-router-dom";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#4900A8]";
+const failTextColor = "text-[#EC2752]";
 
 const downloadExcel = (dataDown) => {
   const fileType =
@@ -216,7 +216,7 @@ const RegisterUserDetails = () => {
               onClick={() => {
                 setFailBox(false);
               }}
-              className={"bg-[#4900A8] text-white"}
+              className={"bg-[#EC2752] text-white"}
             >
               Okay
             </button>
@@ -233,7 +233,7 @@ const RegisterUserDetails = () => {
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => deleteHandler(selectedUser)}
-                className={"bg-[#4900A8] text-white"}
+                className={"bg-[#EC2752] text-white"}
               >
                 Okay
               </button>
@@ -242,7 +242,7 @@ const RegisterUserDetails = () => {
                   setConfBox(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#4900A8]"
+                className="bg-white text-[#EC2752]"
               >
                 Cancel
               </button>
@@ -252,7 +252,7 @@ const RegisterUserDetails = () => {
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <TableFilters
@@ -354,8 +354,8 @@ const TableFilters = ({
 const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#4900A8]">
-        <thead className="bg-[#4900A8] text-white">
+      <table className="w-full border border-[#EC2752]">
+        <thead className="bg-[#EC2752] text-white">
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Name</th>

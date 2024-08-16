@@ -75,7 +75,7 @@ const AdminLogin = () => {
               <div className="input">
                 <MdOutlineLocationOn
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={{ margin: "0px 10px", color: "#EC2752" }}
                 />
                 <input
                   type="text"
@@ -93,7 +93,7 @@ const AdminLogin = () => {
               <div className="input">
                 <MdOutlineStorefront
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={{ margin: "0px 10px", color: "#EC2752" }}
                 />
                 <select
                   id="store"
@@ -124,7 +124,7 @@ const AdminLogin = () => {
               <div className="input">
                 <FaRegUser
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={{ margin: "0px 10px", color: "#EC2752" }}
                 />
                 <select
                   id="user"
@@ -152,7 +152,7 @@ const AdminLogin = () => {
               <div className="input">
                 <MdOutlineMailLock
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={{ margin: "0px 10px", color: "#EC2752" }}
                 />
                 <input
                   type="text"
@@ -171,7 +171,7 @@ const AdminLogin = () => {
               <div className="input">
                 <RiLockPasswordLine
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={{ margin: "0px 10px", color: "#EC2752" }}
                 />
                 <input
                   type="password"

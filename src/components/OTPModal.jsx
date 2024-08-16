@@ -60,7 +60,7 @@ const OTPModal = () => {
 
             <button
               onClick={handleDetailSubmit}
-              className="text-white bg-[#4900A8] p-2 rounded-md"
+              className="text-white bg-[#EC2752] p-2 rounded-md"
             >
               Submit
             </button>
@@ -78,7 +78,7 @@ const OTPModal = () => {
             autoFocus
             className="m-[20px] "
           ></OtpInput>
-          <button className="text-white bg-[#4900A8] p-2 rounded-md">
+          <button className="text-white bg-[#EC2752] p-2 rounded-md">
             Submit
           </button>
         </div>

@@ -18,12 +18,12 @@
 }
 .search_bar_wrap svg {
   transition: all 0.5s ease;
-  color: #4900a8;
+  color: #ec2752;
   width: 35px;
   padding: 5px;
 }
 .search_bar_wrap svg:hover {
-  background-color: #4900a8;
+  background-color: #ec2752;
   color: white;
   transform: rotate(360deg);
 }
@@ -37,7 +37,7 @@
 
 .date_box {
   color: white;
-  background-color: #4900a8;
+  background-color: #ec2752;
   border-radius: 0.55rem;
   font-weight: 500;
   font-size: 0.8rem;
@@ -58,7 +58,7 @@
 
 .icons_box {
   color: white;
-  background-color: #4900a8;
+  background-color: #ec2752;
   border-radius: 0.55rem;
   padding: 5px;
   display: flex;
@@ -70,7 +70,7 @@
 }
 
 .bulkdown_button {
-  color: #4900a8;
+  color: #ec2752;
   font-weight: 500;
   font-size: 0.9rem;
   display: flex;
@@ -91,7 +91,7 @@
 }
 
 .filter_button {
-  background-color: #4900a8;
+  background-color: #ec2752;
   color: white;
   font-weight: 500;
   font-size: 0.9rem;
@@ -116,7 +116,7 @@
 .filter_drop {
   position: absolute;
   z-index: 10;
-  color: #4900a8;
+  color: #ec2752;
   background-color: white;
   font-weight: 500;
   font-size: 0.9rem;
@@ -147,7 +147,7 @@
 }
 
 .filter_option:hover {
-  background-color: #4900a8;
+  background-color: #ec2752;
   color: white;
 }
 

@@ -115,7 +115,7 @@ const WatchQuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
           >
             <button
               onClick={() => setIsSearchOpen(false)}
-              className="p-1 bg-[#4900A8] text-white rounded"
+              className="p-1 bg-[#EC2752] text-white rounded"
             >
               <IoClose size={30} />
             </button>
@@ -130,7 +130,7 @@ const WatchQuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
             />
             <button
               onClick={(e) => setSearchQuery("")}
-              className="py-[7px] px-2 flex flex-col items-center justify-center bg-[#4900A8] text-white rounded"
+              className="py-[7px] px-2 flex flex-col items-center justify-center bg-[#EC2752] text-white rounded"
             >
               <p className="">Clear</p>
             </button>

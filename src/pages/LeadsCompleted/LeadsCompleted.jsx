@@ -288,7 +288,7 @@ const SubLeadsCompleted = ({
     <div className="overflow-y-hidden">
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={loading} size={15} />
+          <BeatLoader color={"#EC2752"} loading={loading} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -426,7 +426,7 @@ const SubLeadsCompleted = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#4900A8] text-white cursor-pointer"
+              : "bg-[#EC2752] text-white cursor-pointer"
           }`}
         >
           Previous
@@ -437,7 +437,7 @@ const SubLeadsCompleted = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#4900A8] text-white cursor-pointer"
+              : "bg-[#EC2752] text-white cursor-pointer"
           }`}
         >
           Next

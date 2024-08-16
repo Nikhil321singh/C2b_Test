@@ -15,7 +15,7 @@
 }
 
 .acpt_btn {
-  background-color: #4900a8;
+  background-color: #ec2752;
   color: white;
   padding: 1px 7px;
   border-radius: 0.25rem;
@@ -33,7 +33,7 @@
 
 .view_btn {
   background-color: white;
-  color: #4900a8;
+  color: #ec2752;
   padding: 1px 7px;
   border-radius: 0.25rem;
   box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158),
@@ -88,11 +88,11 @@
 .search_bar_wrap svg {
   margin-right: -5px;
   transition: all 0.5s ease;
-  color: #4900a8;
+  color: #ec2752;
   border-radius: 0.25rem;
 }
 .search_bar_wrap svg:hover {
-  background-color: #4900a8;
+  background-color: #ec2752;
   color: white;
 }
 
@@ -105,7 +105,7 @@
 
 .icons_box {
   color: white;
-  background-color: #4900a8;
+  background-color: #ec2752;
   border-radius: 0.55rem;
   padding: 4px;
   display: flex;
@@ -117,7 +117,7 @@
 }
 
 .bulkdown_button {
-  color: #4900a8;
+  color: #ec2752;
   border-radius: 0.55rem;
   font-size: 0.9rem;
   font-weight: bold;

@@ -34,7 +34,7 @@ const CustomerFormDetails = ({ QNAData, closeModal }) => {
                     <p className="text-xl">{question.quetion}</p>
                   </div>
                   <div className="ml-3 max-w-[200px] flex gap-20">
-                    <label className="font-medium text-[#4900A8]">
+                    <label className="font-medium text-[#EC2752]">
                       <input
                         type="radio"
                         value="yes"
@@ -43,7 +43,7 @@ const CustomerFormDetails = ({ QNAData, closeModal }) => {
                       />{" "}
                       Yes
                     </label>
-                    <label className="text-[#4900A8] font-medium">
+                    <label className="text-[#EC2752] font-medium">
                       <input
                         type="radio"
                         value="no"
@@ -61,7 +61,7 @@ const CustomerFormDetails = ({ QNAData, closeModal }) => {
 
         <button
           onClick={closeModal}
-          className="mt-4 px-4 py-2 bg-[#4900A8] text-white rounded hover:bg-[#D7203D] focus:outline-none"
+          className="mt-4 px-4 py-2 bg-[#EC2752] text-white rounded hover:bg-[#D7203D] focus:outline-none"
         >
           Close
         </button>

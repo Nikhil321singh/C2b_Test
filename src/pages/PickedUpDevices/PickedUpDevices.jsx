@@ -21,7 +21,7 @@ import { setStoreFilter } from "../../store/slices/userSlice";
 
 const userRoles = ["Pickup", "Payroll"];
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#4900A8]";
+const failTextColor = "text-[#EC2752]";
 const checkOnPkd = "Check it On Picked Up";
 const PendingConf = "Pending Pickup Confirmation";
 const PickConf = "Pending Delivery At Warehouse"; //Technican Earlier - Pickup Confirmed
@@ -299,7 +299,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailMode(false);
               }}
-              className={"bg-[#4900A8] text-white"}
+              className={"bg-[#EC2752] text-white"}
             >
               Okay
             </button>
@@ -316,7 +316,7 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => statusUpdHandler(tempId, ApprovDelivery)}
-                className={"bg-[#4900A8] text-white"}
+                className={"bg-[#EC2752] text-white"}
               >
                 Okay
               </button>
@@ -325,7 +325,7 @@ const ExtComps = ({
                   setConfMod(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#4900A8]"
+                className="bg-white text-[#EC2752]"
               >
                 Cancel
               </button>
@@ -335,7 +335,7 @@ const ExtComps = ({
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
         </div>
       )}
     </React.Fragment>
@@ -416,7 +416,7 @@ const PickedUpFilter = ({
         >
           <input
             id="datepicker"
-            style={{ color: "#4900A8" }}
+            style={{ color: "#EC2752" }}
             type="date"
             value={dateValue}
             onChange={dateChangeHandler}
@@ -566,8 +566,8 @@ const PickedUpDevicesTable = ({
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
           </div>
         )}
-        <table className="w-full border border-[#4900A8]">
-          <thead className="bg-[#4900A8] text-white">
+        <table className="w-full border border-[#EC2752]">
+          <thead className="bg-[#EC2752] text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
@@ -622,7 +622,11 @@ const PickedUpDevicesTable = ({
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, PendingConf, val?.uniqueCode)
+                              statusUpdateHandler(
+                                val?._id,
+                                PendingConf,
+                                val?.uniqueCode
+                              )
                             }
                             className={`${styles.acpt_btn}`}
                           >
@@ -654,7 +658,11 @@ const PickedUpDevicesTable = ({
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, PickConf, val?.uniqueCode)
+                              statusUpdateHandler(
+                                val?._id,
+                                PickConf,
+                                val?.uniqueCode
+                              )
                             }
                             className={`${styles.acpt_btn}`}
                           >
@@ -666,7 +674,11 @@ const PickedUpDevicesTable = ({
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() =>
-                              statusUpdateHandler(val?._id, PickDelivered, val?.uniqueCode)
+                              statusUpdateHandler(
+                                val?._id,
+                                PickDelivered,
+                                val?.uniqueCode
+                              )
                             }
                             className={`${styles.acpt_btn}`}
                           >

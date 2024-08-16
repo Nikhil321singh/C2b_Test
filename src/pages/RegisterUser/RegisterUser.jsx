@@ -8,7 +8,7 @@ import axios from "axios";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 
 const sucTextColor = "text-green-500";
-const failTextColor = "text-[#4900A8]";
+const failTextColor = "text-[#EC2752]";
 const role = ["Admin Manager", "Technician", "Sale User"];
 
 const getStore = async () => {
@@ -158,7 +158,7 @@ const RegisterUser = () => {
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
         </div>
       )}
       {(sucBox || failBox) && (
@@ -189,7 +189,7 @@ const RegisterUser = () => {
                 setFailBox(false);
               }}
               className={
-                sucBox ? "bg-green-500 text-white" : "text-white bg-[#4900A8]"
+                sucBox ? "bg-green-500 text-white" : "text-white bg-[#EC2752]"
               }
             >
               Okay
@@ -212,7 +212,7 @@ const RegisterUser = () => {
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <button
               onClick={() => navigate("/registeruserdetails")}
-              className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+              className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
             >
               View Details
             </button>
@@ -232,12 +232,7 @@ const RegisterUser = () => {
 
 export default RegisterUser;
 
-const UserForm = ({
-  formData,
-  submitHandler,
-  handleChange,
-  storeData,
-}) => {
+const UserForm = ({ formData, submitHandler, handleChange, storeData }) => {
   return (
     <form
       className="ml-10 flex flex-col gap-4"
@@ -377,7 +372,7 @@ const UserForm = ({
       <div className="mt-8">
         <button
           type="submit"
-          className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+          className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
         >
           Submit Form
         </button>

@@ -301,7 +301,7 @@ const UpperFilter = ({
     <React.Fragment>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -314,17 +314,17 @@ const UpperFilter = ({
           <select
             name=""
             id=""
-            className="bg-[#4900A8] text-white rounded-lg outline-none px-2 py-1"
+            className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
             onChange={(e) => setDeviceCategory(e.target.value)}
           >
             <option
-              className="bg-white text-[#4900A8] font-medium"
+              className="bg-white text-[#EC2752] font-medium"
               value="Mobile"
             >
               Mobile
             </option>
             <option
-              className="bg-white text-[#4900A8] hover:bg-[#4900A8] font-medium"
+              className="bg-white text-[#EC2752] hover:bg-[#EC2752] font-medium"
               value="Watch"
             >
               Watch
@@ -634,7 +634,7 @@ const TableCont = ({ currentPage, tableData, setCurrentPage, maxPages }) => {
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#4900A8] text-white cursor-pointer"
+              : "bg-[#EC2752] text-white cursor-pointer"
           }`}
         >
           Previous
@@ -645,7 +645,7 @@ const TableCont = ({ currentPage, tableData, setCurrentPage, maxPages }) => {
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#4900A8] text-white cursor-pointer"
+              : "bg-[#EC2752] text-white cursor-pointer"
           }`}
         >
           Next

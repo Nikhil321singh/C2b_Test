@@ -36,8 +36,8 @@
 }
 
 .option_selected {
-  background-color: #4900a8;
-  border: 1px solid #4900a8;
+  background-color: #ec2752;
+  border: 1px solid #ec2752;
   color: white;
   border-radius: 0.55rem;
   overflow: hidden;
@@ -57,7 +57,8 @@
 }
 
 .ansBox {
-  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.158), 1px 1px 0px 0px rgba(0, 0, 0, 0.034);
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.158),
+    1px 1px 0px 0px rgba(0, 0, 0, 0.034);
 }
 
 @media screen and (max-width: 767px) {

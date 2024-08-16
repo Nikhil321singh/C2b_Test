@@ -289,14 +289,14 @@ const SubSpecialOffers = ({
           <p className="text-xl">₹{Number(phonePrice)}</p>
           <p
             onClick={handleViewSummary}
-            className="text-[#4900A8] cursor-pointer"
+            className="text-[#EC2752] cursor-pointer"
           >
             View Summary
           </p>
         </div>
         <div
           onClick={handleSubmit}
-          className="bg-[#4900A8] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
+          className="bg-[#EC2752] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
         >
           {isLoading && (
             <CgSpinner

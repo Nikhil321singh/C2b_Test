@@ -20,7 +20,7 @@ const AdminFinalGrade = () => {
       <div className="w-[90%] mt-2 mx-auto">
         <button
           onClick={handleBack}
-          className="text-center  px-4 py-2 rounded-lg bg-[#4900A8] text-white cursor-pointer"
+          className="text-center  px-4 py-2 rounded-lg bg-[#EC2752] text-white cursor-pointer"
         >
           Back To Home
         </button>
