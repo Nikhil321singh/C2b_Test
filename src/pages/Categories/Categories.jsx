@@ -5,9 +5,6 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import styles from "../SelectDevice/SelectDevice.module.css";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import smasung from "../../assets/samsung-logo.png";
-import vivo from "../../assets/Vivo-Logo.png";
-import Oppo from "../../assets/Oppo.png";
 import Motorola from "../../assets/Motorola.png";
 import Lenovo from "../../assets/Lenovo.png";
 import Nokia from "../../assets/Nokia.png";
@@ -116,13 +113,6 @@ function Categories() {
   }, [deviceType]);
 
   const navigate = useNavigate();
-
-  const extraBrands = [
-    { name: "Motorola", logo: Motorola },
-    { name: "Lenovo", logo: Lenovo },
-    { name: "Nokia", logo: Nokia },
-    { name: "Honor", logo: Honor },
-  ];
 
   const handleBrandClick = (brandItem) => {
     console.log("morere", deviceType);
