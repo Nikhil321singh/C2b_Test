@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
 import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
-import { FaCamera } from "react-icons/fa";
+import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
-import { FaInfoCircle } from "react-icons/fa";
 const Price = ({ submitdata, userToken }) => {
   const userName = "";
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
@@ -41,8 +40,8 @@ const Price = ({ submitdata, userToken }) => {
   };
 
   const handleChange = (setMEthod, e) => {
-    const file = e.target.files[0];
-    setMEthod(file);
+    const doc = e.target.files[0];
+    setMEthod(doc);
   };
 
   const uploadAllImages = async () => {
@@ -431,7 +430,6 @@ const PhonePhotos1 = ({
 }) => {
   const Device = sessionStorage.getItem("DeviceType");
   const [showHoldModal, setShowHoldModal] = useState(false);
-  const [holdReason, setHoldReason] = useState("");
 
   return (
     <div className="flex flex-col adharcard mt-[10px] ">

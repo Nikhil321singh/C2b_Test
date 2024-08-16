@@ -8,8 +8,7 @@ import {
   updateFunctionalMinorObject,
   updateWarrantyObject,
 } from "../../store/slices/QNAslice";
-import { useDispatch, useSelector } from "react-redux";
-import { IoMdSearch } from "react-icons/io";
+import { useSelector } from "react-redux";
 import store from "../../store/store";
 const whiteText = "text-white";
 const blackText = "text-black";

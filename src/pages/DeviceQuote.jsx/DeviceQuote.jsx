@@ -32,7 +32,7 @@ const DeviceQuote = () => {
   const savedBonus = useSelector((state) => state.responseData?.bonus) || null;
   const [bonus, setBonus] = useState(savedBonus || null);
   const [termsChecked, setTermsChecked] = useState(false);
-  let ResponseData = useSelector((state) => state.responseData);
+  const ResponseData = useSelector((state) => state.responseData);
   const Price = useSelector((state) => state.responseData.price);
   const uniqueCode = useSelector((state) => state.responseData.uniqueCode);
   console.log(savedBonus, Price);
@@ -41,7 +41,7 @@ const DeviceQuote = () => {
   }, [uniqueCode]);
 
   const continueOTPHandler = () => {
-    let resData = {
+    const resData = {
       grade: ResponseData.grade,
       price: 0,
       bonus: 0,
@@ -103,11 +103,7 @@ const DeviceQuote = () => {
               <p className="font-medium text-gray-700">
                 {`${deviceModalInfo.models?.name}${
                   deviceModalInfo.models?.type === "Mobile"
-                    ? "(" +
-                      deviceModalInfo.models?.config?.RAM +
-                      "/" +
-                      deviceModalInfo.models?.config?.storage +
-                      ")"
+                    ? `(${deviceModalInfo.models?.config?.RAM}/${deviceModalInfo.models?.config?.storage})`
                     : ""
                 }`}
               </p>

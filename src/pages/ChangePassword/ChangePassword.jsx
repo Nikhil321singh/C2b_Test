@@ -5,11 +5,9 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import { MdOutlineMailLock } from "react-icons/md";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
-import userSlice from "../../store/slices/userSlice";
 
 const ChangePassword = () => {
   const [password, setPassword] = useState("");
@@ -20,7 +18,7 @@ const ChangePassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [showUserPassword, setShowUserPassword] = useState(false);
+  const showUserPassword = false;
   const [showUserPassword2, setShowUserPassword2] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const navigate = useNavigate();
@@ -35,8 +33,6 @@ const ChangePassword = () => {
   };
 
   const passwordValidation = () => {
-    const passRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     const lCaseRegex = /[a-z]/;
     const uCaseRegex = /[A-Z]/;
     const numRegex = /\d/;
@@ -98,7 +94,6 @@ const ChangePassword = () => {
     ) {
       setIsValid(true);
       setErrMsg("Password Matched Please Submit");
-      return;
     } else {
       setIsValid(false);
     }

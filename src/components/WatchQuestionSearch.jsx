@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import {
   updateCoreObject,
@@ -8,100 +8,13 @@ import {
   updateFunctionalMinorObject,
   updateWarrantyObject,
 } from "../store/slices/QNAslice";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import store from "../store/store";
 
 const WatchQuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredQuestions, setFilteredQuestions] = useState([]);
-  const qnaAnswer = useSelector((AnsState) => AnsState.qna);
 
-  const handleSearch = () => {
-    console.log(state);
-    const uniqueQuestions = new Set();
-
-    const filtered = Object.entries(state).flatMap(
-      ([groupKey, group], groupIndex) =>
-        group
-          .filter((question, questionIndex) => {
-            return (
-              question.quetion
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) ||
-              groupKey.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-          })
-          .map((question, questionIndex) => ({
-            ...question,
-            questionIndex: questionIndex,
-            groupKey: groupKey,
-          }))
-    );
-    console.log(filtered);
-    setFilteredQuestions(filtered);
-  };
-
-  const handleChange = (event, index, group, optionIndex, yesKey, noKey) => {
-    if (group === "Core") {
-      store.dispatch(
-        updateCoreObject({
-          index: index,
-          yesKey: yesKey,
-          noKey: noKey,
-          newKey: "yes",
-          selectedIndex: optionIndex,
-        })
-      );
-    } else if (group === "Cosmetics") {
-      store.dispatch(
-        updateCosmeticsObject({
-          index: index,
-          yesKey: yesKey,
-          noKey: noKey,
-          newKey: "yes",
-          selectedIndex: optionIndex,
-        })
-      );
-    } else if (group === "Display") {
-      store.dispatch(
-        updateDisplayObject({
-          index: index,
-          yesKey: yesKey,
-          noKey: noKey,
-          newKey: "yes",
-          selectedIndex: optionIndex,
-        })
-      );
-    } else if (group === "Functional_major") {
-      store.dispatch(
-        updateFunctionalMajorObject({
-          index: index,
-          yesKey: yesKey,
-          noKey: noKey,
-          newKey: "yes",
-          selectedIndex: optionIndex,
-        })
-      );
-    } else if (group === "Functional_minor") {
-      store.dispatch(
-        updateFunctionalMinorObject({
-          index: index,
-          yesKey: yesKey,
-          noKey: noKey,
-          newKey: "yes",
-          selectedIndex: optionIndex,
-        })
-      );
-    } else if (group === "Warranty") {
-      store.dispatch(
-        updateWarrantyObject({
-          index: index,
-          newAnswer: yesKey,
-          newKey: "yes",
-        })
-      );
-    }
-  };
   return (
     <>
       <div className="fixed top-0 left-0 w-full min-h-full bg-white z-50">

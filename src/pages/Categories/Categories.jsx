@@ -5,7 +5,6 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import styles from "../SelectDevice/SelectDevice.module.css";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import mi from "../../assets/mi-logo.jpg";
 import smasung from "../../assets/samsung-logo.png";
 import vivo from "../../assets/Vivo-Logo.png";
 import Oppo from "../../assets/Oppo.png";
@@ -18,21 +17,7 @@ import mobile from "../../assets/mobile-logo.png";
 import watch from "../../assets/watch_logo.png";
 import { ImCancelCircle } from "react-icons/im";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import poco from "../../assets/POCO.png";
-import real from "../../assets/real-logo.png";
 
-const brandImages = {
-  Apple: (logo) => <img className="w-[80px] mb-2" src={logo} alt="Apple" />,
-  OnePlus: (logo) => <img className="w-[80px] mb-2" src={logo} alt="OnePlus" />,
-  POCO: (logo) => <img className="mx-auto" src={logo} alt="POCO" />,
-  Realme: (logo) => <img className="mx-auto" src={logo} alt="Realme" />,
-  Xiaomi: (logo) => (
-    <img className="mx-auto w-[50px]" src={logo} alt="Xiaomi" />
-  ),
-  Samsung: () => <img className="mx-auto" src={smasung} alt="Samsung" />,
-  Vivo: () => <img className="mx-auto" src={vivo} alt="Vivo" />,
-  OPPO: () => <img className="mx-auto" src={Oppo} alt="OPPO" />,
-};
 
 export const DeviceTypeFilter = ({
   setSelectedBtn,

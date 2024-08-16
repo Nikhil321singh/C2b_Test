@@ -20,7 +20,8 @@ import AdminNavbar from "../../components/Admin_Navbar";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { useDispatch, useSelector } from "react-redux";
 import { setStoreFilter } from "../../store/slices/userSlice";
-
+const buttonStyles = "bg-[#EC2752] text-white";
+const updateStatusError = "Failed to update status";
 const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
 const PickupAvail = "Available For Pickup";
@@ -372,7 +373,7 @@ const ExtComps = ({
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
-              className={"bg-[#EC2752] text-white"}
+              className={buttonStyles}
               onClick={() => {
                 setFailMode(false);
               }}
@@ -392,7 +393,7 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={reqPickupHandler}
-                className={"bg-[#EC2752] text-white"}
+                className={buttonStyles}
               >
                 Okay
               </button>
@@ -755,7 +756,7 @@ const PDTable = ({
       })
       .catch((error) => {
         setIsTableLoaded(false);
-        setErrorMsg("Failed to update status");
+        setErrorMsg(updateStatusError);
         setFailMode(true);
       });
     setSelectedStatus("");
@@ -791,7 +792,7 @@ const PDTable = ({
       })
       .catch((error) => {
         setIsTableLoaded(false);
-        setErrorMsg("Failed to update status");
+        setErrorMsg(updateStatusError);
         setFailMode(true);
       });
     setShowCancelModal(false);
@@ -826,7 +827,7 @@ const PDTable = ({
       })
       .catch((error) => {
         setIsTableLoaded(false);
-        setErrorMsg("Failed to update status");
+        setErrorMsg(updateStatusError);
         setFailMode(true);
       });
     setShowHoldModal(false);
@@ -887,7 +888,7 @@ const PDTable = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={handleCancelSubmit}
-                className={"bg-[#EC2752] text-white"}
+                className={buttonStyles}
               >
                 Okay
               </button>
@@ -919,7 +920,7 @@ const PDTable = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={handleHoldSubmit}
-                className={"bg-[#EC2752] text-white"}
+                className={buttonStyles}
               >
                 Okay
               </button>
