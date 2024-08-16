@@ -502,8 +502,8 @@ const SelectDeviceType = () => {
     setData(`${temp?.brand} ${temp?.model}`);
   };
 
-  const searchPhone = async (tempData, deviceType) => {
-    const tempRes = await searchPhoneAPI(tempData, deviceType);
+  const searchPhone = async (tempData, typeDevice) => {
+    const tempRes = await searchPhoneAPI(tempData, typeDevice);
     setModel(tempRes || []);
   };
 
@@ -814,7 +814,7 @@ const MiddlePart = ({
               <OrderStatusBox
                 figures={orderCount}
                 title="Order Created"
-                background="#0275F2"
+                background="#E94A4E"
               />
             </Link>
             <Link className="w-[33%]" to={`/orderscompleted/${days}`}>

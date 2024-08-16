@@ -7,11 +7,11 @@ function SideMenu({ setsideMenu, sideMenu }) {
 
   const handleHome = () => {
     setsideMenu(!sideMenu);
-    if(profile.role === "Super Admin"){
+    if (profile.role === "Super Admin") {
       navigate("/adminmodels");
-    }else if(profile.role === "Admin Manager"){
+    } else if (profile.role === "Admin Manager") {
       navigate("/customertable");
-    }else if(profile.role === "Technician"){
+    } else if (profile.role === "Technician") {
       navigate("/devicepickupdashboard");
     }
   };
@@ -143,13 +143,13 @@ function SideMenu({ setsideMenu, sideMenu }) {
               Pickup & Cancel Device
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleTechnician}
+              className="text-[20px] cursor-pointer font-[300] "
             >
               Technician Report
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="font-[300] cursor-pointer text-[20px] "
               onClick={adminDashboard}
             >
               Admin Dashboard
@@ -166,14 +166,14 @@ function SideMenu({ setsideMenu, sideMenu }) {
       {profile.role === "Admin Manager" && (
         <div
           className={
-            "menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center justify-center transition-all duration-950 ease-in " +
+            "menu fixed justify-center left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center transition-all duration-950 ease-in " +
             (sideMenu && "left-[0]")
           }
         >
           <ul className="list-none flex flex-col h-full pl-[6%] pt-[10%] justify-start gap-[2vh]">
             <li
-              className="text-[20px] font-[300] cursor-pointer "
               onClick={handleHome}
+              className="text-[20px] font-[300] cursor-pointer "
             >
               Home
             </li>

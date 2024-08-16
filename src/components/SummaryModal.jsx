@@ -2,8 +2,6 @@ import React from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import { useSelector } from "react-redux";
 const SummaryModal = ({ show, onClose, price, bonus }) => {
-  const BasePrice = useSelector((state) => state.responseData.price);
-
   return (
     <div
       className={`fixed bg-white rounded-l-3xl rounded-r-3xl bottom-0 left-0 w-full p-4 transition-all 

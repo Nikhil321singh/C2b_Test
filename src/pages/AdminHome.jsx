@@ -224,7 +224,7 @@ const AdminHome = () => {
 const CreateQuestion = ({
   closeHandler,
   setGroup,
-  options,
+  option,
   question,
   setQuestion,
   setYes,
@@ -258,7 +258,7 @@ const CreateQuestion = ({
             }}
           >
             <option value="">Select Group</option>
-            {Object.keys(options).map((option) => (
+            {Object.keys(option).map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
