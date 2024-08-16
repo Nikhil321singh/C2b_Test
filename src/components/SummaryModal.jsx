@@ -1,6 +1,5 @@
 import React from "react";
 import { IoCloseCircle } from "react-icons/io5";
-import { useSelector } from "react-redux";
 const SummaryModal = ({ show, onClose, price, bonus }) => {
   return (
     <div

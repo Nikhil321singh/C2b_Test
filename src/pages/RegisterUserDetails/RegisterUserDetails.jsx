@@ -206,49 +206,15 @@ const RegisterUserDetails = () => {
           </div>
         </div>
       )}
-      {failBox && (
-        <div className="fixed top-0 left-0 z-50 justify-center flex items-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <IoIosCloseCircle size={90} className={failTextColor} />
-            <h6 className={failTextColor}>Error!</h6>
-            <p className="text-slate-500">{errMsg}</p>
-            <button
-              onClick={() => {
-                setFailBox(false);
-              }}
-              className={"bg-[#EC2752] text-white"}
-            >
-              Okay
-            </button>
-          </div>
-        </div>
-      )}
+      {failBox && <FailBox errMsg={errMsg} setFailBox={setFailBox} />}
       {confBox && (
-        <div className="fixed z-50 top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <h6 className={failTextColor}>Confirmation!</h6>
-            <p className="text-slate-500">
-              {`Do you want to delete user with email - ${selectedEmail} ?`}
-            </p>
-            <div className="flex flex-row gap-2">
-              <button
-                onClick={() => deleteHandler(selectedUser)}
-                className={"bg-[#EC2752] text-white"}
-              >
-                Okay
-              </button>
-              <button
-                onClick={() => {
-                  setConfBox(false);
-                  setIsTableLoaded(false);
-                }}
-                className="bg-white text-[#EC2752]"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfBox
+          selectedEmail={selectedEmail}
+          deleteHandler={deleteHandler}
+          selectedUser={selectedUser}
+          setIsTableLoaded={setIsTableLoaded}
+          setConfBox={setConfBox}
+        />
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
@@ -276,6 +242,61 @@ const RegisterUserDetails = () => {
 };
 
 export default RegisterUserDetails;
+
+const FailBox = ({ errMsg, setFailBox }) => {
+  return (
+    <div className="fixed top-0 left-0 z-50 justify-center flex items-center w-full h-full bg-black bg-opacity-50">
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <IoIosCloseCircle size={90} className={failTextColor} />
+        <h6 className={failTextColor}>Error!</h6>
+        <p className="text-slate-500">{errMsg}</p>
+        <button
+          onClick={() => {
+            setFailBox(false);
+          }}
+          className={"bg-[#EC2752] text-white"}
+        >
+          Okay
+        </button>
+      </div>
+    </div>
+  );
+};
+const ConfBox = ({
+  selectedEmail,
+  deleteHandler,
+  selectedUser,
+  setIsTableLoaded,
+  setConfBox,
+}) => {
+  return (
+    <div className="fixed z-50 top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>Confirmation!</h6>
+        <p className="text-slate-500">
+          {`Do you want to delete user with email - ${selectedEmail} ?`}
+        </p>
+        <div className="flex flex-row gap-2">
+          <button
+            onClick={() => deleteHandler(selectedUser)}
+            className={"bg-[#EC2752] text-white"}
+          >
+            Okay
+          </button>
+          <button
+            onClick={() => {
+              setConfBox(false);
+              setIsTableLoaded(false);
+            }}
+            className="bg-white text-[#EC2752]"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const TableFilters = ({
   setSearchValue,

@@ -391,10 +391,7 @@ const ExtComps = ({
               {`Do you want to send ${selectedIds.length} devices for Pickup ?`}
             </p>
             <div className="flex flex-row gap-2">
-              <button
-                onClick={reqPickupHandler}
-                className={buttonStyles}
-              >
+              <button onClick={reqPickupHandler} className={buttonStyles}>
                 Okay
               </button>
               <button
@@ -682,8 +679,6 @@ const PDTable = ({
   getData,
 }) => {
   const token2 = sessionStorage.getItem("authToken");
-  const [cancelReason, setCancelReason] = useState("");
-  const [holdReason, setHoldReason] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showHoldModal, setShowHoldModal] = useState(false);
 
@@ -762,78 +757,6 @@ const PDTable = ({
     setSelectedStatus("");
   };
 
-  const handleCancelSubmit = () => {
-    setIsTableLoaded(true);
-    const config = {
-      method: "post",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/update`,
-      headers: {
-        Authorization: token2,
-      },
-      data: {
-        deviceIDs: selectedIds,
-        newStatus: "Cancelled",
-        reason: cancelReason,
-      },
-    };
-    axios
-      .request(config)
-      .then((response) => {
-        getData();
-        setSelectedIds([]);
-        setSelectedData([]);
-        setSelectedRows([]);
-        setErrorMsg(`Successfully created Cancelled Lot`);
-        setErrorMsg1(`Lot Id: ${response.data.data._id}`);
-        setErrorMsg2(`Check it on Outstanding`);
-        setSuccessMod(true);
-      })
-      .catch((error) => {
-        setIsTableLoaded(false);
-        setErrorMsg(updateStatusError);
-        setFailMode(true);
-      });
-    setShowCancelModal(false);
-    setCancelReason("");
-  };
-
-  const handleHoldSubmit = () => {
-    setIsTableLoaded(true);
-    const config = {
-      method: "post",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/update`,
-      headers: {
-        Authorization: token2,
-      },
-      data: {
-        deviceIDs: selectedIds,
-        newStatus: "On Hold",
-        reason: holdReason,
-      },
-    };
-    axios
-      .request(config)
-      .then((response) => {
-        getData();
-        setSelectedIds([]);
-        setSelectedData([]);
-        setSelectedRows([]);
-        setErrorMsg(`Successfully updated status to On Hold`);
-        setSuccessMod(true);
-      })
-      .catch((error) => {
-        setIsTableLoaded(false);
-        setErrorMsg(updateStatusError);
-        setFailMode(true);
-      });
-    setShowHoldModal(false);
-    setHoldReason("");
-  };
-
   const confHandler = () => {
     setIsTableLoaded(true);
     if (selectedIds.length === 0) {
@@ -875,68 +798,201 @@ const PDTable = ({
       </div>
 
       {showCancelModal && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <h6 className={failTextColor}>Cancellation Reason</h6>
-            <input
-              type="text"
-              value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
-              className="border-2 border-[#EC2752] rounded-md px-4 py-2 mb-4 w-full"
-              placeholder="Enter Reason for Cancellation"
-            />
-            <div className="flex flex-row gap-2">
-              <button
-                onClick={handleCancelSubmit}
-                className={buttonStyles}
-              >
-                Okay
-              </button>
-              <button
-                onClick={() => {
-                  setShowCancelModal(false);
-                  setIsTableLoaded(false);
-                }}
-                className="bg-white text-[#EC2752]"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        <CancelModal
+          setShowCancelModal={setShowCancelModal}
+          setIsTableLoaded={setIsTableLoaded}
+          token2={token2}
+          selectedIds={selectedIds}
+          getData={getData}
+          setSelectedIds={setSelectedIds}
+          setSelectedData={setSelectedData}
+          setSelectedRows={setSelectedRows}
+          setErrorMsg={setErrorMsg}
+          setErrorMsg1={setErrorMsg1}
+          setErrorMsg2={setErrorMsg2}
+          setSuccessMod={setSuccessMod}
+          setFailMode={setFailMode}
+        />
       )}
 
       {showHoldModal && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <h6 className={failTextColor}>Hold Reason</h6>
-            <input
-              type="text"
-              value={holdReason}
-              onChange={(e) => setHoldReason(e.target.value)}
-              className="border-2 border-[#EC2752] rounded-md px-4 py-2 mb-4 w-full"
-              placeholder="Enter Reason for Hold"
-            />
-            <div className="flex flex-row gap-2">
-              <button
-                onClick={handleHoldSubmit}
-                className={buttonStyles}
-              >
-                Okay
-              </button>
-              <button
-                onClick={() => {
-                  setShowHoldModal(false);
-                  setIsTableLoaded(false);
-                }}
-                className="bg-white text-[#EC2752]"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        <HoldModal
+          setShowHoldModal={setShowHoldModal}
+          setIsTableLoaded={setIsTableLoaded}
+          token2={token2}
+          selectedIds={selectedIds}
+          getData={getData}
+          setSelectedIds={setSelectedIds}
+          setSelectedData={setSelectedData}
+          setSelectedRows={setSelectedRows}
+          setErrorMsg={setErrorMsg}
+          setSuccessMod={setSuccessMod}
+          setFailMode={setFailMode}
+        />
       )}
     </React.Fragment>
+  );
+};
+
+const CancelModal = ({
+  setShowCancelModal,
+  setIsTableLoaded,
+  token2,
+  selectedIds,
+  getData,
+  setSelectedIds,
+  setSelectedData,
+  setSelectedRows,
+  setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
+  setSuccessMod,
+  setFailMode,
+}) => {
+  const [cancelReason, setCancelReason] = useState("");
+
+  const handleCancelSubmit = () => {
+    setIsTableLoaded(true);
+    const config = {
+      method: "post",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/update`,
+      headers: {
+        Authorization: token2,
+      },
+      data: {
+        deviceIDs: selectedIds,
+        newStatus: "Cancelled",
+        reason: cancelReason,
+      },
+    };
+    axios
+      .request(config)
+      .then((response) => {
+        getData();
+        setSelectedIds([]);
+        setSelectedData([]);
+        setSelectedRows([]);
+        setErrorMsg(`Successfully created Cancelled Lot`);
+        setErrorMsg1(`Lot Id: ${response.data.data._id}`);
+        setErrorMsg2(`Check it on Outstanding`);
+        setSuccessMod(true);
+      })
+      .catch((error) => {
+        setIsTableLoaded(false);
+        setErrorMsg(updateStatusError);
+        setFailMode(true);
+      });
+    setShowCancelModal(false);
+    setCancelReason("");
+  };
+
+  return (
+    <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>Cancellation Reason</h6>
+        <input
+          type="text"
+          value={cancelReason}
+          onChange={(e) => setCancelReason(e.target.value)}
+          className="border-2 border-[#EC2752] rounded-md px-4 py-2 mb-4 w-full"
+          placeholder="Enter Reason for Cancellation"
+        />
+        <div className="flex flex-row gap-2">
+          <button onClick={handleCancelSubmit} className={buttonStyles}>
+            Okay
+          </button>
+          <button
+            onClick={() => {
+              setShowCancelModal(false);
+              setIsTableLoaded(false);
+            }}
+            className="bg-white text-[#EC2752]"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const HoldModal = ({
+  setShowHoldModal,
+  setIsTableLoaded,
+  token2,
+  selectedIds,
+  getData,
+  setSelectedIds,
+  setSelectedData,
+  setSelectedRows,
+  setErrorMsg,
+  setSuccessMod,
+  setFailMode,
+}) => {
+  const [holdReason, setHoldReason] = useState("");
+
+  const handleHoldSubmit = () => {
+    setIsTableLoaded(true);
+    const config = {
+      method: "post",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/update`,
+      headers: {
+        Authorization: token2,
+      },
+      data: {
+        deviceIDs: selectedIds,
+        newStatus: "On Hold",
+        reason: holdReason,
+      },
+    };
+    axios
+      .request(config)
+      .then((response) => {
+        getData();
+        setSelectedIds([]);
+        setSelectedData([]);
+        setSelectedRows([]);
+        setErrorMsg(`Successfully updated status to On Hold`);
+        setSuccessMod(true);
+      })
+      .catch((error) => {
+        setIsTableLoaded(false);
+        setErrorMsg(updateStatusError);
+        setFailMode(true);
+      });
+    setShowHoldModal(false);
+    setHoldReason("");
+  };
+  return (
+    <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>Hold Reason</h6>
+        <input
+          type="text"
+          value={holdReason}
+          onChange={(e) => setHoldReason(e.target.value)}
+          className="border-2 border-[#EC2752] rounded-md px-4 py-2 mb-4 w-full"
+          placeholder="Enter Reason for Hold"
+        />
+        <div className="flex flex-row gap-2">
+          <button onClick={handleHoldSubmit} className={buttonStyles}>
+            Okay
+          </button>
+          <button
+            onClick={() => {
+              setShowHoldModal(false);
+              setIsTableLoaded(false);
+            }}
+            className="bg-white text-[#EC2752]"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };

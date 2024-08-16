@@ -595,56 +595,12 @@ const PickedUpDevicesTable = ({
                   )}
                   {(userRole === "Super Admin" ||
                     userRole === "Admin Manager") && (
-                    <div className="flex flex-col gap-1">
-                      <button
-                        className={`${styles.view_btn}`}
-                        onClick={() => viewHandler(val?._id)}
-                      >
-                        View
-                      </button>
-                      {val?.status === "Pending Payment Confirmation" && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() =>
-                              statusUpdateHandler(
-                                val?._id,
-                                "Pending Admin Approval",
-                                val?.uniqueCode
-                              )
-                            }
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Confirm Payment
-                          </button>
-                        </div>
-                      )}
-                      {val?.status === "Pending Admin Approval" && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() =>
-                              statusUpdateHandler(
-                                val?._id,
-                                PendingConf,
-                                val?.uniqueCode
-                              )
-                            }
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Accept
-                          </button>
-                        </div>
-                      )}
-                      {val?.status === PickDelivered && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() => confHandler(val?._id)}
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Approve Delivery
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    <UserAdminContent
+                      confHandler={confHandler}
+                      val={val}
+                      statusUpdateHandler={statusUpdateHandler}
+                      viewHandler={viewHandler}
+                    />
                   )}
                   {userRole === "Technician" && (
                     <div className="flex flex-col gap-1">
@@ -709,6 +665,62 @@ const PickedUpDevicesTable = ({
           </tbody>
         </table>
       </div>
+    </div>
+  );
+};
+
+const UserAdminContent = ({
+  confHandler,
+  val,
+  statusUpdateHandler,
+  viewHandler,
+}) => {
+  return (
+    <div className="flex flex-col gap-1">
+      <button
+        className={`${styles.view_btn}`}
+        onClick={() => viewHandler(val?._id)}
+      >
+        View
+      </button>
+      {val?.status === "Pending Payment Confirmation" && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() =>
+              statusUpdateHandler(
+                val?._id,
+                "Pending Admin Approval",
+                val?.uniqueCode
+              )
+            }
+            className={`${styles.acpt_btn}`}
+          >
+            Confirm Payment
+          </button>
+        </div>
+      )}
+      {val?.status === "Pending Admin Approval" && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() =>
+              statusUpdateHandler(val?._id, PendingConf, val?.uniqueCode)
+            }
+            className={`${styles.acpt_btn}`}
+          >
+            Accept
+          </button>
+        </div>
+      )}
+      {val?.status === PickDelivered && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => confHandler(val?._id)}
+            className={`${styles.acpt_btn}`}
+          >
+            Approve Delivery
+          </button>
+        </div>
+      )}
     </div>
   );
 };

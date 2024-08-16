@@ -169,7 +169,6 @@ const AdminHome = () => {
           <CreateQuestion
             closeHandler={closeHandler}
             setGroup={setGroup}
-            options={options}
             question={question}
             setQuestion={setQuestion}
             setYes={setYes}
@@ -224,7 +223,6 @@ const AdminHome = () => {
 const CreateQuestion = ({
   closeHandler,
   setGroup,
-  options,
   question,
   setQuestion,
   setYes,

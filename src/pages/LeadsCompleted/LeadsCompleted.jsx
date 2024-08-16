@@ -123,7 +123,9 @@ const LeadsCompleted = () => {
     setLoading(true);
     const endpoint = `${
       import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=${fromDateDup}&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=${search1}&deviceType=${deviceType}`;
+    }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=
+    ${fromDateDup}&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=
+    ${search1}&deviceType=${deviceType}`;
     axios
       .get(endpoint, {
         headers: { authorization: userToken },
