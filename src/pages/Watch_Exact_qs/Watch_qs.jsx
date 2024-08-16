@@ -17,7 +17,6 @@ import useUserProfile from "../../utils/useUserProfile";
 import { CgSpinner } from "react-icons/cg";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack } from "react-icons/io";
-import QuestionSearch from "../../components/QuestionSearch/QuestionSearch";
 import store from "../../store/store";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import question1 from "../../assets/question1.png";

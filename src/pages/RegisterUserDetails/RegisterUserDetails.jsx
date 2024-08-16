@@ -199,7 +199,7 @@ const RegisterUserDetails = () => {
               onClick={() => {
                 setSucBox(false);
               }}
-              className={"bg-green-500 text-white"}
+              className={"text-white bg-green-500"}
             >
               Okay
             </button>
@@ -207,9 +207,9 @@ const RegisterUserDetails = () => {
         </div>
       )}
       {failBox && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div className="fixed top-0 left-0 z-50 justify-center flex items-center w-full h-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <IoIosCloseCircle className={failTextColor} size={90} />
+            <IoIosCloseCircle size={90} className={failTextColor} />
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
@@ -224,7 +224,7 @@ const RegisterUserDetails = () => {
         </div>
       )}
       {confBox && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div className="fixed z-50 top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${failTextColor}`}>
             <h6 className={failTextColor}>Confirmation!</h6>
             <p className="text-slate-500">

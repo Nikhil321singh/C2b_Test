@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import { React, useEffect, useReducer, useState } from "react";
 import "./newDeviceqs.scss";
 import { useQuestionContext } from "../../components/QuestionContext";
 import axios from "axios";
@@ -465,7 +465,7 @@ const FirstPart = ({ NDstate, core }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#ec275271] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -498,8 +498,8 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
                               index: index,
                               yesKey: data.yes,
                               noKey: data.no,
-                              newKey: "yes",
                               selectedIndex: optionIndex,
+                              newKey: "yes",
                             })
                           );
                         }}
@@ -511,11 +511,11 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
                       >
                         <div className="mt-3 mb-1 rounded-md overflow-hidden">
                           <img
-                            className="scale-[1.2]"
                             src={imageMap[option.img]}
+                            className="scale-[1.2]"
                           />
                         </div>
-                        <div className="border-t-[1.5px] w-full py-2">
+                        <div className="w-full border-t-[1.5px] py-2">
                           <p
                             className={`text-xs font-medium text-center ${
                               !Cosmetics[index].selected[optionIndex]
@@ -536,7 +536,7 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
             }
           })}
       </div>
-      <div className="flex flex mt-4 bg-[#ec275271] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -596,7 +596,7 @@ const ThirdPart = ({ NDstate, Display }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#ec275271] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -658,7 +658,7 @@ const FourthPart = ({ FunctionalMajor, NDstate }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#ec275271] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -720,7 +720,7 @@ const FifthPart = ({ FunctionalMinor, NDstate }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#ec275271] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -743,6 +743,11 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
                   {data?.options.map((option, optionIndex) => (
                     <React.Fragment key={optionIndex}>
                       <div
+                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                          !Cosmetics[index].selected[optionIndex]
+                            ? whiteBg
+                            : pinkBg
+                        }`}
                         onClick={(e) => {
                           console.log(Cosmetics);
                           console.log("assssaaaaa", option);
@@ -750,19 +755,14 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
                           console.log(optionIndex + "ok");
                           store.dispatch(
                             updateCosmeticsObject({
+                              noKey: data.no,
                               index: index,
                               yesKey: data.yes,
-                              noKey: data.no,
                               newKey: "yes",
                               selectedIndex: optionIndex,
                             })
                           );
                         }}
-                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                          !Cosmetics[index].selected[optionIndex]
-                            ? whiteBg
-                            : pinkBg
-                        }`}
                       >
                         <div className="mt-3 mb-1 rounded-md overflow-hidden">
                           <img
@@ -791,7 +791,7 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
             }
           })}
       </div>
-      <div className="flex flex mt-4 bg-[#ec275271] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>

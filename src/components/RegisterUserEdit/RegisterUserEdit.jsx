@@ -280,19 +280,19 @@ const RegisterUserEditSub = ({
           >
             <option value="">None</option>
             {storeData.map((item) => (
-              <option key={item._id} value={item._id}>
+              <option value={item._id} key={item._id}>
                 {`${item.storeName}, ${item.region}`}
               </option>
             ))}
           </select>
         </label>
-        <label className="flex flex-col w-[70%] gap-2">
+        <label className="flex w-[70%] flex-col gap-2">
           <span className="font-medium text-xl">Role*</span>
           <select
             id="role"
+            className="outline-none text-base border-2 px-2 py-2 rounded-lg"
             name="role"
             value={formData.role}
-            className="outline-none text-base border-2 px-2 py-2 rounded-lg"
             onChange={handleChange}
             required
           >
@@ -309,8 +309,8 @@ const RegisterUserEditSub = ({
           <input
             name="city"
             id="city"
-            placeholder="Enter your city name"
             value={formData.city}
+            placeholder="Enter your city name"
             onChange={handleChange}
             className="border-2 px-2 py-2 rounded-lg  outline-none"
             type="text"
