@@ -6,7 +6,6 @@ import { useDispatch } from "react-redux";
 import watch from "../../assets/apple_watch.png";
 
 export const DeleteModal = ({ onCancel, onConfirm }) => {
-  const savedQuote = "Quote Saved";
   return (
     <div className="fixed z-50 flex items-center justify-center w-full h-full mx-2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
       <div className="absolute top-0 left-0 w-full h-full bg-gray-800 opacity-50"></div>
@@ -90,6 +89,7 @@ const OrdersCard = ({
   };
 
   const handleInitiate = () => {
+    const savedQuote = "Quote Saved";
     if (isExpired()) {
       return;
     }
