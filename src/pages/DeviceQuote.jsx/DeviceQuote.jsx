@@ -196,47 +196,68 @@ const DeviceQuote = () => {
             </p>
           </div>
         )}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex flex-col w-1/2 text-xl font-medium">
-            <p>
-              ₹
-              {savedBonus
-                ? Number(Price) + Number(bonus) - Number(savedBonus)
-                : Number(Price) + Number(bonus)}
-            </p>
-          </div>
-          {quoteSaved === false && exactQuoteValue === "true" && (
-            <div
-              onClick={termsChecked ? continueOTPHandler : undefined}
-              className={`${
-                termsChecked ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
-              } py-1 rounded-lg cursor-pointer w-1/2 sm:max-w-[200px]  flex justify-between px-2 text-white items-center`}
-            >
-              <p className="font-medium mx-auto text-xl p-[6px] ">Continue</p>
-            </div>
-          )}
-          {quoteSaved === false && exactQuoteValue === "false" && (
-            <div
-              onClick={() => navigate("/device/Qestions")}
-              className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
-            >
-              <p className="p-2 mx-auto text-lg font-medium ">
-                Get Exact Value
-              </p>
-            </div>
-          )}
-          {quoteSaved === true && (
-            <div
-              onClick={() => navigate("/selectdevicetype")}
-              className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
-            >
-              <p className="p-2 mx-auto text-lg font-medium ">Return To Home</p>
-            </div>
-          )}
-        </div>
+        <SubDeviceQuote
+          savedBonus={savedBonus}
+          Price={Price}
+          bonus={bonus}
+          quoteSaved={quoteSaved}
+          exactQuoteValue={exactQuoteValue}
+          termsChecked={termsChecked}
+          continueOTPHandler={continueOTPHandler}
+        />
       </div>
     </div>
   );
 };
 
 export default DeviceQuote;
+
+const SubDeviceQuote = ({
+  savedBonus,
+  Price,
+  bonus,
+  quoteSaved,
+  exactQuoteValue,
+  termsChecked,
+  continueOTPHandler,
+}) => {
+  const navigate = useNavigate();
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col w-1/2 text-xl font-medium">
+        <p>
+          ₹
+          {savedBonus
+            ? Number(Price) + Number(bonus) - Number(savedBonus)
+            : Number(Price) + Number(bonus)}
+        </p>
+      </div>
+      {quoteSaved === false && exactQuoteValue === "true" && (
+        <div
+          onClick={termsChecked ? continueOTPHandler : undefined}
+          className={`${
+            termsChecked ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
+          } py-1 rounded-lg cursor-pointer w-1/2 sm:max-w-[200px]  flex justify-between px-2 text-white items-center`}
+        >
+          <p className="font-medium mx-auto text-xl p-[6px] ">Continue</p>
+        </div>
+      )}
+      {quoteSaved === false && exactQuoteValue === "false" && (
+        <div
+          onClick={() => navigate("/device/Qestions")}
+          className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
+        >
+          <p className="p-2 mx-auto text-lg font-medium ">Get Exact Value</p>
+        </div>
+      )}
+      {quoteSaved === true && (
+        <div
+          onClick={() => navigate("/selectdevicetype")}
+          className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
+        >
+          <p className="p-2 mx-auto text-lg font-medium ">Return To Home</p>
+        </div>
+      )}
+    </div>
+  );
+};
