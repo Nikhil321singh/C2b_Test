@@ -37,29 +37,6 @@ const getStore = async () => {
   return storeNamesArray;
 };
 
-const getCompany = async () => {
-  const token1 = sessionStorage.getItem("authToken");
-  const config = {
-    method: "get",
-    url: `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/company/findAll?page=0&limit=9999`,
-    headers: { Authorization: token1 },
-  };
-  let storeNamesArray = [];
-  await axios
-    .request(config)
-    .then((response) => {
-      storeNamesArray = response.data.result.map((company) => ({
-        companyName: company.companyName,
-        _id: company._id,
-      }));
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  return storeNamesArray;
-};
 
 const initForm = {
   firstName: "",
@@ -82,7 +59,6 @@ const RegisterUser = () => {
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [storeData, setStoreData] = useState([]);
-  const [companyData, setCompanyData] = useState([]);
   const [formData, setFormData] = useState(initForm);
   const navigate = useNavigate();
 
@@ -95,8 +71,6 @@ const RegisterUser = () => {
 
   const saveStrCmp = async () => {
     const tempStr = await getStore();
-    const tempCmp = await getCompany();
-    setCompanyData(tempCmp);
     setStoreData(tempStr);
   };
   useEffect(() => {

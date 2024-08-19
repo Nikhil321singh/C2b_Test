@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 const WatchQuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredQuestions, setFilteredQuestions] = useState([]);
+  const filteredQuestions = [];
 
   return (
     <>
