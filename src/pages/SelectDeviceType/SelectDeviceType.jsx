@@ -249,16 +249,22 @@ export const BrandList = ({ deviceType }) => {
   };
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands`, {
-        headers: { authorization: `${userToken1}` },
-      })
+      .get(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/brands/getBrands?deviceType=${deviceType}`,
+        {
+          headers: { authorization: `${userToken1}` },
+        }
+      )
       .then((res) => {
         setBrandList(res.data.data);
+        console.log(res.data.data);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [deviceType]);
 
   const handleDeviceClick = () => {
     setPopout(true);
@@ -290,9 +296,8 @@ export const BrandList = ({ deviceType }) => {
       handleDeviceClick();
     }
   };
-  const extraBrands = [{ name: "More" }];
 
-  const allBrands = [...brandList, ...extraBrands];
+  const allBrands = [...brandList];
   return (
     <>
       {popout && (
@@ -333,9 +338,13 @@ export const BrandList = ({ deviceType }) => {
             <div
               key={index}
               onClick={() => handleBrandClick(brandItem)}
-              className={`flex-shrink-0 ${styles.brand_card}`}
+              className={`flex-shrink-0  ${styles.brand_card} px-[20px] py-[10px]`}
             >
-              <BrandImgSetter brandItem={brandItem} />
+              <img
+                className=" w-[50px]"
+                src={brandItem.logo}
+                alt={brandItem.name}
+              />
             </div>
           ))}
         </div>
@@ -388,15 +397,13 @@ const searchPhoneAPI = async (Sdata, deviceType) => {
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/user/Dashboard/search/phones`,
-      { name: Sdata,
-        deviceType: deviceType,
-      },
+      { name: Sdata, deviceType: deviceType },
       { headers: { authorization: `${userToken}` } }
     )
     .then((res) => {
-      const updatedData = res.data.map(item => ({
+      const updatedData = res.data.map((item) => ({
         ...item,
-        imgSrc: ImgSelectore(item)
+        imgSrc: ImgSelectore(item),
       }));
       response = updatedData;
     })
@@ -495,8 +502,8 @@ const SelectDeviceType = () => {
     setData(`${temp?.brand} ${temp?.model}`);
   };
 
-  const searchPhone = async (tempData, deviceType1) => {
-    const tempRes = await searchPhoneAPI(tempData, deviceType1);
+  const searchPhone = async (tempData, typeDevice) => {
+    const tempRes = await searchPhoneAPI(tempData, typeDevice);
     setModel(tempRes || []);
   };
 
@@ -509,7 +516,7 @@ const SelectDeviceType = () => {
   useEffect(() => {
     if (imei.length >= 15) {
       searchDevice(imei);
-    }else if(imei.length >= 3 && !/^\d+$/.test(imei.slice(0, 3))){
+    } else if (imei.length >= 3 && !/^\d+$/.test(imei.slice(0, 3))) {
       searchPhone(imei, deviceType);
     }
   }, [imei]);
@@ -538,11 +545,11 @@ const SelectDeviceType = () => {
           }/api/user/Dashboard/get/top/sellingModels?time=${days}&deviceType=${deviceType}`,
           { headers: { authorization: `${token}` } }
         );
-        const updatedData = await response.data.map(item => ({
+        const updatedData = await response.data.map((item) => ({
           ...item,
-          imgSrc: ImgSelectore(item)
+          imgSrc: ImgSelectore(item),
         }));
-        console.log(updatedData)
+        console.log(updatedData);
         setTopmodels(updatedData);
       } catch (err) {
         console.error(err);
@@ -645,7 +652,7 @@ const SearchBox = ({
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-          <img className="w-28" src={Grest_Logo} alt="app logo" />
+          <img className="w-40" src={Grest_Logo} alt="app logo" />
         </div>
       </div>
       {isSearchBoxOpen && (
@@ -685,11 +692,7 @@ const SearchBox = ({
                     style={{ boxShadow: "0 0 10px 0 rgb(0 0 0 / 0.1)" }}
                     onClick={() => handleDeviceClick(model)}
                   >
-                    <img
-                      className="w-[50px] mb-2"
-                      src={model.imgSrc}
-                      alt=""
-                    />
+                    <img className="w-[50px] mb-2" src={model.imgSrc} alt="" />
                     <p className="text-[11px] font-medium">{model.name}</p>
                   </div>
                 ))}
@@ -770,20 +773,48 @@ const MiddlePart = ({
               onChange={(e) => {
                 handlepick(e);
               }}
-              className="p-2 border-2 rounded-lg shadow-md outline-none "
+              className="p-2 border-2 rounded-lg shadow-md outline-none bg-[#EC275271] text-white"
+              style={{ backgroundColor: "#ec275271", color: "white" }}
             >
-              <option value="today">Today</option>
-              <option value="7days">7 Days</option>
-              <option value="lastmonth">Last Month</option>
-              <option value="Custom">Custom</option>
+              <option
+                value="today"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Today
+              </option>
+              <option
+                value="7days"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                7 Days
+              </option>
+              <option
+                value="thismonth"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                This Month
+              </option>
+              <option
+                value="lastmonth"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Last Month
+              </option>
+              <option
+                value="Custom"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Custom
+              </option>
             </select>
           </div>
+
           <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
             <Link className="w-[33%]" to={`/orderscreated/${days}`}>
               <OrderStatusBox
                 figures={orderCount}
                 title="Order Created"
-                background="#0275F2"
+                background="#E94A4E"
               />
             </Link>
             <Link className="w-[33%]" to={`/orderscompleted/${days}`}>
@@ -819,23 +850,23 @@ const MiddlePart = ({
       <p
         className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#EC2752]`}
       >
-        How Grest Works?
+        How SwitchKart Works?
       </p>
       <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
         <div className="flex flex-col min-w-[30%]  items-center  ">
           <img className={`w-[50px] mb-2`} src={how1} />
           <p className="-mb-1 text-base font-bold">Add</p>
-          <p className="text-base font-medium opacity-60">product details</p>
+          <p className="text-sm font-medium opacity-60">Product Details</p>
         </div>
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how2} />
           <p className="-mb-1 text-base font-bold">Exchange</p>
-          <p className="text-base font-medium opacity-60">your device</p>
+          <p className="text-sm font-medium opacity-60">Your Device</p>
         </div>
         <div className="flex flex-col min-w-[30%] items-center  ">
           <img className={`w-[50px] mb-2`} src={how3} />
-          <p className="-mb-1 text-base font-bold">Transfer</p>
-          <p className="text-base font-medium opacity-60">your money</p>
+          <p className="-mb-1 text-base font-bold">Get Paid</p>
+          <p className="text-sm font-medium opacity-60">Instantly</p>
         </div>
       </div>
     </div>

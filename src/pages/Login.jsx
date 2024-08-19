@@ -5,7 +5,6 @@ import Grest_Logo from "../assets/Grest_Logo.jpg";
 import { useDispatch } from "react-redux";
 import { setUserProfile, setStoreFilter } from "../store/slices/userSlice";
 import "../styles/login.scss";
-import { SocialIcon } from "react-social-icons";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdOutlineMailLock } from "react-icons/md";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -47,7 +46,12 @@ const Login = () => {
           sessionStorage.setItem("DeviceType", "Mobile");
           localStorage.removeItem("formData");
           dispatch(setUserProfile(profile));
-          dispatch(setStoreFilter({selStore: profile?.storeName, selRegion: profile?.region}));
+          dispatch(
+            setStoreFilter({
+              selStore: profile?.storeName,
+              selRegion: profile?.region,
+            })
+          );
           console.log(profile.role);
 
           switch (profile.role) {
@@ -55,7 +59,7 @@ const Login = () => {
               navigate("/adminmodels");
               break;
             case "Admin Manager":
-              navigate("/adminmodels");
+              navigate("/customertable");
               break;
             case "Technician":
               navigate("/devicepickupdashboard");
@@ -78,22 +82,19 @@ const Login = () => {
     }
   };
 
-  const handleClick = (event) => {
-    event.preventDefault();
-  };
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-white Container">
       <div className="flex flex-col items-center justify-center px-10 pb-4 secondContainer">
-        <img className="w-48 pt-4" src={Grest_Logo} alt="app logo" />
-        <h1 className="mb-2 text-2xl font-semibold sm:text-3xl">Sign in</h1>
-        <div className="underline"></div>
+        <img className="w-48 pt-4 mt-2 mb-4" src={Grest_Logo} alt="app logo" />
+        <h1 className="font-sans text-[#EC2752] mt-2 text-3xl font-bold sm:text-4xl">
+          Login
+        </h1>
         {error && <p className="text-sm text-red-500 sm:text-base">{error}</p>}
         <div
           id="loginForm"
           className="flex flex-col border-b-2 pb-6 gap-4 w-[32vw] formOuter"
         >
-          <div>
+          <div className="">
             <label htmlFor="userEmail">Email</label>
             <div className="input">
               <MdOutlineMailLock
@@ -139,8 +140,8 @@ const Login = () => {
           </div>
 
           <Link to="/PasswordRecovery">
-            <span className="text-right text-sm font-medium block text-[rgb(236,39,82)] forgetpass">
-              Forget Password?
+            <span className="text-right text-sm font-medium block text-[#EC2752] forgetpass">
+              Forgot Password?
             </span>
           </Link>
           <Link to="/" className="login_button_holder">
@@ -162,35 +163,6 @@ const Login = () => {
               )}
             </button>
           </Link>
-        </div>
-
-        <div className="pb-2 mediaicon">
-          <span>or sign up using</span>
-          <div className="flex gap-2 list">
-            <SocialIcon
-              className="my-icon"
-              url="https://twitter.com"
-              bgColor="#1DA1F2"
-              onClick={handleClick}
-            />
-            <SocialIcon
-              className="my-icon"
-              url="https://www.facebook.com"
-              onClick={handleClick}
-            />
-            <SocialIcon
-              className="my-icon"
-              url="https://www.instagram.com"
-              onClick={handleClick}
-            />
-            <div className="p-1 rounded-full bg-grey-400">
-              <img
-                className="w-[30px] mt-[2px]"
-                src="https://flat-icons.com/wp-content/uploads/2022/07/Gmail-Icon-Aesthetic.png"
-                alt=""
-              />
-            </div>
-          </div>
         </div>
       </div>
     </div>

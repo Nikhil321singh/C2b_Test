@@ -44,7 +44,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
     formData.append("panNumber", formValues.panNumber);
     formData.append("remarks", formValues.remarks);
     formData.append("id", formValues._id);
-    if(attachedFiles.length){
+    if (attachedFiles.length) {
       attachedFiles.forEach((file, index) => {
         formData.append("files", file, `file-${index}`);
       });
@@ -58,7 +58,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
       .put(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/edit`,
         formData,
-        { headers: { Authorization: token }}
+        { headers: { Authorization: token } }
       )
       .then((res) => {
         setIsTableLoading(false);

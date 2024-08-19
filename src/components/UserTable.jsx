@@ -28,7 +28,7 @@ const UserTable = ({ data }) => {
 
     if (val.lead.model.type === "Mobile") {
       if (val.lead.ram) {
-        return `${val.lead.storage}/${val.lead.ram}`;
+        return `${val.lead.ram}/${val.lead.storage}`;
       }
       return val.lead.storage;
     }
@@ -56,6 +56,7 @@ const UserTable = ({ data }) => {
             <th className="p-2 text-sm md:p-3 md:text-base">Category</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Product name</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Variant</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Price</th>
             <th className="p-2 text-sm md:p-3 md:text-base min-w-[160px]">
               Final Price Offered to Customer
             </th>
@@ -90,6 +91,9 @@ const UserTable = ({ data }) => {
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base min-w-[170px]">
                 {getDeviceDetails(val)}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.lead?.actualPrice}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.lead?.price}

@@ -6,7 +6,7 @@ import styles from "./SelectDevice.module.css";
 import AppFooter from "../../components/AppFooter";
 import apple_watch from "../../assets/apple_watch.png";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io";
 import { BeatLoader } from "react-spinners";
 const data = JSON.parse(sessionStorage.getItem("dataModel"));
 
@@ -16,19 +16,9 @@ export const SeriesFilter = ({
   selectedBtn,
   setSelectedBtn,
   setSeriesType,
+  seriesList,
 }) => {
-  const categories = [
-    { name: "All", apiType: "" },
-    { name: "SE", apiType: "SE" },
-    { name: "Series 6", apiType: "Series 6" },
-    { name: "Series 7", apiType: "Series 7" },
-    { name: "Series 8", apiType: "Series 8" },
-    { name: "Series 9", apiType: "Series 9" },
-    { name: "Ultra", apiType: "Ultra" },
-    { name: "Ultra 2", apiType: "Ultra 2" },
-  ];
   const catContainerRef = useRef(null);
-
   const scrollCategory = (direction) => {
     const scrollAmount = 200;
 
@@ -59,17 +49,17 @@ export const SeriesFilter = ({
         ref={catContainerRef}
         className={`flex flex-shrink-0 px-1 gap-4 overflow-x-auto scroll-smooth scrollbar-hide ${styles.select_button_box}`}
       >
-        {categories.map((category, index) => (
+        {seriesList.map((category, index) => (
           <div
             className={`${
               selectedBtn === category.name
                 ? styles.button_checked
                 : styles.button_unchecked
-            } text-xs font-medium text-nowrap flex-grow flex-shrink-0 px-0 w-[70px]`}
+            } text-xs font-medium text-nowrap flex-shrink-0 px-0`}
             key={index}
             onClick={() => {
               setSelectedBtn(category.name);
-              setSeriesType(category.apiType);
+              setSeriesType(category.seriesKey);
             }}
           >
             <p className="px-0 mx-0">{category.name}</p>
@@ -92,6 +82,8 @@ const SelectDevice = () => {
   const Device = sessionStorage.getItem("DeviceType");
   const [selectedBtn, setSelectedBtn] = useState("All");
   const [seriesType, setSeriesType] = useState("");
+  const [seriesList, setSeriesList] = useState([]);
+  const [searchModel, setSearchModel] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const DummyImg =
     Device === "Mobile"
@@ -100,31 +92,40 @@ const SelectDevice = () => {
   const { brandId } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchModels = () => {
     setIsTableLoaded(true);
     const config = {
-      method: 'post',
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getSelectedBrandModels`,
+      method: "post",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/brands/getSelectedBrandModels`,
       headers: {
-        'Authorization': `${userToken}`,
+        Authorization: `${userToken}`,
       },
-      data : {
-        "brandId": brandId,
-        "deviceType": Device,
-        "search": seriesType
-      }
+      data: {
+        brandId: brandId,
+        deviceType: Device,
+        series: seriesType,
+        search: searchModel,
+      },
     };
-    console.log(config)
-    axios.request(config)
-    .then((res) => {
-      console.log("asd", res?.data);
-      setModelInfo(res.data);
-      setIsTableLoaded(false);
-    })
-    .catch((err) => {
-      console.log(err);
-      setIsTableLoaded(false);
-    });
+    console.log(config);
+    axios
+      .request(config)
+      .then((res) => {
+        console.log("asd", res?.data);
+        setModelInfo(res.data.models);
+        setSeriesList(res.data.seriesList);
+        setIsTableLoaded(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsTableLoaded(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchModels();
   }, [seriesType]);
 
   const handleDeviceClick = (model) => {
@@ -136,6 +137,7 @@ const SelectDevice = () => {
     sessionStorage.setItem("dataModelConfig", JSON.stringify(model));
     navigate("/selectmodel");
   };
+
   return (
     <div className="flex flex-col min-h-screen pb-16 bg-white">
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
@@ -148,7 +150,7 @@ const SelectDevice = () => {
           <ProfileBox />
           <img
             onClick={() => navigate("/selectdevicetype")}
-            className="w-28 "
+            className="w-40"
             src={Grest_Logo}
             alt="app logo"
           />
@@ -161,13 +163,37 @@ const SelectDevice = () => {
           <p className="text-2xl font-bold">Select Smartwatches</p>
         )}
       </div>
-      {Device === "Watch" && brandId === "653cbbeae2eb1f468a1dd7ea" && (
+      {seriesList.length > 1 && (
         <SeriesFilter
           selectedBtn={selectedBtn}
           setSelectedBtn={setSelectedBtn}
           setSeriesType={setSeriesType}
+          seriesList={seriesList}
         />
       )}
+      <div
+        className="flex items-center mt-1 mx-4 bg-[#f5f5f5] rounded-[0.55rem] overflow-hidden"
+        style={{
+          boxShadow:
+            "1px 1px 2px 0px rgba(0, 0, 0, 0.158), 0px 0px 0px 0px rgba(0, 0, 0, 0.034)",
+        }}
+      >
+        <input
+          placeholder="Search Products"
+          id="searchModel"
+          name="searchModel"
+          value={searchModel}
+          onChange={(e) => setSearchModel(e.target.value)}
+          className="inline w-full ml-4 mr-2 my-2 outline-none bg-transparent"
+          type="text"
+        />
+        <div
+          className="flex items-center justify-center bg-[#EC2752] h-[40px] w-[50px] cursor-pointer"
+          onClick={fetchModels}
+        >
+          <IoMdSearch size={25} className="inline text-white" />
+        </div>
+      </div>
       <div
         className={` ${styles.cardsContainer} m-4 shrink flex flex-wrap justify-center gap-2 md:gap-8`}
       >

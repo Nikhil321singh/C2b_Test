@@ -193,8 +193,8 @@ const AdminLogin = () => {
             <Link to="/adminlogin" className="login_button_holder">
               <button
                 onClick={userLogin}
-                type="button"
                 className={`login_button ${isLoading && "opacity-[.9]"}`}
+                type="button"
                 disabled={isLoading}
               >
                 {isLoading && (

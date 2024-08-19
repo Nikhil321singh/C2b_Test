@@ -40,23 +40,25 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
         }
       )
       .then((res) => {
-        const modifiedDataArray = res.data?.data?.[orderType]?.data.map((leadSetItem) => {
-          const storageValue = leadSetItem.lead?.storage;
-          const filteredConfig = leadSetItem.lead?.model?.config.filter(
-            (configItem) => configItem.storage === storageValue
-          );
+        const modifiedDataArray = res.data?.data?.[orderType]?.data.map(
+          (leadSetItem) => {
+            const storageValue = leadSetItem.lead?.storage;
+            const filteredConfig = leadSetItem.lead?.model?.config.filter(
+              (configItem) => configItem.storage === storageValue
+            );
 
-          return {
-            ...leadSetItem,
-            lead: {
-              ...leadSetItem.lead,
-              model: {
-                ...leadSetItem.lead.model,
-                config: filteredConfig.length ? filteredConfig[0] : null,
+            return {
+              ...leadSetItem,
+              lead: {
+                ...leadSetItem.lead,
+                model: {
+                  ...leadSetItem.lead.model,
+                  config: filteredConfig.length ? filteredConfig[0] : null,
+                },
               },
-            },
-          };
-        });
+            };
+          }
+        );
         setData(modifiedDataArray);
         setLoading(false);
       })
@@ -107,7 +109,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
             <ProfileBox />
             <img
               onClick={() => navigate("/selectdevicetype")}
-              className="w-28 "
+              className="w-40"
               src={Grest_Logo}
               alt="app logo"
             />

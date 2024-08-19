@@ -51,7 +51,6 @@ const OrdersCard = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const deviceSelected = sessionStorage.getItem("DeviceType");
-  console.log(deviceSelected);
 
   const formatDateTime = (dateTimeString) => {
     const options = {
@@ -67,25 +66,48 @@ const OrdersCard = ({
       new Date(dateTimeString)
     );
   };
+
   useEffect(() => {
     console.log("card");
   }, []);
 
+  const isExpired = () => {
+    const createdDate = new Date(dateTime);
+    const currentDate = new Date();
+    const timeDiff = currentDate - createdDate;
+
+    const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+    const threeDays = 3 * oneDay; // 3 days in milliseconds
+
+    if (title === savedQuote) {
+      return timeDiff > oneDay;
+    } else if (title === "Lead Saved") {
+      return timeDiff > threeDays;
+    } else {
+      return false;
+    }
+  };
+
   const handleInitiate = () => {
-    if (title === "Quote Saved") {
+    const savedQuote = "Quote Saved";
+    if (isExpired()) {
+      return;
+    }
+
+    if (title === savedQuote) {
       const detail = {
         models: itemData.lead?.model,
         phoneNumber: customerMobile,
-        status: "Quote Saved",
+        status: savedQuote,
         customerName: customerName,
       };
-      console.log("asas", detail);
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
       const responseData = {
         grade: "",
         id: itemData.lead_id,
         price: price,
         uniqueCode: quoteId,
+        bonus: 0,
       };
       dispatch(setResponseData(responseData));
       sessionStorage.setItem("LeadId", itemData?.lead_id);
@@ -102,13 +124,13 @@ const OrdersCard = ({
         models: itemData.lead?.model,
         customerName: customerName,
       };
-      console.log("asas", detail);
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
       const responseData = {
         grade: "",
         id: itemData.lead_id,
-        price: price,
+        price: Number(itemData.lead?.price) - Number(itemData.lead?.bonusPrice),
         uniqueCode: quoteId,
+        bonus: Number(itemData.lead?.bonusPrice),
       };
 
       dispatch(setResponseData(responseData));
@@ -125,16 +147,22 @@ const OrdersCard = ({
 
   const handleDeleteConfirmed = () => {
     setShowDeleteModal(false);
-    // Call the actual delete function
     handleDelete(itemData._id);
   };
 
   const handleDeleteCancelled = () => {
     setShowDeleteModal(false);
-    // Optionally, perform any other action when delete is cancelled
   };
+
   return (
-    <div className="p-2 mx-2 bg-white rounded-lg">
+    <div className="p-2 mx-2 bg-white rounded-lg relative">
+      {isExpired() && (
+        <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 bg-white">
+          <div className="text-[#EC2752] text-2xl font-bold border-4 border-[#ec275271] px-4 py-2 rounded-md">
+            Expired
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between p-2 border-b-2 border-gray-300 border-dashed">
         <div className="flex items-center py-1 px-2 text-[#EC2752]  bg-[#ec275271] rounded-xl">
           <p className="text-sm font-medium">{title}</p>
@@ -181,13 +209,14 @@ const OrdersCard = ({
           <p>{savedBy}</p>
         </div>
       </div>
+
       {showDeleteModal && (
         <DeleteModal
           onCancel={handleDeleteCancelled}
           onConfirm={handleDeleteConfirmed}
         />
       )}
-      {title !== "Lead Completed" && (
+      {title !== "Lead Completed" && !isExpired() && (
         <div className="flex items-center justify-between gap-2 p-2 font-medium">
           <div
             onClick={handleDeleteConfirmation}

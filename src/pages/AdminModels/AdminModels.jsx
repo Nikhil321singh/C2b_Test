@@ -189,7 +189,10 @@ const AdminModels = () => {
       });
   };
   const selectHandler = (modelId, modelStorage, ram, modelName) => {
-    sessionStorage.setItem("adminModelName", `${modelName} (${ram}/${modelStorage})`);
+    sessionStorage.setItem(
+      "adminModelName",
+      `${modelName} (${ram}/${modelStorage})`
+    );
     if (category === "Watch") {
       sessionStorage.setItem("adminModelName", modelName);
     }

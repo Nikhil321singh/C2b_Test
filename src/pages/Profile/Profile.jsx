@@ -7,7 +7,6 @@ import axios from "axios";
 import styles from "./Profile.module.css";
 import { BeatLoader } from "react-spinners";
 
-
 const Profile = () => {
   const storedProfile = JSON.parse(sessionStorage.getItem("profile")) || {};
   const authToken = sessionStorage.getItem("authToken");
@@ -40,7 +39,7 @@ const Profile = () => {
       email: storedProfile?.email || "",
       phoneNumber: storedProfile?.phoneNumber || "",
     });
-    console.log(storedProfile?.profileImage)
+    console.log(storedProfile?.profileImage);
     setProfileImage(storedProfile?.profileImage || "");
   }, []);
 
@@ -64,6 +63,11 @@ const Profile = () => {
   const handleFileInputChange = async (e) => {
     setIsTableLoaded(true);
     const file = e.target.files[0];
+    if (file.size > 2 * 1024 * 1024) {
+      setErrorMsg("File size must be less than 2MB");
+      setIsTableLoaded(false);
+      return;
+    }
     const formData = new FormData();
     formData.append("Profileimage", file);
     try {
@@ -253,14 +257,18 @@ const ProfileDetail = ({
                   <input
                     id="fileInput"
                     type="file"
-                    accept="image/*"
                     style={{ display: "none" }}
+                    accept=".jpg, .jpeg, .png"
                     onChange={handleFileInputChange}
                   />
-                  {profileImage &&
-                  <button onClick={Deleteimage} className={styles.prof_button2}>
-                    Delete
-                  </button>}
+                  {profileImage && (
+                    <button
+                      onClick={Deleteimage}
+                      className={styles.prof_button2}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
               )}
             </div>

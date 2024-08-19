@@ -162,10 +162,10 @@ const QuickQuote = () => {
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
-      JSON.stringify(response.data.data)
+      JSON.stringify({ ...response.data.data, bonus: 0 })
     );
     sessionStorage.setItem("ExactQuote", false);
-    dispatch(setResponseData(response.data.data));
+    dispatch(setResponseData({ ...response.data.data, bonus: 0 }));
     setIsLoading(false);
     navigate("/devicequote");
   };
@@ -173,10 +173,10 @@ const QuickQuote = () => {
   return (
     <div className="mainQContainer">
       <div className="flex items-center w-screen py-4 h-16 border-b-2  bg-white HEADER header">
-        <div className="w-full flex items-center justify-betweenpr-2">
+        <div className="w-full flex items-center justify-between pr-2">
           <ProfileBox />
           <img
-            className="w-28"
+            className="w-40"
             onClick={() => navigate("/selectdevicetype")}
             alt="app logo"
             src={Grest_Logo}

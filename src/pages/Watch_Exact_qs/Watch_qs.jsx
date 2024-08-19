@@ -17,7 +17,6 @@ import useUserProfile from "../../utils/useUserProfile";
 import { CgSpinner } from "react-icons/cg";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack } from "react-icons/io";
-import QuestionSearch from "../../components/QuestionSearch/QuestionSearch";
 import store from "../../store/store";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import question1 from "../../assets/question1.png";
@@ -52,7 +51,7 @@ import {
   MdRadioButtonUnchecked,
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
-
+import WatchQuestionSearch from "../../components/WatchQuestionSearch";
 
 const initialState = {
   Functional: [],
@@ -140,24 +139,29 @@ function Watchqs() {
       ram: id?.models?.config?.RAM,
       name: id?.customerName ? id?.customerName : profile?.name,
     };
-    const response = await axios.post(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/questionnaires/calculatePriceWatch`,
-      finalPayload,
-      {
-        headers: {
-          Authorization: `${token}`,
-        },
-      }
-    );
+    const response = await axios
+      .post(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/questionnaires/calculatePriceWatch`,
+        finalPayload,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      )
+      .catch((error) => {
+        console.log(error);
+        setIsLoading(false);
+      });
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
-      JSON.stringify(response.data.data)
+      JSON.stringify({ ...response.data.data, bonus: 0 })
     );
     sessionStorage.setItem("ExactQuote", true);
-    store.dispatch(setResponseData(response.data.data));
+    store.dispatch(setResponseData({ ...response.data.data, bonus: 0 }));
     setIsLoading(false);
     navigate("/devicequote");
   };
@@ -183,7 +187,7 @@ function Watchqs() {
           <div className="flex items-center justify-center underline underline-offset-4 pt-4 text-lg font-medium tracking-tight text-{1.325rem}">
             {visible > 1 && visible <= 3 && (
               <div
-                className="text-white rounded-[.45rem] flex flex-row justify-center items-center mr-2 bg-[#ec2752]"
+                className="text-white rounded-[.45rem] flex flex-row justify-center items-center mr-2 bg-[#EC2752]"
                 onClick={() => setVisible(visible - 1)}
               >
                 <MdOutlineKeyboardBackspace size={30} />
@@ -257,7 +261,7 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
           <ProfileBox />
           <img
             onClick={() => navigate("/selectdevicetype")}
-            className="w-28 "
+            className="w-40"
             src={Grest_Logo}
             alt="app logo"
           />
@@ -286,7 +290,7 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
             type="text"
           />
           {isSearchOpen && (
-            <QuestionSearch
+            <WatchQuestionSearch
               setIsSearchOpen={setIsSearchOpen}
               state={WTCstate}
               dispatch={dispatch}
@@ -341,6 +345,9 @@ const FirstPart = ({ WTCstate, Functional }) => {
             </div>
           ))}
       </div>
+      <div className="flex flex mt-4 bg-[#ec275271] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
+      </div>
     </div>
   );
 };
@@ -373,7 +380,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[0]?.answer === WTCstate?.Physical[0]?.yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#ec2752]"
+                  className="mr-2 text-[#EC2752]"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -408,7 +415,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[1]?.answer === WTCstate?.Physical[1]?.yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#ec2752]"
+                  className="mr-2 text-[#EC2752]"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -444,7 +451,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[2]?.answer === WTCstate?.Physical[2].yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#ec2752]"
+                  className="mr-2 text-[#EC2752]"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -479,7 +486,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[3]?.answer === WTCstate?.Physical[3].yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#ec2752]"
+                  className="mr-2 text-[#EC2752]"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -497,6 +504,9 @@ const SecondPart = ({ WTCstate, Physical }) => {
           </div>
         </div>
       )}
+      <div className="flex flex mt-4 bg-[#ec275271] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
+      </div>
     </div>
   );
 };
@@ -544,6 +554,9 @@ const ThirdPart = ({ WTCstate, Accessories }) => {
             </div>
           ))}
       </div>
+      <div className="flex flex mt-4 bg-[#ec275271] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
+      </div>
     </div>
   );
 };
@@ -564,7 +577,7 @@ const FourthPart = ({ WTCstate, Warranty }) => {
           WTCstate?.Warranty.map((data, index) => (
             <div
               key={index}
-              className="max-w-[500px]  flex gap-4 ml-3 lableconatiner flex-col"
+              className="max-w-[500px]  flex gap-4 ml-3 flex-col"
             >
               <label
                 className={`text-[#EC2752] ${
@@ -578,6 +591,7 @@ const FourthPart = ({ WTCstate, Warranty }) => {
                 <input
                   type="radio"
                   value={data.yes}
+                  className="hidden"
                   onChange={(e) => {
                     store.dispatch(
                       updateWatchWarrantyObject({

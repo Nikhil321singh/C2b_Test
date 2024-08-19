@@ -82,6 +82,8 @@ const ViewOfferDetail = () => {
             <button
               className={`${styles.bulkdown_button}`}
               onClick={() => {
+                sessionStorage.setItem("rowData", JSON.stringify({}));
+                sessionStorage.setItem("offerUserName", "");
                 navigate("/offers");
               }}
             >

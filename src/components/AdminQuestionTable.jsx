@@ -447,7 +447,7 @@ const QSComp = ({
                   <option value="">Select No Key</option>
                   {group &&
                     options[group].map((option, optionkey) => (
-                      <option  value={option} key={optionkey}>
+                      <option value={option} key={optionkey}>
                         {option}
                       </option>
                     ))}

@@ -9,7 +9,7 @@ import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 
 const sucTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
-const role = ["Super Admin", "Admin Manager", "Technician", "Sale User"];
+const role = ["Admin Manager", "Technician", "Sale User"];
 
 const getStore = async () => {
   const token1 = sessionStorage.getItem("authToken");
@@ -37,29 +37,6 @@ const getStore = async () => {
   return storeNamesArray;
 };
 
-const getCompany = async () => {
-  const token1 = sessionStorage.getItem("authToken");
-  const config = {
-    method: "get",
-    url: `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/company/findAll?page=0&limit=9999`,
-    headers: { Authorization: token1 },
-  };
-  let storeNamesArray = [];
-  await axios
-    .request(config)
-    .then((response) => {
-      storeNamesArray = response.data.result.map((company) => ({
-        companyName: company.companyName,
-        _id: company._id,
-      }));
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  return storeNamesArray;
-};
 
 const initForm = {
   firstName: "",
@@ -67,8 +44,6 @@ const initForm = {
   email: "",
   password: "",
   phoneNumber: "",
-  companyId: "",
-  grestMember: false,
   role: "",
   storeId: "",
   city: "",
@@ -84,7 +59,6 @@ const RegisterUser = () => {
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [storeData, setStoreData] = useState([]);
-  const [companyData, setCompanyData] = useState([]);
   const [formData, setFormData] = useState(initForm);
   const navigate = useNavigate();
 
@@ -97,10 +71,8 @@ const RegisterUser = () => {
 
   const saveStrCmp = async () => {
     const tempStr = await getStore();
-    const tempCmp = await getCompany();
-    setCompanyData(tempCmp);
     setStoreData(tempStr);
-  }
+  };
   useEffect(() => {
     saveStrCmp();
   }, []);
@@ -123,8 +95,6 @@ const RegisterUser = () => {
       email: formData.email,
       password: formData.password,
       phoneNumber: formData.phoneNumber,
-      companyId: formData.companyId,
-      grestMember: formData.grestMember,
       role: formData.role,
       storeId: formData.storeId,
       city: formData.city,
@@ -221,8 +191,13 @@ const RegisterUser = () => {
               View Details
             </button>
           </div>
-          <UserForm formData={formData} submitHandler={submitHandler} handleChange={handleChange}
-          isGrest={isGrest} setIsGrest={setIsGrest} storeData={storeData} companyData={companyData}/>
+          <UserForm
+            formData={formData}
+            submitHandler={submitHandler}
+            handleChange={handleChange}
+            setIsGrest={setIsGrest}
+            storeData={storeData}
+          />
         </div>
       </div>
     </div>
@@ -231,201 +206,151 @@ const RegisterUser = () => {
 
 export default RegisterUser;
 
-const UserForm = ({ formData, submitHandler, handleChange, isGrest, setIsGrest, storeData, companyData }) => {
-  return<form
-  className="ml-10 flex flex-col gap-4"
-  onSubmit={submitHandler}
-  autoComplete="off"
->
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">First name*</span>
-    <input
-      name="firstName"
-      id="firstName"
-      placeholder="Enter first name"
-      value={formData.firstName}
-      onChange={handleChange}
-      className="border-2 px-2 py-2 rounded-lg outline-none"
-      type="text"
-      required
-    />
-  </label>
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">Last name</span>
-    <input
-      name="lastName"
-      id="lastName"
-      placeholder="Enter last name"
-      value={formData.lastName}
-      onChange={handleChange}
-      className="border-2 px-2 py-2 rounded-lg outline-none"
-      type="text"
-    />
-  </label>
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">Email*</span>
-    <input
-      name="email"
-      id="email"
-      minLength={6}
-      placeholder="Enter your email address"
-      value={formData.email || ""}
-      onChange={handleChange}
-      className="border-2 px-2 py-2 rounded-lg  outline-none "
-      type="email"
+const UserForm = ({ formData, submitHandler, handleChange, storeData }) => {
+  return (
+    <form
+      className="ml-10 flex flex-col gap-4"
+      onSubmit={submitHandler}
       autoComplete="off"
-      required
-    />
-  </label>
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">Password*</span>
-    <input
-      name="password"
-      id="password"
-      minLength={6}
-      placeholder="Enter new password (min. 6 characters)"
-      value={formData.password || ""}
-      onChange={handleChange}
-      className="border-2 px-2 py-2 rounded-lg  outline-none "
-      type="password"
-      autoComplete="off"
-      required
-    />
-  </label>
-  <label className="flex flex-col w-[70%] gap-2 ">
-    <span className="font-medium text-xl">Mobile Number*</span>
-    <input
-      name="phoneNumber"
-      id="phoneNumber"
-      minLength={10}
-      placeholder="Enter 10-digit mobile number"
-      value={formData.phoneNumber}
-      onChange={handleChange}
-      className="border-2 px-2 py-2 rounded-lg  outline-none"
-      maxLength={10}
-      type="tel"
-      required
-    />
-  </label>
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">Is Grest Member?*</span>
-    <div className="flex gap-4">
-      <div
-        className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${
-          isGrest === "yes" ? "bg-[#EC2752] text-white" : ""
-        } `}
-      >
+    >
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">First name*</span>
         <input
-          onChange={() => setIsGrest("yes")}
-          type="radio"
-          value="yes"
-          id="yes"
-          name="GrestUser"
-          checked={isGrest === "yes"}
-          className="hidden"
+          name="firstName"
+          id="firstName"
+          placeholder="Enter first name"
+          value={formData.firstName}
+          onChange={handleChange}
+          className="border-2 px-2 py-2 rounded-lg outline-none"
+          type="text"
+          required
         />
-        <label htmlFor="yes">Yes</label>
-      </div>
-      <div
-        className={`w-[100px] text-center border-2 border-[#EC2752] p-2 rounded ${
-          isGrest === "no" ? "bg-[#EC2752] text-white" : ""
-        } `}
-      >
+      </label>
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Last name</span>
         <input
-          onChange={() => setIsGrest("no")}
-          type="radio"
-          value="no"
-          id="no"
-          name="GrestUser"
-          checked={isGrest === "no"}
-          className="hidden"
+          name="lastName"
+          id="lastName"
+          placeholder="Enter last name"
+          value={formData.lastName}
+          onChange={handleChange}
+          className="border-2 px-2 py-2 rounded-lg outline-none"
+          type="text"
         />
-        <label htmlFor="no">No</label>
+      </label>
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Email*</span>
+        <input
+          name="email"
+          id="email"
+          minLength={6}
+          placeholder="Enter your email address"
+          value={formData.email || ""}
+          onChange={handleChange}
+          className="border-2 px-2 py-2 rounded-lg  outline-none "
+          type="email"
+          autoComplete="off"
+          required
+        />
+      </label>
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Password*</span>
+        <input
+          name="password"
+          id="password"
+          minLength={6}
+          placeholder="Enter new password (min. 6 characters)"
+          value={formData.password || ""}
+          onChange={handleChange}
+          className="border-2 px-2 py-2 rounded-lg  outline-none "
+          type="password"
+          autoComplete="off"
+          required
+        />
+      </label>
+      <label className="flex flex-col w-[70%] gap-2 ">
+        <span className="font-medium text-xl">Mobile Number*</span>
+        <input
+          name="phoneNumber"
+          id="phoneNumber"
+          minLength={10}
+          placeholder="Enter 10-digit mobile number"
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          className="border-2 px-2 py-2 rounded-lg  outline-none"
+          maxLength={10}
+          type="tel"
+          required
+        />
+      </label>
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Store Name*</span>
+        <select
+          name="storeId"
+          id="storeId"
+          value={formData.storeId}
+          className="outline-none text-base border-2 p-2 rounded-lg"
+          onChange={handleChange}
+          required
+        >
+          <option value=""> None </option>
+          {storeData.map((item) => (
+            <option key={item._id} value={item._id}>
+              {`${item.storeName}, ${item.region}`}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Role*</span>
+        <select
+          id="role"
+          name="role"
+          value={formData.role}
+          className="outline-none text-base border-2 px-2 py-2 rounded-lg"
+          onChange={handleChange}
+          required
+        >
+          <option value="">None</option>
+          {role.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">City</span>
+        <input
+          name="city"
+          id="city"
+          placeholder="Enter your city name"
+          value={formData.city}
+          onChange={handleChange}
+          className="border-2 px-2 py-2 rounded-lg  outline-none"
+          type="text"
+        />
+      </label>
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Adddress</span>
+        <input
+          name="address"
+          id="address"
+          placeholder="Enter your full address"
+          value={formData.address}
+          onChange={handleChange}
+          className="border-2 px-2 py-2 rounded-lg  outline-none"
+          type="text"
+        />
+      </label>
+      <div className="mt-8">
+        <button
+          type="submit"
+          className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+        >
+          Submit Form
+        </button>
       </div>
-    </div>
-  </label>
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">Company Name*</span>
-    <select
-      name="companyId"
-      id="companyId"
-      value={formData.companyId}
-      className="outline-none text-base border-2 p-2 rounded-lg"
-      onChange={handleChange}
-      required
-    >
-      <option value="">None</option>
-      {companyData.map((item) => (
-        <option key={item._id } value={item._id }>
-          {item.companyName }
-        </option>
-      ))}
-    </select>
-  </label>
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">Store Name*</span>
-    <select
-      name="storeId"
-      id="storeId"
-      value={formData.storeId}
-      className="outline-none text-base border-2 p-2 rounded-lg"
-      onChange={handleChange}
-      required
-    >
-      <option value=""> None </option>
-      {storeData.map((item) => (
-        <option key={item._id} value={item._id}>
-          {`${item.storeName }, ${item.region }`}
-        </option>
-      ))}
-    </select>
-  </label>
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">Role*</span>
-    <select
-      id="role"
-      name="role"
-      value={formData.role}
-      className="outline-none text-base border-2 px-2 py-2 rounded-lg"
-      onChange={handleChange}
-      required
-    >
-      <option value="">None</option>
-      {role.map((item) => (
-        <option key={item} value={item}>
-          {item}
-        </option>
-      ))}
-    </select>
-  </label>
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">City</span>
-    <input
-      name="city"
-      id="city"
-      placeholder="Enter your city name"
-      value={formData.city}
-      onChange={handleChange}
-      className="border-2 px-2 py-2 rounded-lg  outline-none"
-      type="text"
-    />
-  </label>
-  <label className="flex flex-col w-[70%] gap-2">
-    <span className="font-medium text-xl">Adddress</span>
-    <input
-      name="address"
-      id="address"
-      placeholder="Enter your full address"
-      value={formData.address}
-      onChange={handleChange}
-      className="border-2 px-2 py-2 rounded-lg  outline-none"
-      type="text"
-    />
-  </label>
-  <div className="mt-8">
-    <button type="submit"
-      className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
-    >Submit Form</button>
-  </div>
-</form>
-}
+    </form>
+  );
+};

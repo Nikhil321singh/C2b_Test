@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import {
   updateCoreObject,
@@ -8,168 +8,201 @@ import {
   updateFunctionalMinorObject,
   updateWarrantyObject,
 } from "../../store/slices/QNAslice";
-import { useDispatch, useSelector } from "react-redux";
-const QuestionSearch = ({ setIsSearchOpen, state }) => {
+import { useSelector } from "react-redux";
+import store from "../../store/store";
+const whiteText = "text-white";
+const blackText = "text-black";
+const pinkBg = "bg-[#EC2752]";
+const whiteBg = "bg-white";
+
+const QuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredQuestions, setFilteredQuestions] = useState([]);
-  const [answer, setAnswer] = useState("");
-  const dispatch = useDispatch();
   const qnaAnswer = useSelector((AnsState) => AnsState.qna);
-  console.log("qna", qnaAnswer);
   const handleSearch = () => {
-    const filtered = Object.values(state).flatMap((group) =>
-      group.filter((question) =>
-        question.quetion.toLowerCase().includes(searchQuery.toLowerCase())
+    const uniqueCaptions = new Set();
+
+    const filtered = Object.entries(state)
+      .flatMap(([groupKey, group], groupIndex) =>
+        group.flatMap((question, questionIndex) =>
+          question.options
+            .filter((option) => {
+              const isMatch =
+                option.caption
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase()) ||
+                question.quetion
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase()) ||
+                groupKey.toLowerCase().includes(searchQuery.toLowerCase());
+              if (
+                isMatch &&
+                !uniqueCaptions.has(option.caption.toLowerCase())
+              ) {
+                uniqueCaptions.add(option.caption.toLowerCase());
+                return true;
+              }
+              return false;
+            })
+            .map((option, optionIndex) => ({
+              ...option,
+              yes: question.yes,
+              no: question.no,
+              questionTxt: question.quetion,
+              originalOptionIndex: optionIndex,
+              originalQuestionIndex: questionIndex,
+              groupKey: groupKey,
+            }))
+        )
       )
-    );
-    console.log("asdasdasd", state);
+      .slice(0, 6);
     setFilteredQuestions(filtered);
-
-    const checkedQuestion = filtered.length > 0 ? filtered[0] : null;
-
-    if (checkedQuestion) {
-      const questionIndex = qnaAnswer[checkedQuestion.group].findIndex(
-        (q) => q.quetion === checkedQuestion.quetion
-      );
-
-      setAnswer(qnaAnswer[checkedQuestion.group][questionIndex]?.answer || "");
-    }
   };
 
-  const handleChange = (event, index, group, key) => {
-    const { value } = event.target;
-
-    const questionIndex = state[group].findIndex((question) => {
-      console.log("question", question.quetion);
-      console.log("filter", filteredQuestions[0].quetion);
-      return question.quetion === filteredQuestions[0].quetion;
-    });
-    setAnswer(event.target.value);
-    console.log("index", questionIndex);
-    console.log("ac");
+  const handleChange = (event, index, group, optionIndex, yesKey, noKey) => {
     if (group === "Core") {
-      dispatch(
+      store.dispatch(
         updateCoreObject({
-          index: questionIndex,
-          newAnswer: value,
-          newKey: key,
+          index: index,
+          yesKey: yesKey,
+          noKey: noKey,
+          newKey: "yes",
+          selectedIndex: optionIndex,
         })
       );
     } else if (group === "Cosmetics") {
-      dispatch(
+      store.dispatch(
         updateCosmeticsObject({
-          index: questionIndex,
-          newAnswer: value,
-          newKey: key,
+          index: index,
+          yesKey: yesKey,
+          noKey: noKey,
+          newKey: "yes",
+          selectedIndex: optionIndex,
         })
       );
     } else if (group === "Display") {
-      dispatch(
+      store.dispatch(
         updateDisplayObject({
-          index: questionIndex,
-          newAnswer: value,
-          newKey: key,
+          index: index,
+          yesKey: yesKey,
+          noKey: noKey,
+          newKey: "yes",
+          selectedIndex: optionIndex,
         })
       );
     } else if (group === "Functional_major") {
-      dispatch(
+      store.dispatch(
         updateFunctionalMajorObject({
-          index: questionIndex,
-          newAnswer: value,
-          newKey: key,
+          index: index,
+          yesKey: yesKey,
+          noKey: noKey,
+          newKey: "yes",
+          selectedIndex: optionIndex,
         })
       );
     } else if (group === "Functional_minor") {
-      dispatch(
+      store.dispatch(
         updateFunctionalMinorObject({
-          index: questionIndex,
-          newAnswer: value,
-          newKey: key,
+          index: index,
+          yesKey: yesKey,
+          noKey: noKey,
+          newKey: "yes",
+          selectedIndex: optionIndex,
         })
       );
     } else if (group === "Warranty") {
-      dispatch(
+      store.dispatch(
         updateWarrantyObject({
-          index: questionIndex,
-          newAnswer: value,
-          newKey: key,
+          index: index,
+          newAnswer: yesKey,
+          newKey: "yes",
         })
       );
     }
   };
+  useEffect(() => {
+    if (searchQuery && searchQuery.length > 2) {
+      handleSearch();
+    }
+  }, [searchQuery]);
   return (
     <>
-      <div className="absolute top-0 left-0 w-full min-h-screen bg-white z-50 ">
-        <div className="bg-white p-8 rounded ">
-          <div className="flex  p-2 items-center border-2 rounded-lg">
-            <div className="mr-2 ">
-              <IoClose size={20} onClick={() => setIsSearchOpen(false)} />
-            </div>
-
+      <div className="fixed top-0 left-0 w-full min-h-full bg-white z-50">
+        <div className="bg-white py-4 px-8 rounded">
+          <div
+            className="flex items-center rounded-lg"
+            style={{
+              boxShadow:
+                "1px 1px 2px 0px rgba(0, 0, 0, 0.158), 0px 0px 0px 0px rgba(0, 0, 0, 0.034)",
+            }}
+          >
+            <button
+              onClick={() => setIsSearchOpen(false)}
+              className="p-1 bg-[#EC2752] text-white rounded"
+            >
+              <IoClose size={30} />
+            </button>
             <input
               type="text"
               name="Question"
               value={searchQuery}
               placeholder="Search Question..."
               autoFocus
-              className=" rounded outline-none"
+              className="rounded-[.55rem] outline-none mx-auto"
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <button
-              onClick={handleSearch}
-              className="ml-2 p-2 bg-[#EC2752] text-white rounded"
+              onClick={(e) => setSearchQuery("")}
+              className="py-[7px] px-2 flex flex-col items-center justify-center bg-[#EC2752] text-white rounded"
             >
-              Search
+              <p className="">Clear</p>
             </button>
           </div>
-
-          {filteredQuestions.map((data, index) => (
-            <div key={data._id} className="mt-4">
-              <div className="font-medium text-lg ml-3 mb-2">
-                {data.quetion}
-              </div>
-              <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
-                <label
-                  className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                    answer === data.yes ? "bg-[#EC2752] text-white" : ""
+          <div className="w-[90%] mx-auto mt-4 flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
+            {filteredQuestions.map((data, index) => (
+              <React.Fragment key={data._id}>
+                <div
+                  onClick={(e) => {
+                    console.log(data);
+                    console.log(
+                      qnaAnswer[data.groupKey][data.originalQuestionIndex]
+                        .selected[data.originalOptionIndex]
+                    );
+                    handleChange(
+                      "xyz",
+                      data.originalQuestionIndex,
+                      data.groupKey,
+                      data.originalOptionIndex,
+                      data.yes,
+                      data.no
+                    );
+                  }}
+                  className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                    !qnaAnswer[data.groupKey][data.originalQuestionIndex]
+                      .selected[data.originalOptionIndex]
+                      ? whiteBg
+                      : pinkBg
                   }`}
                 >
-                  <input
-                    name={data._id}
-                    type="radio"
-                    hidden
-                    value={data.yes}
-                    onChange={(e) => handleChange(e, index, data.group, "yes")}
-                    checked={answer === data.yes}
-                  />{" "}
-                  Yes
-                </label>
-                <label
-                  className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                    answer === data.no ? "bg-[#EC2752] text-white" : ""
-                  }`}
-                >
-                  <input
-                    name={data._id}
-                    type="radio"
-                    value={data.no}
-                    hidden
-                    onChange={(e) => handleChange(e, index, data.group, "no")}
-                    checked={answer === data.no}
-                  />{" "}
-                  No
-                </label>
-              </div>
-            </div>
-          ))}
-          {filteredQuestions.length > 0 && (
-            <button
-              className="mt-4 p-2 bg-[#EC2752] text-white rounded"
-              onClick={() => setIsSearchOpen(false)}
-            >
-              Close
-            </button>
-          )}
+                  <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                    <img className="scale-[1.2]" src={imageMap[data.img]} />
+                  </div>
+                  <div className="border-t-[1.5px] w-full py-2">
+                    <p
+                      className={`text-xs font-medium text-center ${
+                        !qnaAnswer[data.groupKey][data.originalQuestionIndex]
+                          .selected[data.originalOptionIndex]
+                          ? blackText
+                          : whiteText
+                      }`}
+                    >
+                      {data.caption}
+                    </p>
+                  </div>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       </div>
     </>

@@ -80,7 +80,7 @@ const OrdersCompleted = ({ daysfilters, head }) => {
           <div className="w-full flex items-center justify-between  ">
             <ProfileBox />
             <img
-              className="w-28 "
+              className="w-40"
               onClick={() => navigate("/selectdevicetype")}
               src={Grest_Logo}
               alt="app logo"

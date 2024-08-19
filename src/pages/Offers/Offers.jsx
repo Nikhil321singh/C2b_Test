@@ -6,44 +6,34 @@ import axios from "axios";
 import toast from "react-hot-toast";
 const navViewOfferr = "/viewofferdetail";
 
-const offerArray = [
-  { id: "GRU1000", label: "GRU1000" },
-  { id: "GRU1000", label: "GRU1000" },
-  { id: "GRU2000", label: "GRU2000" },
-  { id: "GRU700", label: "GRU700" },
-  { id: "GRU900", label: "GRU900" },
-];
+const initForm = {
+  offerName: "",
+  price: 0,
+  validFrom: "",
+  validTo: "",
+  warranty: true,
+};
 
 const Offers = () => {
-  const storedItem = JSON.parse(sessionStorage.getItem("rowData")) || {};
-  const storedUser = sessionStorage.getItem("offerUserName");
-  const item = storedItem;
+  const storedItem = sessionStorage.getItem("rowData");
+  const userProfile = JSON.parse(sessionStorage.getItem("profile"));
+  const item = storedItem && JSON.parse(storedItem);
   const authToken = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(true);
   const navigate = useNavigate();
-  const [offerName, setOfferName] = useState(
-    item?.offerName ? item?.offerName : ""
-  );
-  const [price, setPrice] = useState(item ? item?.price : 0);
-  const [validFrom, setValidFrom] = useState("");
-  const [validTo, setValidTo] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
-  const [warranty, setWarranty] = useState(false);
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  const [formData, setFormData] = useState(initForm);
 
   const getData = () => {
     const data = {
-      offerName: offerName,
-      price: price,
-      validFrom: validFrom,
-      validTo: validTo,
-      createdBy: createdBy,
-      warranty: warranty,
+      offerName: formData.offerName,
+      price: formData.price,
+      validFrom: formData.validFrom,
+      validTo: formData.validTo,
+      warranty: formData.warranty,
+      createdBy: userProfile._id,
+      updatedBy: userProfile._id,
     };
+    console.log(data);
     if (item && item.editoffer) {
       const config = {
         method: "put",
@@ -59,12 +49,6 @@ const Offers = () => {
         .then((response) => {
           toast.success("Successfully updated offer details");
           sessionStorage.removeItem("rowData");
-          setOfferName("");
-          setPrice(0);
-          setValidFrom("");
-          setValidTo("");
-          setCreatedBy("");
-          setWarranty(true);
           navigate(navViewOfferr);
         })
         .catch((error) => {
@@ -100,23 +84,24 @@ const Offers = () => {
 
   useEffect(() => {
     if (item) {
-      const date = new Date(item.validFrom);
+      const date = new Date(item?.validFrom);
       const year = date.getFullYear();
-      const month = `0${date.getMonth() + 1}`.slice(-2); // Months are 0-indexed in JavaScript
+      const month = `0${date.getMonth() + 1}`.slice(-2);
       const day = `0${date.getDate()}`.slice(-2);
-      const dateto = new Date(item.validTo);
+      const dateto = new Date(item?.validTo);
       const yearto = dateto.getFullYear();
-      const monthto = `0${dateto.getMonth() + 1}`.slice(-2); // Months are 0-indexed in JavaScript
+      const monthto = `0${dateto.getMonth() + 1}`.slice(-2);
       const dayto = `0${dateto.getDate()}`.slice(-2);
 
-      setOfferName(item.offerName || "");
-      setPrice(item.price || 0);
-      setValidFrom(`${year}-${month}-${day}` || "");
-      setValidTo(`${yearto}-${monthto}-${dayto}` || "");
-      setCreatedBy(storedUser || "");
-      setWarranty(item?.warranty ?? true);
+      setFormData({
+        offerName: item?.offerName || "",
+        price: item?.price || 0,
+        validFrom: `${year}-${month}-${day}` || "",
+        validTo: `${yearto}-${monthto}-${dayto}` || "",
+        warranty: item?.warranty ?? true,
+      });
     }
-  }, [item]);
+  }, []);
 
   return (
     <div className="min-h-screen  pb-8 bg-[#F5F4F9]">
@@ -125,44 +110,24 @@ const Offers = () => {
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
       <SubOffer
-        offerName={offerName}
-        setOfferName={setOfferName}
-        price={price}
-        setPrice={setPrice}
-        validFrom={validFrom}
-        setValidFrom={setValidFrom}
-        validTo={validTo}
-        setValidTo={setValidTo}
-        createdBy={createdBy}
-        setCreatedBy={setCreatedBy}
-        warranty={warranty}
-        setWarranty={setWarranty}
+        formData={formData}
+        setFormData={setFormData}
         handleOffer={handleOffer}
-        isModalOpen={isModalOpen}
-        closeModal={closeModal}
       />
     </div>
   );
 };
 
-const SubOffer = ({
-  offerName,
-  setOfferName,
-  price,
-  setPrice,
-  validFrom,
-  setValidFrom,
-  validTo,
-  setValidTo,
-  createdBy,
-  setCreatedBy,
-  warranty,
-  setWarranty,
-  handleOffer,
-  isModalOpen,
-  closeModal,
-}) => {
+const SubOffer = ({ formData, setFormData, handleOffer }) => {
   const navigate = useNavigate();
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+    setFormData({
+      ...formData,
+      [name]: newValue,
+    });
+  };
   return (
     <div
       style={{
@@ -189,89 +154,87 @@ const SubOffer = ({
           <div className="flex flex-col w-[70%] gap-2">
             <span className="font-medium text-xl">Offer Name *</span>
             <input
+              id="offerName"
+              name="offerName"
               className="border-2 px-2 py-2 rounded-lg outline-none"
               type="text"
               required
-              value={offerName}
-              onChange={(e) => setOfferName(e.target.value)}
+              value={formData.offerName}
+              onChange={handleChange}
             />
           </div>
           <div className="flex flex-col w-[70%] gap-2">
             <span className="font-medium text-xl">Price *</span>
             <input
+              id="price"
+              name="price"
               className="border-2 px-2 py-2 rounded-lg  outline-none "
               type="number"
               required
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              value={formData.price}
+              onChange={handleChange}
             />
           </div>
-
           <div className="flex flex-col w-[70%] gap-2 ">
             <span className="font-medium text-xl">Valid From *</span>
             <input
+              id="validFrom"
+              name="validFrom"
               className="border-2 px-2 py-2 rounded-lg  outline-none"
               type="date"
               required
-              value={validFrom}
-              onChange={(e) => setValidFrom(e.target.value)}
+              value={formData.validFrom}
+              onChange={handleChange}
             />
           </div>
-
           <div className="flex flex-col w-[70%] gap-2">
             <span className="font-medium text-xl">Valid To *</span>
             <input
+              id="validTo"
+              name="validTo"
               className="border-2 px-2 py-2 rounded-lg  outline-none"
               type="date"
               required
-              value={validTo}
-              onChange={(e) => setValidTo(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col w-[70%] gap-2">
-            <span className="font-medium text-xl">Created By</span>
-            <input
-              className="border-2 px-2 py-2 rounded-lg  outline-none"
-              type="text"
-              value={createdBy}
-              onChange={(e) => setCreatedBy(e.target.value)}
+              value={formData.validTo}
+              onChange={handleChange}
             />
           </div>
           <span className="font-medium text-xl">If Warranty</span>
           <div className="flex gap-2 -mt-2">
-            <label
-              className={`text-[#EC2752] font-medium w-[100px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                warranty === true
+            <div
+              className={`text-[#EC2752] font-medium w-[100px] h-[40px] flex items-center justify-center gap-1 p-2 rounded-lg ${
+                formData.warranty === true
                   ? "bg-[#EC2752] text-white"
                   : "border-[#EC2752] border-2"
               }`}
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  warranty: true,
+                })
+              }
             >
-              <input
-                style={{ display: "none" }}
-                name="warranty"
-                type="radio"
-                onClick={(e) => setWarranty(true)}
-              />{" "}
               True
-            </label>
-            <label
-              className={`text-[#EC2752]  font-medium w-[100px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                warranty === false
+            </div>
+            <div
+              className={`text-[#EC2752]  font-medium w-[100px] h-[40px] flex items-center justify-center gap-1 p-2 rounded-lg ${
+                formData.warranty === false
                   ? "bg-[#EC2752] text-white"
                   : "border-2 border-[#EC2752]"
               }`}
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  warranty: false,
+                })
+              }
             >
-              <input
-                style={{ display: "none" }}
-                name="warranty"
-                type="radio"
-                onClick={(e) => setWarranty(false)}
-              />{" "}
               False
-            </label>
+            </div>
           </div>
           <div className="mt-8">
             <button
+              type="submit"
               onClick={(e) => handleOffer(e)}
               className="font-medium text-sm text-white px-8 py-3 rounded bg-[#EC2752]"
             >
@@ -279,35 +242,6 @@ const SubOffer = ({
             </button>
           </div>
         </form>
-        {isModalOpen && (
-          <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center">
-            <div
-              className="absolute w-full h-full bg-gray-900 opacity-50"
-              onClick={closeModal}
-            ></div>
-            <div className="bg-white p-8 rounded-lg z-10">
-              <div className="flex flex-col gap-2">
-                {offerArray.map((element, offerIndex) => (
-                  <div
-                    key={offerIndex}
-                    className="flex gap-4 items-center justify-between"
-                  >
-                    <p className="text-xl font-medium min-w-[80px]">
-                      {element.label}
-                    </p>
-                    <select className="bg-gray-200 font-medium rounded-lg p-2 outline-none">
-                      <option value="">Choose Action</option>
-                      <option value="">View</option>
-                      <option value="">Edit</option>
-                      <option value="">Delete</option>
-                      <option value="">Download</option>
-                    </select>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

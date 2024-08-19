@@ -26,7 +26,7 @@ const downloadExcel = (pickupData) => {
 
   const formattedData = pickupData.map((item) => {
     return {
-      "Lot Id": item._id,
+      "Lot Id": item.uniqueCode || item._id,
       Date: new Date(item.createdAt).toLocaleDateString("en-GB"),
       Status: item.status,
       "Total Amount": item.totalAmount,
@@ -125,7 +125,7 @@ const PickupHistory = () => {
     const storeNamesArray = filterStores.map((store) => store.storeName);
     setRegion(value);
     setStoreData(storeNamesArray);
-    dispatch(setStoreFilter({selStore: "", selRegion: value}));
+    dispatch(setStoreFilter({ selStore: "", selRegion: value }));
   };
 
   const handleStoreChange = (value) => {
@@ -134,7 +134,7 @@ const PickupHistory = () => {
     const newRegion = filterStores[0].region;
     setStoreName(value);
     setRegion(newRegion);
-    dispatch(setStoreFilter({selStore: value, selRegion: newRegion}));
+    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
   };
 
   const viewHandler = (refID) => {
@@ -153,7 +153,7 @@ const PickupHistory = () => {
         {userRole === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-28 " src={Grest_Logo} alt="app logo" />
+            <img className="w-40" src={Grest_Logo} alt="app logo" />
           </div>
         ) : (
           <div className="navbar">
@@ -269,7 +269,7 @@ const PickupTable = ({ pickupData, viewHandler }) => {
               {new Date(val.createdAt).toLocaleDateString("en-GB")}
             </td>
             <td className="text-center p-2 text-sm md:p-3 md:text-base">
-              {val?._id}
+              {val?.uniqueCode || val?._id}
             </td>
             <td className="p-2 text-center text-sm md:p-3 md:text-base">
               {val?.totalDevice}

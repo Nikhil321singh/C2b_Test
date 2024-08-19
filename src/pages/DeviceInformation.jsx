@@ -112,9 +112,9 @@ const DeviceInformation = () => {
       sessionStorage.setItem("LeadId", response.data.data.id);
       sessionStorage.setItem(
         "responsedatadata",
-        JSON.stringify(response.data.data)
+        JSON.stringify({ ...response.data.data, bonus: 0 })
       );
-      dispatch(setResponseData(response.data.data));
+      dispatch(setResponseData({ ...response.data.data, bonus: 0 }));
       console.log("clicked");
       navigate("/inputnumber");
     } else {
@@ -134,7 +134,7 @@ const DeviceInformation = () => {
 
           <img
             onClick={() => navigate("/selectdevicetype")}
-            className="w-28 "
+            className="w-40"
             src={Grest_Logo}
             alt="app logo"
           />

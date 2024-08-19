@@ -263,7 +263,7 @@ const ExtComps = ({
         {userRole === "Technician" ? (
           <div className="w-full flex items-center justify-between">
             <ProfileBox />
-            <img src={Grest_Logo} className="w-28 " alt="app logo" />
+            <img src={Grest_Logo} className="w-40" alt="app logo" />
           </div>
         ) : (
           <div className="navbar">
@@ -357,7 +357,7 @@ const OutstandingFilter = ({
   setStoreData,
   storeData,
   getData,
-  data
+  data,
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
@@ -369,7 +369,7 @@ const OutstandingFilter = ({
     const storeNames = filterStores.map((store) => store.storeName);
     setStoreData(storeNames);
     setRegion(val);
-    dispatch(setStoreFilter({selStore: "", selRegion: val}));
+    dispatch(setStoreFilter({ selStore: "", selRegion: val }));
   };
 
   const handleStoreChange = (val) => {
@@ -378,7 +378,7 @@ const OutstandingFilter = ({
     const bRnewRegion = filterStores[0].region;
     setRegion(bRnewRegion);
     setStoreName(val);
-    dispatch(setStoreFilter({selStore: val, selRegion: bRnewRegion}));
+    dispatch(setStoreFilter({ selStore: val, selRegion: bRnewRegion }));
   };
 
   const handleSearchClear = () => {
@@ -509,8 +509,8 @@ const OutstandingTable = ({
   setFailMode,
 }) => {
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-  const [showView, setShowView] = useState(false);
   const userRole = LoggedInUser?.role || "";
+  const [showView, setShowView] = useState(false);
   const [viewRef, setViewRef] = useState("");
   const token2 = sessionStorage.getItem("authToken");
   const viewHandler = (refID) => {

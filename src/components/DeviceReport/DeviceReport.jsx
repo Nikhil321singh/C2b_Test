@@ -49,12 +49,14 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
             <p className="px-2 text-xl font-medium border-r-2 border-black cursor-default">
               Device Report
             </p>
-            {!quoteSaved &&<p
-              onClick={clickHandler}
-              className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
-            >
-              ModifyAnswers
-            </p>}
+            {!quoteSaved && (
+              <p
+                onClick={clickHandler}
+                className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
+              >
+                Modify Answers
+              </p>
+            )}
             <IoClose
               size={25}
               className="absolute right-2 text-[#EC2752] cursor-pointer"
@@ -199,12 +201,14 @@ const WatchPart = ({ clickHandler, closeHandler, data, quoteSaved }) => {
         <p className="px-2 text-xl font-medium border-r-2 border-black cursor-default">
           Device Report
         </p>
-        {!quoteSaved && <p
-          onClick={clickHandler}
-          className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
-        >
-          ModifyAnswers
-        </p>}
+        {!quoteSaved && (
+          <p
+            onClick={clickHandler}
+            className="cursor-pointer pl-2 text-sm font-medium text-[#EC2752] underline underline-offset-2 hover:underline-offset-4"
+          >
+            Modify Answers
+          </p>
+        )}
         <IoClose
           size={25}
           className="absolute right-2 text-[#EC2752] cursor-pointer"

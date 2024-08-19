@@ -5,32 +5,11 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import styles from "../SelectDevice/SelectDevice.module.css";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import mi from "../../assets/mi-logo.jpg";
-import smasung from "../../assets/samsung-logo.png";
-import vivo from "../../assets/Vivo-Logo.png";
-import Oppo from "../../assets/Oppo.png";
-import Motorola from "../../assets/Motorola.png";
-import Lenovo from "../../assets/Lenovo.png";
-import Nokia from "../../assets/Nokia.png";
-import Honor from "../../assets/Honor.png";
 import laptop from "../../assets/laptop-logo.png";
 import mobile from "../../assets/mobile-logo.png";
 import watch from "../../assets/watch_logo.png";
 import { ImCancelCircle } from "react-icons/im";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import poco from "../../assets/POCO.png";
-import real from "../../assets/real-logo.png";
-
-const brandImages = {
-  Apple: (logo) => <img className="w-[80px] mb-2" src={logo} alt="Apple" />,
-  OnePlus: (logo) => <img className="w-[80px] mb-2" src={logo} alt="OnePlus" />,
-  POCO: () => <img className="mx-auto" src={poco} alt="POCO" />,
-  Realme: () => <img className="mx-auto" src={real} alt="Realme" />,
-  Xiaomi: () => <img className="mx-auto w-[50px]" src={mi} alt="Xiaomi" />,
-  Samsung: () => <img className="mx-auto" src={smasung} alt="Samsung" />,
-  Vivo: () => <img className="mx-auto" src={vivo} alt="Vivo" />,
-  OPPO: () => <img className="mx-auto" src={Oppo} alt="OPPO" />,
-};
 
 export const DeviceTypeFilter = ({
   setSelectedBtn,
@@ -130,13 +109,6 @@ function Categories() {
 
   const navigate = useNavigate();
 
-  const extraBrands = [
-    { name: "Motorola", logo: Motorola },
-    { name: "Lenovo", logo: Lenovo },
-    { name: "Nokia", logo: Nokia },
-    { name: "Honor", logo: Honor },
-  ];
-
   const handleBrandClick = (brandItem) => {
     console.log("morere", deviceType);
     if (deviceType === "Laptop" || deviceType === undefined) {
@@ -160,8 +132,9 @@ function Categories() {
   useEffect(() => {
     axios
       .get(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/brands/getBrands`,
-
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/brands/getBrands?deviceType=${deviceType}`,
         {
           headers: {
             authorization: `${userToken}`,
@@ -174,7 +147,7 @@ function Categories() {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [deviceType]);
 
   console.log(brandList);
 
@@ -210,7 +183,7 @@ function Categories() {
 
             <img
               onClick={() => navigate("/selectdevicetype")}
-              className="w-28 "
+              className="w-40"
               src={Grest_Logo}
               alt="app logo"
             />
@@ -222,36 +195,22 @@ function Categories() {
           setDeviceType={setDeviceType}
         />
         <div
-          className={` ${styles.cardsContainer}   m-4  flex flex-wrap justify-center gap-2 md:gap-8 rounded-md`}
+          className={` ${styles.cardsContainer} m-4 flex flex-wrap justify-center gap-2 md:gap-8 rounded-md`}
         >
           {brandList &&
             brandList.map((model) => (
               <div
                 key={model._id}
-                className={`${styles.card} w-[30%] md:w-[20%] lg:w-[15%] xl:w-[16%] md:rounded-lg gap-2 flex flex-col items-center px-2 py-4 text-center h-[7rem]`}
+                className={`${styles.card} bg-white w-[30%] md:w-[20%] lg:w-[15%] xl:w-[16%] rounded-lg gap-2 flex flex-col items-center px-2 pt-4 pb-2 text-center`}
                 onClick={() => handleBrandClick(model)}
               >
-                <div className="imagecont h-[70px] w-[80px] flex items-center justify-center">
-                  {brandImages[model.name]
-                    ? brandImages[model.name](model?.logo)
-                    : null}
+                <div className="imagecont h-[60px] w-[80px] flex items-center justify-center">
+                  <img
+                    className="w-[60px] mb-2"
+                    src={model?.logo}
+                    alt="Apple"
+                  />
                 </div>
-                <p className="text-[14px] font-medium">{model.name}</p>
-              </div>
-            ))}
-
-          {deviceType === "Mobile" &&
-            brandList &&
-            extraBrands.map((model, index) => (
-              <div
-                key={index}
-                className={`${styles.card} w-[30%] md:w-[20%] lg:w-[15%] xl:w-[16%]  md:rounded-lg gap-2 flex flex-col items-center px-2 py-4  text-center h-[7rem]`}
-                onClick={() => handleDeviceClick()}
-              >
-                <div className="imagecont h-[70px] w-[80px] flex items-center justify-center">
-                  <img className="h-[55px]  mb-2 " src={model?.logo} alt="" />
-                </div>
-
                 <p className="text-[14px] font-medium">{model.name}</p>
               </div>
             ))}

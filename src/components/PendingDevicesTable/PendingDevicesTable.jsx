@@ -78,6 +78,9 @@ const PendingDevicesTable = ({
             <th className="p-2 min-w-[100px] text-sm md:p-3 md:text-base">
               Status
             </th>
+            <th className="p-2 min-w-[100px] text-sm md:p-3 md:text-base">
+              Reason
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -118,6 +121,11 @@ const PendingDevicesTable = ({
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.status}
+              </td>
+              <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                {val?.status === "On Hold" || val?.status === "Cancelled"
+                  ? val?.reason
+                  : ""}
               </td>
             </tr>
           ))}

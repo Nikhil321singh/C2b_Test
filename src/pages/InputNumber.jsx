@@ -50,9 +50,9 @@ const InputNumber = () => {
           sessionStorage.setItem("phoneNumber", number);
           sessionStorage.setItem(
             "responsedatadata",
-            JSON.stringify(response.data.data)
+            JSON.stringify({...response.data.data, bonus: 0})
           );
-          dispatch(setResponseData(response.data.data));
+          dispatch(setResponseData({...response.data.data, bonus: 0}));
         } catch (err) {
           console.error(err);
         }

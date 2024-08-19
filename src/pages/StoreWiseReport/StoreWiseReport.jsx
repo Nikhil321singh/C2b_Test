@@ -49,7 +49,8 @@ const fetchDownloadDataStoreWise = (deviceCategory) => {
     .get(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}`,
+      }/api/prospects/findAll?page=${0}&limit=${9999}
+      &is_selled=${isSelled}&deviceType=${deviceCategory}`,
       {
         headers: {
           authorization: `${userToken}`,
@@ -80,7 +81,9 @@ const StoreWiseReport = () => {
   const [fromDate, setFromDate] = useState("");
   const [fromDateDup, setFromDateDup] = useState("2023-01-01");
   const [toDate, setToDate] = useState("");
-  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
+  const [toDateDup, setToDateDup] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [grestRec, setGrestRec] = useState("");
   const [allUser, setAllUser] = useState([]);
   const [techId, setTechId] = useState("");
@@ -90,9 +93,13 @@ const StoreWiseReport = () => {
   const fetchStoreData = () => {
     setIsTableLoaded(true);
     axios
-      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll?page=${currentPage
-        }&limit=${pageLimit}&is_selled=${isSelled}&store=${storeId}&rid=${searchValue}&grestRec=${grestRec
-        }&endDate=${toDateDup}&startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
+      .get(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/prospects/findAll?page=${currentPage}
+        &limit=${pageLimit}&is_selled=${isSelled}
+        &store=${storeId}&rid=${searchValue}&grestRec=${grestRec}&endDate=${toDateDup}
+        &startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
         { headers: { Authorization: token } }
       )
       .then((res) => {
@@ -163,7 +170,15 @@ const StoreWiseReport = () => {
 
   useEffect(() => {
     fetchStoreData();
-  }, [currentPage, pageLimit, grestRec, fromDateDup, toDateDup, techId, deviceCategory]);
+  }, [
+    currentPage,
+    pageLimit,
+    grestRec,
+    fromDateDup,
+    toDateDup,
+    techId,
+    deviceCategory,
+  ]);
 
   useEffect(() => {
     if (storeId) {
@@ -171,43 +186,7 @@ const StoreWiseReport = () => {
     }
   }, [storeId]);
 
-  const handleFromDateChange = (date) => {
-    if (date === null) {
-      setFromDate("");
-    } else {
-      setFromDate(date);
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
-      const today = new Date();
-      const formattedToday = new Date(
-        today.getTime() - today.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
-      if (toDate === "") {
-        setToDateDup(formattedToday);
-      }
-      setFromDateDup(formattedDate);
-    }
-  };
-  const handleToDateChange = (date) => {
-    if (date === null) {
-      setToDate("");
-    } else {
-      setToDate(date);
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      ).toISOString().split("T")[0];
-      setToDateDup(formattedDate);
-      if (fromDate === "") {
-        const fromDateOneYearBefore = new Date(date);
-        fromDateOneYearBefore.setFullYear(fromDateOneYearBefore.getFullYear() - 1);
-        const formattedFromDate = new Date(
-          fromDateOneYearBefore.getTime() - fromDateOneYearBefore.getTimezoneOffset() * 60000
-        ).toISOString().split("T")[0];
-        setFromDateDup(formattedFromDate);
-      }
-    }
-  };
+
   const handleSearchClear = () => {
     setStoreName("");
     setStoreId("");
@@ -248,10 +227,12 @@ const StoreWiseReport = () => {
         storeData={storeData}
         setStoreData={setStoreData}
         toDate={toDate}
-        handleFromDateChange={handleFromDateChange}
-        handleToDateChange={handleToDateChange}
         fromDate={fromDate}
         entireStore={entireStore}
+        setFromDateDup={setFromDateDup}
+        setToDateDup={setToDateDup}
+        setToDate={setToDate}
+        setFromDate={setFromDate}
       />
       <TableCont
         currentPage={currentPage}
@@ -351,15 +332,65 @@ const MainFilter = ({
   storeData,
   setStoreData,
   toDate,
-  handleFromDateChange,
-  handleToDateChange,
   fromDate,
   entireStore,
+  setFromDateDup,
+  setToDateDup,
+  setToDate,
+  setFromDate,
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
   const [grestDrop, setGrestDrop] = useState(false);
   const [techDrop, setTechDrop] = useState(false);
+  const handleFromDateChange = (date) => {
+    if (date === null) {
+      setFromDate("");
+    } else {
+      setFromDate(date);
+      const formattedDate = new Date(
+        date.getTime() - date.getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .split("T")[0];
+      const today = new Date();
+      const formattedToday = new Date(
+        today.getTime() - today.getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .split("T")[0];
+      if (toDate === "") {
+        setToDateDup(formattedToday);
+      }
+      setFromDateDup(formattedDate);
+    }
+  };
+  const handleToDateChange = (date) => {
+    if (date === null) {
+      setToDate("");
+    } else {
+      setToDate(date);
+      const formattedDate = new Date(
+        date.getTime() - date.getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .split("T")[0];
+      setToDateDup(formattedDate);
+      if (fromDate === "") {
+        const fromDateOneYearBefore = new Date(date);
+        fromDateOneYearBefore.setFullYear(
+          fromDateOneYearBefore.getFullYear() - 1
+        );
+        const formattedFromDate = new Date(
+          fromDateOneYearBefore.getTime() -
+            fromDateOneYearBefore.getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .split("T")[0];
+        setFromDateDup(formattedFromDate);
+      }
+    }
+  };
   const handleRegionChange = (value) => {
     setRegionDrop(false);
     setStoreName("");

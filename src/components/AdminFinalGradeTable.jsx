@@ -5,7 +5,7 @@ const AdminFinalGradeTable = () => {
   const result = JSON.parse(sessionStorage.getItem("combinationOutput"));
   const adminModelName = sessionStorage.getItem("adminModelName");
   console.log(adminAnswer);
-  const category = sessionStorage.getItem("admincategory")
+  const category = sessionStorage.getItem("admincategory");
 
   return (
     <div className="m-2  w-[90%] overflow-x-auto md:m-5 ">

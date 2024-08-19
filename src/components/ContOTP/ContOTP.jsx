@@ -1,4 +1,4 @@
-import React,{ useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./ContOTP.module.css";
 import optImg from "../../assets/otpLogo.svg";
 import OtpInput from "otp-input-react";
@@ -7,6 +7,8 @@ import { useDispatch } from "react-redux";
 import { setOtpVerified } from "../../store/slices/otpSlice";
 import LoadingSpinner from "../LoadingSpinner";
 import { MdEdit } from "react-icons/md";
+import ProfileBox from "../ProfileBox/ProfileBox";
+import Grest_Logo from "../../assets/Grest_Logo.jpg";
 
 const initOtp = {
   name: "",
@@ -79,7 +81,16 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   }, [otpData]);
 
   return (
-    <div className={`${styles.contopt_page} z-20`}>
+    <div className={`${styles.contopt_page}`} style={{ zIndex: 9999 }}>
+      <div className="absolute top-4 md:top-0 bg-white flex items-center justify-between w-full pr-2 py-2 rounded-md">
+        <ProfileBox />
+        <img
+          onClick={() => navigate("/selectdevicetype")}
+          className="w-40"
+          src={Grest_Logo}
+          alt="app logo"
+        />
+      </div>
       <div className={` ${styles.optbox_wrap}`}>
         <div className={`${styles.optimg_wrap}`}>
           <img onClick={() => setContinueOTPOpen(false)} src={optImg} />
@@ -92,7 +103,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
                 OTP sent to
               </span>
               <span
-                className="text-sm font-medium text-left ml-[2px] text-[#ec2752] flex items-center"
+                className="text-sm font-medium text-left ml-[2px] text-[#EC2752] flex items-center"
                 onClick={handleNumberEdit}
               >
                 <span className="text-sm font-medium opacity-60 text-[#000000]">

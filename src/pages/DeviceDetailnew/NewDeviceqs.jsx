@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import { React, useEffect, useReducer, useState } from "react";
 import "./newDeviceqs.scss";
 import { useQuestionContext } from "../../components/QuestionContext";
 import axios from "axios";
@@ -97,8 +97,8 @@ const imageMap = {
   quesImg37: quesImg31,
   quesImg38: quesImg19,
   quesImg39,
-  quesImg40: quesImg35,
-  quesImg41: quesImg39,
+  quesImg40: quesImg36,
+  quesImg41: quesImg35,
   quesImg42,
   quesImg43,
   quesImg44,
@@ -335,7 +335,7 @@ const MainQContainer = ({
           <ProfileBox />
           <img
             onClick={() => navigate("/selectdevicetype")}
-            className="w-28 "
+            className="w-40"
             src={Grest_Logo}
             alt="app logo"
           />
@@ -368,6 +368,7 @@ const MainQContainer = ({
               setIsSearchOpen={setIsSearchOpen}
               state={NDstate}
               dispatch={dispatch}
+              imageMap={imageMap}
             />
           )}
         </div>
@@ -391,7 +392,10 @@ const MainQContainer = ({
               <FifthPart FunctionalMinor={FunctionalMinor} NDstate={NDstate} />
             )}
             {visible === 6 && (
-              <SixthPart Warranty={Warranty} NDstate={NDstate} />
+              <SixthPart Cosmetics={Cosmetics} NDstate={NDstate} />
+            )}
+            {visible === 7 && (
+              <SeventhPart Warranty={Warranty} NDstate={NDstate} />
             )}
           </div>
         </div>
@@ -461,6 +465,9 @@ const FirstPart = ({ NDstate, core }) => {
             </React.Fragment>
           ))}
       </div>
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
+      </div>
     </div>
   );
 };
@@ -474,49 +481,63 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
       </div>
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate.Cosmetics &&
-          NDstate.Cosmetics.map((data, index) => (
-            <React.Fragment key={data._id}>
-              {data?.options.map((option, optionIndex) => (
-                <React.Fragment key={optionIndex}>
-                  <div
-                    onClick={(e) => {
-                      console.log(Cosmetics);
-                      console.log("assssaaaaa", option);
-                      console.log("assssaaaaa", data);
-                      console.log(optionIndex + "ok");
-                      store.dispatch(
-                        updateCosmeticsObject({
-                          index: index,
-                          yesKey: data.yes,
-                          noKey: data.no,
-                          newKey: "yes",
-                          selectedIndex: optionIndex,
-                        })
-                      );
-                    }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                      !Cosmetics[index].selected[optionIndex] ? whiteBg : pinkBg
-                    }`}
-                  >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                      <img className="scale-[1.2]" src={imageMap[option.img]} />
-                    </div>
-                    <div className="border-t-[1.5px] w-full py-2">
-                      <p
-                        className={`text-xs font-medium text-center ${
+          NDstate.Cosmetics.map((data, index) => {
+            if (index < 5) {
+              return (
+                <React.Fragment key={data._id}>
+                  {data?.options.map((option, optionIndex) => (
+                    <React.Fragment key={optionIndex}>
+                      <div
+                        onClick={(e) => {
+                          console.log(Cosmetics);
+                          console.log("assssaaaaa", option);
+                          console.log("assssaaaaa", data);
+                          console.log(optionIndex + "ok");
+                          store.dispatch(
+                            updateCosmeticsObject({
+                              index: index,
+                              yesKey: data.yes,
+                              noKey: data.no,
+                              selectedIndex: optionIndex,
+                              newKey: "yes",
+                            })
+                          );
+                        }}
+                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                           !Cosmetics[index].selected[optionIndex]
-                            ? blackText
-                            : whiteText
+                            ? whiteBg
+                            : pinkBg
                         }`}
                       >
-                        {option.caption}
-                      </p>
-                    </div>
-                  </div>
+                        <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                          <img
+                            src={imageMap[option.img]}
+                            className="scale-[1.2]"
+                          />
+                        </div>
+                        <div className="w-full border-t-[1.5px] py-2">
+                          <p
+                            className={`text-xs font-medium text-center ${
+                              !Cosmetics[index].selected[optionIndex]
+                                ? blackText
+                                : whiteText
+                            }`}
+                          >
+                            {option.caption}
+                          </p>
+                        </div>
+                      </div>
+                    </React.Fragment>
+                  ))}
                 </React.Fragment>
-              ))}
-            </React.Fragment>
-          ))}
+              );
+            } else {
+              return null;
+            }
+          })}
+      </div>
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
   );
@@ -574,6 +595,9 @@ const ThirdPart = ({ NDstate, Display }) => {
               ))}
             </React.Fragment>
           ))}
+      </div>
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
   );
@@ -634,6 +658,9 @@ const FourthPart = ({ FunctionalMajor, NDstate }) => {
             </React.Fragment>
           ))}
       </div>
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
+      </div>
     </div>
   );
 };
@@ -693,16 +720,90 @@ const FifthPart = ({ FunctionalMinor, NDstate }) => {
             </React.Fragment>
           ))}
       </div>
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
+      </div>
     </div>
   );
 };
 
-const SixthPart = ({ Warranty, NDstate }) => {
+const SixthPart = ({ NDstate, Cosmetics }) => {
   return (
     <div className="containClass">
       <div className="subheading">
         <GoDotFill size={20} />
-        <h2>Basic Condition of the Device</h2>
+        <h2>Select Accessories Not Available with Device</h2>
+      </div>
+      <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
+        {NDstate.Cosmetics &&
+          NDstate.Cosmetics.map((data, index) => {
+            if (index >= 5) {
+              return (
+                <React.Fragment key={data._id}>
+                  {data?.options.map((option, optionIndex) => (
+                    <React.Fragment key={optionIndex}>
+                      <div
+                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                          !Cosmetics[index].selected[optionIndex]
+                            ? whiteBg
+                            : pinkBg
+                        }`}
+                        onClick={(e) => {
+                          console.log(Cosmetics);
+                          console.log("assssaaaaa", option);
+                          console.log("assssaaaaa", data);
+                          console.log(optionIndex + "ok");
+                          store.dispatch(
+                            updateCosmeticsObject({
+                              noKey: data.no,
+                              index: index,
+                              yesKey: data.yes,
+                              newKey: "yes",
+                              selectedIndex: optionIndex,
+                            })
+                          );
+                        }}
+                      >
+                        <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                          <img
+                            className="scale-[1.2]"
+                            src={imageMap[option.img]}
+                          />
+                        </div>
+                        <div className="border-t-[1.5px] w-full py-2">
+                          <p
+                            className={`text-xs font-medium text-center ${
+                              !Cosmetics[index].selected[optionIndex]
+                                ? blackText
+                                : whiteText
+                            }`}
+                          >
+                            {option.caption}
+                          </p>
+                        </div>
+                      </div>
+                    </React.Fragment>
+                  ))}
+                </React.Fragment>
+              );
+            } else {
+              return null;
+            }
+          })}
+      </div>
+      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
+      </div>
+    </div>
+  );
+};
+
+const SeventhPart = ({ Warranty, NDstate }) => {
+  return (
+    <div className="containClass">
+      <div className="subheading">
+        <GoDotFill size={20} />
+        <h2>Please Choose the Appropriate Warranty Period for Your Device</h2>
       </div>
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate?.Warranty &&
@@ -798,39 +899,39 @@ const AboveSix = ({
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
-      JSON.stringify(response.data.data)
+      JSON.stringify({ ...response.data.data, bonus: 0 })
     );
     sessionStorage.setItem("ExactQuote", true);
-    store.dispatch(setResponseData(response.data.data));
+    store.dispatch(setResponseData({ ...response.data.data, bonus: 0 }));
     setIsLoading(false);
     navigate("/devicequote");
   };
 
   return (
     <React.Fragment>
-      {visible >= 6 ? (
+      {visible >= 7 ? (
         <div className="fixed bottom-0 flex justify-center w-full gap-2 p-3 bg-white border-t-2">
           <div
             onClick={handleSubtract}
-            className={`bg-[#EC2752] w-[20%] px-6 py-2 rounded-lg flex items-center`}
+            className={`bg-[#EC2752] w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
           >
             <ImArrowLeft color="white" size={20} />
           </div>
-          <button
-            onClick={() => handleSkip(visible, updateAns)}
-            disabled
-            className={` bg-slate-400  w-[30%] py-1 px-2 text-center rounded-lg cursor-not-allowed flex justify-between text-white items-center`}
-          >
-            <p className="w-full p-1 text-xl font-medium">Skip</p>
-          </button>
+          {/* <button
+              onClick={() => handleSkip(visible, updateAns)}
+              disabled
+              className={` bg-slate-400  w-[30%] py-1 px-2 text-center rounded-lg cursor-not-allowed flex justify-between text-white items-center`}
+            >
+              <p className="w-full p-1 text-xl font-medium">Skip</p>
+            </button> */}
           <div
             onClick={handlesubmit}
-            className="bg-[#EC2752] w-[50%] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
+            className="bg-[#EC2752] w-[70%] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
           >
             {isLoading && (
               <CgSpinner
                 size={20}
-                className="absolute left-[28%] top-[8px] mt-1 animate-spin"
+                className="absolute left-[18%] top-[8px] mt-1 animate-spin"
               />
             )}
             <p className="w-full p-1 text-xl font-medium">
@@ -847,20 +948,20 @@ const AboveSix = ({
                 visible < 2
                   ? "bg-slate-400 cursor-not-allowed"
                   : "bg-[#EC2752] cursor-pointer"
-              }  w-[20%] px-6 py-2 rounded-lg flex items-center`}
+              }  w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
             >
               <ImArrowLeft color="white" size={20} />
             </button>
           )}
-          <div
+          {/* <div
             onClick={() => handleSkip(visible, updateAns)}
             className="bg-[#EC2752] w-[30%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
           >
             <p className="w-full p-1 text-xl font-medium">Skip</p>
-          </div>
+          </div> */}
           <div
             onClick={handleADD}
-            className="bg-[#EC2752] w-[50%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
+            className="bg-[#EC2752] w-[70%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
           >
             <p className="w-full p-1 text-xl font-medium">Continue</p>
           </div>

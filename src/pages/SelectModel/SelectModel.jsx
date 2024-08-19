@@ -10,9 +10,14 @@ import apple_watch from "../../assets/apple_watch.png";
 
 const SelectModel = () => {
   const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
-  const phoneFrontPhoto = phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront;
+  const phoneFrontPhoto =
+    phoneImg?.models?.phonePhotos?.front ||
+    phoneImg?.models?.phonePhotos?.upFront;
   const Device = sessionStorage.getItem("DeviceType");
-  const DummyImg = Device === "Mobile" ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg" : apple_watch;
+  const DummyImg =
+    Device === "Mobile"
+      ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
+      : apple_watch;
   const [modelData, setModelData] = useState();
   const { resetState } = useQuestionContext();
   const [selectedConfig, setSelectedConfig] = useState(() => {
@@ -86,7 +91,7 @@ const SelectModel = () => {
           <ProfileBox />
           <img
             onClick={() => navigate("/selectdevicetype")}
-            className="w-28 "
+            className="w-40"
             src={Grest_Logo}
             alt="app logo"
           />

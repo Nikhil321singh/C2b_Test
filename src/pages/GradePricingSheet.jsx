@@ -15,7 +15,6 @@ import { ToastContainer, toast } from "react-toastify";
 
 const pageLimit = 10;
 
-
 const downloadExcelGradePricingSheet = (apiData) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";

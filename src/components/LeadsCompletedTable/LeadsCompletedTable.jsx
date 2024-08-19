@@ -62,7 +62,7 @@ const LeadsCompletedTable = ({ data }) => {
   const getStorage = (val) => {
     if (val?.modelId?.type === "Mobile") {
       return `${
-        val?.storage && val?.ram ? `${val?.storage}/${val?.ram}` : val?.storage
+        val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
       }`;
     } else {
       return "-";
@@ -78,6 +78,7 @@ const LeadsCompletedTable = ({ data }) => {
             <th className="p-2 text-sm md:p-3 md:text-base">Category</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Product Name</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Variant</th>
+            <th className="p-2 text-sm md:p-3 md:text-base">Price</th>
             <th className="p-2 text-sm md:p-3 md:text-base min-w-[160px]">
               Final Price Offered to Customer
             </th>
@@ -113,10 +114,11 @@ const LeadsCompletedTable = ({ data }) => {
               <td className="p-2 min-w-[150px] text-sm text-center md:p-3 md:text-base">
                 {getStorage(val)}
               </td>
+              <td className="p-2 min-w-[150px] text-sm text-center md:p-3 md:text-base">
+                {val?.actualPrice}
+              </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {typeof val.price === "object"
-                  ? val.price["$numberDecimal"]
-                  : val.price}
+                {val?.price}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.documentId?.IMEI}
