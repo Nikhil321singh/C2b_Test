@@ -5,16 +5,11 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import styles from "../SelectDevice/SelectDevice.module.css";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import Motorola from "../../assets/Motorola.png";
-import Lenovo from "../../assets/Lenovo.png";
-import Nokia from "../../assets/Nokia.png";
-import Honor from "../../assets/Honor.png";
 import laptop from "../../assets/laptop-logo.png";
 import mobile from "../../assets/mobile-logo.png";
 import watch from "../../assets/watch_logo.png";
 import { ImCancelCircle } from "react-icons/im";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-
 
 export const DeviceTypeFilter = ({
   setSelectedBtn,

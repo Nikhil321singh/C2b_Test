@@ -49,7 +49,8 @@ const fetchDownloadDataStoreWise = (deviceCategory) => {
     .get(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}`,
+      }/api/prospects/findAll?page=${0}&limit=${9999}
+      &is_selled=${isSelled}&deviceType=${deviceCategory}`,
       {
         headers: {
           authorization: `${userToken}`,
@@ -95,7 +96,10 @@ const StoreWiseReport = () => {
       .get(
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll?page=${currentPage}&limit=${pageLimit}&is_selled=${isSelled}&store=${storeId}&rid=${searchValue}&grestRec=${grestRec}&endDate=${toDateDup}&startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
+        }/api/prospects/findAll?page=${currentPage}
+        &limit=${pageLimit}&is_selled=${isSelled}
+        &store=${storeId}&rid=${searchValue}&grestRec=${grestRec}&endDate=${toDateDup}
+        &startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
         { headers: { Authorization: token } }
       )
       .then((res) => {
