@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 const WatchQuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const filteredQuestions = [];
 
   return (
     <>
@@ -36,20 +35,6 @@ const WatchQuestionSearch = ({ setIsSearchOpen, state, imageMap }) => {
             >
               <p className="">Clear</p>
             </button>
-          </div>
-          <div className="w-[90%] mt-4 mx-auto flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
-            {filteredQuestions.map((data, index) => (
-              <div
-                key={data._id}
-                className={`flex flex-col items-center justify-start`}
-                onClick={() => {}}
-              >
-                <img src={"temp"} className="bg-white" />
-                <p className="py-2 px-2 w-[100%] items-center flex flex-row justify-center text-xs font-medium text-balance">
-                  {data.quetion}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
       </div>
