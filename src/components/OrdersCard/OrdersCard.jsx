@@ -70,6 +70,7 @@ const OrdersCard = ({
   useEffect(() => {
     console.log("card");
   }, []);
+    const savedQuote = "Quote Saved";
 
   const isExpired = () => {
     const createdDate = new Date(dateTime);
@@ -78,7 +79,6 @@ const OrdersCard = ({
 
     const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
     const threeDays = 3 * oneDay; // 3 days in milliseconds
-
     if (title === savedQuote) {
       return timeDiff > oneDay;
     } else if (title === "Lead Saved") {
@@ -89,7 +89,6 @@ const OrdersCard = ({
   };
 
   const handleInitiate = () => {
-    const savedQuote = "Quote Saved";
     if (isExpired()) {
       return;
     }

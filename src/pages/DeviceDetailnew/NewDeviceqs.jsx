@@ -465,7 +465,7 @@ const FirstPart = ({ NDstate, core }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#EC2752] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -536,7 +536,7 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
             }
           })}
       </div>
-      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#EC2752] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -596,7 +596,7 @@ const ThirdPart = ({ NDstate, Display }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#EC2752] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -658,7 +658,7 @@ const FourthPart = ({ FunctionalMajor, NDstate }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#EC2752] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -720,7 +720,7 @@ const FifthPart = ({ FunctionalMinor, NDstate }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#EC2752] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -791,7 +791,7 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
             }
           })}
       </div>
-      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex flex mt-4 bg-[#EC2752] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>

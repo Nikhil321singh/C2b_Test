@@ -819,7 +819,7 @@ const MiddlePart = ({
               <OrderStatusBox
                 figures={orderCount}
                 title="Order Created"
-                background="#E94A4E"
+                background="rgb(2, 117, 242)"
               />
             </Link>
             <Link className="w-[33%]" to={`/orderscompleted/${days}`}>
