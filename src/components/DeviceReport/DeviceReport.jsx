@@ -1,9 +1,9 @@
+import React from "react";
 import styles from "./DeviceReport.module.css";
 import { useSelector } from "react-redux";
 import { IoClose } from "react-icons/io5";
 import { LuDot } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
-import React from "react";
 
 const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
   console.log(quoteSaved);

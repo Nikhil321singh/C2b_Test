@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import User_Logo from "../../assets/User_Logo.jpg";
 import { IoClose } from "react-icons/io5";
 import styles from "./ProfileBox.module.css";

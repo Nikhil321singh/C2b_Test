@@ -1,4 +1,4 @@
-import { React, useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import "./newDeviceqs.scss";
 import { useQuestionContext } from "../../components/QuestionContext";
 import axios from "axios";

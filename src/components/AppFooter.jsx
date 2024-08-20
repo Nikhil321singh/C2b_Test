@@ -1,3 +1,4 @@
+import React from "react";
 import { MdOutlineHome } from "react-icons/md";
 import { IoBagAddOutline } from "react-icons/io5";
 import { BiCategory } from "react-icons/bi";

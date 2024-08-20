@@ -137,6 +137,11 @@ const SelectDevice = () => {
     sessionStorage.setItem("dataModelConfig", JSON.stringify(model));
     navigate("/selectmodel");
   };
+  const isArray = Array.isArray(modelInfo);
+  const sortedModels = isArray
+    ? [...modelInfo].sort((a, b) => a.name.localeCompare(b.name))
+    : [];
+
 
   return (
     <div className="flex flex-col min-h-screen pb-16 bg-white">
@@ -198,10 +203,10 @@ const SelectDevice = () => {
         className={` ${styles.cardsContainer} m-4 shrink flex flex-wrap justify-center gap-2 md:gap-8`}
       >
         {modelInfo && modelInfo.length === 0 && (
-          <div className="mt-[50%] font-bold text-4xl">...comming soon...</div>
+          <div className="mt-[50%] font-bold text-4xl">No Product Found</div>
         )}
-        {modelInfo &&
-          modelInfo.map((model) => (
+        {isArray && sortedModels.length > 0 &&
+          sortedModels.map((model) => (
             <div
               key={model._id}
               className={`${styles.card} w-[30%] md:w-[20%] lg:w-[15%] xl:w-[16%] gap-2 flex flex-col items-center px-2 py-4 text-center`}

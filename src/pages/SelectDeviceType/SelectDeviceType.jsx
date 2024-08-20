@@ -297,7 +297,11 @@ export const BrandList = ({ deviceType }) => {
     }
   };
 
-  const allBrands = [...brandList];
+  const isArray = Array.isArray(brandList);
+  const allBrands = isArray
+    ? [...brandList].sort((a, b) => a.name.localeCompare(b.name))
+    : [];
+
   return (
     <>
       {popout && (
@@ -334,7 +338,8 @@ export const BrandList = ({ deviceType }) => {
           ref={brandContainerRef}
           className={`flex flex-shrink-0 gap-4 px-1 overflow-x-auto  scroll-smooth scrollbar-hide ${styles.topSell_box}`}
         >
-          {allBrands.map((brandItem, index) => (
+          {isArray && allBrands.length >0 &&
+            allBrands.map((brandItem, index) => (
             <div
               key={index}
               onClick={() => handleBrandClick(brandItem)}
@@ -850,7 +855,7 @@ const MiddlePart = ({
       <p
         className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#EC2752]`}
       >
-        How SwitchKart Works?
+        How Grest Works?
       </p>
       <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
         <div className="flex flex-col min-w-[30%]  items-center  ">
