@@ -139,6 +139,10 @@ const ChangePassword = () => {
           </div>
         </div>
         <PasswordChange
+          isValid={isValid}
+          userEmail={userEmail}
+          password={password}
+          newPassword={newPassword}
           errMsg={errMsg}
           setConfPassword={setConfPassword}
           setNewFocus={setNewFocus}
@@ -158,6 +162,11 @@ const ChangePassword = () => {
 };
 
 const PasswordChange = ({
+  isValid,
+  userEmail,
+  password,
+  newPassword,
+  confPassword,
   errMsg,
   setConfPassword,
   setNewFocus,
