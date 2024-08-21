@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const userSlice = createSlice({
   name: "user",
-  initialState: { profile: null, selStore: "Switchkart", selRegion: "chandigarh" },
+  initialState: { profile: null, selStore: "GrestTest", selRegion: "Chandigarh" },
   reducers: {
     setUserProfile: (state, action) => {
       state.profile = action.payload;
