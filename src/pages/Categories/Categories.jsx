@@ -208,7 +208,7 @@ function Categories() {
                   <img
                     className="w-[60px] mb-2"
                     src={model?.logo}
-                    alt="Apple"
+                    alt={model.name}
                   />
                 </div>
                 <p className="text-[14px] font-medium">{model.name}</p>
