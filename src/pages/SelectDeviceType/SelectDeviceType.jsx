@@ -297,11 +297,6 @@ export const BrandList = ({ deviceType }) => {
     }
   };
 
-  const isArray = Array.isArray(brandList);
-  const allBrands = isArray
-    ? [...brandList].sort((a, b) => a.name.localeCompare(b.name))
-    : [];
-
   return (
     <>
       {popout && (
@@ -338,8 +333,8 @@ export const BrandList = ({ deviceType }) => {
           ref={brandContainerRef}
           className={`flex flex-shrink-0 gap-4 px-1 overflow-x-auto  scroll-smooth scrollbar-hide ${styles.topSell_box}`}
         >
-          {isArray && allBrands.length >0 &&
-            allBrands.map((brandItem, index) => (
+          {brandList && brandList.length >0 &&
+            brandList.map((brandItem, index) => (
             <div
               key={index}
               onClick={() => handleBrandClick(brandItem)}
