@@ -231,7 +231,7 @@ const OTPComp = ({
             <input
               id="name"
               name="name"
-              placeholder="Enter Name"
+              placeholder="Enter Name *"
               value={otpData?.name}
               onChange={handleChange}
               className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
@@ -242,7 +242,7 @@ const OTPComp = ({
               id="email"
               name="email"
               type="email"
-              placeholder="Enter Email"
+              placeholder="Enter Email *"
               value={otpData?.email}
               onChange={handleChange}
               className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
@@ -266,7 +266,7 @@ const OTPComp = ({
                   });
                 }}
                 className=""
-                placeholder="Enter your Mobile"
+                placeholder="Enter your Mobile *"
               />
             </div>
           </div>

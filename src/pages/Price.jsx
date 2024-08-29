@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
 import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
+import { useSelector } from "react-redux";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 const Price = ({ submitdata, userToken }) => {
@@ -19,6 +20,7 @@ const Price = ({ submitdata, userToken }) => {
   const [phoneRight, setPhoneRight] = useState(null);
   const [phoneTop, setPhoneTop] = useState(null);
   const [phoneBottom, setPhoneBottom] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
   const [imeinumber, setImeiNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -31,7 +33,10 @@ const Price = ({ submitdata, userToken }) => {
   const phoneRightRef = useRef(null);
   const phoneTopRef = useRef(null);
   const phoneBottomRef = useRef(null);
-
+   const isBillNotAvailableSelected = useSelector(
+     (state) => state.qna.isBillNotAvailableSelected
+   );
+  console.log(isBillNotAvailableSelected);
   const handleCameraButtonClick = (ref) => {
     if (!ref.current) {
       return;
@@ -96,7 +101,10 @@ const Price = ({ submitdata, userToken }) => {
     formData.append("emailId", savedOtpData?.email);
     formData.append("name", savedOtpData?.name);
     formData.append("phoneNumber", savedOtpData?.phone);
-    console.log(formData);
+    if (isBillNotAvailableSelected && !phoneBill) {
+      setShowPopup(true);
+      return;
+    }
     try {
       await axios.post(
         `${
@@ -113,7 +121,13 @@ const Price = ({ submitdata, userToken }) => {
   };
 
   return (
-    <div className="h-[100vh] max-h-[200vh] overflow-y-auto bg-white ">
+    <div className="overflow-y-auto bg-white ">
+      <div className={`popup ${showPopup ? "show" : ""}`}>
+        <div className="text">
+          Please Upload Bill of Your Device
+        </div>
+        <button onClick={() => setShowPopup(false)}> Close</button>
+      </div>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
         <div className="flex items-center justify-between w-full ">
           <div className="flex flex-row-reverse items-center gap-2 ml-4">
