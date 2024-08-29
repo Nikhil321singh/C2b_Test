@@ -52,7 +52,7 @@ const ChangePassword = () => {
     }
 
     if (password.length < 8) {
-      setErrMsg("Password Size Must Be More Than 8");
+      setErrMsg("Password Size Must Be More Than 8 Characters");
       setIsValid(false);
       return;
     } else {
@@ -60,7 +60,7 @@ const ChangePassword = () => {
     }
 
     if (newPassword.length < 8) {
-      setErrMsg("Password Size Must Be More Than 8");
+      setErrMsg("Password Size Must Be More Than 8 Characters");
       setIsValid(false);
       return;
     }
@@ -99,7 +99,7 @@ const ChangePassword = () => {
       setIsValid(true);
       setErrMsg("Password Matched Please Submit");
       return;
-    }else{
+    } else {
       setIsValid(false);
     }
   };
@@ -121,8 +121,7 @@ const ChangePassword = () => {
 
     axios
       .post(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/userregistry/updatePassword`,
         data,
         {
@@ -168,7 +167,7 @@ const ChangePassword = () => {
               <h1 className="font-sans text-[#4900A8] my-2 text-3xl font-bold sm:text-4xl">
                 Change Password
               </h1>
-              <p className={`${isValid ? "text-[#8080FF]": "text-red-600"} text-sm h-[20px]`}>{errMsg}</p>
+              <p className={`${isValid ? "text-[#8080FF]" : "text-[#8080FF]"} text-sm h-[20px]`}>{errMsg}</p>
             </div>
             <div className="innerbox">
               <div className="flex flex-col items-center w-full gap-6">
@@ -260,10 +259,9 @@ const ChangePassword = () => {
                   <div className="mb-6 login_button_holder">
                     <button
                       type="submit"
-                      className={`login_button ${
-                        (isLoading || !isValid) &&
+                      className={`login_button ${(isLoading || !isValid) &&
                         "opacity-[.8]"
-                      }`}
+                        }`}
                       disabled={isLoading || !isValid}
                     >
                       {isLoading && (
