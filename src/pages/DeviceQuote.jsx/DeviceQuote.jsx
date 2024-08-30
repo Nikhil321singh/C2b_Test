@@ -55,6 +55,7 @@ const DeviceQuote = () => {
       Price,
       bonus,
     });
+  const navigate = useNavigate();
   
     useEffect(() => {
       let timer;
@@ -91,7 +92,6 @@ const DeviceQuote = () => {
     setShowDeviceReport(!showDeviceReport);
   };
 
-  const navigate = useNavigate();
   const toggleModal = () => {
     setShowModal(!showModal);
   };

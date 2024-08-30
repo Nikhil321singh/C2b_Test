@@ -5,6 +5,8 @@ import OtpInput from "otp-input-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setOtpVerified } from "../../store/slices/otpSlice";
+import { auth } from "../../firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import LoadingSpinner from "../LoadingSpinner";
 import { MdEdit } from "react-icons/md";
 import ProfileBox from "../ProfileBox/ProfileBox";
@@ -28,6 +30,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
+    const [firstTime, setFirstIme] = useState(true);
   const isFormComplete = otpData.name && otpData.email && ph;
   const [errMsg, setErrMsg] = useState("");
 
@@ -42,6 +45,86 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setLoading(false);
     setOtpBoxOpen(!otpBoxOpen);
   };
+  function onCaptchVerify() {
+    console.log(auth);
+    // For Firebase version 9 and above
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
+      size: "invisible",
+      callback: (response) => {
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+        // ...
+      },
+    });
+  }
+  function onSignup(event) {
+    setLoading(true);
+    if (firstTime) {
+      onCaptchVerify();
+      setFirstIme(false);
+    }
+
+    const appVerifier = window.recaptchaVerifier;
+    const formatPh = "+91" + ph;
+    console.log(formatPh);
+    //setNumber(formatPh);
+
+    signInWithPhoneNumber(auth, formatPh, appVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+        setLoading(false);
+        setOtpBoxOpen(true);
+        setDisableResend(true);
+        // toast.success("OTP sended successfully!");
+        console.log("OTP sent successfully!");
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
+
+    setOtpData({
+      ...otpData,
+      phone: ph,
+    });
+  }
+
+ function onOTPVerify() {
+   setLoading(true);
+   window.confirmationResult
+     .confirm(otp)
+     .then(async (res) => {
+       // setUser(res.user);
+       // console.log("ho gya");
+       //setChange(!change);
+       console.log("ho gya");
+       // sessionStorage.setItem("otpverified", "true");
+       dispatch(setOtpVerified(true));
+       navigate("/inputnumber");
+     })
+     .catch((err) => {
+       console.log(err);
+       setLoading(false);
+     });
+ }
+    const resendOTP = () => {
+      // Start the countdown timer
+      setDisableResend(true);
+      //onCaptchVerify();
+
+      const appVerifier = window.recaptchaVerifier;
+      const formatPh = "+91" + ph;
+
+      // Resend the OTP without changing the loading state
+      signInWithPhoneNumber(auth, formatPh, appVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          console.log("OTP resent successfully!");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
+  
   const onSignupDup = () => {
     if (!isFormComplete) {
       setErrMsg("Please Fill All Details");
@@ -145,7 +228,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
               </span>
               <button
                 className=" text-left  min-w-[100px]"
-                onClick={resendOTPDup}
+                onClick={resendOTP}
                 disabled={disableResend}
               >
                 {disableResend ? `Resend in ${timer}` : "Resend OTP"}
@@ -158,7 +241,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
           {otpBoxOpen ? (
             <>
               <button
-                onClick={onOTPVerifyDup}
+                onClick={onOTPVerify}
                 className={`${loading || !otp ? "opacity-[.8]" : ""}`}
                 disabled={loading || !otp}
               >
@@ -179,10 +262,8 @@ const ContOTP = ({ setContinueOTPOpen }) => {
           ) : (
             <>
               <button
-                onClick={onSignupDup}
-                className={`${
-                  loading ? "opacity-[.8]" : ""
-                }`}
+                onClick={onSignup}
+                className={`${loading ? "opacity-[.8]" : ""}`}
                 disabled={loading}
               >
                 {loading && (
