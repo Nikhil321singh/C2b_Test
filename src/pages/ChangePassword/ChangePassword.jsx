@@ -88,7 +88,7 @@ const ChangePassword = () => {
     console.log(isValid);
   }, [userEmail, newPassword, confPassword, newFocus, confFocus]);
   const showPop = () => {
-    if (newPassword != confPassword) {
+    if (newPassword !== confPassword) {
       setShowPopup(true);
     }
   };
