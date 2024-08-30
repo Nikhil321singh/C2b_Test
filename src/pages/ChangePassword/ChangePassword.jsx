@@ -190,10 +190,10 @@ const PasswordChange = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full mt-16">
-      <div className={`popup ${showPopup ? "show" : ""}`}>
-        <div className="text">New Password & Confirm Password</div>
-        <button onClick={() => setShowPopup(false)}> Close</button>
-      </div>
+       <div className={`w-[85vw] h-[160px] popup py-0 ${showPopup ? "show" : ""}`}>
+            <div className="text">New Password & Confirm Password must be same</div>
+            <button onClick={() => setShowPopup(false)}> Close</button>
+          </div>
       <div className="flex flex-col items-center justify-center box">
         <div className="imgBox">
           <img className="w-48 pt-4 mt-2 mb-3" src={Grest_Logo} />
