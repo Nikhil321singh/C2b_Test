@@ -28,6 +28,9 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
+  const isFormComplete = otpData.name && otpData.email && ph;
+  const [errMsg, setErrMsg] = useState("");
+
 
   const handleChange = (e) => {
     setOtpData({
@@ -40,6 +43,10 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setOtpBoxOpen(!otpBoxOpen);
   };
   const onSignupDup = () => {
+    if (!isFormComplete) {
+      setErrMsg("Please Fill All Details");
+      return;
+    }
     setLoading(true);
     const formatPh = "+" + ph;
     console.log(formatPh);
@@ -81,18 +88,16 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   }, [otpData]);
 
   return (
-    <div className={`${styles.contopt_page}`}
-    style={{ zIndex: 9999 }}
-    >
+    <div className={`${styles.contopt_page}`} style={{ zIndex: 9999 }}>
       <div className="absolute top-4 md:top-0 bg-white flex items-center justify-between w-full pr-2 py-2 rounded-md">
-          <ProfileBox />
-          <img
-            onClick={() => navigate("/selectdevicetype")}
-            className="w-40"
-            src={Grest_Logo}
-            alt="app logo"
-          />
-        </div>
+        <ProfileBox />
+        <img
+          onClick={() => navigate("/selectdevicetype")}
+          className="w-40"
+          src={Grest_Logo}
+          alt="app logo"
+        />
+      </div>
       <div className={` ${styles.optbox_wrap}`}>
         <div className={`${styles.optimg_wrap}`}>
           <img onClick={() => setContinueOTPOpen(false)} src={optImg} />
@@ -124,6 +129,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
         <OTPComp
           otpBoxOpen={otpBoxOpen}
           otp={otp}
+          errMsg={errMsg}
           setOtp={setOtp}
           otpData={otpData}
           handleChange={handleChange}
@@ -153,8 +159,8 @@ const ContOTP = ({ setContinueOTPOpen }) => {
             <>
               <button
                 onClick={onOTPVerifyDup}
-                className={`${loading && "opacity-[.8]"}`}
-                disabled={loading}
+                className={`${loading || !otp ? "opacity-[.8]" : ""}`}
+                disabled={loading || !otp}
               >
                 {loading && (
                   <div className={`${styles.spinner} -ml-4`}>
@@ -167,13 +173,16 @@ const ContOTP = ({ setContinueOTPOpen }) => {
                   <span>Verify OTP</span>
                 )}
               </button>
+
               <div id="recaptcha"></div>
             </>
           ) : (
             <>
               <button
                 onClick={onSignupDup}
-                className={`${loading && "opacity-[.8]"}`}
+                className={`${
+                  loading ? "opacity-[.8]" : ""
+                }`}
                 disabled={loading}
               >
                 {loading && (
@@ -204,6 +213,7 @@ const OTPComp = ({
   setOtp,
   otpData,
   handleChange,
+  errMsg,
   ph,
   setPh,
   setOtpData,
@@ -230,11 +240,14 @@ const OTPComp = ({
         </div>
       ) : (
         <div className={`${styles.form_fields_wrap}`}>
+          <div className="flex items-center justify-center m-auto">
+            <p className="text-[#8080FF] text-sm h-[20px] p-0 m-0">{errMsg}</p>
+          </div>
           <div>
             <input
               id="name"
               name="name"
-              placeholder="Enter Name"
+              placeholder="Enter Name *"
               value={otpData?.name}
               onChange={handleChange}
               className="border-2 border-[#4900A8] py-1 rounded-lg pl-[12px]"
@@ -245,7 +258,7 @@ const OTPComp = ({
               id="email"
               name="email"
               type="email"
-              placeholder="Enter Email"
+              placeholder="Enter Email *"
               value={otpData?.email}
               onChange={handleChange}
               className="border-2 border-[#4900A8] py-1 rounded-lg pl-[12px]"
@@ -269,7 +282,7 @@ const OTPComp = ({
                   });
                 }}
                 className=""
-                placeholder="Enter your Mobile"
+                placeholder="Enter your Mobile *"
               />
             </div>
           </div>
