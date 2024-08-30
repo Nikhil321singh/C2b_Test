@@ -16,6 +16,22 @@ const ProductSold = () => {
     const ShowMessage = sessionStorage.getItem("messageReceived");
     setMessage(ShowMessage);
   }, []);
+  const [countdown, setCountdown] = useState(10); // 10 seconds countdown
+
+  useEffect(() => {
+    let timer;
+    if ( countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prevCount) => {
+          console.log("Countdown:", prevCount - 1); // Log the countdown
+          return prevCount - 1;
+        });
+      }, 1000);
+    } else if (countdown === 0) {
+      navigate("/selectdevicetype");
+    }
+    return () => clearInterval(timer);
+  }, [countdown, navigate]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -57,7 +73,7 @@ const ProductSold = () => {
           onClick={handleReturn}
           className=" bg-[#EC2752] mb-20 text-center p-3 mx-2 text-lg rounded-lg cursor-pointer flex justify-between  text-white items-center"
         >
-          <p className="font-medium  text-2xl flex-1 mx-4">Return to Home</p>
+          <p className="font-medium  text-2xl flex-1 mx-4">Return To Home ({countdown}s)</p>
         </div>
       </div>
     </div>

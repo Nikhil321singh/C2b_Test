@@ -273,9 +273,9 @@ const ExtComps = ({
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
             <IoIosCheckmarkCircle size={90} className={succTextColor} />
             <h6 className={succTextColor}>Success!</h6>
-            <p className="text-slate-500">{errorMsg}</p>
-            {errorMsg1 && <p className="text-slate-500">{errorMsg1}</p>}
-            {errorMsg2 && <p className="text-slate-500">{errorMsg2}</p>}
+            <p className="text-slate-700">{errorMsg}</p>
+            {errorMsg1 && <p className="text-slate-700">{errorMsg1}</p>}
+            {errorMsg2 && <p className="text-slate-700">{errorMsg2}</p>}
             <button
               className={"text-white bg-green-500 "}
               onClick={() => {
@@ -294,7 +294,7 @@ const ExtComps = ({
           <div className={`${styles.err_mod_box} ${failTextColor}`}>
             <IoIosCloseCircle className={failTextColor} size={90} />
             <h6 className={failTextColor}>Error!</h6>
-            <p className="text-slate-500">{errorMsg}</p>
+            <p className="text-slate-700">{errorMsg}</p>
             <button
               onClick={() => {
                 setFailMode(false);
@@ -310,7 +310,7 @@ const ExtComps = ({
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
           <div className={`${failTextColor} ${styles.err_mod_box} `}>
             <h6 className={failTextColor}>Confirmation!</h6>
-            <p className="text-slate-500">
+            <p className="text-slate-700">
               {`Confirm Payment for lot - ${tempId} ?`}
             </p>
             <div className="flex flex-row gap-2">

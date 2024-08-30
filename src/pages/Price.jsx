@@ -1,11 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
 import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
-import { useSelector } from "react-redux";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
+import toast from "react-hot-toast";
 const Price = ({ submitdata, userToken }) => {
   const userName = "";
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
@@ -20,7 +20,6 @@ const Price = ({ submitdata, userToken }) => {
   const [phoneRight, setPhoneRight] = useState(null);
   const [phoneTop, setPhoneTop] = useState(null);
   const [phoneBottom, setPhoneBottom] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
   const [imeinumber, setImeiNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -33,10 +32,17 @@ const Price = ({ submitdata, userToken }) => {
   const phoneRightRef = useRef(null);
   const phoneTopRef = useRef(null);
   const phoneBottomRef = useRef(null);
-   const isBillNotAvailableSelected = useSelector(
-     (state) => state.qna.isBillNotAvailableSelected
-   );
-  console.log(isBillNotAvailableSelected);
+
+  const [isBillRequired, setIsBillRequired] = useState(false);
+
+  useEffect(() => {
+    const billData = JSON.parse(sessionStorage.getItem("billData"));
+    if (billData && billData?.selected[0] === false) {
+      setIsBillRequired(true);
+      console.log(isBillRequired);
+    }
+  }, []);
+
   const handleCameraButtonClick = (ref) => {
     if (!ref.current) {
       return;
@@ -59,7 +65,8 @@ const Price = ({ submitdata, userToken }) => {
       !phoneLeft ||
       !phoneRight ||
       !phoneTop ||
-      !phoneBottom
+      !phoneBottom ||
+      (isBillRequired && !phoneBill)
     ) {
       alert(
         "Please fill in all mandatory fields (IMEI/Serial number and device images)."
@@ -101,14 +108,16 @@ const Price = ({ submitdata, userToken }) => {
     formData.append("emailId", savedOtpData?.email);
     formData.append("name", savedOtpData?.name);
     formData.append("phoneNumber", savedOtpData?.phone);
-    if (isBillNotAvailableSelected && !phoneBill) {
-      setShowPopup(true);
-      return;
-    }
+    // if (isBillRequired && !formData.phoneBill) {
+    //   console.log("Phone Bill Is required");
+    //   toast.error("Phone Bill Is required");
+    //   setIsLoading(false);
+    //   return;
+    // }
+    console.log(formData);
     try {
       await axios.post(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/questionnaires/upload-documents`,
         formData,
         { headers: { Authorization: token } }
@@ -121,13 +130,7 @@ const Price = ({ submitdata, userToken }) => {
   };
 
   return (
-    <div className="overflow-y-auto bg-white ">
-      <div className={`popup ${showPopup ? "show" : ""}`}>
-        <div className="text">
-          Please Upload Bill of Your Device
-        </div>
-        <button onClick={() => setShowPopup(false)}> Close</button>
-      </div>
+    <div className="h-[100vh] max-h-[200vh] overflow-y-auto bg-white ">
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
         <div className="flex items-center justify-between w-full ">
           <div className="flex flex-row-reverse items-center gap-2 ml-4">
@@ -169,6 +172,7 @@ const Price = ({ submitdata, userToken }) => {
             handleCameraButtonClick={handleCameraButtonClick}
             phoneBillRef={phoneBillRef}
             phoneBill={phoneBill}
+            isBillRequired={isBillRequired}
           />
           <PhonePhotos1
             handleCameraButtonClick={handleCameraButtonClick}
@@ -198,17 +202,16 @@ const Price = ({ submitdata, userToken }) => {
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div
           onClick={() => uploadAllImages()}
-          className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
-            !imeinumber ||
-            !phoneFront ||
-            !phoneBack ||
-            !phoneLeft ||
-            !phoneRight ||
-            !phoneTop ||
-            !phoneBottom
+          className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${!imeinumber ||
+              !phoneFront ||
+              !phoneBack ||
+              !phoneLeft ||
+              !phoneRight ||
+              !phoneTop ||
+              !phoneBottom
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-[#EC2752]"
-          }`}
+            }`}
         >
           {isLoading && (
             <CgSpinner
@@ -283,9 +286,8 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
           maxLength={15}
         />
         <button
-          className={`px-4 py-2 font-bold text-white rounded ${
-            !error ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
-          }`}
+          className={`px-4 py-2 font-bold text-white rounded ${!error ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
+            }`}
           onClick={handleVerify}
           disabled={!!error}
         >
@@ -373,6 +375,7 @@ const PhoneBill = ({
   handleCameraButtonClick,
   phoneBillRef,
   phoneBill,
+  isBillRequired,
 }) => {
   const Device = sessionStorage.getItem("DeviceType");
   return (
@@ -383,6 +386,7 @@ const PhoneBill = ({
           <p className="text-base font-medium three">
             Upload your {Device === "Mobile" && "phone's"}
             {Device === "Watch" && "smartwatch's"} bill
+            {isBillRequired && <span className="text-red-500">*</span>}
           </p>
         </div>
       </div>
