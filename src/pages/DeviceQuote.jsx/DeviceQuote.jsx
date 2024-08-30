@@ -51,8 +51,7 @@ const DeviceQuote = () => {
   useEffect(() => {
     setQuoteId(uniqueCode);
   }, [uniqueCode]);
-
-  
+  const deviceTypePage = "/selectdevicetype";
   const displayPrice = calculateDisplayPrice({
     quoteSaved,
     savedBonus,
@@ -100,7 +99,7 @@ const DeviceQuote = () => {
         <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
           <img
-            onClick={() => navigate("/selectdevicetype")}
+            onClick={() => navigate({deviceTypePage})}
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
@@ -226,9 +225,7 @@ const DeviceQuote = () => {
     </div>
   );
 };
-
 export default DeviceQuote;
-
 const SubDeviceQuote = ({
   savedBonus,
   Price,
@@ -240,7 +237,6 @@ const SubDeviceQuote = ({
 }) => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(10); // 10 seconds countdown
-
   useEffect(() => {
     let timer;
     if (quoteSaved && countdown > 0) {
@@ -251,11 +247,10 @@ const SubDeviceQuote = ({
         });
       }, 1000);
     } else if (quoteSaved && countdown === 0) {
-      navigate("/selectdevicetype");
+      navigate({deviceTypePage});
     }
     return () => clearInterval(timer);
   }, [quoteSaved, countdown, navigate]);
-  
   return (
     <div className="flex items-center justify-between gap-2">
       <div className="flex flex-col w-1/2 text-xl font-medium">
@@ -286,7 +281,7 @@ const SubDeviceQuote = ({
       )}
       {quoteSaved === true && (
         <div
-          onClick={() => navigate("/selectdevicetype")}
+          onClick={() => navigate({deviceTypePage})}
           className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
         >
           <p className="p-2 mx-auto text-lg font-medium ">Return To Home ({countdown}s) </p>

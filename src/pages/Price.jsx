@@ -5,7 +5,6 @@ import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
-import toast from "react-hot-toast";
 const Price = ({ submitdata, userToken }) => {
   const userName = "";
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
@@ -32,32 +31,25 @@ const Price = ({ submitdata, userToken }) => {
   const phoneRightRef = useRef(null);
   const phoneTopRef = useRef(null);
   const phoneBottomRef = useRef(null);
-
   const [isBillRequired, setIsBillRequired] = useState(false);
-
   useEffect(() => {
     const billData = JSON.parse(sessionStorage.getItem("billData"));
     if (billData && billData?.selected[0] === false) {
       setIsBillRequired(true);
-      console.log(isBillRequired);
     }
   }, []);
-
   const handleCameraButtonClick = (ref) => {
     if (!ref.current) {
       return;
     }
     ref.current.click();
   };
-
   const handleChange = (setMEthod, e) => {
     const doc = e.target.files[0];
     setMEthod(doc);
   };
-
   const uploadAllImages = async () => {
     setIsLoading(true);
-
     if (
       !imeinumber ||
       !phoneFront ||
@@ -68,9 +60,7 @@ const Price = ({ submitdata, userToken }) => {
       !phoneBottom ||
       (isBillRequired && !phoneBill)
     ) {
-      alert(
-        "Please fill in all mandatory fields (IMEI/Serial number and device images)."
-      );
+      alert("Please fill in all mandatory fields (IMEI/Serial number and device images).");
       setIsLoading(false);
       return;
     }
@@ -108,13 +98,6 @@ const Price = ({ submitdata, userToken }) => {
     formData.append("emailId", savedOtpData?.email);
     formData.append("name", savedOtpData?.name);
     formData.append("phoneNumber", savedOtpData?.phone);
-    // if (isBillRequired && !formData.phoneBill) {
-    //   console.log("Phone Bill Is required");
-    //   toast.error("Phone Bill Is required");
-    //   setIsLoading(false);
-    //   return;
-    // }
-    console.log(formData);
     try {
       await axios.post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -128,7 +111,6 @@ const Price = ({ submitdata, userToken }) => {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="h-[100vh] max-h-[200vh] overflow-y-auto bg-white ">
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
@@ -148,10 +130,7 @@ const Price = ({ submitdata, userToken }) => {
       <div className="w-[90%] md:w-[90%] mx-auto h-[auto] mb-[93px]">
         <div className="mt-3 text-center relative">
           <h1 className="text-2xl font-semibold">Upload Documents</h1>
-          <p className="mt-4 text-gray-600">
-            Regulations require you to upload a national identity card. Don't
-            worry, your data will stay safe and private.
-          </p>
+          <p className="mt-4 text-gray-600">Regulations require you to upload a national identity card. Don't worry, your data will stay safe and private.</p>
         </div>
         <div className="flex flex-col">
           <ImeiField setImeiNumber={setImeiNumber} imeinumber={imeinumber} />
@@ -198,7 +177,6 @@ const Price = ({ submitdata, userToken }) => {
           />
         </div>
       </div>
-
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div
           onClick={() => uploadAllImages()}
@@ -393,7 +371,6 @@ const PhoneBill = ({
       <p className="mt-2 text-sm text-[#ec275271]">
         Note: Image size should not exceed 2MB
       </p>
-
       <div className="flex justify-start ml-3 inputAADHAR">
         {/* 1 */}
         <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
