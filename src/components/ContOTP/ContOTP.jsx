@@ -321,9 +321,13 @@ const OTPComp = ({
         </div>
       ) : (
         <div className={`${styles.form_fields_wrap}`}>
-          <div className="flex items-center justify-center m-auto">
-            <p className="text-[#8080FF] text-sm h-[20px] p-0 m-0">{errMsg}</p>
-          </div>
+          {errMsg && (
+            <div className="flex items-center justify-center my-0 py-0 m-auto">
+              <p className="text-[#8080FF] text-sm h-[20px] p-0 m-0">
+                {errMsg}
+              </p>
+            </div>
+          )}
           <div>
             <input
               id="name"
