@@ -155,42 +155,20 @@ const ContOTP = ({ setContinueOTPOpen }) => {
         <div className={`${styles.otp_button_wrap}`}>
           {otpBoxOpen ? (
             <>
-              <button
+              <ActionButton
                 onClick={onOTPVerifyDup}
-                className={`${loading || !otp ? "opacity-[.8]" : ""}`}
-                disabled={loading || !otp}
+                loading={loading}
+                disabled={!otp}
               >
-                {loading && (
-                  <div className={`${styles.spinner} -ml-4`}>
-                    <LoadingSpinner />
-                  </div>
-                )}
-                {loading ? (
-                  <span className="-ml-4">Loading</span>
-                ) : (
-                  <span>Verify OTP</span>
-                )}
-              </button>
+                Verify OTP
+              </ActionButton>
               <div id="recaptcha"></div>
             </>
           ) : (
             <>
-              <button
-                onClick={onSignupDup}
-                className={`${loading && "opacity-[.8]"}`}
-                disabled={loading}
-              >
-                {loading && (
-                  <div className={`${styles.spinner} -ml-4`}>
-                    <LoadingSpinner />
-                  </div>
-                )}
-                {loading ? (
-                  <span className="-ml-4">Loading</span>
-                ) : (
-                  <span>Get OTP</span>
-                )}
-              </button>
+              <ActionButton onClick={onSignupDup} loading={loading}>
+                Get OTP
+              </ActionButton>
               <div id="recaptcha"></div>
             </>
           )}
@@ -201,6 +179,25 @@ const ContOTP = ({ setContinueOTPOpen }) => {
 };
 
 export default ContOTP;
+
+const ActionButton = ({ onClick, loading, disabled, children }) => (
+  <button
+    onClick={onClick}
+    className={`${loading || disabled ? "opacity-[.8]" : ""}`}
+    disabled={loading || disabled}
+  >
+    {loading ? (
+      <>
+        <div className={`${styles.spinner} -ml-4`}>
+          <LoadingSpinner />
+        </div>
+        <span className="-ml-4">Loading</span>
+      </>
+    ) : (
+      <span>{children}</span>
+    )}
+  </button>
+);
 
 const OTPComp = ({
   otpBoxOpen,
