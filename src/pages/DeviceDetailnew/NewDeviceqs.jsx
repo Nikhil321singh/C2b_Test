@@ -889,6 +889,10 @@ const AboveSix = ({
       name: id?.customerName ? id?.customerName : profile?.name,
     };
     console.log(finalPayload);
+      sessionStorage.setItem(
+        "billData",
+        JSON.stringify(finalPayload.QNA.Cosmetics[6])
+      );
     const response = await axios.post(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT

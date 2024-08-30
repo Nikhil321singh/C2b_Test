@@ -9,6 +9,15 @@ import DeviceReport from "../../components/DeviceReport/DeviceReport";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import apple_watch from "../../assets/apple_watch.png";
 import { setResponseData } from "../../store/slices/responseSlice";
+const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) => {
+  if (quoteSaved) {
+    return savedBonus
+      ? Number(Price) + Number(bonus) - Number(savedBonus)
+      : Number(Price) + Number(bonus);
+  } else {
+    return savedBonus ? Number(Price) - Number(savedBonus) : Number(Price);
+  }
+};
 
 const DeviceQuote = () => {
   const dispatch = useDispatch();
@@ -32,7 +41,7 @@ const DeviceQuote = () => {
   const savedBonus = useSelector((state) => state.responseData?.bonus) || null;
   const [bonus, setBonus] = useState(savedBonus || null);
   const [termsChecked, setTermsChecked] = useState(false);
-  
+   const [countdown, setCountdown] = useState(10);
   let ResponseData = useSelector((state) => state.responseData);
   const Price = useSelector((state) => state.responseData.price);
   const uniqueCode = useSelector((state) => state.responseData.uniqueCode);
@@ -40,7 +49,27 @@ const DeviceQuote = () => {
   useEffect(() => {
     setQuoteId(uniqueCode);
   }, [uniqueCode]);
+    const displayPrice = calculateDisplayPrice({
+      quoteSaved,
+      savedBonus,
+      Price,
+      bonus,
+    });
   
+    useEffect(() => {
+      let timer;
+      if (quoteSaved && countdown > 0) {
+        timer = setInterval(() => {
+          setCountdown((prevCount) => {
+            console.log("Countdown:", prevCount - 1); // Log the countdown
+            return prevCount - 1;
+          });
+        }, 1000);
+      } else if (quoteSaved && countdown === 0) {
+        navigate("/selectdevicetype");
+      }
+      return () => clearInterval(timer);
+    }, [quoteSaved, countdown, navigate]);
 
   const continueOTPHandler = () => {
     let resData = {
@@ -114,15 +143,7 @@ const DeviceQuote = () => {
                     : ""
                 }`}
               </p>
-              <p className="text-[#4900A8] font-semibold">
-                ₹
-                {/* {savedBonus
-                  ? Number(Price) - Number(savedBonus)
-                  : Number(Price)} */}
-                  {savedBonus
-                ? Number(Price) + Number(bonus) - Number(savedBonus)
-                : Number(Price) + Number(bonus)}
-              </p>
+              <p className="text-[#4900A8] font-semibold">₹{displayPrice}</p>
             </div>
           </div>
           <QuoteModal
@@ -237,13 +258,13 @@ const DeviceQuote = () => {
           )}
           {quoteSaved === true && (
             <div
-            onClick={() => navigate("/selectdevicetype")}
-            className="bg-[#4900A8] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
-          >
-            <p className="p-2 mx-auto text-lg font-medium">
-              Return To Home
-            </p>
-          </div>
+              onClick={() => navigate("/selectdevicetype")}
+              className="bg-[#4900A8] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
+            >
+              <p className="p-2 mx-auto text-lg font-medium ">
+                Return To Home ({countdown}s){" "}
+              </p>
+            </div>
           )}
         </div>
       </div>
