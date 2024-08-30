@@ -121,15 +121,12 @@ import {
   updateFunctionalMinorObject,
   updateWarrantyObject,
 } from "../../store/slices/QNAslice";
-import styles from "../SelectDeviceType/SelectDeviceType.module.css";
-import { CiSearch } from "react-icons/ci";
 import { setResponseData } from "../../store/slices/responseSlice";
 import useUserProfile from "../../utils/useUserProfile";
 import { CgSpinner } from "react-icons/cg";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack } from "react-icons/io";
 import styless from "../QuickQuote/QuickQuote.module.css";
-import QuestionSearch from "../../components/QuestionSearch/QuestionSearch";
 
 const initialState = {
   Core: [],
