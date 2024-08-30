@@ -790,6 +790,12 @@ const MiddlePart = ({
                 Today
               </option>
               <option
+                value="yesterday"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Yesterday
+              </option>
+              <option
                 value="7days"
                 style={{ backgroundColor: "white", color: "black" }}
               >
