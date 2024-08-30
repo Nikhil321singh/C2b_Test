@@ -41,10 +41,10 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setOtpBoxOpen(!otpBoxOpen);
   };
   const onSignupDup = () => {
-      if (!isFormComplete) {
-        setErrMsg("Please Fill All Details");
-        return;
-      }
+    if (!isFormComplete) {
+      setErrMsg("Please Fill All Details");
+      return;
+    }
     setLoading(true);
     const formatPh = "+" + ph;
     console.log(formatPh);
@@ -232,9 +232,13 @@ const OTPComp = ({
         </div>
       ) : (
         <div className={`${styles.form_fields_wrap}`}>
-          <div className="flex items-center justify-center m-auto">
-            <p className="text-[#EC2752] text-sm h-[20px] p-0 m-0">{errMsg}</p>
-          </div>
+          {errMsg && (
+            <div className="flex items-center justify-center my-0 py-0 mx-auto">
+              <p className="text-[#EC2752] text-sm p-0 m-0">
+                {errMsg}
+              </p>
+            </div>
+          )}
           <div>
             <input
               id="name"

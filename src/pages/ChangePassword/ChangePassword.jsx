@@ -88,83 +88,85 @@ const ChangePassword = () => {
     console.log(isValid);
   }, [userEmail, newPassword, confPassword, newFocus, confFocus]);
   const showPop = () => {
-    if {(newPassword !== confPassword) setShowPopup(true);
-  }
-}
-const handleSubmit = (event) => {
-  event.preventDefault();
-  showPop();
-  setIsLoading(true);
-  const userToken = sessionStorage.getItem("authToken");
-  const data = {
-    email: userEmail,
-    oldPassword: password,
-    newPassword: newPassword,
+    if (newPassword != confPassword) {
+      setShowPopup(true);
+    }
   };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    showPop();
+    setIsLoading(true);
+    const userToken = sessionStorage.getItem("authToken");
+    const data = {
+      email: userEmail,
+      oldPassword: password,
+      newPassword: newPassword,
+    };
 
-  axios
-    .post(
-      `${import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/userregistry/updatePassword`,
-      data,
-      {
-        headers: {
-          Authorization: `${userToken}`,
-        },
-      }
-    )
-    .then((res) => {
-      if (res.data.msg === "Successfully updated user password ") {
-        setErrMsg("Successfully Updated User Password");
-        setTimeout(() => {
-          navigate("/");
-        }, 3000);
-      }
-      setIsLoading(false);
-    })
-    .catch((err) => {
-      console.log("failed", err);
-      setIsLoading(false);
-      setErrMsg("Failed to Change Password");
-    });
-};
-return (
-  <>
-    <div className="outer">
-      <div className="absolute top-0 flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full ">
-          <ProfileBox />
-          <img
-            onClick={() => navigate("/selectdevicetype")}
-            className="w-40"
-            src={Grest_Logo}
-            alt="app logo"
-          />
+    axios
+      .post(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/userregistry/updatePassword`,
+        data,
+        {
+          headers: {
+            Authorization: `${userToken}`,
+          },
+        }
+      )
+      .then((res) => {
+        if (res.data.msg === "Successfully updated user password ") {
+          setErrMsg("Successfully Updated User Password");
+          setTimeout(() => {
+            navigate("/");
+          }, 3000);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log("failed", err);
+        setIsLoading(false);
+        setErrMsg("Failed to Change Password");
+      });
+  };
+  return (
+    <>
+      <div className="outer">
+        <div className="absolute top-0 flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
+          <div className="flex items-center justify-between w-full ">
+            <ProfileBox />
+            <img
+              onClick={() => navigate("/selectdevicetype")}
+              className="w-40"
+              src={Grest_Logo}
+              alt="app logo"
+            />
+          </div>
         </div>
+        <PasswordChange
+          isValid={isValid}
+          userEmail={userEmail}
+          password={password}
+          newPassword={newPassword}
+          errMsg={errMsg}
+          setConfPassword={setConfPassword}
+          setNewFocus={setNewFocus}
+          setConfFocus={setConfFocus}
+          showPopup={showPopup}
+          setShowPopup={setShowPopup}
+          isLoading={isLoading}
+          showUserPassword={showUserPassword}
+          showUserPassword2={showUserPassword2}
+          setShowUserPassword2={setShowUserPassword2}
+          handlePasswordChange={handlePasswordChange}
+          handleNewPasswordChange={handleNewPasswordChange}
+          handleEmailChange={handleEmailChange}
+          handleSubmit={handleSubmit}
+        />
       </div>
-      <PasswordChange
-        isValid={isValid}
-        userEmail={userEmail}
-        password={password}
-        newPassword={newPassword}
-        errMsg={errMsg}
-        setConfPassword={setConfPassword}
-        setNewFocus={setNewFocus}
-        setConfFocus={setConfFocus}
-        showPopup={showPopup}
-        setShowPopup={setShowPopup}
-        isLoading={isLoading}
-        showUserPassword={showUserPassword}
-        showUserPassword2={showUserPassword2}
-        setShowUserPassword2={setShowUserPassword2}
-        handlePasswordChange={handlePasswordChange}
-        handleNewPasswordChange={handleNewPasswordChange}
-        handleEmailChange={handleEmailChange}
-        handleSubmit={handleSubmit}
-      />
-    </div>
-  </>
-);
+    </>
+  );
 };
 
 const PasswordChange = ({
@@ -190,7 +192,9 @@ const PasswordChange = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full mt-16">
-      <div className={`w-[85vw] h-[160px] popup py-0 ${showPopup ? "show" : ""}`}>
+      <div
+        className={`w-[85vw] h-[160px] popup py-0 ${showPopup ? "show" : ""}`}
+      >
         <div className="text">New Password & Confirm Password must be same</div>
         <button onClick={() => setShowPopup(false)}> Close</button>
       </div>
@@ -201,8 +205,9 @@ const PasswordChange = ({
             Change Password
           </h1>
           <p
-            className={`${isValid ? "text-[#ec275271]" : "text-red-600"
-              } text-sm h-[20px]`}
+            className={`${
+              isValid ? "text-[#ec275271]" : "text-red-600"
+            } text-sm h-[20px]`}
           >
             {errMsg}
           </p>
@@ -297,8 +302,9 @@ const PasswordChange = ({
               <div className="mb-6 login_button_holder">
                 <button
                   type="submit"
-                  className={`login_button ${(isLoading || !isValid) && "opacity-[.8]"
-                    }`}
+                  className={`login_button ${
+                    (isLoading || !isValid) && "opacity-[.8]"
+                  }`}
                   disabled={isLoading || !isValid}
                 >
                   {isLoading && (
