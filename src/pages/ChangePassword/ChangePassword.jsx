@@ -21,7 +21,7 @@ const ChangePassword = () => {
   const [isValid, setIsValid] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showUserPassword, setShowUserPassword] = useState(false);
-    const [showPopup, setShowPopup] = useState(true);
+    const [showPopup, setShowPopup] = useState(false);
   const [showUserPassword2, setShowUserPassword2] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const navigate = useNavigate();
