@@ -27,6 +27,8 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
+  const isFormComplete = otpData.name && otpData.email && ph;
+  const [errMsg, setErrMsg] = useState("");
 
   const handleChange = (e) => {
     setOtpData({
@@ -39,6 +41,10 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setOtpBoxOpen(!otpBoxOpen);
   };
   const onSignupDup = () => {
+    if (!isFormComplete) {
+      setErrMsg("Please Fill All Details");
+      return;
+    }
     setLoading(true);
     const formatPh = "+" + ph;
     console.log(formatPh);
@@ -82,14 +88,14 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   return (
     <div className={`${styles.contopt_page}`} style={{ zIndex: 9999 }}>
       <div className="absolute top-4 md:top-0 bg-white flex items-center justify-between w-full pr-2 py-2 rounded-md">
-          <ProfileBox />
-          <img
-            onClick={() => navigate("/selectdevicetype")}
-            className="w-40"
-            src={Grest_Logo}
-            alt="app logo"
-          />
-        </div>
+        <ProfileBox />
+        <img
+          onClick={() => navigate("/selectdevicetype")}
+          className="w-40"
+          src={Grest_Logo}
+          alt="app logo"
+        />
+      </div>
       <div className={` ${styles.optbox_wrap}`}>
         <div className={`${styles.optimg_wrap}`}>
           <img onClick={() => setContinueOTPOpen(false)} src={optImg} />
@@ -124,6 +130,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
           setOtp={setOtp}
           otpData={otpData}
           handleChange={handleChange}
+          errMsg={errMsg}
           ph={ph}
           setPh={setPh}
           setOtpData={setOtpData}
@@ -148,42 +155,20 @@ const ContOTP = ({ setContinueOTPOpen }) => {
         <div className={`${styles.otp_button_wrap}`}>
           {otpBoxOpen ? (
             <>
-              <button
+              <ActionButton
                 onClick={onOTPVerifyDup}
-                className={`${loading && "opacity-[.8]"}`}
-                disabled={loading}
+                loading={loading}
+                disabled={!otp}
               >
-                {loading && (
-                  <div className={`${styles.spinner} -ml-4`}>
-                    <LoadingSpinner />
-                  </div>
-                )}
-                {loading ? (
-                  <span className="-ml-4">Loading</span>
-                ) : (
-                  <span>Verify OTP</span>
-                )}
-              </button>
+                Verify OTP
+              </ActionButton>
               <div id="recaptcha"></div>
             </>
           ) : (
             <>
-              <button
-                onClick={onSignupDup}
-                className={`${loading && "opacity-[.8]"}`}
-                disabled={loading}
-              >
-                {loading && (
-                  <div className={`${styles.spinner} -ml-4`}>
-                    <LoadingSpinner />
-                  </div>
-                )}
-                {loading ? (
-                  <span className="-ml-4">Loading</span>
-                ) : (
-                  <span>Get OTP</span>
-                )}
-              </button>
+              <ActionButton onClick={onSignupDup} loading={loading}>
+                Get OTP
+              </ActionButton>
               <div id="recaptcha"></div>
             </>
           )}
@@ -195,11 +180,31 @@ const ContOTP = ({ setContinueOTPOpen }) => {
 
 export default ContOTP;
 
+const ActionButton = ({ onClick, loading, disabled, children }) => (
+  <button
+    onClick={onClick}
+    className={`${loading || disabled ? "opacity-[.8]" : ""}`}
+    disabled={loading || disabled}
+  >
+    {loading ? (
+      <>
+        <div className={`${styles.spinner} -ml-4`}>
+          <LoadingSpinner />
+        </div>
+        <span className="-ml-4">Loading</span>
+      </>
+    ) : (
+      <span>{children}</span>
+    )}
+  </button>
+);
+
 const OTPComp = ({
   otpBoxOpen,
   otp,
   setOtp,
   otpData,
+  errMsg,
   handleChange,
   ph,
   setPh,
@@ -227,11 +232,18 @@ const OTPComp = ({
         </div>
       ) : (
         <div className={`${styles.form_fields_wrap}`}>
+          {errMsg && (
+            <div className="flex items-center justify-center my-0 py-0 mx-auto">
+              <p className="text-[#EC2752] text-sm p-0 m-0">
+                {errMsg}
+              </p>
+            </div>
+          )}
           <div>
             <input
               id="name"
               name="name"
-              placeholder="Enter Name"
+              placeholder="Enter Name *"
               value={otpData?.name}
               onChange={handleChange}
               className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
@@ -242,7 +254,7 @@ const OTPComp = ({
               id="email"
               name="email"
               type="email"
-              placeholder="Enter Email"
+              placeholder="Enter Email *"
               value={otpData?.email}
               onChange={handleChange}
               className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
@@ -266,7 +278,7 @@ const OTPComp = ({
                   });
                 }}
                 className=""
-                placeholder="Enter your Mobile"
+                placeholder="Enter your Mobile *"
               />
             </div>
           </div>

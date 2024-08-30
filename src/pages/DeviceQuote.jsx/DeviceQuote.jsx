@@ -10,6 +10,18 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import apple_watch from "../../assets/apple_watch.png";
 import { setResponseData } from "../../store/slices/responseSlice";
 
+const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) => {
+  if (quoteSaved) {
+    return savedBonus
+      ? Number(Price) + Number(bonus) - Number(savedBonus)
+      : Number(Price) + Number(bonus);
+  } else {
+    return savedBonus
+      ? Number(Price) - Number(savedBonus)
+      : Number(Price);
+  }
+};
+
 const DeviceQuote = () => {
   const dispatch = useDispatch();
   const Device = sessionStorage.getItem("DeviceType");
@@ -39,6 +51,13 @@ const DeviceQuote = () => {
   useEffect(() => {
     setQuoteId(uniqueCode);
   }, [uniqueCode]);
+  const deviceTypePage = "/selectdevicetype";
+  const displayPrice = calculateDisplayPrice({
+    quoteSaved,
+    savedBonus,
+    Price,
+    bonus
+  });
 
   const continueOTPHandler = () => {
     const resData = {
@@ -80,7 +99,7 @@ const DeviceQuote = () => {
         <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
           <img
-            onClick={() => navigate("/selectdevicetype")}
+            onClick={() => navigate({deviceTypePage})}
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
@@ -108,10 +127,7 @@ const DeviceQuote = () => {
                 }`}
               </p>
               <p className="text-[#EC2752] font-semibold">
-                ₹
-                {savedBonus
-                  ? Number(Price) - Number(savedBonus)
-                  : Number(Price)}
+                ₹{displayPrice}
               </p>
             </div>
           </div>
@@ -209,9 +225,7 @@ const DeviceQuote = () => {
     </div>
   );
 };
-
 export default DeviceQuote;
-
 const SubDeviceQuote = ({
   savedBonus,
   Price,
@@ -222,6 +236,21 @@ const SubDeviceQuote = ({
   continueOTPHandler,
 }) => {
   const navigate = useNavigate();
+  const [countdown, setCountdown] = useState(10); // 10 seconds countdown
+  useEffect(() => {
+    let timer;
+    if (quoteSaved && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prevCount) => {
+          console.log("Countdown:", prevCount - 1); // Log the countdown
+          return prevCount - 1;
+        });
+      }, 1000);
+    } else if (quoteSaved && countdown === 0) {
+      navigate({deviceTypePage});
+    }
+    return () => clearInterval(timer);
+  }, [quoteSaved, countdown, navigate]);
   return (
     <div className="flex items-center justify-between gap-2">
       <div className="flex flex-col w-1/2 text-xl font-medium">
@@ -252,10 +281,10 @@ const SubDeviceQuote = ({
       )}
       {quoteSaved === true && (
         <div
-          onClick={() => navigate("/selectdevicetype")}
+          onClick={() => navigate({deviceTypePage})}
           className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
         >
-          <p className="p-2 mx-auto text-lg font-medium ">Return To Home</p>
+          <p className="p-2 mx-auto text-lg font-medium ">Return To Home ({countdown}s) </p>
         </div>
       )}
     </div>

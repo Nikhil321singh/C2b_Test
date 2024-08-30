@@ -646,7 +646,14 @@ const SearchBox = ({
     navigate("/selectmodel");
     addPhoneView(model._id);
   };
-
+ const isArray = Array.isArray(modelsL);
+ const sortedModels = isArray
+   ? [...modelsL].sort((a, b) => {
+       const numA = parseInt(a.name.match(/\d+/), 10);
+       const numB = parseInt(b.name.match(/\d+/), 10);
+       return numA - numB;
+     })
+   : [];
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
@@ -678,16 +685,16 @@ const SearchBox = ({
               </div>
             </div>
           </div>
-          {imei.length > 0 && modelsL.length > 0 ? (
+          {imei.length > 0 && sortedModels.length > 0 ? (
             <div
               className={`   mx-auto mt-4 justify-center  w-full  flex flex-wrap gap-2  max-h-screen overflow-y-scroll pb-[15vh] `}
             >
-              {modelsL &&
-                modelsL.map((model) => (
+              {sortedModels &&
+                sortedModels.map((model) => (
                   <div
                     key={model._id}
                     className={` ${
-                      modelsL.length < 3 ? "min-w-[30%] max-w-[30%]" : "w-[30%]"
+                      sortedModels.length < 3 ? "min-w-[30%] max-w-[30%]" : "w-[30%]"
                     }  h-auto  gap-2 flex flex-col items-center px-2 py-4  text-center`}
                     style={{ boxShadow: "0 0 10px 0 rgb(0 0 0 / 0.1)" }}
                     onClick={() => handleDeviceClick(model)}
@@ -781,6 +788,12 @@ const MiddlePart = ({
                 style={{ backgroundColor: "white", color: "black" }}
               >
                 Today
+              </option>
+              <option
+                value="yesterday"
+                style={{ backgroundColor: "white", color: "black" }}
+              >
+                Yesterday
               </option>
               <option
                 value="7days"

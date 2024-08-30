@@ -121,15 +121,12 @@ import {
   updateFunctionalMinorObject,
   updateWarrantyObject,
 } from "../../store/slices/QNAslice";
-import styles from "../SelectDeviceType/SelectDeviceType.module.css";
-import { CiSearch } from "react-icons/ci";
 import { setResponseData } from "../../store/slices/responseSlice";
 import useUserProfile from "../../utils/useUserProfile";
 import { CgSpinner } from "react-icons/cg";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack } from "react-icons/io";
 import styless from "../QuickQuote/QuickQuote.module.css";
-import QuestionSearch from "../../components/QuestionSearch/QuestionSearch";
 
 const initialState = {
   Core: [],
@@ -190,9 +187,8 @@ function NewDeviceqs() {
   }
   const fetchData = async () => {
     try {
-      const apiUrl = `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/questionnaires/findAll?page=0&limit=31`;
+      const apiUrl = `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/questionnaires/findAll?page=0&limit=31`;
       const response = await axios.get(apiUrl, {
         headers: {
           authorization: `${userToken}`,
@@ -349,30 +345,6 @@ const MainQContainer = ({
         />
         <p className="ml-2 text-xl font-medium">Device Details</p>
       </div>
-      <div className={`${styles.search_box_wrap} mt-[15px] mb-[5px] w-[90vw]`}>
-        <div
-          className={`flex items-center bg-gray-200  p-2 mb-1 rounded-lg w-[100%] ${styles.search_box}`}
-        >
-          <div className="flex items-center">
-            <CiSearch size={20} className="inline ml-1" />
-          </div>
-          <input
-            placeholder="Search Question"
-            onChange={() => console.log("state is ", NDstate)}
-            onClick={() => setIsSearchOpen(true)}
-            className="inline w-full mx-2 bg-gray-200 outline-none"
-            type="text"
-          />
-          {isSearchOpen && (
-            <QuestionSearch
-              setIsSearchOpen={setIsSearchOpen}
-              state={NDstate}
-              dispatch={dispatch}
-              imageMap={imageMap}
-            />
-          )}
-        </div>
-      </div>
       <div className="innerContainer">
         <div className={`maindata`}>
           <div className="text-lg font-medium tracking-tight text-{1.325rem}">
@@ -441,20 +413,18 @@ const FirstPart = ({ NDstate, core }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                      !core[index].selected[optionIndex] ? whiteBg : pinkBg
-                    }`}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!core[index].selected[optionIndex] ? whiteBg : pinkBg
+                      }`}
                   >
                     <div className="mt-3 mb-1 rounded-md overflow-hidden">
                       <img className="scale-[1.2]" src={imageMap[option.img]} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${
-                          !core[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!core[index].selected[optionIndex]
                             ? blackText
                             : whiteText
-                        }`}
+                          }`}
                       >
                         {option.caption}
                       </p>
@@ -503,11 +473,10 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
                             })
                           );
                         }}
-                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                          !Cosmetics[index].selected[optionIndex]
+                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!Cosmetics[index].selected[optionIndex]
                             ? whiteBg
                             : pinkBg
-                        }`}
+                          }`}
                       >
                         <div className="mt-3 mb-1 rounded-md overflow-hidden">
                           <img
@@ -517,11 +486,10 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
                         </div>
                         <div className="w-full border-t-[1.5px] py-2">
                           <p
-                            className={`text-xs font-medium text-center ${
-                              !Cosmetics[index].selected[optionIndex]
+                            className={`text-xs font-medium text-center ${!Cosmetics[index].selected[optionIndex]
                                 ? blackText
                                 : whiteText
-                            }`}
+                              }`}
                           >
                             {option.caption}
                           </p>
@@ -572,20 +540,18 @@ const ThirdPart = ({ NDstate, Display }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                      !Display[index].selected[optionIndex] ? whiteBg : pinkBg
-                    }`}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!Display[index].selected[optionIndex] ? whiteBg : pinkBg
+                      }`}
                   >
                     <div className="mt-3 mb-1 rounded-md overflow-hidden">
                       <img className="scale-[1.2]" src={imageMap[option.img]} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${
-                          !Display[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!Display[index].selected[optionIndex]
                             ? blackText
                             : whiteText
-                        }`}
+                          }`}
                       >
                         {option.caption}
                       </p>
@@ -632,22 +598,20 @@ const FourthPart = ({ FunctionalMajor, NDstate }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                      !FunctionalMajor[index].selected[optionIndex]
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!FunctionalMajor[index].selected[optionIndex]
                         ? whiteBg
                         : pinkBg
-                    }`}
+                      }`}
                   >
                     <div className="mt-3 mb-1 rounded-md overflow-hidden">
                       <img className="scale-[1.2]" src={imageMap[option.img]} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${
-                          !FunctionalMajor[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!FunctionalMajor[index].selected[optionIndex]
                             ? blackText
                             : whiteText
-                        }`}
+                          }`}
                       >
                         {option.caption}
                       </p>
@@ -694,22 +658,20 @@ const FifthPart = ({ FunctionalMinor, NDstate }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                      !FunctionalMinor[index].selected[optionIndex]
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!FunctionalMinor[index].selected[optionIndex]
                         ? whiteBg
                         : pinkBg
-                    }`}
+                      }`}
                   >
                     <div className="mt-3 mb-1 rounded-md overflow-hidden">
                       <img className="scale-[1.2]" src={imageMap[option.img]} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${
-                          !FunctionalMinor[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!FunctionalMinor[index].selected[optionIndex]
                             ? blackText
                             : whiteText
-                        }`}
+                          }`}
                       >
                         {option.caption}
                       </p>
@@ -743,11 +705,10 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
                   {data?.options.map((option, optionIndex) => (
                     <React.Fragment key={optionIndex}>
                       <div
-                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                          !Cosmetics[index].selected[optionIndex]
+                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!Cosmetics[index].selected[optionIndex]
                             ? whiteBg
                             : pinkBg
-                        }`}
+                          }`}
                         onClick={(e) => {
                           console.log(Cosmetics);
                           console.log("assssaaaaa", option);
@@ -772,11 +733,10 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
                         </div>
                         <div className="border-t-[1.5px] w-full py-2">
                           <p
-                            className={`text-xs font-medium text-center ${
-                              !Cosmetics[index].selected[optionIndex]
+                            className={`text-xs font-medium text-center ${!Cosmetics[index].selected[optionIndex]
                                 ? blackText
                                 : whiteText
-                            }`}
+                              }`}
                           >
                             {option.caption}
                           </p>
@@ -825,20 +785,18 @@ const SeventhPart = ({ Warranty, NDstate }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
-                      !Warranty[index].selected[optionIndex] ? whiteBg : pinkBg
-                    }`}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!Warranty[index].selected[optionIndex] ? whiteBg : pinkBg
+                      }`}
                   >
                     <div className="mt-3 mb-1 rounded-md overflow-hidden">
                       <img className="scale-[1.2]" src={imageMap[option.img]} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${
-                          !Warranty[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!Warranty[index].selected[optionIndex]
                             ? blackText
                             : whiteText
-                        }`}
+                          }`}
                       >
                         {option.caption}
                       </p>
@@ -889,9 +847,9 @@ const AboveSix = ({
       name: id?.customerName ? id?.customerName : profile?.name,
     };
     console.log(finalPayload);
+    sessionStorage.setItem("billData", JSON.stringify(finalPayload.QNA.Cosmetics[6]));
     const response = await axios.post(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/questionnaires/calculatePrice`,
       finalPayload,
       { headers: { Authorization: userToken2 } }
@@ -944,11 +902,10 @@ const AboveSix = ({
           {visible > 0 && visible <= 6 && (
             <button
               onClick={handleSubtract}
-              className={`  ${
-                visible < 2
+              className={`  ${visible < 2
                   ? "bg-slate-400 cursor-not-allowed"
                   : "bg-[#EC2752] cursor-pointer"
-              }  w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
+                }  w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
             >
               <ImArrowLeft color="white" size={20} />
             </button>

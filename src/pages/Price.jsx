@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
 import axios from "axios";
@@ -31,22 +31,25 @@ const Price = ({ submitdata, userToken }) => {
   const phoneRightRef = useRef(null);
   const phoneTopRef = useRef(null);
   const phoneBottomRef = useRef(null);
-
+  const [isBillRequired, setIsBillRequired] = useState(false);
+  useEffect(() => {
+    const billData = JSON.parse(sessionStorage.getItem("billData"));
+    if (billData && billData?.selected[0] === false) {
+      setIsBillRequired(true);
+    }
+  }, []);
   const handleCameraButtonClick = (ref) => {
     if (!ref.current) {
       return;
     }
     ref.current.click();
   };
-
   const handleChange = (setMEthod, e) => {
     const doc = e.target.files[0];
     setMEthod(doc);
   };
-
   const uploadAllImages = async () => {
     setIsLoading(true);
-
     if (
       !imeinumber ||
       !phoneFront ||
@@ -54,11 +57,10 @@ const Price = ({ submitdata, userToken }) => {
       !phoneLeft ||
       !phoneRight ||
       !phoneTop ||
-      !phoneBottom
+      !phoneBottom ||
+      (isBillRequired && !phoneBill)
     ) {
-      alert(
-        "Please fill in all mandatory fields (IMEI/Serial number and device images)."
-      );
+      alert("Please fill in all mandatory fields (IMEI/Serial number and device images).");
       setIsLoading(false);
       return;
     }
@@ -96,11 +98,9 @@ const Price = ({ submitdata, userToken }) => {
     formData.append("emailId", savedOtpData?.email);
     formData.append("name", savedOtpData?.name);
     formData.append("phoneNumber", savedOtpData?.phone);
-    console.log(formData);
     try {
       await axios.post(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/questionnaires/upload-documents`,
         formData,
         { headers: { Authorization: token } }
@@ -111,7 +111,6 @@ const Price = ({ submitdata, userToken }) => {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="h-[100vh] max-h-[200vh] overflow-y-auto bg-white ">
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
@@ -131,10 +130,7 @@ const Price = ({ submitdata, userToken }) => {
       <div className="w-[90%] md:w-[90%] mx-auto h-[auto] mb-[93px]">
         <div className="mt-3 text-center relative">
           <h1 className="text-2xl font-semibold">Upload Documents</h1>
-          <p className="mt-4 text-gray-600">
-            Regulations require you to upload a national identity card. Don't
-            worry, your data will stay safe and private.
-          </p>
+          <p className="mt-4 text-gray-600">Regulations require you to upload a national identity card. Don't worry, your data will stay safe and private.</p>
         </div>
         <div className="flex flex-col">
           <ImeiField setImeiNumber={setImeiNumber} imeinumber={imeinumber} />
@@ -155,6 +151,7 @@ const Price = ({ submitdata, userToken }) => {
             handleCameraButtonClick={handleCameraButtonClick}
             phoneBillRef={phoneBillRef}
             phoneBill={phoneBill}
+            isBillRequired={isBillRequired}
           />
           <PhonePhotos1
             handleCameraButtonClick={handleCameraButtonClick}
@@ -180,21 +177,19 @@ const Price = ({ submitdata, userToken }) => {
           />
         </div>
       </div>
-
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div
           onClick={() => uploadAllImages()}
-          className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
-            !imeinumber ||
-            !phoneFront ||
-            !phoneBack ||
-            !phoneLeft ||
-            !phoneRight ||
-            !phoneTop ||
-            !phoneBottom
+          className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${!imeinumber ||
+              !phoneFront ||
+              !phoneBack ||
+              !phoneLeft ||
+              !phoneRight ||
+              !phoneTop ||
+              !phoneBottom
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-[#EC2752]"
-          }`}
+            }`}
         >
           {isLoading && (
             <CgSpinner
@@ -269,9 +264,8 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
           maxLength={15}
         />
         <button
-          className={`px-4 py-2 font-bold text-white rounded ${
-            !error ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
-          }`}
+          className={`px-4 py-2 font-bold text-white rounded ${!error ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
+            }`}
           onClick={handleVerify}
           disabled={!!error}
         >
@@ -359,6 +353,7 @@ const PhoneBill = ({
   handleCameraButtonClick,
   phoneBillRef,
   phoneBill,
+  isBillRequired,
 }) => {
   const Device = sessionStorage.getItem("DeviceType");
   return (
@@ -369,13 +364,13 @@ const PhoneBill = ({
           <p className="text-base font-medium three">
             Upload your {Device === "Mobile" && "phone's"}
             {Device === "Watch" && "smartwatch's"} bill
+            {isBillRequired && <span className="text-red-500">*</span>}
           </p>
         </div>
       </div>
       <p className="mt-2 text-sm text-[#ec275271]">
         Note: Image size should not exceed 2MB
       </p>
-
       <div className="flex justify-start ml-3 inputAADHAR">
         {/* 1 */}
         <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">

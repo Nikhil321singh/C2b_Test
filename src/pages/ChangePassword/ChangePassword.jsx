@@ -13,6 +13,7 @@ const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confPassword, setConfPassword] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
   const [newFocus, setNewFocus] = useState(false);
   const [confFocus, setConfFocus] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +47,7 @@ const ChangePassword = () => {
       },
       {
         condition: password.length < 8 || newPassword.length < 8,
-        message: "Password Size Must Be More Than 8",
+        message: "Password Size Must Be More Than 8 Characters",
       },
       {
         condition: newFocus && !lCaseRegex.test(newPassword),
@@ -86,9 +87,14 @@ const ChangePassword = () => {
     passwordValidation();
     console.log(isValid);
   }, [userEmail, newPassword, confPassword, newFocus, confFocus]);
-
+  const showPop = () => {
+    if (newPassword !== confPassword) {
+      setShowPopup(true);
+    }
+  };
   const handleSubmit = (event) => {
     event.preventDefault();
+    showPop();
     setIsLoading(true);
     const userToken = sessionStorage.getItem("authToken");
     const data = {
@@ -147,6 +153,8 @@ const ChangePassword = () => {
           setConfPassword={setConfPassword}
           setNewFocus={setNewFocus}
           setConfFocus={setConfFocus}
+          showPopup={showPopup}
+          setShowPopup={setShowPopup}
           isLoading={isLoading}
           showUserPassword={showUserPassword}
           showUserPassword2={showUserPassword2}
@@ -172,6 +180,8 @@ const PasswordChange = ({
   setNewFocus,
   setConfFocus,
   isLoading,
+  showPopup,
+  setShowPopup,
   showUserPassword,
   showUserPassword2,
   setShowUserPassword2,
@@ -182,6 +192,12 @@ const PasswordChange = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full mt-16">
+      <div
+        className={`w-[85vw] h-[160px] popup py-0 ${showPopup ? "show" : ""}`}
+      >
+        <div className="text">New Password & Confirm Password must be same</div>
+        <button onClick={() => setShowPopup(false)}> Close</button>
+      </div>
       <div className="flex flex-col items-center justify-center box">
         <div className="imgBox">
           <img className="w-48 pt-4 mt-2 mb-3" src={Grest_Logo} />

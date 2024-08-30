@@ -137,10 +137,14 @@ const SelectDevice = () => {
     sessionStorage.setItem("dataModelConfig", JSON.stringify(model));
     navigate("/selectmodel");
   };
-  const isArray = Array.isArray(modelInfo);
-  const sortedModels = isArray
-    ? [...modelInfo].sort((a, b) => a.name.localeCompare(b.name))
-    : [];
+ const isArray = Array.isArray(modelInfo);
+ const sortedModels = isArray
+   ? [...modelInfo].sort((a, b) => {
+       const numA = parseInt(a.name.match(/\d+/), 10);
+       const numB = parseInt(b.name.match(/\d+/), 10);
+       return numA - numB;
+     })
+   : [];
 
 
   return (
