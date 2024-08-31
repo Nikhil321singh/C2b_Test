@@ -21,6 +21,7 @@ const ChangePassword = () => {
   const [isValid, setIsValid] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showUserPassword, setShowUserPassword] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
   const [showUserPassword2, setShowUserPassword2] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const ChangePassword = () => {
     }
 
     if (password.length < 8) {
-      setErrMsg("Password Size Must Be More Than 8");
+      setErrMsg("Password Size Must Be More Than 8 Characters");
       setIsValid(false);
       return;
     } else {
@@ -60,7 +61,7 @@ const ChangePassword = () => {
     }
 
     if (newPassword.length < 8) {
-      setErrMsg("Password Size Must Be More Than 8");
+      setErrMsg("Password Size Must Be More Than 8 Characters");
       setIsValid(false);
       return;
     }
@@ -99,7 +100,7 @@ const ChangePassword = () => {
       setIsValid(true);
       setErrMsg("Password Matched Please Submit");
       return;
-    }else{
+    } else {
       setIsValid(false);
     }
   };
@@ -109,8 +110,12 @@ const ChangePassword = () => {
     console.log(isValid);
   }, [userEmail, newPassword, confPassword, newFocus, confFocus]);
 
+  const showPop = () => {
+    if (newPassword != confPassword) setShowPopup(true);
+  };
   const handleSubmit = (event) => {
     event.preventDefault();
+    showPop();
     setIsLoading(true);
     const userToken = sessionStorage.getItem("authToken");
     const data = {
@@ -121,8 +126,7 @@ const ChangePassword = () => {
 
     axios
       .post(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/userregistry/updatePassword`,
         data,
         {
@@ -162,13 +166,23 @@ const ChangePassword = () => {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center w-full h-full mt-16">
+          <div className={`w-[85vw] h-[160px] popup py-0 ${showPopup ? "show" : ""}`}>
+            <div className="text">New Password & Confirm Password must be same</div>
+            <button onClick={() => setShowPopup(false)}> Close</button>
+          </div>
           <div className="flex flex-col items-center justify-center box">
             <div className="imgBox">
               <img className="w-48 pt-4 mt-2 mb-3" src={Grest_Logo} />
               <h1 className="font-sans text-[#4900A8] my-2 text-3xl font-bold sm:text-4xl">
                 Change Password
               </h1>
-              <p className={`${isValid ? "text-[#8080FF]": "text-red-600"} text-sm h-[20px]`}>{errMsg}</p>
+              <p
+                className={`${
+                  isValid ? "text-[#8080FF]" : "text-[#8080FF]"
+                } text-sm h-[20px]`}
+              >
+                {errMsg}
+              </p>
             </div>
             <div className="innerbox">
               <div className="flex flex-col items-center w-full gap-6">
@@ -261,8 +275,7 @@ const ChangePassword = () => {
                     <button
                       type="submit"
                       className={`login_button ${
-                        (isLoading || !isValid) &&
-                        "opacity-[.8]"
+                        (isLoading || !isValid) && "opacity-[.8]"
                       }`}
                       disabled={isLoading || !isValid}
                     >

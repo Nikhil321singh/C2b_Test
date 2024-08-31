@@ -82,80 +82,80 @@ function SideMenu({ setsideMenu, sideMenu }) {
         >
           <ul className="list-none flex flex-col h-full pl-[6%] pt-[10%] justify-start gap-[2vh]">
             <li
-              className="text-[20px] font-[300] cursor-pointer"
+              className="text-[20px] pt-1 font-[300] cursor-pointer"
               onClick={handleHome}
             >
               Home
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer  "
+              className="text-[20px] pt-1 font-[300] cursor-pointer  "
               onClick={handleProfile}
             >
               Profile
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer  "
+              className="text-[20px] pt-1 font-[300] cursor-pointer  "
               onClick={handleOffer}
             >
               Offers
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleGrade}
             >
               Grade Pricing
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleRegister}
             >
               Register User
             </li>
 
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleStoreListing}
             >
               Store Listing
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleStoreReport}
             >
               Store Report
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleTable}
             >
               Customer Table
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleCompanyListing}
             >
               Company Listing
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handlpickup}
             >
               Pickup & Cancel Device
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleTechnician}
             >
               Technician Report
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={adminDashboard}
             >
               Admin Dashboard
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleLogout}
             >
               Logout
@@ -172,55 +172,61 @@ function SideMenu({ setsideMenu, sideMenu }) {
         >
           <ul className="list-none flex flex-col h-full pl-[6%] pt-[10%] justify-start gap-[2vh]">
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleHome}
             >
               Home
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleProfile}
             >
               Profile
             </li>
             {/* <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleTable}
             >
               Customer Table
             </li> */}
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleRegister}
             >
               Register User
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handlpickup}
             >
               Pickup & Cancel Device
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
+              onClick={handleStoreListing}
+            >
+              Store Listing
+            </li>
+            <li
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleStoreReport}
             >
               Store Report
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleTechnician}
             >
               Technician Report
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={adminDashboard}
             >
               Admin Dashboard
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleLogout}
             >
               Logout
@@ -237,19 +243,19 @@ function SideMenu({ setsideMenu, sideMenu }) {
         >
           <ul className="list-none flex flex-col h-full pl-[6%] pt-[10%] justify-start gap-[2vh]">
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleHome}
             >
               Home
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleProfile}
             >
               Profile
             </li>
             <li
-              className="text-[20px] font-[300] cursor-pointer "
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleLogout}
             >
               Logout

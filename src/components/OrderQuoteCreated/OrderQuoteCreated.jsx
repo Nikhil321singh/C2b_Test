@@ -141,7 +141,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
         {data.map((item, index) => (
           <OrdersCard
             itemData={item}
-            title={orderType === "quoteData" ? "Quote Saved" : "Lead Saved"}
+            title={orderType === "quoteData" ? "Quote Saved" : "Order Saved"}
             customerName={item.lead?.name}
             customerMobile={item.lead?.phoneNumber}
             deviceName={item.lead?.model?.name}

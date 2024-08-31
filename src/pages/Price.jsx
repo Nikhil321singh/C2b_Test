@@ -1,8 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
 import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
+import toast from "react-hot-toast";
 import { FaCamera } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 import { FaInfoCircle } from "react-icons/fa";
@@ -33,6 +34,16 @@ const Price = ({ submitdata, userToken }) => {
   const phoneTopRef = useRef(null);
   const phoneBottomRef = useRef(null);
 
+    const [isBillRequired, setIsBillRequired] = useState(false);
+
+    useEffect(() => {
+      const billData = JSON.parse(sessionStorage.getItem("billData"));
+      if (billData && billData?.selected[0] === false) {
+        setIsBillRequired(true);
+        console.log(isBillRequired);
+      }
+    }, []);
+
   const handleCameraButtonClick = (ref) => {
     if (!ref.current) {
       return;
@@ -55,7 +66,8 @@ const Price = ({ submitdata, userToken }) => {
       !phoneLeft ||
       !phoneRight ||
       !phoneTop ||
-      !phoneBottom
+        !phoneBottom ||
+      (isBillRequired && !phoneBill)
     ) {
       alert(
         "Please fill in all mandatory fields (IMEI/Serial number and device images)."
@@ -107,6 +119,7 @@ const Price = ({ submitdata, userToken }) => {
         { headers: { Authorization: token } }
       );
       setIsLoading(false);
+      sessionStorage.removeItem("billData");
       navigate("/specialoffers");
     } catch (error) {
       setIsLoading(false);
@@ -156,6 +169,7 @@ const Price = ({ submitdata, userToken }) => {
             handleCameraButtonClick={handleCameraButtonClick}
             phoneBillRef={phoneBillRef}
             phoneBill={phoneBill}
+            isBillRequired={isBillRequired}
           />
           <PhonePhotos1
             handleCameraButtonClick={handleCameraButtonClick}
@@ -360,6 +374,7 @@ const PhoneBill = ({
   handleCameraButtonClick,
   phoneBillRef,
   phoneBill,
+  isBillRequired,
 }) => {
   const Device = sessionStorage.getItem("DeviceType");
   return (
@@ -370,6 +385,7 @@ const PhoneBill = ({
           <p className="text-base font-medium three">
             Upload your {Device === "Mobile" && "phone's"}
             {Device === "Watch" && "smartwatch's"} bill
+            {isBillRequired && <span className="text-red-500">*</span>}
           </p>
         </div>
       </div>

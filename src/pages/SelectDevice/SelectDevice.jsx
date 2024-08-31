@@ -137,6 +137,14 @@ const SelectDevice = () => {
     sessionStorage.setItem("dataModelConfig", JSON.stringify(model));
     navigate("/selectmodel");
   };
+ const isArray = Array.isArray(modelInfo);
+ const sortedModels = isArray
+   ? [...modelInfo].sort((a, b) => {
+       const numA = parseInt(a.name.match(/\d+/), 10);
+       const numB = parseInt(b.name.match(/\d+/), 10);
+       return numA - numB;
+     })
+   : [];
 
   return (
     <div className="flex flex-col min-h-screen pb-16 bg-white">
@@ -200,8 +208,8 @@ const SelectDevice = () => {
         {modelInfo && modelInfo.length === 0 && (
           <div className="mt-[50%] font-bold text-4xl">...comming soon...</div>
         )}
-        {modelInfo &&
-          modelInfo.map((model) => (
+        {sortedModels &&
+          sortedModels.map((model) => (
             <div
               key={model._id}
               className={`${styles.card} w-[30%] md:w-[20%] lg:w-[15%] xl:w-[16%] gap-2 flex flex-col items-center px-2 py-4 text-center`}
