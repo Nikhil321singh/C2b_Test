@@ -203,6 +203,12 @@ function SideMenu({ setsideMenu, sideMenu }) {
             </li>
             <li
               className="text-[20px] pt-1 font-[300] cursor-pointer "
+              onClick={handleStoreListing}
+            >
+              Store Listing
+            </li>
+            <li
+              className="text-[20px] pt-1 font-[300] cursor-pointer "
               onClick={handleStoreReport}
             >
               Store Report
