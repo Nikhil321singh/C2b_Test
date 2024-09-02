@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
-import { setResponseData } from "../../store/slices/responseSlice";
+import { setLeadOTPData, setResponseData } from "../../store/slices/responseSlice";
 import { useDispatch } from "react-redux";
 import watch from "../../assets/apple_watch.png";
 
@@ -131,10 +131,11 @@ const OrdersCard = ({
       };
 
       dispatch(setResponseData(responseData));
-
+      dispatch(setLeadOTPData(otpData));
+      sessionStorage.setItem("otpData", JSON.stringify(otpData));
       sessionStorage.setItem("LeadId", itemData?.lead_id);
       sessionStorage.setItem("responsedatadata", JSON.stringify(responseData));
-      navigate("/pricepage");
+      navigate("/inputnumber");
     }
   };
 
