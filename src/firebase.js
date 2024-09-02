@@ -1,17 +1,18 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp,getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAzgXMq9YP-KkuS7HnPzbNJq5Ua30JuB0c",
-  authDomain: "fydox-app.firebaseapp.com",
-  projectId: "fydox-app",
-  storageBucket: "fydox-app.appspot.com",
-  messagingSenderId: "133025646403",
-  appId: "1:133025646403:web:45ffd22d38d90a724191f6",
-  measurementId: "G-4BKF6TEZR2",
+  apiKey: "AIzaSyAB4JhZE4VIyWI6nSNb-PhiizlMX-R6Yp8",
+  authDomain: "test-96002.firebaseapp.com",
+  projectId: "test-96002",
+  storageBucket: "test-96002.appspot.com",
+  messagingSenderId: "1004864820442",
+  appId: "1:1004864820442:web:8e095ad255054f0d5281e3",
+  measurementId: "G-EMRYWSK2Z1",
 };
 
-const app = initializeApp(firebaseConfig);
-
-export const auth = getAuth(app);
-
+// Initialize Firebase
+const app = getApps.length === 0 ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+auth.useDeviceLanguage();
+export { auth };
