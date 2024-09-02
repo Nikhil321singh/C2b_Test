@@ -5,13 +5,12 @@ import OtpInput from "otp-input-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setOtpVerified } from "../../store/slices/otpSlice";
-import { auth } from "../../firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import LoadingSpinner from "../LoadingSpinner";
 import { MdEdit } from "react-icons/md";
 import ProfileBox from "../ProfileBox/ProfileBox";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
-import toast from "react-hot-toast";
+import { auth } from "../../firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const initOtp = {
   name: "",
@@ -31,9 +30,9 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
-  const [firstTime, setFirstIme] = useState(true);
   const isFormComplete = otpData.name && otpData.email && ph;
   const [errMsg, setErrMsg] = useState("");
+  const [firstTime, setFirstIme] = useState(true);
 
   const handleChange = (e) => {
     setOtpData({
@@ -45,34 +44,28 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setLoading(false);
     setOtpBoxOpen(!otpBoxOpen);
   };
-  
- function onCaptchVerify() {
-   if (!window.recaptchaVerifier) {
-     window.recaptchaVerifier = new RecaptchaVerifier(
-       auth,
-       "recaptcha",
-       {
-         size: "invisible",
-         callback: (response) => {
-           onSignup();
-         },
-         "expired-callback": () => {},
-       },
-     );
-   }
- }
-  function onSignup(event) {
-    event.preventDefault();
-    setLoading(true);
-      // onCaptchVerify();
 
-    const appVerifier = new RecaptchaVerifier(auth, "recaptcha", {
+  function onCaptchVerify() {
+    console.log(auth);
+    // For Firebase version 9 and above
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
       size: "invisible",
       callback: (response) => {
-        onSignup();
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+        // ...
       },
-      "expired-callback": () => {},
     });
+  }
+
+  //on submit phone number
+  function onSignup(event) {
+    setLoading(true);
+    if (firstTime) {
+      onCaptchVerify();
+      setFirstIme(false);
+    }
+
+    const appVerifier = window.recaptchaVerifier;
     const formatPh = "+91" + ph;
     console.log(formatPh);
     //setNumber(formatPh);
@@ -83,7 +76,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
         setLoading(false);
         setOtpBoxOpen(true);
         setDisableResend(true);
-        toast.success("OTP sended successfully!");
+        // toast.success("OTP sended successfully!");
         console.log("OTP sent successfully!");
       })
       .catch((error) => {
@@ -106,7 +99,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
         // console.log("ho gya");
         //setChange(!change);
         console.log("ho gya");
-        setLoading(false);
         // sessionStorage.setItem("otpverified", "true");
         dispatch(setOtpVerified(true));
         navigate("/inputnumber");
@@ -116,6 +108,8 @@ const ContOTP = ({ setContinueOTPOpen }) => {
         setLoading(false);
       });
   }
+
+  //resend otp
   const resendOTP = () => {
     // Start the countdown timer
     setDisableResend(true);
@@ -332,7 +326,7 @@ const OTPComp = ({
       ) : (
         <div className={`${styles.form_fields_wrap}`}>
           {errMsg && (
-            <div className="flex items-center justify-center my-0 py-0 m-auto">
+            <div className="flex items-center justify-center m-auto">
               <p className="text-[#8080FF] text-sm h-[20px] p-0 m-0">
                 {errMsg}
               </p>

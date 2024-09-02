@@ -36,6 +36,8 @@ const QuoteModal = ({
   const [otherReason, setOtherReason] = useState("");
   const [isOther, setIsOther] = useState(false);
   const [userData, setUserData] = useState({});
+  const [errMsg, setErrMsg] = useState("");
+  const isFormComplete = name && userEmail && ph;
 
   useEffect(() => {
     setShowOtp(false);
@@ -61,7 +63,32 @@ const QuoteModal = ({
     };
   }, [disableResend, timer]);
 
+  const passwordValidation = () => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailRegex.test(userEmail)) {
+      setErrMsg("Please Enter a Valid Email");
+      return;
+    } else {
+      setErrMsg("");
+    }
+    if (ph.length !== 10) {
+      setErrMsg("Please Enter a Valid Mobile no.");
+      return;
+    } else {
+      setErrMsg("");
+    }
+  }
+  useEffect(() => {
+    passwordValidation();
+  }, [userEmail,ph]);
+
+
   const onSignupDup = () => {
+     if (!isFormComplete) {
+       setErrMsg("Please Fill All Details");
+       return;
+     }
     setLoading(true);
     const data = {
       lead_id: leadData.id,
@@ -183,6 +210,7 @@ const QuoteModal = ({
           }`}
         >
           <OTPCOmp
+            errMsg={errMsg}
             showOtp={showOtp}
             quoteId={quoteId}
             setName={setName}
@@ -235,6 +263,7 @@ const OTPCOmp = ({
   name,
   ph,
   setPh,
+  errMsg,
   userEmail,
   setUserEmail,
   isOther,
@@ -255,7 +284,16 @@ const OTPCOmp = ({
     <React.Fragment>
       {!showOtp ? (
         <div>
-          <p className="block text-xl font-medium display">Save Quote</p>
+          <div className="flex items-center gap-28">
+            <p className="text-xl font-medium">Save Quote</p>
+            {errMsg && (
+              <div className="flex items-center justify-center my-0 py-0">
+                <p className="text-[#8080FF] text-sm h-[20px] p-0 m-0">
+                  {errMsg}
+                </p>
+              </div>
+            )}
+          </div>
           <div className="flex flex-col gap-2 pb-4 mt-4">
             <input
               className="p-2 border-2 outline-none"
@@ -267,7 +305,7 @@ const OTPCOmp = ({
             <input
               className="p-2 border-2 outline-none"
               type="text"
-              placeholder="Name"
+              placeholder="Name *"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -276,12 +314,12 @@ const OTPCOmp = ({
               value={ph}
               onChange={(e) => setPh(e.target.value)}
               type="number"
-              placeholder="Mobile"
+              placeholder="Mobile *"
             />
             <input
               className="p-2 border-2 outline-none"
               type="email"
-              placeholder="Email Id"
+              placeholder="Email Id *"
               value={userEmail}
               onChange={(e) => setUserEmail(e.target.value)}
             />
