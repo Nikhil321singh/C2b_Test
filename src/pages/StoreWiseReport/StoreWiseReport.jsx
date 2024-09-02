@@ -43,13 +43,17 @@ const downloadExcelStoreWise = (apiData) => {
   saveAs(dataFileStoreWise, "StoreWise_Report" + fileExtension);
 };
 
-const fetchDownloadDataStoreWise = (deviceCategory) => {
+const fetchDownloadDataStoreWise = (deviceCategory, fromDate, toDate) => {
+  if (!fromDate || !toDate) {
+    alert("Set dates before Downloading");
+    return;
+  }
   const userToken = sessionStorage.getItem("authToken");
   axios
     .get(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}`,
+      }/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}&startDate=${fromDate}&endDate=${toDate}`,
       {
         headers: {
           authorization: `${userToken}`,
@@ -250,6 +254,8 @@ const StoreWiseReport = () => {
         deviceCategory={deviceCategory}
         setDeviceCategory={setDeviceCategory}
         setSearchValue={setSearchValue}
+        fromDate={fromDate}
+        toDate={toDate}
         searchValue={searchValue}
         handleSearchClear={handleSearchClear}
         fetchStoreData={fetchStoreData}
@@ -292,6 +298,8 @@ const UpperFilter = ({
   deviceCategory,
   setDeviceCategory,
   setSearchValue,
+  fromDate,
+  toDate,
   searchValue,
   handleSearchClear,
   fetchStoreData,
@@ -347,7 +355,7 @@ const UpperFilter = ({
         <div>
           <button
             className={`${styles.bulkdown_button}`}
-            onClick={() => fetchDownloadDataStoreWise(deviceCategory)}
+            onClick={() => fetchDownloadDataStoreWise(deviceCategory, fromDate, toDate)}
           >
             <FaDownload /> Bulk Download
           </button>

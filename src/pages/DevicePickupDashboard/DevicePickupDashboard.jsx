@@ -349,7 +349,7 @@ const ExtComps = ({
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
             <IoIosCheckmarkCircle className={succTextColor} size={90} />
             <h6 className={succTextColor}>Success!</h6>
-            <p className="text-slate-500">{errorMsg}</p>
+            <p className="text-green-500">{errorMsg}</p>
             {errorMsg1 && <p className="text-slate-500">{errorMsg1}</p>}
             {errorMsg2 && <p className="text-slate-500">{errorMsg2}</p>}
             <button

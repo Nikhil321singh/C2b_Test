@@ -81,7 +81,7 @@ const OrdersCard = ({
 
     if (title === "Quote Saved") {
       return timeDiff > oneDay;
-    } else if (title === "Lead Saved") {
+    } else if (title === "Order Saved") {
       return timeDiff > threeDays;
     } else {
       return false;

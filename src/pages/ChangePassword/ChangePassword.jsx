@@ -86,7 +86,6 @@ const ChangePassword = () => {
     }
     if (newPassword !== confPassword) {
       setErrMsg("Confirm Password Does'nt Match");
-      setIsValid(false);
       return;
     }
     if (
@@ -110,12 +109,12 @@ const ChangePassword = () => {
     console.log(isValid);
   }, [userEmail, newPassword, confPassword, newFocus, confFocus]);
 
-  const showPop = () => {
-    if (newPassword != confPassword) setShowPopup(true);
-  };
   const handleSubmit = (event) => {
     event.preventDefault();
-    showPop();
+    if (newPassword != confPassword) {
+      setShowPopup(true)
+      return;
+    }
     setIsLoading(true);
     const userToken = sessionStorage.getItem("authToken");
     const data = {
