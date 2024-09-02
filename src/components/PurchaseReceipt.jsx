@@ -1,5 +1,5 @@
 import React from "react";
-import grest_logo from "../assets/grest_pdf.jpg";
+import Grest_Logo from "../assets/Grest_Logo.jpg";
 
 const PurchaseReceipt = ({
   imeiNumber,
@@ -13,7 +13,7 @@ const PurchaseReceipt = ({
   return (
     <div className="w-full  p-4 bg-white border-2 text-sm">
       <div className="flex items-center justify-center mb-2 bg-white p-[2vh] mx-[2vh] my-[2vh]">
-        <img src={grest_logo} alt="Grest logo" className="w-24 h-12" />
+        <img src={Grest_Logo} alt="Grest logo" className="w-24 h-12" />
       </div>
       <div className="flex flex-col items-center justify-between mb-2">
         <p className="text-sm ">
