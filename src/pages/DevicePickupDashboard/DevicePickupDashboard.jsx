@@ -874,8 +874,8 @@ const CancelModal = ({
         setSelectedIds([]);
         setSelectedData([]);
         setSelectedRows([]);
-        setErrorMsg(`Successfully created Cancelled Lot`);
-        setErrorMsg1(`Lot Id: ${response.data.data._id}`);
+        setErrorMsg(`Successfully Updated status to Cancelled`);
+        setErrorMsg1(`Lot No. not updated yet.`);
         setErrorMsg2(`Check it on Outstanding`);
         setSuccessMod(true);
       })

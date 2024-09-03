@@ -23,11 +23,19 @@ const downloadExcelStoreWise = (apiData) => {
     return {
       "Purchase Date": new Date(item.createdAt).toLocaleDateString("en-IN"),
       Technicians: item.userId?.firstName,
+      Category: item.modelId?.type,
       "IMEI No.": item.documentId?.IMEI,
       "Product Details": item.modelId?.name,
-      Location: item.store?.storeName,
-      "Price Offered To Customer": item.price,
-      "Unique ID": item.uniqueCode,
+      Location: item?.store?.storeName,
+      Price: item?.actualPrice,
+      "Price Offered To Customer": item?.price,
+      "Unique ID": item?.uniqueCode,
+      "GREST Received": item?.grestReceived || "NA",
+      "Receiving Date": item?.grestRecDate || "NA",
+      "New Prices As Per New Range": "NA",
+      "Store Payment Status": "NA",
+      "Payment Date": "NA",
+      "Store Payment UTR Number": "NA",
     };
   });
   const wsStoreWise = XLSX.utils.json_to_sheet(formattedData);
@@ -43,14 +51,17 @@ const downloadExcelStoreWise = (apiData) => {
   saveAs(dataFileStoreWise, "StoreWise_Report" + fileExtension);
 };
 
-const fetchDownloadDataStoreWise = (deviceCategory) => {
+const fetchDownloadDataStoreWise = (deviceCategory, fromDate, toDate) => {
+  if (!fromDate || !toDate) {
+    alert("Set dates before Downloading");
+    return;
+  }
   const userToken = sessionStorage.getItem("authToken");
   axios
     .get(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll?page=${0}&limit=${9999}
-      &is_selled=${isSelled}&deviceType=${deviceCategory}`,
+      }/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}&startDate=${fromDate}&endDate=${toDate}`,
       {
         headers: {
           authorization: `${userToken}`,
@@ -64,7 +75,6 @@ const fetchDownloadDataStoreWise = (deviceCategory) => {
       console.log(err);
     });
 };
-
 const StoreWiseReport = () => {
   const token = sessionStorage.getItem("authToken");
   const [maxPages, setMaxPages] = useState(0);
@@ -186,7 +196,6 @@ const StoreWiseReport = () => {
     }
   }, [storeId]);
 
-
   const handleSearchClear = () => {
     setStoreName("");
     setStoreId("");
@@ -208,6 +217,8 @@ const StoreWiseReport = () => {
         setDeviceCategory={setDeviceCategory}
         setSearchValue={setSearchValue}
         searchValue={searchValue}
+        fromDate={fromDate}
+        toDate={toDate}
         handleSearchClear={handleSearchClear}
         fetchStoreData={fetchStoreData}
       />
@@ -252,6 +263,8 @@ const UpperFilter = ({
   setDeviceCategory,
   setSearchValue,
   searchValue,
+  fromDate,
+  toDate,
   handleSearchClear,
   fetchStoreData,
 }) => {
@@ -306,7 +319,9 @@ const UpperFilter = ({
         <div>
           <button
             className={`${styles.bulkdown_button}`}
-            onClick={() => fetchDownloadDataStoreWise(deviceCategory)}
+            onClick={() =>
+              fetchDownloadDataStoreWise(deviceCategory, fromDate, toDate)
+            }
           >
             <FaDownload /> Bulk Download
           </button>

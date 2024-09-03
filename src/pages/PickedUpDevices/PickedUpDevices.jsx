@@ -40,6 +40,7 @@ const PickedUpDevices = () => {
   const [dateValue, setDateValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [tempId, setTempId] = useState();
+  const [tempUCode, setTempUCode] = useState();
   const [successMod, setSuccessMod] = useState(false);
   const [errorMsg, setErrorMsg] = useState("successfully updated status");
   const [errorMsg1, setErrorMsg1] = useState(null);
@@ -134,9 +135,10 @@ const PickedUpDevices = () => {
     }
   }, [dateValue, storeName, region]);
 
-  const confHandler = (id) => {
+  const confHandler = (id, uniqueCode) => {
     console.log(id);
     setTempId(id);
+    setTempUCode(uniqueCode);
     setIsTableLoaded(true);
     setConfMod(true);
   };
@@ -153,6 +155,7 @@ const PickedUpDevices = () => {
         setIsTableLoaded={setIsTableLoaded}
         failMod={failMod}
         setFailMode={setFailMode}
+        tempUCode={tempUCode}
         confMod={confMod}
         setConfMod={setConfMod}
         setErrorMsg={setErrorMsg}
@@ -208,6 +211,7 @@ const ExtComps = ({
   failMod,
   setFailMode,
   confMod,
+  tempUCode,
   setConfMod,
   setErrorMsg,
   setErrorMsg1,
@@ -238,7 +242,7 @@ const ExtComps = ({
       .then((response) => {
         getData();
         setErrorMsg(
-          `Successfully Updated Status of Lot ${refID} to ${newStatus}`
+          `Successfully Updated Status of Lot ${tempUCode} to ${newStatus}`
         );
         if (newStatus === ApprovDelivery) {
           setErrorMsg(`Delivery Approved for Lot ${refID}.`);
@@ -273,9 +277,9 @@ const ExtComps = ({
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
             <IoIosCheckmarkCircle size={90} className={succTextColor} />
             <h6 className={succTextColor}>Success!</h6>
-            <p className="text-slate-700">{errorMsg}</p>
-            {errorMsg1 && <p className="text-slate-700">{errorMsg1}</p>}
-            {errorMsg2 && <p className="text-slate-700">{errorMsg2}</p>}
+            <p className="text-green-500 block">{errorMsg}</p>
+            {errorMsg1 && <p className="text-slate-700 block">{errorMsg1}</p>}
+            {errorMsg2 && <p className="text-slate-700 block">{errorMsg2}</p>}
             <button
               className={"text-white bg-green-500 "}
               onClick={() => {
@@ -311,11 +315,13 @@ const ExtComps = ({
           <div className={`${failTextColor} ${styles.err_mod_box} `}>
             <h6 className={failTextColor}>Confirmation!</h6>
             <p className="text-slate-700">
-              {`Confirm Payment for lot - ${tempId} ?`}
+              {`Confirm Payment for lot - ${tempUCode} ?`}
             </p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => statusUpdHandler(tempId, ApprovDelivery)}
+                onClick={() =>
+                  statusUpdHandler(tempId, "Pending Admin Approval")
+                }
                 className={"bg-[#EC2752] text-white"}
               >
                 Okay
@@ -538,10 +544,17 @@ const PickedUpDevicesTable = ({
         setErrorMsg2(checkOnPkd);
         if (newStatus === PickConf) {
           setErrorMsg(`Pickup Confirmed Successfully, Lot No. ${uniqueCode}`);
-          setErrorMsg1(`Status Updated to Pending Approval for Delivery`);
+          setErrorMsg1(`Status Pending for Delivery at Warehouse`);
           setErrorMsg2(checkOnPkd);
         }
-        if (newStatus === PickDelivered || newStatus === ApprovDelivery) {
+        if (newStatus === PickDelivered) {
+          setErrorMsg(`Successfully Updated Status to ${newStatus}`);
+          setErrorMsg1(
+            `Pending Admin Approval for Delivery for Lot No. :- ${uniqueCode}`
+          );
+          setErrorMsg2("Check it On History");
+        }
+        if (newStatus === ApprovDelivery) {
           setErrorMsg(`Successfully Updated Status to ${newStatus}`);
           setErrorMsg1(`Lot No. :- ${uniqueCode}`);
           setErrorMsg2("Check it On History");
@@ -676,51 +689,57 @@ const UserAdminContent = ({
   viewHandler,
 }) => {
   return (
-    <div className="flex flex-col gap-1">
-      <button
-        className={`${styles.view_btn}`}
-        onClick={() => viewHandler(val?._id)}
-      >
-        View
-      </button>
-      {val?.status === "Pending Payment Confirmation" && (
-        <div className="flex flex-col gap-1">
-          <button
-            onClick={() =>
-              statusUpdateHandler(
-                val?._id,
-                "Pending Admin Approval",
-                val?.uniqueCode
-              )
-            }
-            className={`${styles.acpt_btn}`}
-          >
-            Confirm Payment
-          </button>
-        </div>
-      )}
-      {val?.status === "Pending Admin Approval" && (
-        <div className="flex flex-col gap-1">
-          <button
-            onClick={() =>
-              statusUpdateHandler(val?._id, PendingConf, val?.uniqueCode)
-            }
-            className={`${styles.acpt_btn}`}
-          >
-            Accept
-          </button>
-        </div>
-      )}
-      {val?.status === PickDelivered && (
-        <div className="flex flex-col gap-1">
-          <button
-            onClick={() => confHandler(val?._id)}
-            className={`${styles.acpt_btn}`}
-          >
-            Approve Delivery
-          </button>
-        </div>
-      )}
-    </div>
+          <div className="flex flex-col gap-1">
+                      <button
+                        className={`${styles.view_btn}`}
+                        onClick={() => viewHandler(val?._id)}
+                      >
+                        View
+                      </button>
+                      {val?.status === "Pending Payment Confirmation" && (
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={ () => 
+                              confHandler(val?._id, val?.uniqueCode)
+                            }
+                            className={`${styles.acpt_btn}`}
+                          >
+                            Confirm Payment
+                          </button>
+                        </div>
+                      )}
+                      {val?.status === "Pending Admin Approval" && (
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() =>
+                              statusUpdateHandler(
+                                val?._id,
+                                PendingConf,
+                                val?.uniqueCode
+                              )
+                            }
+                            className={`${styles.acpt_btn}`}
+                          >
+                            Accept
+                          </button>
+                        </div>
+                      )}
+                      {val?.status === PickDelivered && (
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={() =>
+                              statusUpdateHandler(
+                                val?._id,
+                                ApprovDelivery,
+                                val?.uniqueCode
+                              )
+                            }
+                            className={`${styles.acpt_btn}`}
+                          >
+                            Approve Delivery
+                          </button>
+                        </div>
+                      )}
+                    </div>
   );
 };

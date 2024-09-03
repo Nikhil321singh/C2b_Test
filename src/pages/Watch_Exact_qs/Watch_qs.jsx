@@ -275,29 +275,6 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
         />
         <p className="ml-2 text-xl font-medium">Device Details</p>
       </div>
-      <div className={`${styles.search_box_wrap} mt-[15px] mb-[5px] w-[90vw]`}>
-        <div
-          className={`flex items-center bg-gray-200  p-2 mb-1 rounded-lg w-[100%] ${styles.search_box}`}
-        >
-          <div className="flex items-center">
-            <CiSearch size={20} className="inline ml-1" />
-          </div>
-          <input
-            placeholder="Search Question"
-            onChange={() => console.log("state is ", WTCstate)}
-            onClick={() => setIsSearchOpen(true)}
-            className="inline w-full mx-2 bg-gray-200 outline-none"
-            type="text"
-          />
-          {isSearchOpen && (
-            <WatchQuestionSearch
-              setIsSearchOpen={setIsSearchOpen}
-              state={WTCstate}
-              dispatch={dispatch}
-            />
-          )}
-        </div>
-      </div>
     </React.Fragment>
   );
 };

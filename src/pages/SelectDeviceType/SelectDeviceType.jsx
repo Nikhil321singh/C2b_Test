@@ -297,6 +297,18 @@ export const BrandList = ({ deviceType }) => {
     }
   };
 
+  const isArray = Array.isArray(brandList);
+  const sortedModels = isArray
+    ? [...brandList].sort((a, b) => {
+        const nameA = a.name.toLowerCase(); // Convert to lowercase to ensure case-insensitive sorting
+        const nameB = b.name.toLowerCase();
+
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0; // If both are equal
+      })
+    : [];
+
   return (
     <>
       {popout && (
@@ -333,8 +345,8 @@ export const BrandList = ({ deviceType }) => {
           ref={brandContainerRef}
           className={`flex flex-shrink-0 gap-4 px-1 overflow-x-auto  scroll-smooth scrollbar-hide ${styles.topSell_box}`}
         >
-          {brandList && brandList.length >0 &&
-            brandList.map((brandItem, index) => (
+          {sortedModels && sortedModels.length >0 &&
+            sortedModels.map((brandItem, index) => (
             <div
               key={index}
               onClick={() => handleBrandClick(brandItem)}

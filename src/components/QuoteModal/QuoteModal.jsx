@@ -36,7 +36,7 @@ const QuoteModal = ({
   const [otherReason, setOtherReason] = useState("");
   const [isOther, setIsOther] = useState(false);
   const [userData, setUserData] = useState({});
-
+ const [errMsg, setErrMsg] = useState("");
   useEffect(() => {
     setShowOtp(false);
   }, [show]);
@@ -60,8 +60,42 @@ const QuoteModal = ({
       clearInterval(interval);
     };
   }, [disableResend, timer]);
+const passwordValidation = () => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+  if (!emailRegex.test(userEmail)) {
+    setErrMsg("Please Enter a Valid Email");
+    return;
+  } else {
+    setErrMsg("");
+  }
+  if (ph.length !== 10) {
+    setErrMsg("Please Enter a Valid Mobile no.");
+    return;
+  } else {
+    setErrMsg("");
+  }
+};
+useEffect(() => {
+  passwordValidation();
+}, [userEmail, ph]);
   const onSignupDup = () => {
+     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+     if (!emailRegex.test(userEmail)) {
+       setErrMsg("Please Enter a Valid Email");
+       return;
+     }
+     if (userEmail.length <= 5) {
+       setErrMsg("Email: (Size Must Be >= 5)");
+       return;
+     }
+
+     if (ph.length !== 10) {
+       console.log(ph);
+       setErrMsg("Mobile: (Must have 10 Digits)");
+       return;
+     }
     setLoading(true);
     const data = {
       lead_id: leadData.id,
@@ -188,6 +222,7 @@ const QuoteModal = ({
         isOther={isOther}
         setIsOther={setIsOther}
         otherReason={otherReason}
+        errMsg={errMsg}
         setReason={setReason}
         setOtherReason={setOtherReason}
         onSignupDup={onSignupDup}
@@ -221,6 +256,7 @@ const OTPCOmp = ({
   setReason,
   setOtherReason,
   onSignupDup,
+  errMsg,
   handleNumberEdit,
   resendOTPDup,
   disableResend,
@@ -239,7 +275,16 @@ const OTPCOmp = ({
         <React.Fragment>
           {!showOtp ? (
             <div>
-              <p className="block text-xl font-medium display">Save Quote</p>
+              <div className="flex items-center gap-28">
+                <p className="text-xl font-medium">Save Quote</p>
+                {errMsg && (
+                  <div className="flex items-center justify-center my-0 py-0">
+                    <p className="text-[#8080FF] text-sm h-[20px] p-0 m-0">
+                      {errMsg}
+                    </p>
+                  </div>
+                )}
+              </div>
               <div className="flex flex-col gap-2 pb-4 mt-4">
                 <input
                   className="p-2 border-2 outline-none"
@@ -260,12 +305,12 @@ const OTPCOmp = ({
                   value={ph}
                   onChange={(e) => setPh(e.target.value)}
                   type="number"
-                  placeholder="Mobile"
+                  placeholder="Mobile *"
                 />
                 <input
                   className="p-2 border-2 outline-none"
                   type="email"
-                  placeholder="Email Id"
+                  placeholder="Email Id *"
                   value={userEmail}
                   onChange={(e) => setUserEmail(e.target.value)}
                 />
