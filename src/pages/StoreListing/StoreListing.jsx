@@ -44,7 +44,7 @@ const StoreListing = () => {
     setIsTableLoaded(true);
     const data = {
       storeName: formData.storeName,
-      uniqueId: formData.uniqueId,
+      // uniqueId: formData.uniqueId,
       email: formData.email,
       contactNumber: formData.contactNumber,
       region: formData.region,
@@ -167,7 +167,7 @@ const StoreListingForm = ({ submitHandler, formData, handleChange }) => {
           required={true}
         />
       </div>
-      <div className="w-[70%] flex flex-col gap-2">
+      {/* <div className="w-[70%] flex flex-col gap-2">
         <span className="font-medium text-xl">Unique Id*</span>
         <input
           id="uniqueId"
@@ -178,7 +178,7 @@ const StoreListingForm = ({ submitHandler, formData, handleChange }) => {
           type="text"
           required={true}
         />
-      </div>
+      </div> */}
       <div className="flex flex-col w-[70%] gap-2 ">
         <span className="text-xl font-medium">Email*</span>
         <input

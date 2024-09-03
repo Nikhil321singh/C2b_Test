@@ -67,6 +67,7 @@ const downloadExcelLeadsompleted = (apiData) => {
       "Customer Name": item.name,
       Product: item.modelId?.name,
       Price: item.actualPrice,
+      "Final Price Offered to Customer": item?.price,
       "Order Id": item?.uniqueCode,
       "IMEI No.": item.documentId?.IMEI,
       ...questionData, // Spread the questionData to include in the final object

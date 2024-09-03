@@ -84,6 +84,7 @@ const downloadExcelCustomerTable = (apiData) => {
       category: element?.lead?.model?.type,
       "Product Name": element?.lead?.model?.name,
       Variant: element?.lead?.storage,
+      Price: element?.lead?.actualPrice,
       "Final Price Offered to Customer": element?.lead?.price,
       "Unique Id": element?.lead?.uniqueCode,
       "Customer Name": element?.lead?.name,

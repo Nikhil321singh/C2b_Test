@@ -547,10 +547,17 @@ const PickedUpDevicesTable = ({
           setErrorMsg1(`Status Pending for Delivery at Warehouse`);
           setErrorMsg2(checkOnPkd);
         }
-        if (newStatus === PickDelivered || newStatus === ApprovDelivery) {
+        if (newStatus === PickDelivered) {
           setErrorMsg(`Successfully Updated Status to ${newStatus}`);
           setErrorMsg1(
             `Pending Admin Approval for Delivery for Lot No. :- ${uniqueCode}`
+          );
+          setErrorMsg2("Check it On History");
+        }
+        if (newStatus === ApprovDelivery) {
+          setErrorMsg(`Successfully Updated Status to ${newStatus}`);
+          setErrorMsg1(
+            `Lot No. :- ${uniqueCode}`
           );
           setErrorMsg2("Check it On History");
         }

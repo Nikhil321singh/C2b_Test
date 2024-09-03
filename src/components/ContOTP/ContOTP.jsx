@@ -59,11 +59,12 @@ const ContOTP = ({ setContinueOTPOpen }) => {
 
   //on submit phone number
   function onSignup(event) {
-    if(otpData.name.length <= 3){
-      setErrMsg("Name: (Size Must Be >= 3)");
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailRegex.test(otpData.email)) {
+      setErrMsg("Please Enter a Valid Email");
       return;
     }
-
     if(otpData.email.length <= 5){
       setErrMsg("Email: (Size Must Be >= 5)");
       return;

@@ -21,7 +21,6 @@ const ChangePassword = () => {
   const [isValid, setIsValid] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showUserPassword, setShowUserPassword] = useState(false);
-    const [showPopup, setShowPopup] = useState(false);
   const [showUserPassword2, setShowUserPassword2] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const navigate = useNavigate();
@@ -65,27 +64,28 @@ const ChangePassword = () => {
       setIsValid(false);
       return;
     }
-    if (!lCaseRegex.test(newPassword) && newFocus) {
+    if (!lCaseRegex.test(newPassword)) {
       setErrMsg("Password Must Contain a Lower Case Letter");
       setIsValid(false);
       return;
     }
-    if (!uCaseRegex.test(newPassword) && newFocus) {
+    if (!uCaseRegex.test(newPassword)) {
       setErrMsg("Password Must Contain a Upper Case Letter");
       setIsValid(false);
       return;
     }
-    if (!numRegex.test(newPassword) && newFocus) {
+    if (!numRegex.test(newPassword)) {
       setErrMsg("Password Must Contain a Number");
       setIsValid(false);
       return;
     }
-    if (!spCharRegex.test(newPassword) && newFocus) {
+    if (!spCharRegex.test(newPassword)) {
       setErrMsg("Password Must Contain a Speacial Char [@$!%*?&]");
       return;
     }
     if (newPassword !== confPassword) {
       setErrMsg("Confirm Password Does'nt Match");
+      setIsValid(false);
       return;
     }
     if (
@@ -111,10 +111,6 @@ const ChangePassword = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (newPassword != confPassword) {
-      setShowPopup(true)
-      return;
-    }
     setIsLoading(true);
     const userToken = sessionStorage.getItem("authToken");
     const data = {
@@ -125,7 +121,8 @@ const ChangePassword = () => {
 
     axios
       .post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/userregistry/updatePassword`,
         data,
         {
@@ -165,10 +162,6 @@ const ChangePassword = () => {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center w-full h-full mt-16">
-          <div className={`w-[85vw] h-[160px] popup py-0 ${showPopup ? "show" : ""}`}>
-            <div className="text">New Password & Confirm Password must be same</div>
-            <button onClick={() => setShowPopup(false)}> Close</button>
-          </div>
           <div className="flex flex-col items-center justify-center box">
             <div className="imgBox">
               <img className="w-48 pt-4 mt-2 mb-3" src={Grest_Logo} />
