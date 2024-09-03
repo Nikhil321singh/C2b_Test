@@ -23,11 +23,19 @@ const downloadExcelStoreWise = (apiData) => {
     return {
       "Purchase Date": new Date(item.createdAt).toLocaleDateString("en-IN"),
       Technicians: item.userId?.firstName,
+      Category: item.modelId?.type,
       "IMEI No.": item.documentId?.IMEI,
       "Product Details": item.modelId?.name,
-      Location: item.store?.storeName,
-      "Price Offered To Customer": item.price,
-      "Unique ID": item.uniqueCode,
+      Location: item?.store?.storeName,
+      Price: item?.actualPrice,
+      "Price Offered To Customer": item?.price,
+      "Unique ID": item?.uniqueCode,
+      "GREST Received": item?.grestReceived || "NA",
+      "Receiving Date": item?.grestRecDate || "NA",
+      "New Prices As Per New Range": "NA",
+      "Store Payment Status": "NA",
+      "Payment Date": "NA",
+      "Store Payment UTR Number": "NA",
     };
   });
   const wsStoreWise = XLSX.utils.json_to_sheet(formattedData);

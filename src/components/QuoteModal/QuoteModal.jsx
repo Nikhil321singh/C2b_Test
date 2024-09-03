@@ -85,8 +85,20 @@ const QuoteModal = ({
 
 
   const onSignupDup = () => {
-     if (!isFormComplete) {
-       setErrMsg("Please Fill All Details");
+     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+     if (!emailRegex.test(userEmail)) {
+       setErrMsg("Please Enter a Valid Email");
+       return;
+     }
+     if (userEmail.length <= 5) {
+       setErrMsg("Email: (Size Must Be >= 5)");
+       return;
+     }
+
+    if (ph.length !== 10) {
+       console.log(ph)
+       setErrMsg("Mobile: (Must have 10 Digits)");
        return;
      }
     setLoading(true);
