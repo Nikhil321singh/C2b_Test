@@ -30,7 +30,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
-  const isFormComplete = otpData.name && otpData.email && ph;
+  //const isFormComplete = otpData.name && otpData.email && ph;
   const [errMsg, setErrMsg] = useState("");
   const [firstTime, setFirstIme] = useState(true);
 
@@ -59,6 +59,21 @@ const ContOTP = ({ setContinueOTPOpen }) => {
 
   //on submit phone number
   function onSignup(event) {
+    if(otpData.name.length <= 3){
+      setErrMsg("Name: (Size Must Be >= 3)");
+      return;
+    }
+
+    if(otpData.email.length <= 5){
+      setErrMsg("Email: (Size Must Be >= 5)");
+      return;
+    }
+
+    if(otpData.phone.length !== 10){
+      setErrMsg("Mobile: (Must have 10 Digits)");
+      return;
+    }
+    setErrMsg("");
     setLoading(true);
     if (firstTime) {
       onCaptchVerify();
@@ -129,30 +144,30 @@ const ContOTP = ({ setContinueOTPOpen }) => {
       });
   };
 
-  const onSignupDup = () => {
-    if (!isFormComplete) {
-      setErrMsg("Please Fill All Details");
-      return;
-    }
-    setLoading(true);
-    const formatPh = "+" + ph;
-    console.log(formatPh);
-    setLoading(false);
-    setOtpBoxOpen(true);
-    setDisableResend(true);
-  };
-  const resendOTPDup = () => {
-    setDisableResend(true);
-  };
-  const onOTPVerifyDup = () => {
-    setLoading(true);
-    if (otp === "123456") {
-      dispatch(setOtpVerified(true));
-      navigate("/inputnumber");
-    } else {
-      setLoading(false);
-    }
-  };
+  // const onSignupDup = () => {
+  //   if (!isFormComplete) {
+  //     setErrMsg("Please Fill All Details");
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   const formatPh = "+" + ph;
+  //   console.log(formatPh);
+  //   setLoading(false);
+  //   setOtpBoxOpen(true);
+  //   setDisableResend(true);
+  // };
+  // const resendOTPDup = () => {
+  //   setDisableResend(true);
+  // };
+  // const onOTPVerifyDup = () => {
+  //   setLoading(true);
+  //   if (otp === "123456") {
+  //     dispatch(setOtpVerified(true));
+  //     navigate("/inputnumber");
+  //   } else {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     let intrvl;
@@ -208,8 +223,8 @@ const ContOTP = ({ setContinueOTPOpen }) => {
               </span>
             </div>
           ) : (
-            <span className="flex flex-col items-center justify-center text-sm font-medium opacity-60">
-              We will send you a one-time Password to this number.
+            <span className={`flex flex-col items-center justify-center text-sm font-medium ${errMsg ? "text-red-500" : "opacity-60"} min-h-[40px]`}>
+              {errMsg ? errMsg : "We will send you a one-time Password to this number."}
             </span>
           )}
         </div>
@@ -325,13 +340,6 @@ const OTPComp = ({
         </div>
       ) : (
         <div className={`${styles.form_fields_wrap}`}>
-          {errMsg && (
-            <div className="flex items-center justify-center m-auto">
-              <p className="text-[#8080FF] text-sm h-[20px] p-0 m-0">
-                {errMsg}
-              </p>
-            </div>
-          )}
           <div>
             <input
               id="name"

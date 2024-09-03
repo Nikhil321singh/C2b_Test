@@ -144,6 +144,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
             title={orderType === "quoteData" ? "Quote Saved" : "Order Saved"}
             customerName={item.lead?.name}
             customerMobile={item.lead?.phoneNumber}
+            customerEmail={item.lead?.emailId}
             deviceName={item.lead?.model?.name}
             savedBy={item.user?.name}
             deviceRam={item.lead?.model?.config?.RAM}
