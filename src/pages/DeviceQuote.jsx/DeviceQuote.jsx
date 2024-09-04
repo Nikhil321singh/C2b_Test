@@ -44,6 +44,7 @@ const DeviceQuote = () => {
   const savedBonus = useSelector((state) => state.responseData?.bonus) || null;
   const [bonus, setBonus] = useState(savedBonus || null);
   const [termsChecked, setTermsChecked] = useState(false);
+     const [countdown, setCountdown] = useState(10);
   const ResponseData = useSelector((state) => state.responseData);
   const Price = useSelector((state) => state.responseData.price);
   const uniqueCode = useSelector((state) => state.responseData.uniqueCode);
@@ -247,7 +248,7 @@ const SubDeviceQuote = ({
         });
       }, 1000);
     } else if (quoteSaved && countdown === 0) {
-      navigate({deviceTypePage});
+       navigate("/selectdevicetype");
     }
     return () => clearInterval(timer);
   }, [quoteSaved, countdown, navigate]);
@@ -281,10 +282,12 @@ const SubDeviceQuote = ({
       )}
       {quoteSaved === true && (
         <div
-          onClick={() => navigate({deviceTypePage})}
+          onClick={() => navigate("/selectdevicetype")}
           className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
         >
-          <p className="p-2 mx-auto text-lg font-medium ">Return To Home ({countdown}s) </p>
+          <p className="p-2 mx-auto text-lg font-medium ">
+            Return To Home ({countdown}s){" "}
+          </p>
         </div>
       )}
     </div>

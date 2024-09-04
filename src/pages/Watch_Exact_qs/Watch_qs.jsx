@@ -11,7 +11,6 @@ import {
   updateWatchWarrantyObject,
 } from "../../store/slices/WatchQna_slice";
 import styles from "./Watch_qs.module.css";
-import { CiSearch } from "react-icons/ci";
 import { setResponseData } from "../../store/slices/responseSlice";
 import useUserProfile from "../../utils/useUserProfile";
 import { CgSpinner } from "react-icons/cg";
@@ -51,7 +50,6 @@ import {
   MdRadioButtonUnchecked,
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
-import WatchQuestionSearch from "../../components/WatchQuestionSearch";
 
 const initialState = {
   Functional: [],
@@ -252,7 +250,6 @@ export default Watchqs;
 
 const WatchHeader = ({ WTCstate, dispatch }) => {
   const navigate = useNavigate();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <React.Fragment>

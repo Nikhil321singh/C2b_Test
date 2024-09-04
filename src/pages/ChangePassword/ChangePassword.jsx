@@ -13,7 +13,6 @@ const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confPassword, setConfPassword] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
   const [newFocus, setNewFocus] = useState(false);
   const [confFocus, setConfFocus] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,8 +33,6 @@ const ChangePassword = () => {
   };
 
 const passwordValidation = () => {
-  const passRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   const lCaseRegex = /[a-z]/;
   const uCaseRegex = /[A-Z]/;
   const numRegex = /\d/;
@@ -97,7 +94,6 @@ const passwordValidation = () => {
   ) {
     setIsValid(true);
     setErrMsg("Password Matched Please Submit");
-    return;
   } else {
     setIsValid(false);
   }

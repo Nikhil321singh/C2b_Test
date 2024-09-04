@@ -689,57 +689,47 @@ const UserAdminContent = ({
   viewHandler,
 }) => {
   return (
-          <div className="flex flex-col gap-1">
-                      <button
-                        className={`${styles.view_btn}`}
-                        onClick={() => viewHandler(val?._id)}
-                      >
-                        View
-                      </button>
-                      {val?.status === "Pending Payment Confirmation" && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={ () => 
-                              confHandler(val?._id, val?.uniqueCode)
-                            }
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Confirm Payment
-                          </button>
-                        </div>
-                      )}
-                      {val?.status === "Pending Admin Approval" && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() =>
-                              statusUpdateHandler(
-                                val?._id,
-                                PendingConf,
-                                val?.uniqueCode
-                              )
-                            }
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Accept
-                          </button>
-                        </div>
-                      )}
-                      {val?.status === PickDelivered && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() =>
-                              statusUpdateHandler(
-                                val?._id,
-                                ApprovDelivery,
-                                val?.uniqueCode
-                              )
-                            }
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Approve Delivery
-                          </button>
-                        </div>
-                      )}
-                    </div>
+    <div className="flex flex-col gap-1">
+      <button
+        className={`${styles.view_btn}`}
+        onClick={() => viewHandler(val?._id)}
+      >
+        View
+      </button>
+      {val?.status === "Pending Payment Confirmation" && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => confHandler(val?._id, val?.uniqueCode)}
+            className={`${styles.acpt_btn}`}
+          >
+            Confirm Payment
+          </button>
+        </div>
+      )}
+      {val?.status === "Pending Admin Approval" && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() =>
+              statusUpdateHandler(val?._id, PendingConf, val?.uniqueCode)
+            }
+            className={`${styles.acpt_btn}`}
+          >
+            Accept
+          </button>
+        </div>
+      )}
+      {val?.status === PickDelivered && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() =>
+              statusUpdateHandler(val?._id, ApprovDelivery, val?.uniqueCode)
+            }
+            className={`${styles.acpt_btn}`}
+          >
+            Approve Delivery
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
