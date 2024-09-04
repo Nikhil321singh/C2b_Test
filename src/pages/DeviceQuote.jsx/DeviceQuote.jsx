@@ -44,7 +44,6 @@ const DeviceQuote = () => {
   const savedBonus = useSelector((state) => state.responseData?.bonus) || null;
   const [bonus, setBonus] = useState(savedBonus || null);
   const [termsChecked, setTermsChecked] = useState(false);
-     const [countdown, setCountdown] = useState(10);
   const ResponseData = useSelector((state) => state.responseData);
   const Price = useSelector((state) => state.responseData.price);
   const uniqueCode = useSelector((state) => state.responseData.uniqueCode);
@@ -100,7 +99,7 @@ const DeviceQuote = () => {
         <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
           <img
-            onClick={() => navigate({deviceTypePage})}
+            onClick={() => navigate({ deviceTypePage })}
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
@@ -127,9 +126,7 @@ const DeviceQuote = () => {
                     : ""
                 }`}
               </p>
-              <p className="text-[#EC2752] font-semibold">
-                ₹{displayPrice}
-              </p>
+              <p className="text-[#EC2752] font-semibold">₹{displayPrice}</p>
             </div>
           </div>
           <QuoteModal
@@ -221,6 +218,7 @@ const DeviceQuote = () => {
           exactQuoteValue={exactQuoteValue}
           termsChecked={termsChecked}
           continueOTPHandler={continueOTPHandler}
+          deviceTypePage={deviceTypePage}
         />
       </div>
     </div>
@@ -235,6 +233,7 @@ const SubDeviceQuote = ({
   exactQuoteValue,
   termsChecked,
   continueOTPHandler,
+  deviceTypePage,
 }) => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(10); // 10 seconds countdown
@@ -248,7 +247,7 @@ const SubDeviceQuote = ({
         });
       }, 1000);
     } else if (quoteSaved && countdown === 0) {
-       navigate("/selectdevicetype");
+      navigate(deviceTypePage);
     }
     return () => clearInterval(timer);
   }, [quoteSaved, countdown, navigate]);
@@ -282,7 +281,7 @@ const SubDeviceQuote = ({
       )}
       {quoteSaved === true && (
         <div
-          onClick={() => navigate("/selectdevicetype")}
+          onClick={() => navigate(deviceTypePage)}
           className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
         >
           <p className="p-2 mx-auto text-lg font-medium ">

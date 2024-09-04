@@ -38,7 +38,6 @@ const QuoteModal = ({
   const [userData, setUserData] = useState({});
   const [errMsg, setErrMsg] = useState("");
   const [isValid, setIsValid] = useState(false);
-  
   useEffect(() => {
     setShowOtp(false);
   }, [show]);
@@ -98,8 +97,6 @@ const passwordValidation = () => {
 useEffect(() => {
   passwordValidation();
 }, [userEmail, ph]);
- 
-
   const resendOTPDup = () => {
     setDisableResend(true);
   };
@@ -432,7 +429,6 @@ const OTPCompSub = ({
     handleClose();
   };
   return (
-   
       <div className="flex flex-col gap-2 pb-4 mt-4">
         <input
           className="p-2 border-2 outline-none"
