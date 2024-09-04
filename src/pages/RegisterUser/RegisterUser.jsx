@@ -6,6 +6,8 @@ import SideMenu from "../../components/SideMenu";
 import { BeatLoader } from "react-spinners";
 import axios from "axios";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
+import { IoEye, IoEyeOffSharp } from "react-icons/io5";
+
 
 const sucTextColor = "text-green-500";
 const failTextColor = "text-[#4900A8]";
@@ -238,6 +240,8 @@ const UserForm = ({
   handleChange,
   storeData,
 }) => {
+  const [showUserPassword, setShowUserPassword] = useState(false);
+
   return (
     <form
       className="ml-10 flex flex-col gap-4"
@@ -284,21 +288,31 @@ const UserForm = ({
           required
         />
       </label>
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Password*</span>
-        <input
-          name="password"
-          id="password"
-          minLength={6}
-          placeholder="Enter new password (min. 6 characters)"
-          value={formData.password || ""}
-          onChange={handleChange}
-          className="border-2 px-2 py-2 rounded-lg  outline-none "
-          type="password"
-          autoComplete="off"
-          required
-        />
-      </label>
+      <div>
+        <label className="font-medium text-xl" htmlFor="password">
+          Password*
+        </label>
+        <div className="flex flex-col relative input w-[70%] gap-2">
+          <input
+            name="password"
+            id="password"
+            minLength={6}
+            placeholder="Enter new password (min. 6 characters)"
+            value={formData.password || ""}
+            onChange={handleChange}
+            className="border-2 px-2 py-2 rounded-lg  outline-none "
+            type={showUserPassword ? "text" : "password"}
+            autoComplete="off"
+            required
+          />
+          <span
+            onClick={() => setShowUserPassword(!showUserPassword)}
+            className="absolute transform -translate-y-1/2 cursor-pointer right-2 top-6"
+          >
+            {!showUserPassword ? <IoEyeOffSharp /> : <IoEye />}
+          </span>
+        </div>
+      </div>
       <label className="flex flex-col w-[70%] gap-2 ">
         <span className="font-medium text-xl">Mobile Number*</span>
         <input
