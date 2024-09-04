@@ -81,7 +81,7 @@ const OrdersCard = ({
     const threeDays = 3 * oneDay; // 3 days in milliseconds
     if (title === savedQuote) {
       return timeDiff > oneDay;
-    } else if (title === "Lead Saved") {
+    } else if (title === "Order Saved") {
       return timeDiff > threeDays;
     } else {
       return false;

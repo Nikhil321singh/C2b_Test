@@ -11,7 +11,6 @@ import {
   updateWatchWarrantyObject,
 } from "../../store/slices/WatchQna_slice";
 import styles from "./Watch_qs.module.css";
-import { CiSearch } from "react-icons/ci";
 import { setResponseData } from "../../store/slices/responseSlice";
 import useUserProfile from "../../utils/useUserProfile";
 import { CgSpinner } from "react-icons/cg";
@@ -51,7 +50,6 @@ import {
   MdRadioButtonUnchecked,
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
-import WatchQuestionSearch from "../../components/WatchQuestionSearch";
 
 const initialState = {
   Functional: [],
@@ -252,7 +250,6 @@ export default Watchqs;
 
 const WatchHeader = ({ WTCstate, dispatch }) => {
   const navigate = useNavigate();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <React.Fragment>
@@ -274,29 +271,6 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
           className="ml-2 text-[#EC2752]"
         />
         <p className="ml-2 text-xl font-medium">Device Details</p>
-      </div>
-      <div className={`${styles.search_box_wrap} mt-[15px] mb-[5px] w-[90vw]`}>
-        <div
-          className={`flex items-center bg-gray-200  p-2 mb-1 rounded-lg w-[100%] ${styles.search_box}`}
-        >
-          <div className="flex items-center">
-            <CiSearch size={20} className="inline ml-1" />
-          </div>
-          <input
-            placeholder="Search Question"
-            onChange={() => console.log("state is ", WTCstate)}
-            onClick={() => setIsSearchOpen(true)}
-            className="inline w-full mx-2 bg-gray-200 outline-none"
-            type="text"
-          />
-          {isSearchOpen && (
-            <WatchQuestionSearch
-              setIsSearchOpen={setIsSearchOpen}
-              state={WTCstate}
-              dispatch={dispatch}
-            />
-          )}
-        </div>
       </div>
     </React.Fragment>
   );

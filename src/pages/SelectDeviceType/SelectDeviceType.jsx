@@ -297,6 +297,21 @@ export const BrandList = ({ deviceType }) => {
     }
   };
 
+  const isArray = Array.isArray(brandList);
+  const sortedModels = isArray
+    ? [...brandList].sort((a, b) => {
+        const nameA = a.name.toLowerCase();
+        const nameB = b.name.toLowerCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;
+      })
+    : [];
+
   return (
     <>
       {popout && (
@@ -333,20 +348,21 @@ export const BrandList = ({ deviceType }) => {
           ref={brandContainerRef}
           className={`flex flex-shrink-0 gap-4 px-1 overflow-x-auto  scroll-smooth scrollbar-hide ${styles.topSell_box}`}
         >
-          {brandList && brandList.length >0 &&
-            brandList.map((brandItem, index) => (
-            <div
-              key={index}
-              onClick={() => handleBrandClick(brandItem)}
-              className={`flex-shrink-0  ${styles.brand_card} px-[20px] py-[10px]`}
-            >
-              <img
-                className=" w-[50px]"
-                src={brandItem.logo}
-                alt={brandItem.name}
-              />
-            </div>
-          ))}
+          {sortedModels &&
+            sortedModels.length > 0 &&
+            sortedModels.map((brandItem, index) => (
+              <div
+                key={index}
+                onClick={() => handleBrandClick(brandItem)}
+                className={`flex-shrink-0  ${styles.brand_card} px-[20px] py-[10px]`}
+              >
+                <img
+                  className=" w-[50px]"
+                  src={brandItem.logo}
+                  alt={brandItem.name}
+                />
+              </div>
+            ))}
         </div>
         <button
           className={`-translate-x-3 ${styles.scroll_button}`}
@@ -646,14 +662,14 @@ const SearchBox = ({
     navigate("/selectmodel");
     addPhoneView(model._id);
   };
- const isArray = Array.isArray(modelsL);
- const sortedModels = isArray
-   ? [...modelsL].sort((a, b) => {
-       const numA = parseInt(a.name.match(/\d+/), 10);
-       const numB = parseInt(b.name.match(/\d+/), 10);
-       return numA - numB;
-     })
-   : [];
+  const isArray = Array.isArray(modelsL);
+  const sortedModels = isArray
+    ? [...modelsL].sort((a, b) => {
+        const numA = parseInt(a.name.match(/\d+/), 10);
+        const numB = parseInt(b.name.match(/\d+/), 10);
+        return numA - numB;
+      })
+    : [];
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
@@ -694,7 +710,9 @@ const SearchBox = ({
                   <div
                     key={model._id}
                     className={` ${
-                      sortedModels.length < 3 ? "min-w-[30%] max-w-[30%]" : "w-[30%]"
+                      sortedModels.length < 3
+                        ? "min-w-[30%] max-w-[30%]"
+                        : "w-[30%]"
                     }  h-auto  gap-2 flex flex-col items-center px-2 py-4  text-center`}
                     style={{ boxShadow: "0 0 10px 0 rgb(0 0 0 / 0.1)" }}
                     onClick={() => handleDeviceClick(model)}

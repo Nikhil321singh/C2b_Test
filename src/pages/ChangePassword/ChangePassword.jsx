@@ -13,7 +13,6 @@ const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confPassword, setConfPassword] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
   const [newFocus, setNewFocus] = useState(false);
   const [confFocus, setConfFocus] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,68 +32,81 @@ const ChangePassword = () => {
     setUserEmail(event.target.value);
   };
 
-  const passwordValidation = () => {
-    const lCaseRegex = /[a-z]/;
-    const uCaseRegex = /[A-Z]/;
-    const numRegex = /\d/;
-    const spCharRegex = /[@$!%*?&]/;
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const passwordValidation = () => {
+  const lCaseRegex = /[a-z]/;
+  const uCaseRegex = /[A-Z]/;
+  const numRegex = /\d/;
+  const spCharRegex = /[@$!%*?&]/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    const validations = [
-      {
-        condition: !emailRegex.test(userEmail),
-        message: "Please Enter a Valid Email",
-      },
-      {
-        condition: password.length < 8 || newPassword.length < 8,
-        message: "Password Size Must Be More Than 8 Characters",
-      },
-      {
-        condition: newFocus && !lCaseRegex.test(newPassword),
-        message: "Password Must Contain a Lower Case Letter",
-      },
-      {
-        condition: newFocus && !uCaseRegex.test(newPassword),
-        message: "Password Must Contain an Upper Case Letter",
-      },
-      {
-        condition: newFocus && !numRegex.test(newPassword),
-        message: "Password Must Contain a Number",
-      },
-      {
-        condition: newFocus && !spCharRegex.test(newPassword),
-        message: "Password Must Contain a Special Char [@$!%*?&]",
-      },
-      {
-        condition: newPassword !== confPassword,
-        message: "Confirm Password Doesn't Match",
-      },
-    ];
+  if (!emailRegex.test(userEmail)) {
+    setErrMsg("Please Enter a Valid Email");
+    setIsValid(false);
+    return;
+  } else {
+    setErrMsg("");
+  }
 
-    for (const validation of validations) {
-      if (validation.condition) {
-        setErrMsg(validation.message);
-        setIsValid(false);
-        return;
-      }
-    }
+  if (password.length < 8) {
+    setErrMsg("Password Size Must Be More Than 8 Characters");
+    setIsValid(false);
+    return;
+  } else {
+    setErrMsg("");
+  }
 
-    setErrMsg("Password Matched Please Submit");
+  if (newPassword.length < 8) {
+    setErrMsg("Password Size Must Be More Than 8 Characters");
+    setIsValid(false);
+    return;
+  }
+  if (!lCaseRegex.test(newPassword)) {
+    setErrMsg("Password Must Contain a Lower Case Letter");
+    setIsValid(false);
+    return;
+  }
+  if (!uCaseRegex.test(newPassword)) {
+    setErrMsg("Password Must Contain a Upper Case Letter");
+    setIsValid(false);
+    return;
+  }
+  if (!numRegex.test(newPassword)) {
+    setErrMsg("Password Must Contain a Number");
+    setIsValid(false);
+    return;
+  }
+  if (!spCharRegex.test(newPassword)) {
+    setErrMsg("Password Must Contain a Speacial Char [@$!%*?&]");
+    return;
+  }
+  if (newPassword !== confPassword) {
+    setErrMsg("Confirm Password Does'nt Match");
+    setIsValid(false);
+    return;
+  }
+  if (
+    newPassword === confPassword &&
+    newPassword.length >= 8 &&
+    lCaseRegex.test(newPassword) &&
+    uCaseRegex.test(newPassword) &&
+    numRegex.test(newPassword) &&
+    spCharRegex.test(newPassword)
+  ) {
     setIsValid(true);
-  };
+    setErrMsg("Password Matched Please Submit");
+  } else {
+    setIsValid(false);
+  }
+};
+
+
 
   useEffect(() => {
     passwordValidation();
     console.log(isValid);
   }, [userEmail, newPassword, confPassword, newFocus, confFocus]);
-  const showPop = () => {
-    if (newPassword !== confPassword) {
-      setShowPopup(true);
-    }
-  };
   const handleSubmit = (event) => {
     event.preventDefault();
-    showPop();
     setIsLoading(true);
     const userToken = sessionStorage.getItem("authToken");
     const data = {
@@ -153,8 +165,6 @@ const ChangePassword = () => {
           setConfPassword={setConfPassword}
           setNewFocus={setNewFocus}
           setConfFocus={setConfFocus}
-          showPopup={showPopup}
-          setShowPopup={setShowPopup}
           isLoading={isLoading}
           showUserPassword={showUserPassword}
           showUserPassword2={showUserPassword2}
@@ -180,8 +190,6 @@ const PasswordChange = ({
   setNewFocus,
   setConfFocus,
   isLoading,
-  showPopup,
-  setShowPopup,
   showUserPassword,
   showUserPassword2,
   setShowUserPassword2,
@@ -192,12 +200,6 @@ const PasswordChange = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full mt-16">
-      <div
-        className={`w-[85vw] h-[160px] popup py-0 ${showPopup ? "show" : ""}`}
-      >
-        <div className="text">New Password & Confirm Password must be same</div>
-        <button onClick={() => setShowPopup(false)}> Close</button>
-      </div>
       <div className="flex flex-col items-center justify-center box">
         <div className="imgBox">
           <img className="w-48 pt-4 mt-2 mb-3" src={Grest_Logo} />
