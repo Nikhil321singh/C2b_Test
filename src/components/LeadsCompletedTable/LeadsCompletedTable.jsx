@@ -38,14 +38,9 @@ const LeadsCompletedTable = ({ data }) => {
     const printElement = ReactDOMServer.renderToString(
       <PurchaseReceipt
         phoneNumber={data[index]?.phoneNumber}
-        uniqueCode={data[index]?.uniqueCode}
-        emailId={data[index]?.emailId}
-        name={data[index]?.name}
         imeiNumber={data[index]?.documentId?.IMEI}
         phoneName={data[index]?.modelId?.name}
-        storeName={data[index]?.store?.storeName}
-        region={data[index]?.store?.region}
-        address={data[index]?.store?.address}
+        storeName={data[index]?.userId?.storeName}
         storage={data[index]?.storage}
         RAM={data[index]?.ram}
         formattedDate={formattedDate}
