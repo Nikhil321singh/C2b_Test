@@ -14,7 +14,6 @@ const initStoreForm = {
   storeName: "",
   region: "",
   email: "",
-  uniqueId: "",
   contactNumber: "",
   address: "",
 };
@@ -44,7 +43,6 @@ const StoreListing = () => {
     setIsTableLoaded(true);
     const data = {
       storeName: formData.storeName,
-      uniqueId: formData.uniqueId,
       email: formData.email,
       contactNumber: formData.contactNumber,
       region: formData.region,
@@ -162,18 +160,6 @@ const StoreListingForm = ({ submitHandler, formData, handleChange }) => {
           value={formData.storeName}
           name="storeName"
           className="border-2 px-2 py-2 rounded-lg outline-none"
-          onChange={handleChange}
-          type="text"
-          required={true}
-        />
-      </div>
-      <div className="w-[70%] flex flex-col gap-2">
-        <span className="font-medium text-xl">Unique Id*</span>
-        <input
-          id="uniqueId"
-          name="uniqueId"
-          value={formData.uniqueId}
-          className="border-2 px-2 py-2 rounded-lg  outline-none "
           onChange={handleChange}
           type="text"
           required={true}
