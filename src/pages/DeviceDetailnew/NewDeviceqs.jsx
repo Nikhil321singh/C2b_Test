@@ -210,7 +210,17 @@ function NewDeviceqs() {
       const newPopulateAnswers = response.data.data.map((ele) => ele.default);
       if (answers.length === 0) {
         const newAnswers = newPopulateAnswers.map((answer, index) => {
-          if (response.data.data[index].yes === answer) {
+          if (response.data.data[index].yes === answer && response.data.data[index].no === answer) {
+            return {
+              quetion: response.data.data[index].quetion,
+              answer,
+              key: "no",
+              group: response.data.data[index].group,
+              selected: Array(response.data.data[index].options.length).fill(
+                false
+              ),
+            };
+          }else if (response.data.data[index].yes === answer) {
             return {
               quetion: response.data.data[index].quetion,
               answer,
@@ -452,7 +462,7 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate.Cosmetics &&
           NDstate.Cosmetics.map((data, index) => {
-            if (index < 5) {
+            if (index < 6) {
               return (
                 <React.Fragment key={data._id}>
                   {data?.options.map((option, optionIndex) => (
@@ -699,7 +709,7 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate.Cosmetics &&
           NDstate.Cosmetics.map((data, index) => {
-            if (index >= 5) {
+            if (index >= 6) {
               return (
                 <React.Fragment key={data._id}>
                   {data?.options.map((option, optionIndex) => (
