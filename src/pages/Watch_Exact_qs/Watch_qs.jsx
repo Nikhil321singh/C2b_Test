@@ -516,7 +516,7 @@ const ThirdPart = ({ WTCstate, Accessories }) => {
   return (
     <div className="containClass">
       <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
-        <p>Please select accessories which are available</p>
+        <p>Please select accessories which are not available</p>
       </div>
       <div className="grid grid-cols-2">
         {WTCstate?.Accessories &&
@@ -524,7 +524,7 @@ const ThirdPart = ({ WTCstate, Accessories }) => {
             <div
               key={data._id}
               className={`${
-                Accessories[index]?.answer === data.yes
+                Accessories[index]?.answer !== data.yes
                   ? styles.option_selected
                   : styles.option_selected_not
               } flex flex-col justify-start items-center`}
