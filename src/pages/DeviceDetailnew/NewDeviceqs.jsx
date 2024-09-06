@@ -216,9 +216,7 @@ function NewDeviceqs() {
               answer,
               key: "no",
               group: response.data.data[index].group,
-              selected: Array(response.data.data[index].options.length).fill(
-                false
-              ),
+              selected: Array(response.data.data[index].options.length).fill(false),
             };
           }else if (response.data.data[index].yes === answer) {
             return {
@@ -234,11 +232,9 @@ function NewDeviceqs() {
             return {
               quetion: response.data.data[index].quetion,
               answer,
-              key: "no",
               group: response.data.data[index].group,
-              selected: Array(response.data.data[index].options.length).fill(
-                false
-              ),
+              key: "no",
+              selected: Array(response.data.data[index].options.length).fill(false),
             };
           }
         });
