@@ -12,8 +12,8 @@ import axios from "axios";
 import { BeatLoader } from "react-spinners";
 import QuotesCreatedAdminTable from "../../components/QuotesCreatedAdminTable/QuotesCreatedAdminTable";
 import * as XLSX from "xlsx";
+const ALLstore = "All Stores";
 
-const allst = "All Stores";
 const downloadExcelQuotesAdminCreated = (apiData) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -112,7 +112,7 @@ const QuotesCreatedAdmin = () => {
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [storeData, setStoreData] = useState([]);
-  const [storeName, setStoreName] = useState(allst);
+  const [storeName, setStoreName] = useState(ALLstore);
   const [storeDrop, setStoreDrop] = useState(false);
   const [storeId, setStoreId] = useState("");
   const [toDate, setToDate] = useState(null);
@@ -122,7 +122,9 @@ const QuotesCreatedAdmin = () => {
   const [toDateDup, setToDateDup] = useState(
     new Date().toISOString().split("T")[0]
   );
-
+   const [searchTerm, setSearchTerm] = useState("");
+   const [filteredStores, setFilteredStores] = useState(storeData);
+  
   const getTableData = () => {
     setIsTableLoaded(true);
     axios
@@ -169,7 +171,30 @@ const QuotesCreatedAdmin = () => {
     setFromDateDup("2023-01-01");
     setFilFlag(!filFlag);
   };
+  useEffect(() => {
+    if (
+      searchValue === "" &&
+      storeName == ALLstore &&
+      storeId === "" &&
+      fromDateDup === "2023-01-01"
+    ) {
+getTableData();
+    }
+  }, [searchValue, storeName, storeId, fromDateDup]);
 
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value === "") {
+      setFilteredStores(storeData);
+    } else {
+      const filtered = storeData.filter((store) =>
+        store.storeName.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredStores(filtered);
+    }
+  };
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     setStoreName(value.storeName);
@@ -258,29 +283,49 @@ const QuotesCreatedAdmin = () => {
             }}
           >
             <p className="truncate">
-              {storeName === "" ? "Select Store" : storeName}
+              {searchTerm === "" ? "Select Store" : searchTerm}
             </p>
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
-            <div
-              className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
-            >
+            <div className="absolute w-full bg-white shadow-md">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border-b border-gray-300"
+                placeholder="Search store..."
+              />
               <div
-                onClick={() => handleStoreChange({ storeName: allst, _id: "" })}
-                className={`${styles.filter_option}`}
+                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
               >
-                <p className="truncate">{allst}</p>
-              </div>
-              {storeData.map((item, index) => (
+                {filteredStores.length > 0 ? (
+                  filteredStores.map((item, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        handleStoreChange(item);
+                        setSearchTerm(item.storeName);
+                        setStoreDrop(false);
+                      }}
+                      className={`${styles.filter_option}`}
+                    >
+                      <p className="truncate">{item.storeName}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="p-2 text-gray-500">No stores found</p>
+                )}
                 <div
-                  key={index}
-                  onClick={() => handleStoreChange(item)}
                   className={`${styles.filter_option}`}
+                  onClick={() => {
+                    handleStoreChange({ _id: "", storeName: ALLstore });
+                    setSearchTerm(ALLstore);
+                  }}
                 >
-                  <p className="truncate">{item.storeName}</p>
+                  <p className="truncate">{ALLstore}</p>
                 </div>
-              ))}
+              </div>
             </div>
           )}
         </div>

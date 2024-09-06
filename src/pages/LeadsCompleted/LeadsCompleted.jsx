@@ -112,6 +112,8 @@ const LeadsCompleted = () => {
   const [selStoreId, setSelStoreId] = useState("");
   const [storeData, setStoreData] = useState([]);
   const [reset, setReset] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredStores, setFilteredStores] = useState(storeData);
   const saveStore = async () => {
     const temparr = await getStore();
     setStoreData(temparr);
@@ -152,6 +154,31 @@ const LeadsCompleted = () => {
     setReset(!reset);
   };
 
+   useEffect(() => {
+     if (
+       search === "" &&
+       search1 === "" &&
+       storeName == ALLstore &&
+       selStoreId === "" &&
+       fromDateDup === "2023-01-01"
+     ) {
+getSalesData();
+     }
+   }, [search, search1, storeName, selStoreId, fromDateDup]);
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value === "") {
+      setFilteredStores(storeData);
+    } else {
+      const filtered = storeData.filter((store) =>
+        store.storeName.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredStores(filtered);
+    }
+  };
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     console.log(value._id);
@@ -228,6 +255,10 @@ const LeadsCompleted = () => {
         deviceType={deviceType}
         setDeviceType={setDeviceType}
         selStoreId={selStoreId}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        handleSearch={handleSearch}
+        filteredStores={filteredStores}
       />
     </div>
   );
@@ -283,6 +314,10 @@ const SubLeadsCompleted = ({
   deviceType,
   setDeviceType,
   selStoreId,
+  searchTerm,
+  setSearchTerm,
+  handleSearch,
+  filteredStores,
 }) => {
   const [deviceDrop, setDeviceDrop] = useState(false);
   return (
@@ -328,31 +363,50 @@ const SubLeadsCompleted = ({
             onClick={() => setStoreDrop(!storeDrop)}
           >
             <p className="truncate">
-              {storeName === ALLstore ? "Select Store" : storeName}
+              {searchTerm === "" ? "Select Store" : searchTerm}
             </p>
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
-            <div
-              className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
-            >
+            <div className="absolute w-full bg-white shadow-md">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border-b border-gray-300"
+                placeholder="Search store..."
+              />
               <div
-                className={`${styless.filter_option}`}
-                onClick={() =>
-                  handleStoreChange({ _id: "", storeName: ALLstore })
-                }
+                className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
               >
-                <p className="truncate">{ALLstore}</p>
-              </div>
-              {storeData.map((sitem, index) => (
+                {filteredStores.length > 0 ? (
+                  filteredStores.map((item, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        handleStoreChange(item);
+                        setSearchTerm(item.storeName);
+                        setStoreDrop(false);
+                      }}
+                      className={`${styles.filter_option}`}
+                    >
+                      <p className="truncate">{item.storeName}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="p-2 text-gray-500">No stores found</p>
+                )}
                 <div
-                  key={index}
-                  className={`${styless.filter_option}`}
-                  onClick={() => handleStoreChange(sitem)}
+                  className={`${styles.filter_option}`}
+                  onClick={() => {
+                    handleStoreChange({ _id: "", storeName: ALLstore })
+                  setSearchTerm(ALLstore);
+                  }}
+                  
                 >
-                  <p className="truncate">{sitem.storeName}</p>
+                  <p className="truncate">{ALLstore}</p>
                 </div>
-              ))}
+              </div>
             </div>
           )}
         </div>

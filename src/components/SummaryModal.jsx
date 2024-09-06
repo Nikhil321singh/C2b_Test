@@ -1,7 +1,7 @@
 import React from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import { useSelector } from "react-redux";
-const SummaryModal = ({ show, onClose, price, bonus }) => {
+const SummaryModal = ({ show, onClose, price, bonus, sellingPrice }) => {
   const BasePrice = useSelector((state) => state.responseData.price);
 
   return (
@@ -39,7 +39,7 @@ const SummaryModal = ({ show, onClose, price, bonus }) => {
             </div>
             <div className="flex justify-between text-lg font-semibold">
               <p>Total Amount</p>
-              <p>{price}</p>
+              <p>{sellingPrice}</p>
             </div>
           </div>
         </div>
