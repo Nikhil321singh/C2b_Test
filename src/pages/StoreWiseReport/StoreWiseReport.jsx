@@ -503,13 +503,10 @@ const MainFilterSub = ({
       const handleSearch = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
-
         if (value === "") {
           setFilteredStores(storeData);
         } else {
-          const filtered = storeData.filter((store) =>
-            store.storeName.toLowerCase().includes(value.toLowerCase())
-          );
+          const filtered = storeData.filter((store) => store.storeName.toLowerCase().includes(value.toLowerCase()));
           setFilteredStores(filtered);
         }
       };
@@ -518,9 +515,7 @@ const MainFilterSub = ({
       <div className="relative w-[15%]">
         <div
           className={`${styles.filter_button}`}
-          onClick={() => {
-            setTechDrop(!techDrop);
-          }}
+          onClick={() => setTechDrop(!techDrop)}
         >
           <p className="truncate">
             {techName === "" ? "Select Technician" : techName}
@@ -617,9 +612,7 @@ const MainFilterSub = ({
             setStoreDrop(!storeDrop);
           }}
         >
-          <p className="truncate">
-            {searchTerm === "" ? "Select Store" : searchTerm}
-          </p>
+          <p className="truncate">{searchTerm === "" ? "Select Store" : searchTerm}</p>
           <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
         </div>
         {storeDrop && (
@@ -644,9 +637,7 @@ const MainFilterSub = ({
                       setStoreDrop(false);
                     }}
                     className={`${styles.filter_option}`}
-                  >
-                    <p className="truncate">{item.storeName}</p>
-                  </div>
+                  ><p className="truncate">{item.storeName}</p></div>
                 ))
               ) : (
                 <p className="p-2 text-gray-500">No stores found</p>
