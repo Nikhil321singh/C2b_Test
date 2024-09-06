@@ -224,7 +224,7 @@ function NewDeviceqs() {
             return {
               quetion: response.data.data[index].quetion,
               answer,
-              key: response.data.data[index].yes === answer ? "yes" : "no",
+              key: "yes",
               group: response.data.data[index].group,
               selected: Array(response.data.data[index].options.length).fill(
                 true
@@ -234,7 +234,7 @@ function NewDeviceqs() {
             return {
               quetion: response.data.data[index].quetion,
               answer,
-              key: response.data.data[index].yes === answer ? "yes" : "no",
+              key: "no",
               group: response.data.data[index].group,
               selected: Array(response.data.data[index].options.length).fill(
                 false
