@@ -458,7 +458,7 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate.Cosmetics &&
           NDstate.Cosmetics.map((data, index) => {
-            if (index < 6) {
+            if (index < 9) {
               return (
                 <React.Fragment key={data._id}>
                   {data?.options.map((option, optionIndex) => (
@@ -705,7 +705,7 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate.Cosmetics &&
           NDstate.Cosmetics.map((data, index) => {
-            if (index >= 6) {
+            if (index >= 9) {
               return (
                 <React.Fragment key={data._id}>
                   {data?.options.map((option, optionIndex) => (
