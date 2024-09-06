@@ -309,7 +309,8 @@ const SubSpecialOffers = ({
       </div>
       <SummaryModal
         show={showModal}
-        price={phonePrice}
+        price={Price}
+        sellingPrice={phonePrice}
         onClose={handleCloseModal}
         bonus={extraBonus}
       />
