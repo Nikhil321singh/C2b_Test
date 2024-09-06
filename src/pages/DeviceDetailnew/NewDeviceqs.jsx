@@ -847,6 +847,7 @@ const AboveSix = ({
     const finalPayload = {
       QNA: qna,
       phoneNumber: id?.phoneNumber ? id?.phoneNumber : "123456789",
+      aadharNumber: id?.aadharNumber ? id?.aadharNumber : "123456789012",
       modelId: id?.models?._id,
       storage: id?.models?.config?.storage,
       ram: id?.models?.config?.RAM,

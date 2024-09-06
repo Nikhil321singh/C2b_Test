@@ -366,11 +366,35 @@ const PickedUpFilter = ({
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
+   const [searchTerm, setSearchTerm] = useState("");
+   const [filteredStores, setFilteredStores] = useState(storeData);
   const dispatch = useDispatch();
   const handleSearchClear = () => {
-    setSearchValue("");
-    setDateValue("");
-    getData();
+ setSearchValue("");
+ setSearchTerm("");
+ setDateValue("");
+ setRegion("");
+ setStoreName("GrestTest");
+  };
+
+  useEffect(() => {
+    if (dateValue === "" && searchValue === "") {
+      getData();
+    }
+  }, [dateValue, searchValue]);
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value === "") {
+      setFilteredStores(storeData);
+    } else {
+      const filtered = storeData.filter((store) =>
+        store.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredStores(filtered);
+    }
   };
 
   const handleRegionChange = (value) => {
@@ -467,29 +491,46 @@ const PickedUpFilter = ({
             </div>
           )}
         </div>
-        <div className="w-[70%] relative ">
+        <div className="relative w-[70%]">
           <div
-            onClick={() => {
-              setStoreDrop(!storeDrop);
-            }}
-            className={`${styles.filter_button}`}
+            className={`${styles.filter_button} w-full`}
+            onClick={() => setStoreDrop(!storeDrop)}
           >
             <p className="truncate">
-              {storeName === "" ? "Select Store" : storeName}
+              {searchTerm === "" ? "Select Store" : searchTerm}
             </p>
             <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
           </div>
           {storeDrop && (
-            <div className={`${styles.filter_drop}`}>
-              {storeData.map((element, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleStoreChange(element)}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{element}</p>
-                </div>
-              ))}
+            <div className="absolute w-full bg-white shadow-md">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border-b border-gray-300"
+                placeholder="Search store..."
+              />
+              <div
+                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
+              >
+                {filteredStores.length > 0 ? (
+                  filteredStores.map((item, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        handleStoreChange(item);
+                        setSearchTerm(item);
+                        setStoreDrop(false);
+                      }}
+                      className={`${styles.filter_option}`}
+                    >
+                      <p className="truncate">{item}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="p-2 text-gray-500">No stores found</p>
+                )}
+              </div>
             </div>
           )}
         </div>

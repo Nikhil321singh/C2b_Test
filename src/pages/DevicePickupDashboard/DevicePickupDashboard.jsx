@@ -217,6 +217,7 @@ const DevicePickupDashboard = () => {
         getDataBySearch={getDataBySearch}
         dateValue={dateValue}
         statusValue={statusValue}
+        selectedStatus={selectedStatus}
         setStatusValue={setStatusValue}
         setDateValue={setDateValue}
         setRegion={setRegion}
@@ -430,6 +431,7 @@ const DPFilter = ({
   getDataBySearch,
   dateValue,
   statusValue,
+  selectedStatus,
   setStatusValue,
   setDateValue,
   setRegion,
@@ -447,6 +449,8 @@ const DPFilter = ({
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredStores, setFilteredStores] = useState(storeData);
   const dispatch = useDispatch();
 
   const handleRegionChange = (value) => {
@@ -474,9 +478,29 @@ const DPFilter = ({
     setSearchValue("");
     setSelectedStatus("");
     setDateValue("");
-    getData();
+    setRegion("chandigarh");
+    setStoreName("GrestTest");
+    setSearchTerm("");
   };
+  useEffect(() => {
+    if (selectedStatus === "" && dateValue === "" && searchValue === "") {
+      getData();
+    }
+  }, [dateValue, selectedStatus, searchValue]);
 
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value === "") {
+      setFilteredStores(storeData);
+    } else {
+      const filtered = storeData.filter((store) =>
+        store.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredStores(filtered);
+    }
+  };
   const handleFilterClick = () => {
     setShowFilterDropdown(!showFilterDropdown);
   };
@@ -560,27 +584,44 @@ const DPFilter = ({
         </div>
         <div className="relative w-[70%]">
           <div
-            className={`w-[100%] ${styles.filter_button}`}
-            onClick={() => {
-              setStoreDrop(!storeDrop);
-            }}
+            className={`${styles.filter_button} w-full`}
+            onClick={() => setStoreDrop(!storeDrop)}
           >
             <p className="truncate">
-              {storeName === "" ? "Select Store" : storeName}
+              {searchTerm === "" ? "Select Store" : searchTerm}
             </p>
             <FaAngleDown size={17} className={`${storeDrop && RotateCss}`} />
           </div>
           {storeDrop && (
-            <div className={`w-[100%] ${styles.filter_drop}`}>
-              {storeData.map((item, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleStoreChange(item)}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{item}</p>
-                </div>
-              ))}
+            <div className="absolute w-full bg-white shadow-md">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border-b border-gray-300"
+                placeholder="Search store..."
+              />
+              <div
+                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
+              >
+                {filteredStores.length > 0 ? (
+                  filteredStores.map((item, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        handleStoreChange(item);
+                        setSearchTerm(item);
+                        setStoreDrop(false);
+                      }}
+                      className={`${styles.filter_option}`}
+                    >
+                      <p className="truncate">{item}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="p-2 text-gray-500">No stores found</p>
+                )}
+              </div>
             </div>
           )}
         </div>

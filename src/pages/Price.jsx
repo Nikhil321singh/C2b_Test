@@ -19,6 +19,7 @@ const Price = ({ submitdata, userToken }) => {
   const [phoneRight, setPhoneRight] = useState(null);
   const [phoneTop, setPhoneTop] = useState(null);
   const [phoneBottom, setPhoneBottom] = useState(null);
+    const [aadharNumber, setAadharNumber] = useState("");
   const [imeinumber, setImeiNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ const Price = ({ submitdata, userToken }) => {
     setIsLoading(true);
     if (
       !imeinumber ||
+      !aadharNumber ||
       !phoneFront ||
       !phoneBack ||
       !phoneLeft ||
@@ -60,7 +62,9 @@ const Price = ({ submitdata, userToken }) => {
       !phoneBottom ||
       (isBillRequired && !phoneBill)
     ) {
-      alert("Please fill in all mandatory fields (IMEI/Serial number and device images).");
+      alert(
+        "Please fill in all mandatory fields (IMEI/Serial number and device images)."
+      );
       setIsLoading(false);
       return;
     }
@@ -98,6 +102,7 @@ const Price = ({ submitdata, userToken }) => {
     formData.append("emailId", savedOtpData?.email);
     formData.append("name", savedOtpData?.name);
     formData.append("phoneNumber", savedOtpData?.phone);
+        formData.append("aadharNumber", aadharNumber);
     try {
       await axios.post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -130,10 +135,17 @@ const Price = ({ submitdata, userToken }) => {
       <div className="w-[90%] md:w-[90%] mx-auto h-[auto] mb-[93px]">
         <div className="mt-3 text-center relative">
           <h1 className="text-2xl font-semibold">Upload Documents</h1>
-          <p className="mt-4 text-gray-600">Regulations require you to upload a national identity card. Don't worry, your data will stay safe and private.</p>
+          <p className="mt-4 text-gray-600">
+            Regulations require you to upload a national identity card. Don't
+            worry, your data will stay safe and private.
+          </p>
         </div>
         <div className="flex flex-col">
           <ImeiField setImeiNumber={setImeiNumber} imeinumber={imeinumber} />
+          <AadharNumberField
+            setAadharNumber={setAadharNumber}
+            aadharNumber={aadharNumber}
+          />
           <AdharField
             handleChange={handleChange}
             setFile={setFile}
@@ -180,16 +192,17 @@ const Price = ({ submitdata, userToken }) => {
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div
           onClick={() => uploadAllImages()}
-          className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${!imeinumber ||
-              !phoneFront ||
-              !phoneBack ||
-              !phoneLeft ||
-              !phoneRight ||
-              !phoneTop ||
-              !phoneBottom
+          className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
+            !imeinumber ||
+            !phoneFront ||
+            !phoneBack ||
+            !phoneLeft ||
+            !phoneRight ||
+            !phoneTop ||
+            !phoneBottom
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-[#EC2752]"
-            }`}
+          }`}
         >
           {isLoading && (
             <CgSpinner
@@ -276,7 +289,68 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
     </div>
   );
 };
+const AadharNumberField = ({ aadharNumber, setAadharNumber }) => {
+  const [error, setError] = useState(true);
+  const Device = sessionStorage.getItem("DeviceType");
 
+  const validateAadharNumber = (value) => {
+    if (value.length !== 12) {
+      setError("Aadhar Number number must be exactly 12 digits.");
+      return false;
+    } else if (!/^\d{12}$/.test(value)) {
+      setError("Aadhar Number must only contain digits.");
+      return false;
+    }
+    setError("");
+    return true;
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setAadharNumber(value);
+    validateAadharNumber(value);
+  };
+
+  const handleVerify = () => {
+    if (validateAadharNumber(aadharNumber)) {
+      // Handle the verify logic here
+      console.log("Aadhar Number is valid.");
+    }
+  };
+
+  return (
+    <div className="flex flex-col eminumber mt-[4px]">
+      <div className="flex gap-1 two">
+        <p className="text-base font-medium">2.</p>
+        <p className="text-base font-medium three">
+          Enter your Aadhar Number
+          <span className="text-red-500">*</span>
+        </p>
+      </div>
+
+      <div className="flex items-center gap-4 mt-2 ml-[19px]">
+        <input
+          type="text"
+          className="w-auto p-2 border-2 border-gray-300 rounded"
+          value={aadharNumber}
+          placeholder="Aadhar no."
+          onChange={handleChange}
+          maxLength={12}
+        />
+        <button
+          className={`px-4 py-2 font-bold text-white rounded ${
+            !error ? "bg-[#4900A8]" : "bg-gray-400 cursor-not-allowed"
+          }`}
+          onClick={handleVerify}
+          disabled={!!error}
+        >
+          Verify
+        </button>
+      </div>
+      {error && <p className="text-[#8080FF] mt-2 text-sm">{error}</p>}
+    </div>
+  );
+};
 const AdharField = ({
   handleChange,
   setFile,
@@ -290,7 +364,7 @@ const AdharField = ({
   return (
     <div className="flex flex-col adharcard mt-[10px]">
       <div className="flex gap-1 two">
-        <p className="text-base font-medium">2.</p>
+        <p className="text-base font-medium">3.</p>
         <div className="flex items-center">
           <p className="text-base font-medium three">
             {"Upload your Aadhar Card"} <span className="text-red-500">*</span>
@@ -359,7 +433,7 @@ const PhoneBill = ({
   return (
     <div className="flex flex-col adharcard mt-[10px]">
       <div className="flex gap-1 two">
-        <p className="text-base font-medium">3.</p>
+        <p className="text-base font-medium">4.</p>
         <div className="flex items-center">
           <p className="text-base font-medium three">
             Upload your {Device === "Mobile" && "phone's"}
@@ -429,7 +503,7 @@ const PhonePhotos1 = ({
   return (
     <div className="flex flex-col adharcard mt-[10px] ">
       <div className="flex gap-1 two">
-        <p className="text-base font-medium">4.</p>
+        <p className="text-base font-medium">5.</p>
         <div className="flex items-center">
           <p className="text-base font-medium three">
             {`Upload Your ${Device}'s Images`}{" "}
