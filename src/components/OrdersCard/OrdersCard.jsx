@@ -214,7 +214,7 @@ const OrdersCard = ({
           onConfirm={handleDeleteConfirmed}
         />
       )}
-      {title !== "Lead Completed" && !isExpired() && (
+      {title !== "Order Completed" && !isExpired() && (
         <div className="flex items-center justify-between gap-2 p-2 font-medium">
           <div
             onClick={handleDeleteConfirmation}

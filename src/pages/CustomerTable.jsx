@@ -13,6 +13,7 @@ import * as XLSX from "xlsx";
 import { IoMdSearch } from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
 import styless from "../pages/QuotesCreatedAdmin/QuotesCreatedAdmin.module.css";
+const ALLstore = "All Stores";
 
 const getStore = async () => {
   const token = sessionStorage.getItem("authToken");
@@ -128,7 +129,9 @@ const CustomerTable = () => {
   const [selStoreId, setSelStoreId] = useState("");
   const [storeData, setStoreData] = useState([]);
   const [filFlag, setFilFlag] = useState(false);
-
+   const [searchTerm, setSearchTerm] = useState("");
+   const [filteredStores, setFilteredStores] = useState(storeData);
+ 
   useEffect(() => {
     myordercretad();
   }, [toDate, fromDate, selStoreId, filFlag]);
@@ -166,7 +169,30 @@ const CustomerTable = () => {
     setToDateDup(new Date().toISOString().split("T")[0]);
     setFilFlag(!filFlag);
   };
+   useEffect(() => {
+     if (
+       search === "" &&
+       storeName == ALLstore &&
+       selStoreId === "" &&
+       fromDateDup === "2023-01-01"
+     ) {
+myordercretad();
+     }
+   }, [search, storeName, selStoreId, fromDateDup]);
 
+   const handleSearch = (e) => {
+     const value = e.target.value;
+     setSearchTerm(value);
+
+     if (value === "") {
+       setFilteredStores(storeData);
+     } else {
+       const filtered = storeData.filter((store) =>
+         store.storeName.toLowerCase().includes(value.toLowerCase())
+       );
+       setFilteredStores(filtered);
+     }
+   };
   const handleFromDateChange = (date) => {
     if (date !== null) {
       setFromDate(date);
@@ -282,26 +308,44 @@ const CustomerTable = () => {
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
-            <div
-              className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
-            >
+            <div className="absolute w-full bg-white shadow-md">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border-b border-gray-300"
+                placeholder="Search store..."
+              />
               <div
-                onClick={() =>
-                  handleStoreChange({ storeName: allStore, _id: "" })
-                }
-                className={`${styless.filter_option}`}
+                className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
               >
-                <p className="truncate">{allStore}</p>
-              </div>
-              {storeData.map((item, index) => (
+                {filteredStores.length > 0 ? (
+                  filteredStores.map((item, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        handleStoreChange(item);
+                        setSearchTerm(item.storeName);
+                        setStoreDrop(false);
+                      }}
+                      className={`${styles.filter_option}`}
+                    >
+                      <p className="truncate">{item.storeName}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="p-2 text-gray-500">No stores found</p>
+                )}
                 <div
-                  key={index}
-                  onClick={() => handleStoreChange(item)}
-                  className={`${styless.filter_option}`}
+                  className={`${styles.filter_option}`}
+                  onClick={() => {
+                    handleStoreChange({ _id: "", storeName: ALLstore });
+                    setSearchTerm(ALLstore);
+                  }}
                 >
-                  <p className="truncate">{item.storeName}</p>
+                  <p className="truncate">{ALLstore}</p>
                 </div>
-              ))}
+              </div>
             </div>
           )}
         </div>

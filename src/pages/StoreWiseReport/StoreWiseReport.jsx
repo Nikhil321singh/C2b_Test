@@ -11,6 +11,7 @@ import DatePicker from "react-datepicker";
 import { IoMdSearch } from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
 
+const ALLstore = "All Stores";
 const isSelled = "true";
 const rotateCss = "rotate-180";
 const pageLimit = 10;
@@ -82,7 +83,7 @@ const StoreWiseReport = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [tableData, setTableData] = useState();
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [storeName, setStoreName] = useState("");
+  const [storeName, setStoreName] = useState(ALLstore);
   const [storeId, setStoreId] = useState("");
   const [region, setRegion] = useState("");
   const [storeData, setStoreData] = useState([]);
@@ -100,7 +101,8 @@ const StoreWiseReport = () => {
   const [techId, setTechId] = useState("");
   const [techName, setTechName] = useState("");
   const [deviceCategory, setDeviceCategory] = useState("Mobile");
-
+     const [searchTerm, setSearchTerm] = useState("");
+     const [filteredStores, setFilteredStores] = useState(storeData);
   const fetchStoreData = () => {
     setIsTableLoaded(true);
     axios
@@ -243,18 +245,62 @@ const StoreWiseReport = () => {
     }
   };
   const handleSearchClear = () => {
-    setStoreName("");
+    setStoreName(ALLstore);
     setStoreId("");
     setRegion("");
     setSearchValue("");
     setFromDate("");
-    setFromDateDup("");
+    setFromDateDup("2023-01-01");
     setToDate("");
-    setToDateDup("");
+    setToDateDup(new Date().toISOString().split("T")[0]);
     setGrestRec("");
     setTechId("");
     setTechName("");
+    setSearchTerm("");
   };
+  useEffect(() => {
+    if (
+      storeId === "" &&
+      region === "" &&
+      searchValue === "" &&
+      fromDate === "" &&
+      fromDateDup === "2023-01-01" &&
+      toDate === "" &&
+      toDateDup === new Date().toISOString().split("T")[0] &&
+      grestRec === "" &&
+      techId === "" &&
+      techName === "" &&
+      searchTerm === ""
+    ) {
+      fetchStoreData();
+    }
+  }, [
+    storeId,
+    region,
+    searchValue,
+    fromDate,
+    fromDateDup,
+    toDate,
+    toDateDup,
+    grestRec,
+    techId,
+    techName,
+    searchTerm,
+  ]);
+
+     const handleSearch = (e) => {
+       const value = e.target.value;
+       setSearchTerm(value);
+
+       if (value === "") {
+         setFilteredStores(storeData);
+       } else {
+         const filtered = storeData.filter((store) =>
+           store.storeName.toLowerCase().includes(value.toLowerCase())
+         );
+         setFilteredStores(filtered);
+       }
+     };
   return (
     <div>
       <UpperFilter
@@ -288,6 +334,11 @@ const StoreWiseReport = () => {
         handleToDateChange={handleToDateChange}
         fromDate={fromDate}
         entireStore={entireStore}
+        searchTerm={searchTerm}
+        handleSearch={handleSearch}
+        filteredStores={filteredStores}
+        setSearchTerm={setSearchTerm}
+        handleSearchClear={handleSearchClear}
       />
       <TableCont
         currentPage={currentPage}
@@ -393,6 +444,11 @@ const MainFilter = ({
   handleToDateChange,
   fromDate,
   entireStore,
+  searchTerm,
+  handleSearch,
+  filteredStores,
+  setSearchTerm,
+  handleSearchClear,
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
@@ -458,6 +514,11 @@ const MainFilter = ({
         handleFromDateChange={handleFromDateChange}
         toDate={toDate}
         handleToDateChange={handleToDateChange}
+        searchTerm={searchTerm}
+        handleSearch={handleSearch}
+        filteredStores={filteredStores}
+        setSearchTerm={setSearchTerm}
+        handleSearchClear={handleSearchClear}
       />
     </div>
   );
@@ -482,29 +543,17 @@ const MainFilterSub = ({
   handleRegionChange,
   setStoreDrop,
   storeDrop,
-  storeName,
-  storeData,
   handleStoreChange,
   fromDate,
   handleFromDateChange,
   toDate,
   handleToDateChange,
+  searchTerm,
+  handleSearch,
+  filteredStores,
+  setSearchTerm,
+  handleSearchClear,
 }) => {
-    const [searchTerm, setSearchTerm] = useState("");
-  const [filteredStores, setFilteredStores] = useState(storeData);
-    const handleSearch = (e) => {
-      const value = e.target.value;
-      setSearchTerm(value);
-
-      if (value === "") {
-        setFilteredStores(storeData);
-      } else {
-        const filtered = storeData.filter((store) =>
-          store.storeName.toLowerCase().includes(value.toLowerCase())
-        );
-        setFilteredStores(filtered);
-      }
-    };
   return (
     <div className="flex flex-row px-5 gap-2 w-[100%] justify-center items-center">
       <div className="relative w-[15%]">
@@ -644,6 +693,12 @@ const MainFilterSub = ({
               ) : (
                 <p className="p-2 text-gray-500">No stores found</p>
               )}
+              <div
+                className={`${styles.filter_option}`}
+                onClick={handleSearchClear}
+              >
+                <p className="truncate">{ALLstore}</p>
+              </div>
             </div>
           </div>
         )}
