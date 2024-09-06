@@ -498,14 +498,24 @@ const MainFilterSub = ({
   toDate,
   handleToDateChange,
 }) => {
+      const [searchTerm, setSearchTerm] = useState("");
+      const [filteredStores, setFilteredStores] = useState(storeData);
+      const handleSearch = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        if (value === "") {
+          setFilteredStores(storeData);
+        } else {
+          const filtered = storeData.filter((store) => store.storeName.toLowerCase().includes(value.toLowerCase()));
+          setFilteredStores(filtered);
+        }
+      };
   return (
     <div className="flex flex-row px-5 gap-2 w-[100%] justify-center items-center">
       <div className="relative w-[15%]">
         <div
           className={`${styles.filter_button}`}
-          onClick={() => {
-            setTechDrop(!techDrop);
-          }}
+          onClick={() => setTechDrop(!techDrop)}
         >
           <p className="truncate">
             {techName === "" ? "Select Technician" : techName}
@@ -602,24 +612,37 @@ const MainFilterSub = ({
             setStoreDrop(!storeDrop);
           }}
         >
-          <p className="truncate">
-            {storeName === "" ? "Select Store" : storeName}
-          </p>
+          <p className="truncate">{searchTerm === "" ? "Select Store" : searchTerm}</p>
           <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
         </div>
         {storeDrop && (
-          <div
-            className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
-          >
-            {storeData.map((item, index) => (
-              <div
-                key={index}
-                onClick={() => handleStoreChange(item)}
-                className={`${styles.filter_option}`}
-              >
-                <p className="truncate">{item.storeName}</p>
-              </div>
-            ))}
+          <div className="absolute w-full bg-white shadow-md">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full p-2 border-b border-gray-300"
+              placeholder="Search store..."
+            />
+            <div
+              className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
+            >
+              {filteredStores.length > 0 ? (
+                filteredStores.map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      handleStoreChange(item);
+                      setSearchTerm(item.storeName);
+                      setStoreDrop(false);
+                    }}
+                    className={`${styles.filter_option}`}
+                  ><p className="truncate">{item.storeName}</p></div>
+                ))
+              ) : (
+                <p className="p-2 text-gray-500">No stores found</p>
+              )}
+            </div>
           </div>
         )}
       </div>
