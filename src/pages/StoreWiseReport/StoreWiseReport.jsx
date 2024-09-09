@@ -15,6 +15,7 @@ const ALLstore = "All Stores";
 const isSelled = "true";
 const rotateCss = "rotate-180";
 const pageLimit = 10;
+const startDateFillter = "2023-01-01";
 
 const downloadExcelStoreWise = (apiData) => {
   const fileType =
@@ -45,7 +46,6 @@ const downloadExcelStoreWise = (apiData) => {
     bookType: "xlsx",
     type: "array",
   });
-
   const dataFileStoreWise = new Blob([excelBufferStoreWise], {
     type: fileType,
   });
@@ -90,30 +90,22 @@ const StoreWiseReport = () => {
   const [entireStore, setEntireStore] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [fromDate, setFromDate] = useState("");
-  const [fromDateDup, setFromDateDup] = useState("2023-01-01");
+  const [fromDateDup, setFromDateDup] = useState(startDateFillter);
   const [toDate, setToDate] = useState("");
-  const [toDateDup, setToDateDup] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
   const [grestRec, setGrestRec] = useState("");
   const [allUser, setAllUser] = useState([]);
   const [techId, setTechId] = useState("");
   const [techName, setTechName] = useState("");
   const [deviceCategory, setDeviceCategory] = useState("Mobile");
-     const [searchTerm, setSearchTerm] = useState("");
-     const [filteredStores, setFilteredStores] = useState(storeData);
+  const [searchTerm, setSearchTerm] = useState("");
   const fetchStoreData = () => {
     setIsTableLoaded(true);
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll?page=${currentPage}
+    axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll?page=${currentPage}
         &limit=${pageLimit}&is_selled=${isSelled}
         &store=${storeId}&rid=${searchValue}&grestRec=${grestRec}&endDate=${toDateDup}
         &startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
-        { headers: { Authorization: token } }
-      )
+        { headers: { Authorization: token } })
       .then((res) => {
         setMaxPages(Math.ceil(res.data.totalCounts / 10));
         setTableData(res.data.data);
@@ -127,9 +119,7 @@ const StoreWiseReport = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=0&limit=9999`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
     axios
@@ -182,15 +172,7 @@ const StoreWiseReport = () => {
 
   useEffect(() => {
     fetchStoreData();
-  }, [
-    currentPage,
-    pageLimit,
-    grestRec,
-    fromDateDup,
-    toDateDup,
-    techId,
-    deviceCategory,
-  ]);
+  }, [currentPage, pageLimit, grestRec, fromDateDup, toDateDup, techId, deviceCategory]);
 
   useEffect(() => {
     if (storeId) {
@@ -198,27 +180,26 @@ const StoreWiseReport = () => {
     }
   }, [storeId]);
 
-const handleSearchClear = () => {
+ const handleSearchClear = () => {
   setStoreName(ALLstore);
   setStoreId("");
   setRegion("");
   setSearchValue("");
   setFromDate("");
-  setFromDateDup("2023-01-01");
+  setFromDateDup(startDateFillter);
   setToDate("");
   setToDateDup(new Date().toISOString().split("T")[0]);
   setGrestRec("");
   setTechId("");
   setTechName("");
   setSearchTerm("");
-};
-   useEffect(() => {
-     if (
-       storeId === "" &&
+ };
+  useEffect(() => {
+     if (storeId === "" &&
        region === "" &&
        searchValue === "" &&
        fromDate === "" &&
-       fromDateDup === "2023-01-01" &&
+       fromDateDup === startDateFillter &&
        toDate === "" &&
        toDateDup === new Date().toISOString().split("T")[0] &&
        grestRec === "" &&
@@ -228,33 +209,9 @@ const handleSearchClear = () => {
      ) {
        fetchStoreData();
      }
-   }, [
-     storeId,
-     region,
-     searchValue,
-     fromDate,
-     fromDateDup,
-     toDate,
-     toDateDup,
-     grestRec,
-     techId,
-     techName,
-     searchTerm,
-   ]);
-
-   const handleSearch = (e) => {
-     const value = e.target.value;
-     setSearchTerm(value);
-
-     if (value === "") {
-       setFilteredStores(storeData);
-     } else {
-       const filtered = storeData.filter((store) =>
-         store.storeName.toLowerCase().includes(value.toLowerCase())
-       );
-       setFilteredStores(filtered);
-     }
-   };
+   }, [storeId, region, searchValue, fromDate, fromDateDup, toDate, toDateDup, grestRec,
+     techId, techName, searchTerm
+    ]);
   return (
     <div>
       <UpperFilter
@@ -569,9 +526,7 @@ const MainFilterSub = ({
           className={`${styles.filter_button}`}
           onClick={() => setTechDrop(!techDrop)}
         >
-          <p className="truncate">
-            {techName === "" ? "Select Technician" : techName}
-          </p>
+          <p className="truncate">{techName === "" ? "Select Technician" : techName}</p>
           <FaAngleDown size={17} className={`${techDrop && rotateCss}`} />
         </div>
         {techDrop && (
@@ -591,9 +546,7 @@ const MainFilterSub = ({
                 key={item._id}
                 onClick={() => handleTechChange(item)}
                 className={`${styles.filter_option}`}
-              >
-                <p className="truncate">{item.userName}</p>
-              </div>
+              ><p className="truncate">{item.userName}</p></div>
             ))}
           </div>
         )}
@@ -615,21 +568,15 @@ const MainFilterSub = ({
             <div
               onClick={() => handleGrestRecChange("")}
               className={`${styles.filter_option}`}
-            >
-              <p className="truncate">Show All</p>
-            </div>
+            ><p className="truncate">Show All</p></div>
             <div
               onClick={() => handleGrestRecChange("yes")}
               className={`${styles.filter_option}`}
-            >
-              <p className="truncate">Yes</p>
-            </div>
+            ><p className="truncate">Yes</p></div>
             <div
               onClick={() => handleGrestRecChange("no")}
               className={`${styles.filter_option}`}
-            >
-              <p className="truncate">No</p>
-            </div>
+            ><p className="truncate">No</p></div>
           </div>
         )}
       </div>
@@ -667,7 +614,6 @@ const MainFilterSub = ({
           </p>
           <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
         </div>
-
         {storeDrop && (
           <div className="absolute w-full bg-white shadow-md">
             <input
@@ -707,7 +653,6 @@ const MainFilterSub = ({
           </div>
         )}
       </div>
-
       <div className="w-[15%]">
         <DatePicker
           selected={fromDate}
@@ -745,9 +690,7 @@ const TableCont = ({ currentPage, tableData, setCurrentPage, maxPages }) => {
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
               : "bg-[#EC2752] text-white cursor-pointer"
           }`}
-        >
-          Previous
-        </button>
+        >Previous</button>
         <button
           onClick={() => setCurrentPage(currentPage + 1)}
           disabled={currentPage === maxPages - 1}
@@ -756,9 +699,7 @@ const TableCont = ({ currentPage, tableData, setCurrentPage, maxPages }) => {
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
               : "bg-[#EC2752] text-white cursor-pointer"
           }`}
-        >
-          Next
-        </button>
+        >Next</button>
       </div>
     </React.Fragment>
   );

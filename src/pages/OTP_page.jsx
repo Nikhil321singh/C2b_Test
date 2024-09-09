@@ -26,9 +26,7 @@ function OTPpage({ setChange, change, setNumber }) {
     email: initVal.email,
     phone: initVal.phone,
   });
-  //const isFormComplete = otpData.name && otpData.email && ph;
   const [errMsg, setErrMsg] = useState("");
-  const [firstTime, setFirstIme] = useState(true);
   const handleChange = (e) => {
     setOtpData({
       ...otpData,

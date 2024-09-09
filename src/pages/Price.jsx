@@ -5,7 +5,7 @@ import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
-const Price = ({ submitdata, userToken }) => {
+const Price = () => {
   const userName = "";
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
   const savedOtpData = JSON.parse(localStorage.getItem("otpData"));
@@ -19,7 +19,7 @@ const Price = ({ submitdata, userToken }) => {
   const [phoneRight, setPhoneRight] = useState(null);
   const [phoneTop, setPhoneTop] = useState(null);
   const [phoneBottom, setPhoneBottom] = useState(null);
-    const [aadharNumber, setAadharNumber] = useState("");
+  const [aadharNumber, setAadharNumber] = useState("");
   const [imeinumber, setImeiNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -51,20 +51,10 @@ const Price = ({ submitdata, userToken }) => {
   };
   const uploadAllImages = async () => {
     setIsLoading(true);
-    if (
-      !imeinumber ||
-      !aadharNumber ||
-      !phoneFront ||
-      !phoneBack ||
-      !phoneLeft ||
-      !phoneRight ||
-      !phoneTop ||
-      !phoneBottom ||
-      (isBillRequired && !phoneBill)
+    if (!imeinumber || !aadharNumber || !phoneFront || !phoneBack || !phoneLeft ||
+      !phoneRight || !phoneTop || !phoneBottom || (isBillRequired && !phoneBill)
     ) {
-      alert(
-        "Please fill in all mandatory fields (IMEI/Serial number and device images)."
-      );
+      alert("Please fill in all mandatory fields (IMEI/Serial number and device images).");
       setIsLoading(false);
       return;
     }
@@ -102,11 +92,9 @@ const Price = ({ submitdata, userToken }) => {
     formData.append("emailId", savedOtpData?.email);
     formData.append("name", savedOtpData?.name);
     formData.append("phoneNumber", savedOtpData?.phone);
-        formData.append("aadharNumber", aadharNumber);
+    formData.append("aadharNumber", aadharNumber);
     try {
-      await axios.post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/upload-documents`,
+      await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/upload-documents`,
         formData,
         { headers: { Authorization: token } }
       );
@@ -135,10 +123,8 @@ const Price = ({ submitdata, userToken }) => {
       <div className="w-[90%] md:w-[90%] mx-auto h-[auto] mb-[93px]">
         <div className="mt-3 text-center relative">
           <h1 className="text-2xl font-semibold">Upload Documents</h1>
-          <p className="mt-4 text-gray-600">
-            Regulations require you to upload a national identity card. Don't
-            worry, your data will stay safe and private.
-          </p>
+          <p className="mt-4 text-gray-600">Regulations require you to upload a national identity card.
+           Don't worry, your data will stay safe and private.</p>
         </div>
         <div className="flex flex-col">
           <ImeiField setImeiNumber={setImeiNumber} imeinumber={imeinumber} />
@@ -193,26 +179,11 @@ const Price = ({ submitdata, userToken }) => {
         <div
           onClick={() => uploadAllImages()}
           className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
-            !imeinumber ||
-            !phoneFront ||
-            !phoneBack ||
-            !phoneLeft ||
-            !phoneRight ||
-            !phoneTop ||
-            !phoneBottom
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-[#EC2752]"
-          }`}
+            !imeinumber || !phoneFront || !phoneBack || !phoneLeft || !phoneRight ||
+            !phoneTop || !phoneBottom ? "cursor-not-allowed bg-gray-400" : " bg-[#EC2752] "}`}
         >
-          {isLoading && (
-            <CgSpinner
-              size={20}
-              className="absolute left-[28%] top-[8px] mt-1 animate-spin"
-            />
-          )}
-          <p className="w-full p-1 text-xl font-medium">
-            {isLoading ? "Submitting" : "Submit"}
-          </p>
+          {isLoading && (<CgSpinner size={20} className="absolute left-[28%] top-[8px] mt-1 animate-spin"/>)}
+          <p className="w-full p-1 text-xl font-medium">{isLoading ? "Submitting" : "Submit"}</p>
         </div>
       </div>
     </div>
