@@ -400,8 +400,8 @@ const PickedUpFilter = ({
   const handleRegionChange = (value) => {
     setRegionDrop(false);
     setStoreName("");
-    const filteredStores = allStore?.filter((store) => store.region === value);
-    const storeNamesArray = filteredStores.map((store) => store.storeName);
+    const filteredStoresTemp = allStore?.filter((store) => store.region === value);
+    const storeNamesArray = filteredStoresTemp.map((store) => store.storeName);
     dispatch(setStoreFilter({ selStore: "", selRegion: value }));
     setStoreData(storeNamesArray);
     setRegion(value);
@@ -409,10 +409,10 @@ const PickedUpFilter = ({
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore?.filter(
+    const filteredStoresTemp2 = allStore?.filter(
       (store) => store.storeName === value
     );
-    const newRegion = filteredStores[0].region;
+    const newRegion = filteredStoresTemp2[0].region;
     setRegion(newRegion);
     dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
     setStoreName(value);

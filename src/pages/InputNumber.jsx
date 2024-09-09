@@ -3,7 +3,7 @@ import OTPpage from "./OTP_page";
 import { useSelector } from "react-redux";
 
 const InputNumber = () => {
-  let otpVerification = useSelector((state) => state.otpVerification);
+  const otpVerification = useSelector((state) => state.otpVerification);
   return otpVerification.otpVerified ? <Price /> : <OTPpage />;
 };
 

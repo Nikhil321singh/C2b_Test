@@ -10,7 +10,7 @@ const responseSlice = createSlice({
     bonus: 0,
     name: "",
     email: "",
-    phone: ""
+    phone: "",
   },
 
   reducers: {
