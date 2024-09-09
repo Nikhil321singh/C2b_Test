@@ -31,7 +31,7 @@ const downloadExcelStoreWise = (apiData) => {
       Price: item?.actualPrice,
       "Price Offered To Customer": item?.price,
       "Unique ID": item?.uniqueCode,
-      "GREST Received": item?.grestReceived || "NA",
+      "SWITCHKART Received": item?.grestReceived || "NA",
       "Receiving Date": item?.grestRecDate || "NA",
       "New Prices As Per New Range": "NA",
       "Store Payment Status": "NA",
