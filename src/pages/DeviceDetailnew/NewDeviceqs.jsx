@@ -56,6 +56,10 @@ import quesImg48 from "../../assets/2.jpg";
 import quesImg49 from "../../assets/3.jpg";
 import quesImg50 from "../../assets/4.jpg";
 import quesImg51 from "../../assets/quesImg0.png";
+import quesImg53 from "../../assets/48.jpg";
+import quesImg54 from "../../assets/49.jpg";
+import quesImg55 from "../../assets/50.jpg";
+import quesImg56 from "../../assets/51.jpg";
 
 const imageMap = {
   quesImg1,
@@ -110,6 +114,10 @@ const imageMap = {
   quesImg50,
   quesImg51,
   quesImg52: quesImg51,
+  quesImg53,
+  quesImg54,
+  quesImg55,
+  quesImg56,
 };
 
 import {
