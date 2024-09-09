@@ -7,6 +7,7 @@ import { BeatLoader } from "react-spinners";
 import axios from "axios";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
+import { FaAngleDown } from "react-icons/fa6";
 
 
 const sucTextColor = "text-green-500";
@@ -225,6 +226,7 @@ const RegisterUser = () => {
             handleChange={handleChange}
             setIsGrest={setIsGrest}
             storeData={storeData}
+            setFormData={setFormData}
           />
         </div>
       </div>
@@ -239,9 +241,32 @@ const UserForm = ({
   submitHandler,
   handleChange,
   storeData,
+  setFormData,
 }) => {
   const [showUserPassword, setShowUserPassword] = useState(false);
+  const [storeDrop, setStoreDrop] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredStores, setFilteredStores] = useState(storeData);
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
 
+    if (value === "") {
+      setFilteredStores(storeData);
+    } else {
+      const filtered = storeData.filter((store) =>
+        store.storeName.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredStores(filtered);
+    }
+  };
+  const handleStoreChange = (value) => {
+    setStoreDrop(false);
+    setFormData({
+      ...formData,
+      storeId: value,
+    });
+  };
   return (
     <form
       className="ml-10 flex flex-col gap-4"
@@ -328,24 +353,61 @@ const UserForm = ({
           required
         />
       </label>
-      <label className="flex flex-col w-[70%] gap-2">
+      <div className="relative w-[70%]">
         <span className="font-medium text-xl">Store Name*</span>
-        <select
-          name="storeId"
-          id="storeId"
-          value={formData.storeId}
-          className="outline-none text-base border-2 p-2 rounded-lg"
-          onChange={handleChange}
-          required
+        <div
+          className={`${styles.filter_button} w-full bg-white border p-2 flex justify-between items-center cursor-pointer`}
+          onClick={() => setStoreDrop(!storeDrop)}
         >
-          <option value=""> None </option>
-          {storeData.map((item) => (
-            <option key={item._id} value={item._id}>
-              {`${item.storeName}, ${item.region}`}
-            </option>
-          ))}
-        </select>
-      </label>
+          <p className="truncate">
+            {searchTerm === "" ? "Select Store" : searchTerm}
+          </p>
+          <FaAngleDown
+            className={`${storeDrop ? "rotate-180" : ""} transition-transform`}
+            size={17}
+          />
+        </div>
+        {storeDrop && (
+          <div className="absolute w-full bg-white shadow-md">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full p-2 border-b border-gray-300"
+              placeholder="Search store..."
+            />
+            <div
+              className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full `}
+            >
+              <p
+                className="truncate bg-slate-100 p-1 border"
+                onClick={() => handleStoreChange("")}
+              >
+                None
+              </p>
+              {filteredStores.length > 0 ? (
+                filteredStores.map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      handleStoreChange(item._id);
+                      setSearchTerm(item.storeName + ", " + item.region);
+                      setStoreDrop(false);
+                    }}
+                    className={`${styles.filter_option}`}
+                  >
+                    <p className="truncate bg-slate-100 p-1 border">
+                      {item.storeName},{item.region}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="p-2 text-gray-500">No stores found</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
       <label className="flex flex-col w-[70%] gap-2">
         <span className="font-medium text-xl">Role*</span>
         <select
