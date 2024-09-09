@@ -5,6 +5,7 @@ import { setLeadOTPData, setResponseData } from "../../store/slices/responseSlic
 import { useDispatch } from "react-redux";
 import watch from "../../assets/apple_watch.png";
 
+const quoteSaved = "Quote Saved";;
 export const DeleteModal = ({ onCancel, onConfirm }) => {
   return (
     <div className="fixed z-50 flex items-center justify-center w-full h-full mx-2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
@@ -79,7 +80,7 @@ const OrdersCard = ({
     const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
     const threeDays = 3 * oneDay; // 3 days in milliseconds
 
-    if (title === "Quote Saved") {
+    if (title === quoteSaved) {
       return timeDiff > oneDay;
     } else if (title === "Order Saved") {
       return timeDiff > threeDays;
@@ -89,13 +90,13 @@ const OrdersCard = ({
   };
 
   const handleInitiate = () => {
-    if (isExpired()) return;
+    if (isExpired()) {return}
 
-    if (title === "Quote Saved") {
+    if (title === quoteSaved) {
       const detail = {
         models: itemData.lead?.model,
         phoneNumber: customerMobile,
-        status: "Quote Saved",
+        status: quoteSaved,
         customerName: customerName,
       };
       sessionStorage.setItem("dataModel", JSON.stringify(detail));

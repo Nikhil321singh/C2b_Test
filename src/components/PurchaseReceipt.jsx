@@ -15,26 +15,23 @@ const PurchaseReceipt = ({
   region,
   address,
 }) => {
-  const maskPhoneNumber = (phoneNumber) => {
-    console.log(phoneNumber + " phoneNumber");
-    const visibleLength = Math.ceil(phoneNumber?.length * 0.25);
-    const maskedSection = phoneNumber?.slice(
+  const maskPhoneNumber = (phNumber) => {
+    const visibleLength = Math.ceil(phNumber?.length * 0.25);
+    const maskedSection = phNumber?.slice(
       0,
-      phoneNumber.length - visibleLength
+      phNumber.length - visibleLength
     );
-    const visibleSection = phoneNumber?.slice(
-      phoneNumber?.length - visibleLength
+    const visibleSection = phNumber?.slice(
+      phNumber?.length - visibleLength
     );
     return `${maskedSection.replace(/./g, "x")}${visibleSection}`;
   };
 
   const maskEmail = (email) => {
-    console.log(email + " email");
-
-    const [name, domain] = email.split("@");
-    const visibleLength = Math.ceil(name?.length * 0.25);
-    const maskedName = name?.slice(0, name?.length - visibleLength);
-    const visibleName = name?.slice(name?.length - visibleLength);
+    const [namee, domain] = email.split("@");
+    const visibleLength = Math.ceil(namee?.length * 0.25);
+    const maskedName = namee?.slice(0, namee?.length - visibleLength);
+    const visibleName = namee?.slice(namee?.length - visibleLength);
     return `${maskedName.replace(/./g, "x")}${visibleName}@${domain}`;
   };
 

@@ -212,12 +212,12 @@ const [filteredStores, setFilteredStores] = useState(storeData);
             </div>
           )}
         </div>
-        <div className="relative w-[70%]">
+        <div className=" w-[70%] relative ">
           <div
-            className={`${styles.filter_button} w-full`}
             onClick={() => setStoreDrop(!storeDrop)}
+            className={` w-full ${styles.filter_button} `}
           >
-            <p className="truncate">
+            <p className="truncate ">
               {searchTerm === "" ? "Select Store" : searchTerm}
             </p>
             <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
