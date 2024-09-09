@@ -41,16 +41,35 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setOtpBoxOpen(!otpBoxOpen);
   };
   const onSignupDup = () => {
-    if (!isFormComplete) {
-      setErrMsg("Please Fill All Details");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(otpData.name.length < 3){
+      setErrMsg("Name: (Size Must Be >= 3)");
       return;
     }
+
+    if (otpData.email.length < 5) {
+      setErrMsg("Email: (Size Must Be >= 5)");
+      return;
+    } else if (!emailRegex.test(otpData.email)) {
+      setErrMsg("Invalid Email Format");
+      return;
+    }
+
+    if(otpData.phone.length !== 10){
+      setErrMsg("Mobile: (Must have 10 Digits)");
+      return;
+    }
+    setErrMsg("");
     setLoading(true);
     const formatPh = "+" + ph;
     console.log(formatPh);
     setLoading(false);
     setOtpBoxOpen(true);
     setDisableResend(true);
+    setOtpData({
+      ...otpData,
+      phone: ph,
+    });
   };
   const resendOTPDup = () => {
     setDisableResend(true);
@@ -119,8 +138,8 @@ const ContOTP = ({ setContinueOTPOpen }) => {
               </span>
             </div>
           ) : (
-            <span className="flex flex-col items-center justify-center text-sm font-medium opacity-60">
-              We will send you a one-time Password to this number.
+            <span className={`flex flex-col items-center justify-center text-sm font-medium ${errMsg ? "text-red-500" : "opacity-60"} min-h-[40px]`}>
+              {errMsg ? errMsg : "We will send you a one-time Password to this number."}
             </span>
           )}
         </div>
@@ -232,13 +251,6 @@ const OTPComp = ({
         </div>
       ) : (
         <div className={`${styles.form_fields_wrap}`}>
-          {errMsg && (
-            <div className="flex items-center justify-center my-0 py-0 mx-auto">
-              <p className="text-[#EC2752] text-sm p-0 m-0">
-                {errMsg}
-              </p>
-            </div>
-          )}
           <div>
             <input
               id="name"

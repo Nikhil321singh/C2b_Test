@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { setLeadOTPData, setResponseData } from "../../store/slices/responseSlice";
 import { useDispatch } from "react-redux";
 import watch from "../../assets/apple_watch.png";
+import { setOtpVerified } from "../../store/slices/otpSlice";
 
 const quoteSaved = "Quote Saved";;
 export const DeleteModal = ({ onCancel, onConfirm }) => {
@@ -15,13 +16,13 @@ export const DeleteModal = ({ onCancel, onConfirm }) => {
         <div className="flex justify-end">
           <button
             onClick={onConfirm}
-            className="bg-[#4900A8] text-white px-4 py-2 rounded mr-2"
+            className="bg-[#EC2752] text-white px-4 py-2 rounded mr-2"
           >
             Yes
           </button>
           <button
             onClick={onCancel}
-            className="border border-[#4900A8] text-[#4900A8] px-4 py-2 rounded"
+            className="border border-[#EC2752] text-[#EC2752] px-4 py-2 rounded"
           >
             No
           </button>
@@ -133,6 +134,7 @@ const OrdersCard = ({
 
       dispatch(setResponseData(responseData));
       dispatch(setLeadOTPData(otpData));
+      dispatch(setOtpVerified(false));
       sessionStorage.setItem("otpData", JSON.stringify(otpData));
       sessionStorage.setItem("LeadId", itemData?.lead_id);
       sessionStorage.setItem("responsedatadata", JSON.stringify(responseData));
@@ -157,13 +159,13 @@ const OrdersCard = ({
     <div className="p-2 mx-2 bg-white rounded-lg relative">
       {isExpired() && (
         <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 bg-white">
-          <div className="text-[#4900A8] text-2xl font-bold border-4 border-[#8080FF] px-4 py-2 rounded-md">
+          <div className="text-black text-2xl font-bold border-4 border-[#EC2752] px-4 py-2 rounded-md">
             Expired
           </div>
         </div>
       )}
       <div className="flex items-center justify-between p-2 border-b-2 border-gray-300 border-dashed">
-        <div className="flex items-center py-1 px-2 text-[#4900A8]  bg-[#8080FF] rounded-xl">
+        <div className="flex items-center py-1 px-2 text-white bg-[#EC2752] rounded-xl">
           <p className="text-sm font-medium">{title}</p>
         </div>
         <div className="">
@@ -186,7 +188,7 @@ const OrdersCard = ({
             {deviceName}
             {deviceSelected === "Mobile" && `(${deviceRam}/${deviceStorage})`}
           </p>
-          <p className="text-[#4900A8]">₹{price}</p>
+          <p className="text-[#EC2752]">₹{price}</p>
         </div>
       </div>
 
@@ -225,7 +227,7 @@ const OrdersCard = ({
               <RiDeleteBin6Line size={20} />
             </button>
           </div>
-          <div className="w-[80%] text-center bg-[#4900A8] py-2 rounded-lg">
+          <div className="w-[80%] text-center bg-[#EC2752] py-2 rounded-lg">
             <button onClick={handleInitiate} className="text-white ">
               Initiate Order
             </button>

@@ -339,7 +339,7 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber }) => {
         />
         <button
           className={`px-4 py-2 font-bold text-white rounded ${
-            !error ? "bg-[#4900A8]" : "bg-gray-400 cursor-not-allowed"
+            !error ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
           }`}
           onClick={handleVerify}
           disabled={!!error}
@@ -347,7 +347,7 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber }) => {
           Verify
         </button>
       </div>
-      {error && <p className="text-[#8080FF] mt-2 text-sm">{error}</p>}
+      {error && <p className="text-[#ec275271] mt-2 text-sm">{error}</p>}
     </div>
   );
 };

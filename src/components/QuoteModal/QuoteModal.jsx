@@ -231,7 +231,7 @@ const OTPCOmp = ({
                 <p className="text-xl font-medium">Save Quote</p>
                 {errMsg && (
                   <div className="flex items-center justify-center my-0 py-0">
-                    <p className="text-[#8080FF] text-sm h-[20px] p-0 m-0">
+                    <p className="text-[#ec275271] text-sm h-[20px] p-0 m-0">
                       {errMsg}
                     </p>
                   </div>
