@@ -496,39 +496,39 @@ const PickedUpFilter = ({
             className={`${styles.filter_button} w-full`}
             onClick={() => setStoreDrop(!storeDrop)}
           >
-            <p className="truncate">
+            <p className="  truncate">
               {searchTerm === "" ? "Select Store" : searchTerm}
             </p>
             <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
           </div>
           {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
+            <div className="absolute w-full bg-white   shadow-md">
               <input
                 type="text"
-                value={searchTerm}
                 onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
+                value={searchTerm}
+                className="w-full p-2 border-b   border-gray-300"
                 placeholder="Search store..."
               />
               <div
-                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
+                className={`overflow-y-scroll   max-h-[200px] ${styles.filter_drop} w-full`}
               >
                 {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
+                  filteredStores.map((item2, index) => (
                     <div
                       key={index}
                       onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item);
+                        handleStoreChange(item2);
+                        setSearchTerm(item2);
                         setStoreDrop(false);
                       }}
                       className={`${styles.filter_option}`}
                     >
-                      <p className="truncate">{item}</p>
+                      <p className="truncate">{item2}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
+                  <p className="p-2   text-gray-500">No stores found</p>
                 )}
               </div>
             </div>

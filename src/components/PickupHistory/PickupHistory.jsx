@@ -194,40 +194,38 @@ const [filteredStores, setFilteredStores] = useState(storeData);
             <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
           </div>
           {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
+            <div className="absolute w-full bg-white shadow-md  ">
               <input
                 type="text"
                 value={searchTerm}
                 onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
-                placeholder="Search store..."
+                className="w-full p-2 border-b border-gray-300 "
+                placeholder="Search store... "
               />
               <div
-                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
+                className={`overflow-y-scroll max-h-[200px]   ${styles.filter_drop} w-full `}
               >
                 {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
-                    <div
-                      key={index}
+                  filteredStores.map((item1, index) => (
+                    <div   key={index}
                       onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item);
+                        handleStoreChange(item1);
                         setStoreDrop(false);
+                        setSearchTerm(item1);
                       }}
                       className={`${styles.filter_option}`}
                     >
-                      <p className="truncate">{item}</p>
+                      <p className="truncate  ">{item1}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
+                  <p className="p-2   text-gray-500">No stores found</p>
                 )}
               </div>
-            </div>
-          )}
+            </div>)}
         </div>
       </div>
-      <div className="m-2 overflow-x-auto md:m-5">
+      <div className="m-2 overflow-x-auto   md:m-5">
         {showView && (
           <div className={styles.view_wrap}>
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
