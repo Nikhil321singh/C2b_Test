@@ -10,6 +10,7 @@ import { MdEdit } from "react-icons/md";
 import ProfileBox from "../components/ProfileBox/ProfileBox";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
 import { setLeadOTPData } from "../store/slices/responseSlice";
+import { MainOtpUI } from "../components/ContOTP/ContOTP";
 
 function OTPpage({ setChange, change, setNumber }) {
   const initVal = useSelector( state => state.responseData);
@@ -104,201 +105,25 @@ function OTPpage({ setChange, change, setNumber }) {
   }, [otpData]);
 
   return (
-    <div className={`${styles.contopt_page}`} style={{ zIndex: 9999 }}>
-      <div className="absolute top-4 md:top-0 bg-white flex items-center justify-between w-full pr-2 py-2 rounded-md">
-        <ProfileBox />
-        <img
-          onClick={() => navigate("/selectdevicetype")}
-          className="w-40"
-          src={Grest_Logo}
-          alt="app logo"
-        />
-      </div>
-      <div className={` ${styles.optbox_wrap}`}>
-        <div className={`${styles.optimg_wrap}`}>
-          <img src={optImg} />
-        </div>
-        <div className={`${styles.opt_heading} `}>
-          <p className={`font-bold text-2xl`}>OTP Verificaiton</p>
-          {otpBoxOpen ? (
-            <div className={`flex ${styles.Editresponsive}`}>
-              <span className="flex flex-col items-center justify-center text-sm font-medium opacity-60">
-                OTP sent to
-              </span>
-              <span
-                className="text-sm font-medium text-left ml-[2px] text-[#EC2752] flex items-center"
-                onClick={handleNumberEdit}
-              >
-                <span className="text-sm font-medium opacity-60 text-[#000000]">
-                  {" "}
-                  +91-{ph}
-                </span>
-                <MdEdit /> Edit no.
-              </span>
-            </div>
-          ) : (
-            <span className={`flex flex-col items-center justify-center text-sm font-medium ${errMsg ? "text-red-500" : "opacity-60"} min-h-[40px]`}>
-              {errMsg ? errMsg : "We will send you a one-time Password to this number."}
-            </span>
-          )}
-        </div>
-        <OTPComp
-          otpBoxOpen={otpBoxOpen}
-          otp={otp}
-          errMsg={errMsg}
-          setOtp={setOtp}
-          otpData={otpData}
-          handleChange={handleChange}
-          ph={ph}
-          setPh={setPh}
-          setOtpData={setOtpData}
-        />
-        {otpBoxOpen && (
-          <div className={styles.resend_otp_wrap}>
-            <div className="flex flex-row gap-2  w-[300px] justify-center  text-sm font-medium">
-              <span className="opacity-60 min-w-[132px] ">
-                Didn't Receive OTP?
-              </span>
-              <button
-                className=" text-left  min-w-[100px]"
-                onClick={resendOTPDup}
-                disabled={disableResend}
-              >
-                {disableResend ? `Resend in ${timer}` : "Resend OTP"}
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className={`${styles.otp_button_wrap}`}>
-          {otpBoxOpen ? (
-            <>
-              <button
-                onClick={onOTPVerifyDup}
-                className={`${loading || !otp ? "opacity-[.8]" : ""}`}
-                disabled={loading || !otp}
-              >
-                {loading && (
-                  <div className={`${styles.spinner} -ml-4`}>
-                    <LoadingSpinner />
-                  </div>
-                )}
-                {loading ? (
-                  <span className="-ml-4">Loading</span>
-                ) : (
-                  <span>Verify OTP</span>
-                )}
-              </button>
-
-              <div id="recaptcha"></div>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={onSignupDup}
-                className={`${loading ? "opacity-[.8]" : ""}`}
-                disabled={loading}
-              >
-                {loading && (
-                  <div className={`${styles.spinner} -ml-4`}>
-                    <LoadingSpinner />
-                  </div>
-                )}
-                {loading ? (
-                  <span className="-ml-4">Loading</span>
-                ) : (
-                  <span>Get OTP</span>
-                )}
-              </button>
-              <div id="recaptcha"></div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+    <MainOtpUI
+      otpBoxOpen={otpBoxOpen}
+      handleNumberEdit={handleNumberEdit}
+      ph={ph}
+      errMsg={errMsg}
+      otp={otp}
+      setOtp={setOtp}
+      otpData={otpData}
+      handleChange={handleChange}
+      setPh={setPh}
+      setOtpData={setOtpData}
+      resendOTPDup={resendOTPDup}
+      disableResend={disableResend}
+      timer={timer}
+      onOTPVerifyDup={onOTPVerifyDup}
+      loading={loading}
+      onSignupDup={onSignupDup}
+    />
   );
 }
 
 export default OTPpage;
-
-const OTPComp = ({
-  otpBoxOpen,
-  otp,
-  setOtp,
-  otpData,
-  handleChange,
-  errMsg,
-  ph,
-  setPh,
-  setOtpData,
-}) => {
-  return (
-    <React.Fragment>
-      {otpBoxOpen ? (
-        <div className={`${styles.otp_field_wrap}`}>
-          <OtpInput
-            value={otp}
-            onChange={setOtp}
-            OTPLength={6}
-            otpType="number"
-            disabled={false}
-            autoFocus
-            inputStyles={{
-              border: "2px solid #EC2752",
-              borderRadius: ".55rem",
-              outline: "none",
-              marginRight: "10px",
-            }}
-            className={styles.otp_field}
-          />
-        </div>
-      ) : (
-        <div className={`${styles.form_fields_wrap}`}>
-          <div>
-            <input
-              id="name"
-              name="name"
-              placeholder="Enter Name *"
-              value={otpData?.name}
-              onChange={handleChange}
-              className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
-            />
-          </div>
-          <div>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Enter Email *"
-              value={otpData?.email}
-              onChange={handleChange}
-              className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
-            />
-          </div>
-          <div className="w-[100%] flex flex-row">
-            <div className="flex   border-[#EC2752] rounded-lg border-2  w-[85%] flex-row justify-start">
-              <span className="px-3 py-1 text-gray-600 bg-gray-200 rounded-lg">
-                +91
-              </span>
-              <input
-                type="tel"
-                id="phone"
-                value={ph}
-                maxLength="10"
-                onChange={(e) => {
-                  setPh(e.target.value);
-                  setOtpData({
-                    ...otpData,
-                    ["phone"]: e.target.value,
-                  });
-                }}
-                className=""
-                placeholder="Enter your Mobile *"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-    </React.Fragment>
-  );
-};
