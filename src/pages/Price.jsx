@@ -180,7 +180,7 @@ const Price = () => {
           onClick={() => uploadAllImages()}
           className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
             !imeinumber || !phoneFront || !phoneBack || !phoneLeft || !phoneRight ||
-            !phoneTop || !phoneBottom ? "cursor-not-allowed bg-gray-400" : " bg-[#EC2752] "}`}
+            !phoneTop || !phoneBottom ? "cursor-not-allowed bg-gray-400" : " bg-[#EC2752]  "}`}
         >
           {isLoading && (<CgSpinner size={20} className="absolute left-[28%] top-[8px] mt-1 animate-spin"/>)}
           <p className="w-full p-1 text-xl font-medium">{isLoading ? "Submitting" : "Submit"}</p>
@@ -262,7 +262,6 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
 };
 const AadharNumberField = ({ aadharNumber, setAadharNumber }) => {
   const [error, setError] = useState(true);
-  const Device = sessionStorage.getItem("DeviceType");
 
   const validateAadharNumber = (value) => {
     if (value.length !== 12) {

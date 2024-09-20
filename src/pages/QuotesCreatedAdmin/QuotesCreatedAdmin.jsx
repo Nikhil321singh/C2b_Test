@@ -13,6 +13,7 @@ import { BeatLoader } from "react-spinners";
 import QuotesCreatedAdminTable from "../../components/QuotesCreatedAdminTable/QuotesCreatedAdminTable";
 import * as XLSX from "xlsx";
 const ALLstore = "All Stores";
+const initDate = "2023-01-01";
 
 const downloadExcelQuotesAdminCreated = (apiData) => {
   const fileType =
@@ -118,21 +119,14 @@ const QuotesCreatedAdmin = () => {
   const [toDate, setToDate] = useState(null);
   const [fromDate, setFromDate] = useState(null);
   const [filFlag, setFilFlag] = useState(true);
-  const [fromDateDup, setFromDateDup] = useState("2023-01-01");
-  const [toDateDup, setToDateDup] = useState(
-    new Date().toISOString().split("T")[0]
-  );
-     const [searchTerm, setSearchTerm] = useState("");
-     const [filteredStores, setFilteredStores] = useState(storeData);
-
-
+  const [fromDateDup, setFromDateDup] = useState(initDate);
+  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredStores, setFilteredStores] = useState(storeData);
   const getTableData = () => {
     setIsTableLoaded(true);
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll/quotecreated?fromdate=${fromDateDup}&todate=${toDateDup}&search=${searchValue}&store=${storeId}`,
+    axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll/quotecreated?fromdate=${fromDateDup
+      }&todate=${toDateDup}&search=${searchValue}&store=${storeId}`,
         { headers: { authorization: userToken } }
       )
       .then((res) => {
@@ -144,24 +138,16 @@ const QuotesCreatedAdmin = () => {
         setIsTableLoaded(false);
       });
   };
-
   useEffect(() => {
     getTableData();
   }, [storeId, fromDateDup, toDateDup, filFlag]);
-
   const saveStore = async () => {
     const temparr = await getStore();
     setStoreData(temparr);
   };
-
   useEffect(() => {
     saveStore();
   }, []);
-
-  const handleSearchClick = () => {
-    getTableData();
-  };
-
   const handleSearchClear = () => {
     setSearchValue("");
     setStoreId("");
@@ -169,15 +155,15 @@ const QuotesCreatedAdmin = () => {
     setToDate("");
     setToDateDup(new Date().toISOString().split("T")[0]);
     setFromDate("");
-    setFromDateDup("2023-01-01");
+    setFromDateDup(initDate);
     setFilFlag(!filFlag);
   };
  useEffect(() => {
    if (
      searchValue === "" &&
-     storeName == ALLstore &&
+     storeName === ALLstore &&
      storeId === "" &&
-     fromDateDup === "2023-01-01"
+     fromDateDup === initDate
    ) {
      getTableData();
    }
@@ -186,47 +172,32 @@ const QuotesCreatedAdmin = () => {
  const handleSearch = (e) => {
    const value = e.target.value;
    setSearchTerm(value);
-
    if (value === "") {
      setFilteredStores(storeData);
    } else {
-     const filtered = storeData.filter((store) =>
-       store.storeName.toLowerCase().includes(value.toLowerCase())
-     );
+     const filtered = storeData.filter((store) => store.storeName.toLowerCase().includes(value.toLowerCase()));
      setFilteredStores(filtered);
    }
  };
-
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     setStoreName(value.storeName);
     setStoreId(value._id);
   };
-
   const handleFromDateChange = (date) => {
     if (date !== null) {
       setFromDate(date);
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split("T")[0];
+      const formattedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[0];
       setFromDateDup(formattedDate);
     }
   };
-
   const handleToDateChange = (date) => {
     if (date !== null) {
       setToDate(date);
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split("T")[0];
+      const formattedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[0];
       setToDateDup(formattedDate);
     }
   };
-
   return (
     <div>
       {isTableLoaded && (
@@ -248,17 +219,16 @@ const QuotesCreatedAdmin = () => {
             value={searchValue}
             placeholder="Search...."
           />
-          <IoMdSearch onClick={handleSearchClick} size={25} />
+          <IoMdSearch onClick={() => {
+              getTableData();
+          }} size={25} />
         </div>
-        <div className={styles.icons_box}>
-          <IoRefresh onClick={handleSearchClear} className=" " size={25} />
-        </div>
+        <div className={styles.icons_box}><IoRefresh onClick={handleSearchClear} className=" " size={25} /></div>
         <button
           className={`${styles.bulkdown_button}`}
           onClick={() => fetchDownloadData(storeId)}
         >
-          <FaDownload /> Bulk Download
-        </button>
+          <FaDownload />Bulk Download</button>
         <div className="[bg-[#F5F4F9]">
           <DatePicker
             selected={fromDate}
@@ -284,9 +254,7 @@ const QuotesCreatedAdmin = () => {
               setStoreDrop(!storeDrop);
             }}
           >
-            <p className="truncate">
-              {searchTerm === "" ? "Select Store" : searchTerm}
-            </p>
+            <p className="truncate">{searchTerm === "" ? "Select Store" : searchTerm}</p>
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
@@ -311,13 +279,9 @@ const QuotesCreatedAdmin = () => {
                         setStoreDrop(false);
                       }}
                       className={`${styles.filter_option}`}
-                    >
-                      <p className="truncate">{item.storeName}</p>
-                    </div>
+                    ><p className="truncate">{item.storeName}</p></div>
                   ))
-                ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
-                )}
+                ) : (<p className="p-2 text-gray-500">No stores found</p>)}
                 <div
                   className={`${styles.filter_option}`}
                   onClick={() => {

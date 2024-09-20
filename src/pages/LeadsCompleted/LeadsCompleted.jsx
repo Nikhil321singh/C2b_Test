@@ -17,6 +17,7 @@ import html2pdf from "html2pdf.js";
 import PurchaseReceipt from "../../components/PurchaseReceipt";
 const pageLimit = 10;
 const ALLstore = "All Stores";
+const iniDate = "2023-01-01";
 
 const getStore = async () => {
   let storeNamesArray = [];
@@ -103,7 +104,7 @@ const LeadsCompleted = () => {
   const [maxPages, setMaxPages] = useState(0);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [fromDateDup, setFromDateDup] = useState("2023-01-01");
+  const [fromDateDup, setFromDateDup] = useState(iniDate);
   const [toDateDup, setToDateDup] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -152,7 +153,7 @@ const LeadsCompleted = () => {
     setStoreName(ALLstore);
     setSelStoreId("");
     setFromDate("");
-    setFromDateDup("2023-01-01");
+    setFromDateDup(iniDate);
     setToDate("");
     setToDateDup(new Date().toISOString().split("T")[0]);
     setReset(!reset);
@@ -245,9 +246,9 @@ useEffect(() => {
   if (
     search === "" &&
     search1 === "" &&
-    storeName == ALLstore &&
+    storeName === ALLstore &&
     selStoreId === "" &&
-    fromDateDup === "2023-01-01"
+    fromDateDup === iniDate
   ) {
     getSalesData();
   }
@@ -379,19 +380,13 @@ const SubLeadsCompleted = ({
         <div className="flex gap-4">
           <button
             className={`${styles.bulkdown_button}`}
-            onClick={() =>
-              fetchDownloadData(totalCount, deviceType, selStoreId)
-            }
-          >
-            <FaDownload /> Bulk Download
-          </button>
+            onClick={() =>fetchDownloadData(totalCount, deviceType, selStoreId)}
+          ><FaDownload /> Bulk Download</button>
           <div className="mt-2 ml-4">
             <button
               className={`${styles.bulkdown_button}`}
               onClick={handleBulkDownloadReceipts}
-            >
-              <FaDownload /> Download Receipts
-            </button>
+            ><FaDownload /> Download Receipts</button>
           </div>
         </div>
         <div className="[bg-[#F5F4F9]">
@@ -417,9 +412,7 @@ const SubLeadsCompleted = ({
             className={`${styless.filter_button}`}
             onClick={() => setStoreDrop(!storeDrop)}
           >
-            <p className="truncate">
-              {searchTerm === "" ? "Select Store" : searchTerm}
-            </p>
+            <p className="truncate">{searchTerm === "" ? "Select Store" : searchTerm}</p>
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
@@ -444,22 +437,15 @@ const SubLeadsCompleted = ({
                         setStoreDrop(false);
                       }}
                       className={`${styles.filter_option}`}
-                    >
-                      <p className="truncate">{item.storeName}</p>
-                    </div>
+                    ><p className="truncate">{item.storeName}</p></div>
                   ))
-                ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
-                )}
-                <div
-                  className={`${styles.filter_option}`}
+                ) : (<p className="p-2 text-gray-500">No stores found</p>)}
+                <div className={`${styles.filter_option}`}
                   onClick={() => {
                     handleStoreChange({ _id: "", storeName: ALLstore });
                     setSearchTerm(ALLstore);
                   }}
-                >
-                  <p className="truncate">{ALLstore}</p>
-                </div>
+                ><p className="truncate">{ALLstore}</p></div>
               </div>
             </div>
           )}
@@ -476,24 +462,18 @@ const SubLeadsCompleted = ({
             <div
               className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
             >
-              <div
-                className={`${styless.filter_option}`}
+              <div className={`${styless.filter_option}`}
                 onClick={() => {
                   setDeviceType("Mobile");
                   setDeviceDrop(false);
                 }}
-              >
-                <p className="truncate">Mobile</p>
-              </div>
-              <div
-                className={`${styless.filter_option}`}
+              ><p className="truncate">Mobile</p></div>
+              <div className={`${styless.filter_option}`}
                 onClick={() => {
                   setDeviceType("Watch");
                   setDeviceDrop(false);
                 }}
-              >
-                <p className="truncate">Watch</p>
-              </div>
+              ><p className="truncate">Watch</p></div>
             </div>
           )}
         </div>
@@ -509,13 +489,7 @@ const SubLeadsCompleted = ({
           />
           <IoMdSearch size={25} onClick={() => getSalesData()} />
         </div>
-        <div className={styles.icons_box}>
-          <IoRefresh
-            onClick={() => handleSearchClear()}
-            className=""
-            size={25}
-          />
-        </div>
+        <div className={styles.icons_box}><IoRefresh onClick={() => handleSearchClear()} size={25}/></div>
         <div className={`${styles.search_bar_wrap}`}>
           <input
             onChange={(e) => setSearch1(e.target.value)}
@@ -523,34 +497,16 @@ const SubLeadsCompleted = ({
             type="text"
             placeholder="Search Customer Name/Mobile No./Email"
             value={search1}
-          />
-          <IoMdSearch size={25} onClick={() => getSalesData()} />
-        </div>
+          /><IoMdSearch size={25} onClick={() => getSalesData()} /></div>
       </div>
       <LeadsCompletedTable data={tableData} />
       <div className="flex justify-center mt-0 mb-4">
-        <button
-          onClick={() => setCurrentPage(currentPage - 1)}
-          disabled={currentPage === 0}
-          className={`mx-2 px-4 py-2 rounded-lg ${
-            currentPage === 0
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
-          }`}
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={currentPage === maxPages - 1}
-          className={`mx-2 px-4 py-2 rounded-lg ${
-            currentPage === maxPages - 1
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
-          }`}
-        >
-          Next
-        </button>
+        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 0}
+          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === 0 ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+              : "bg-[#EC2752] text-white cursor-pointer"}`}>Previous</button>
+        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === maxPages - 1}
+          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === maxPages - 1 ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+              : "bg-[#EC2752] text-white cursor-pointer"}`}>Next</button>
       </div>
     </div>
   );

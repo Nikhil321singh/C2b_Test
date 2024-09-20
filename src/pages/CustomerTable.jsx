@@ -14,6 +14,7 @@ import { IoMdSearch } from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
 import styless from "../pages/QuotesCreatedAdmin/QuotesCreatedAdmin.module.css";
 const ALLstore = "All Stores";
+const iniDate = "2023-01-01";
 
 const getStore = async () => {
   const token = sessionStorage.getItem("authToken");
@@ -119,37 +120,26 @@ const CustomerTable = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState("");
-  const [fromDateDup, setFromDateDup] = useState("2023-01-01");
+  const [fromDateDup, setFromDateDup] = useState(iniDate);
   const [toDate, setToDate] = useState("");
-  const [toDateDup, setToDateDup] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
   const [storeDrop, setStoreDrop] = useState(false);
   const [storeName, setStoreName] = useState(allStore);
   const [selStoreId, setSelStoreId] = useState("");
   const [storeData, setStoreData] = useState([]);
   const [filFlag, setFilFlag] = useState(false);
- const [searchTerm, setSearchTerm] = useState("");
- const [filteredStores, setFilteredStores] = useState(storeData);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredStores, setFilteredStores] = useState(storeData);
 
   useEffect(() => {
     myordercretad();
   }, [toDate, fromDate, selStoreId, filFlag]);
-
   function myordercretad() {
     setLoading(true);
     const userToken = sessionStorage.getItem("authToken");
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll/ordercreated?page=${currentSalesPage}&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
-        {
-          headers: {
-            authorization: `${userToken}`,
-          },
-        }
-      )
+    axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll/ordercreated?page=${currentSalesPage
+      }&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
+      {headers: {authorization: userToken}})
       .then((res) => {
         setTableDataDup(res.data.data.orderData.data);
         setLoading(false);
@@ -158,26 +148,20 @@ const CustomerTable = () => {
         setLoading(false);
       });
   }
-
   const handleSearchClear = () => {
     setSearch("");
     setStoreName(allStore);
     setSelStoreId("");
     setFromDate("");
-    setFromDateDup("2023-01-01");
+    setFromDateDup(iniDate);
     setToDate("");
     setToDateDup(new Date().toISOString().split("T")[0]);
     setFilFlag(!filFlag);
   };
-
   const handleFromDateChange = (date) => {
     if (date !== null) {
       setFromDate(date);
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split("T")[0];
+      const formattedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[0];
       setFromDateDup(formattedDate);
     } else if (date == null) {
       setFromDate("");
@@ -187,66 +171,46 @@ const CustomerTable = () => {
   const handleToDateChange = (date) => {
     if (date !== null) {
       setToDate(date);
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split("T")[0];
+      const formattedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[0];
       setToDateDup(formattedDate);
     } else if (date == null) {
       setToDate("");
       setToDateDup("");
     }
   };
-
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    console.log(value._id);
     setSelStoreId(value._id);
     setStoreName(value.storeName);
   };
-
   const saveStore = async () => {
     const temparr = await getStore();
     setStoreData(temparr);
   };
-
   useEffect(() => {
     saveStore();
   }, []);
-
-     useEffect(() => {
-       if (
-         search === "" &&
-         storeName == ALLstore &&
-         selStoreId === "" &&
-         fromDateDup === "2023-01-01"
-       ) {
-         myordercretad();
-       }
-     }, [search, storeName, selStoreId, fromDateDup]);
-
-     const handleSearch = (e) => {
-       const value = e.target.value;
-       setSearchTerm(value);
-
-       if (value === "") {
-         setFilteredStores(storeData);
-       } else {
-         const filtered = storeData.filter((store) =>
-           store.storeName.toLowerCase().includes(value.toLowerCase())
-         );
-         setFilteredStores(filtered);
-       }
-     };
-
+  useEffect(() => {
+    if (search === "" && storeName === ALLstore && selStoreId === "" && fromDateDup === iniDate) {
+      myordercretad();
+    }
+  }, [search, storeName, selStoreId, fromDateDup]);
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (value === "") {
+      setFilteredStores(storeData);
+    } else {
+      const filtered = storeData.filter((store) => store.storeName.toLowerCase().includes(value.toLowerCase()));
+      setFilteredStores(filtered);
+    }
+  };
   return (
     <div>
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <BeatLoader color={"#EC2752"} loading={loading} size={15} />
-        </div>
-      )}
+        </div>)}
       <div className="navbar">
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
@@ -260,34 +224,18 @@ const CustomerTable = () => {
             type="text"
             placeholder="Search..."
             value={search}
-          />
-          <IoMdSearch size={25} onClick={() => myordercretad()} />
-        </div>
-        <div className={styles.icons_box}>
-          <IoRefresh onClick={handleSearchClear} className="" size={25} />
-        </div>
-        <button
-          className={`${styles.bulkdown_button}`}
-          onClick={() =>
-            fetchDownloadDataCustomerTable(
-              toDateDup,
-              fromDateDup,
-              search,
-              selStoreId
-            )
-          }
-        >
-          <FaDownload /> Bulk Download
-        </button>
-        <div className="[bg-[#F5F4F9]">
-          <DatePicker
+          /><IoMdSearch size={25} onClick={() => myordercretad()} /></div>
+        <div className={styles.icons_box}><IoRefresh onClick={handleSearchClear} className="" size={25} /></div>
+        <button className={`${styles.bulkdown_button}`}
+          onClick={() => fetchDownloadDataCustomerTable(toDateDup,fromDateDup,search,selStoreId)}
+        ><FaDownload /> Bulk Download</button>
+        <div className="[bg-[#F5F4F9]"><DatePicker
             selected={fromDate}
             onChange={handleFromDateChange}
             dateFormat="yyyy-MM-dd"
             className={` mt-1 py-[6px] px-[15px] border rounded-md`}
             placeholderText="Select from date"
-          />
-        </div>
+        /></div>
         <div>
           <DatePicker
             selected={toDate}
@@ -298,15 +246,11 @@ const CustomerTable = () => {
           />
         </div>
         <div className="relative w-[250px]">
-          <div
-            className={`${styless.filter_button}`}
+          <div className={`${styless.filter_button}`}
             onClick={() => {
               setStoreDrop(!storeDrop);
             }}
-          >
-            <p className="truncate">
-              {storeName === allStore ? "Select Store" : storeName}
-            </p>
+          ><p className="truncate">{storeName === allStore ? "Select Store" : storeName}</p>
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
@@ -318,35 +262,25 @@ const CustomerTable = () => {
                 className="w-full p-2 border-b border-gray-300"
                 placeholder="Search store..."
               />
-              <div
-                className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
-              >
+              <div className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}>
                 {filteredStores.length > 0 ? (
                   filteredStores.map((item, index) => (
-                    <div
-                      key={index}
+                    <div key={index}
                       onClick={() => {
                         handleStoreChange(item);
                         setSearchTerm(item.storeName);
                         setStoreDrop(false);
                       }}
                       className={`${styles.filter_option}`}
-                    >
-                      <p className="truncate">{item.storeName}</p>
-                    </div>
+                    ><p className="truncate">{item.storeName}</p></div>
                   ))
-                ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
-                )}
-                <div
-                  className={`${styles.filter_option}`}
+                ) : (<p className="p-2 text-gray-500">No stores found</p>)}
+                <div className={`${styles.filter_option}`}
                   onClick={() => {
                     handleStoreChange({ _id: "", storeName: ALLstore });
                     setSearchTerm(ALLstore);
                   }}
-                >
-                  <p className="truncate">{ALLstore}</p>
-                </div>
+                ><p className="truncate">{ALLstore}</p></div>
               </div>
             </div>
           )}

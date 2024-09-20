@@ -4,11 +4,7 @@ import NavigateTable from "../../components/NavigateTable/NavigateTable";
 import PendingDevicesTable from "../../components/PendingDevicesTable/PendingDevicesTable";
 import axios from "axios";
 import { BeatLoader } from "react-spinners";
-import {
-  IoIosCheckmarkCircle,
-  IoIosCloseCircle,
-  IoMdSearch,
-} from "react-icons/io";
+import {IoIosCheckmarkCircle, IoIosCloseCircle, IoMdSearch} from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
 import { BsCalendarDate } from "react-icons/bs";
 import styles from "./DevicePickupDashboard.module.css";
@@ -26,14 +22,12 @@ const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
 const PickupAvail = "Available For Pickup";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-const id = LoggedInUser?._id || LoggedInUser?.id;
 const RotateCss = "rotate-180";
 
 const downloadExcel = (pendDataDown) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
-
   const formattedData = pendDataDown.map((item) => {
     return {
       "Lead Id": item._id,
@@ -456,8 +450,8 @@ const DPFilter = ({
   const handleRegionChange = (value) => {
     setRegionDrop(false);
     setStoreName("");
-    const filteredStores = allStore.filter((store) => store.region === value);
-    const storeNamesArray = filteredStores.map((store) => store.storeName);
+    const filteredStores1 = allStore.filter((store) => store.region === value);
+    const storeNamesArray = filteredStores1.map((store) => store.storeName);
     setStoreData(storeNamesArray);
     setRegion(value);
     dispatch(setStoreFilter({ selStore: "", selRegion: value }));
@@ -465,10 +459,8 @@ const DPFilter = ({
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore?.filter(
-      (store) => store.storeName === value
-    );
-    const newRegion = filteredStores[0].region;
+    const filteredStores2 = allStore?.filter((store) => store.storeName === value);
+    const newRegion = filteredStores2[0].region;
     setRegion(newRegion);
     setStoreName(value);
     dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));

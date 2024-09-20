@@ -64,15 +64,11 @@ const [filteredStores, setFilteredStores] = useState(storeData);
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
     };
-    axios
-      .request(config)
+    axios.request(config)
       .then((response) => {
-        console.log(response.data.data);
         setPickupData(response.data.data);
         setIsTableLoaded(false);
       })
@@ -86,20 +82,14 @@ const [filteredStores, setFilteredStores] = useState(storeData);
     setIsTableLoaded(true);
     const conf = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=0&limit=9999`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
-    axios
-      .request(conf)
+    axios.request(conf)
       .then((res) => {
-        console.log(res.data.result);
         const allData = res.data.result;
         const storeNamesArray = res.data.result.map((store) => store.storeName);
-        const uniqueRegionsArray = [
-          ...new Set(res.data.result.map((store) => store.region)),
-        ];
+        const uniqueRegionsArray = [...new Set(res.data.result.map((store) => store.region))];
         setStoreData(storeNamesArray);
         setAllStore(allData);
         setIsTableLoaded(false);
@@ -110,7 +100,6 @@ const [filteredStores, setFilteredStores] = useState(storeData);
         console.log(error);
       });
   };
-
   useEffect(() => {
     if (!!storeName && !!region) {
       getData();
@@ -128,7 +117,6 @@ const [filteredStores, setFilteredStores] = useState(storeData);
     setStoreData(storeNamesArray);
     dispatch(setStoreFilter({ selStore: "", selRegion: value }));
   };
-
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     const filterStores = allStore.filter((store) => store.storeName === value);
@@ -137,7 +125,6 @@ const [filteredStores, setFilteredStores] = useState(storeData);
     setRegion(newRegion);
     dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
   };
-
   const viewHandler = (refID) => {
     setViewRef(refID);
     setShowView(true);
@@ -145,13 +132,10 @@ const [filteredStores, setFilteredStores] = useState(storeData);
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-
     if (value === "") {
       setFilteredStores(storeData);
     } else {
-      const filtered = storeData.filter((store) =>
-        store.toLowerCase().includes(value.toLowerCase())
-      );
+      const filtered = storeData.filter((store) => store.toLowerCase().includes(value.toLowerCase()));
       setFilteredStores(filtered);
     }
   };
@@ -179,38 +163,25 @@ const [filteredStores, setFilteredStores] = useState(storeData);
       <button
         className={`${styles.bulkdown_button}`}
         onClick={() => downloadExcel(pickupData)}
-      >
-        <FaDownload /> Bulk Download
-      </button>
+      ><FaDownload /> Bulk Download</button>
       <div className="m-2 flex gap-2 w-100 items-center outline-none">
         <div className="w-[45%] relative">
-          <div
-            onClick={() => {
+          <div onClick={() => {
               setRegionDrop(!regionDrop);
             }}
             className={`${styles.filter_button}`}
           >
-            <p className="truncate ">
-              {region === "" ? "Select Region" : region}
-            </p>
-            <FaAngleDown
-              className={`${regionDrop && "rotate-180"}`}
-              size={17}
-            />
+            <p className="truncate ">{region === "" ? "Select Region" : region}</p>
+            <FaAngleDown className={`${regionDrop && "rotate-180"}`} size={17}/>
           </div>
-          {regionDrop && (
-            <div className={`${styles.filter_drop}`}>
+          {regionDrop && (<div className={`${styles.filter_drop}`}>
               {regionData.map((elem) => (
-                <div
-                  key={elem}
+                <div key={elem}
                   onClick={() => handleRegionChange(elem)}
                   className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{elem}</p>
-                </div>
+                ><p className="truncate">{elem}</p></div>
               ))}
-            </div>
-          )}
+            </div>)}
         </div>
         <div className=" w-[70%] relative ">
           <div
