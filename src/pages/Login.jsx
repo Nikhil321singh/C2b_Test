@@ -23,6 +23,17 @@ const Login = () => {
   useEffect(() => {
     sessionStorage.clear();
     localStorage.clear();
+    const currentDomain = window.location.origin;
+    const bypassedDomain = import.meta.env.BYPASSED_DOMAIN;
+    console.log(currentDomain,"  " ,bypassedDomain);
+    if (currentDomain === "https://tradein.grest.in") {
+          sessionStorage.setItem("authToken", "");
+          sessionStorage.setItem("profile", JSON.stringify({ firstName: "GREST" }));
+          sessionStorage.setItem("DeviceType", "Mobile");
+          localStorage.removeItem("formData");
+          dispatch(setUserProfile({ firstName: "GREST" }));
+          navigate("/SelectDeviceType");
+    }
   }, []);
 
   const userLogin = () => {

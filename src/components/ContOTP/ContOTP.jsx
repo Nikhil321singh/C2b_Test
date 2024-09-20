@@ -9,6 +9,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import { MdEdit } from "react-icons/md";
 import ProfileBox from "../ProfileBox/ProfileBox";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
+import axios from "axios";
 const initOtp = {
   name: "",
   email: "",
@@ -27,7 +28,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
-  const isFormComplete = otpData.name && otpData.email && ph;
   const [errMsg, setErrMsg] = useState("");
 
   const handleChange = (e) => {
@@ -74,12 +74,30 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const resendOTPDup = () => {
     setDisableResend(true);
   };
-  const onOTPVerifyDup = () => {
+
+  const onOTPVerifyDup = async () => {
     setLoading(true);
-    if (otp === "123456") {
-      dispatch(setOtpVerified(true));
-      navigate("/inputnumber");
-    } else {
+    const leadId = sessionStorage.getItem("LeadId");
+    const currentDomain = window.location.origin;
+    if (currentDomain === "https://tradein.grest.in" && otp === "123456") {
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/customerDetail`,
+      {
+        name: otpData.name,
+        emailId: otpData.email,
+        phoneNumber: otpData.phone,
+        leadId,
+      });
+      console.log(response)
+      if(response?.status === 200){
+        navigate("/SelectDeviceType");
+      }else{
+        setErrMsg("Failed to Save Details");
+      }
+      setLoading(false);
+    }else if (currentDomain !== "https://tradein.grest.in" && otp === "123456"){
+        dispatch(setOtpVerified(true));
+        navigate("/inputnumber");
+    }else {
       setLoading(false);
     }
   };
