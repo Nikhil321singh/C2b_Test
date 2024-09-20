@@ -100,6 +100,10 @@ const SpecialOffers = () => {
   const leadId = sessionStorage.getItem("LeadId");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    dispatch(setOtpVerified(false));
+  }, []);
+
   const handleViewSummary = () => {
     const bonus = Number(phonePrice) - Number(Price);
     setExtraBonus(bonus);
@@ -154,7 +158,6 @@ const SpecialOffers = () => {
         sessionStorage.setItem("disableBtn", JSON.stringify(false));
         sessionStorage.setItem("myMessageKey", "");
       }, 30000);
-      dispatch(setOtpVerified(false));
     } else {
       console.log("clicked");
     }

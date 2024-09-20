@@ -9,6 +9,7 @@ import LoadingSpinner from "../LoadingSpinner";
 import { MdEdit } from "react-icons/md";
 import ProfileBox from "../ProfileBox/ProfileBox";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
+import axios from "axios";
 const initOtp = {
   name: "",
   email: "",
@@ -27,7 +28,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [timer, setTimer] = useState(30);
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
-  const isFormComplete = otpData.name && otpData.email && ph;
   const [errMsg, setErrMsg] = useState("");
 
   const handleChange = (e) => {
@@ -41,23 +41,67 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setOtpBoxOpen(!otpBoxOpen);
   };
   const onSignupDup = () => {
-    if (!isFormComplete) {
-      setErrMsg("Please Fill All Details");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (otpData.name.length < 3) {
+      setErrMsg("Name: (Size Must Be >= 3)");
       return;
     }
+
+    if (otpData.email.length < 5) {
+      setErrMsg("Email: (Size Must Be >= 5)");
+      return;
+    } else if (!emailRegex.test(otpData.email)) {
+      setErrMsg("Invalid Email Format");
+      return;
+    }
+
+    if (otpData.phone.length !== 10) {
+      setErrMsg("Mobile: (Must have 10 Digits)");
+      return;
+    }
+    setErrMsg("");
     setLoading(true);
     const formatPh = "+" + ph;
     console.log(formatPh);
     setLoading(false);
     setOtpBoxOpen(true);
     setDisableResend(true);
+    setOtpData({
+      ...otpData,
+      phone: ph,
+    });
   };
   const resendOTPDup = () => {
     setDisableResend(true);
   };
-  const onOTPVerifyDup = () => {
+
+  const onOTPVerifyDup = async () => {
     setLoading(true);
-    if (otp === "123456") {
+    const leadId = sessionStorage.getItem("LeadId");
+    const currentDomain = window.location.origin;
+    if (currentDomain === "https://tradein.grest.in" && otp === "123456") {
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/questionnaires/customerDetail`,
+        {
+          name: otpData.name,
+          emailId: otpData.email,
+          phoneNumber: otpData.phone,
+          leadId,
+        }
+      );
+      console.log(response);
+      if (response?.status === 200) {
+        navigate("/SelectDeviceType");
+      } else {
+        setErrMsg("Failed to Save Details");
+      }
+      setLoading(false);
+    } else if (
+      currentDomain !== "https://tradein.grest.in" &&
+      otp === "123456"
+    ) {
       dispatch(setOtpVerified(true));
       navigate("/inputnumber");
     } else {
@@ -86,6 +130,49 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   }, [otpData]);
 
   return (
+    <MainOtpUI
+      otpBoxOpen={otpBoxOpen}
+      handleNumberEdit={handleNumberEdit}
+      ph={ph}
+      errMsg={errMsg}
+      otp={otp}
+      setOtp={setOtp}
+      otpData={otpData}
+      handleChange={handleChange}
+      setPh={setPh}
+      setOtpData={setOtpData}
+      resendOTPDup={resendOTPDup}
+      disableResend={disableResend}
+      timer={timer}
+      onOTPVerifyDup={onOTPVerifyDup}
+      loading={loading}
+      onSignupDup={onSignupDup}
+    />
+  );
+};
+
+export default ContOTP;
+
+export const MainOtpUI = ({
+  otpBoxOpen,
+  handleNumberEdit,
+  ph,
+  errMsg,
+  otp,
+  setOtp,
+  otpData,
+  handleChange,
+  setPh,
+  setOtpData,
+  resendOTPDup,
+  disableResend,
+  timer,
+  onOTPVerifyDup,
+  loading,
+  onSignupDup,
+}) => {
+  const navigate = useNavigate();
+  return (
     <div className={`${styles.contopt_page}`} style={{ zIndex: 9999 }}>
       <div className="absolute top-4 md:top-0 bg-white flex items-center justify-between w-full pr-2 py-2 rounded-md">
         <ProfileBox />
@@ -98,7 +185,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
       </div>
       <div className={` ${styles.optbox_wrap}`}>
         <div className={`${styles.optimg_wrap}`}>
-          <img onClick={() => setContinueOTPOpen(false)} src={optImg} />
+          <img  src={optImg} />
         </div>
         <div className={`${styles.opt_heading} `}>
           <p className={`font-bold text-2xl`}>OTP Verificaiton</p>
@@ -119,8 +206,14 @@ const ContOTP = ({ setContinueOTPOpen }) => {
               </span>
             </div>
           ) : (
-            <span className="flex flex-col items-center justify-center text-sm font-medium opacity-60">
-              We will send you a one-time Password to this number.
+            <span
+              className={`flex flex-col items-center justify-center text-sm font-medium ${
+                errMsg ? "text-red-500" : "opacity-60"
+              } min-h-[40px]`}
+            >
+              {errMsg
+                ? errMsg
+                : "We will send you a one-time Password to this number."}
             </span>
           )}
         </div>
@@ -178,8 +271,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   );
 };
 
-export default ContOTP;
-
 const ActionButton = ({ onClick, loading, disabled, children }) => (
   <button
     onClick={onClick}
@@ -232,13 +323,6 @@ const OTPComp = ({
         </div>
       ) : (
         <div className={`${styles.form_fields_wrap}`}>
-          {errMsg && (
-            <div className="flex items-center justify-center my-0 py-0 mx-auto">
-              <p className="text-[#EC2752] text-sm p-0 m-0">
-                {errMsg}
-              </p>
-            </div>
-          )}
           <div>
             <input
               id="name"

@@ -114,8 +114,9 @@ const OrdersCompleted = ({ daysfilters, head }) => {
           <OrdersCard
             key={index}
             itemData={item}
-            title={"Orders Completed"}
+            title={"Order Completed"}
             customerName={item?.name}
+            customerEmail={item.lead?.emailId}
             customerMobile={item?.phoneNumber}
             deviceName={item?.model?.name}
             savedBy={item.user?.name}

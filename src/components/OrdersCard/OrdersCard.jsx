@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
-import { setResponseData } from "../../store/slices/responseSlice";
+import { setLeadOTPData, setResponseData } from "../../store/slices/responseSlice";
 import { useDispatch } from "react-redux";
 import watch from "../../assets/apple_watch.png";
+import { setOtpVerified } from "../../store/slices/otpSlice";
 
+const quoteSaved = "Quote Saved";
 export const DeleteModal = ({ onCancel, onConfirm }) => {
   return (
     <div className="fixed z-50 flex items-center justify-center w-full h-full mx-2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
@@ -49,7 +51,6 @@ const OrdersCard = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const deviceSelected = sessionStorage.getItem("DeviceType");
 
   const formatDateTime = (dateTimeString) => {
@@ -70,16 +71,15 @@ const OrdersCard = ({
   useEffect(() => {
     console.log("card");
   }, []);
-    const savedQuote = "Quote Saved";
 
   const isExpired = () => {
     const createdDate = new Date(dateTime);
     const currentDate = new Date();
     const timeDiff = currentDate - createdDate;
-
     const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
     const threeDays = 3 * oneDay; // 3 days in milliseconds
-    if (title === savedQuote) {
+
+    if (title === quoteSaved) {
       return timeDiff > oneDay;
     } else if (title === "Order Saved") {
       return timeDiff > threeDays;
@@ -87,17 +87,15 @@ const OrdersCard = ({
       return false;
     }
   };
-
   const handleInitiate = () => {
     if (isExpired()) {
       return;
     }
-
-    if (title === savedQuote) {
+    if (title === quoteSaved) {
       const detail = {
         models: itemData.lead?.model,
         phoneNumber: customerMobile,
-        status: savedQuote,
+        status: quoteSaved,
         customerName: customerName,
       };
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
@@ -133,10 +131,12 @@ const OrdersCard = ({
       };
 
       dispatch(setResponseData(responseData));
-
+      dispatch(setLeadOTPData(otpData));
+      dispatch(setOtpVerified(false));
+      sessionStorage.setItem("otpData", JSON.stringify(otpData));
       sessionStorage.setItem("LeadId", itemData?.lead_id);
       sessionStorage.setItem("responsedatadata", JSON.stringify(responseData));
-      navigate("/pricepage");
+      navigate("/inputnumber");
     }
   };
 
@@ -157,13 +157,13 @@ const OrdersCard = ({
     <div className="p-2 mx-2 bg-white rounded-lg relative">
       {isExpired() && (
         <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 bg-white">
-          <div className="text-[#EC2752] text-2xl font-bold border-4 border-[#ec275271] px-4 py-2 rounded-md">
+          <div className="text-black text-2xl font-bold border-4 border-[#EC2752] px-4 py-2 rounded-md">
             Expired
           </div>
         </div>
       )}
       <div className="flex items-center justify-between p-2 border-b-2 border-gray-300 border-dashed">
-        <div className="flex items-center py-1 px-2 text-[#EC2752]  bg-[#ec275271] rounded-xl">
+        <div className="flex items-center py-1 px-2 text-white bg-[#EC2752] rounded-xl">
           <p className="text-sm font-medium">{title}</p>
         </div>
         <div className="">
@@ -215,7 +215,7 @@ const OrdersCard = ({
           onConfirm={handleDeleteConfirmed}
         />
       )}
-      {title !== "Lead Completed" && !isExpired() && (
+      {title !== "Order Completed" && !isExpired() && (
         <div className="flex items-center justify-between gap-2 p-2 font-medium">
           <div
             onClick={handleDeleteConfirmation}

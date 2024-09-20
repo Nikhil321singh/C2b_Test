@@ -4,11 +4,7 @@ import NavigateTable from "../../components/NavigateTable/NavigateTable";
 import PendingDevicesTable from "../../components/PendingDevicesTable/PendingDevicesTable";
 import axios from "axios";
 import { BeatLoader } from "react-spinners";
-import {
-  IoIosCheckmarkCircle,
-  IoIosCloseCircle,
-  IoMdSearch,
-} from "react-icons/io";
+import {IoIosCheckmarkCircle, IoIosCloseCircle, IoMdSearch} from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
 import { BsCalendarDate } from "react-icons/bs";
 import styles from "./DevicePickupDashboard.module.css";
@@ -26,14 +22,12 @@ const succTextColor = "text-green-500";
 const failTextColor = "text-[#EC2752]";
 const PickupAvail = "Available For Pickup";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-const id = LoggedInUser?._id || LoggedInUser?.id;
 const RotateCss = "rotate-180";
 
 const downloadExcel = (pendDataDown) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
-
   const formattedData = pendDataDown.map((item) => {
     return {
       "Lead Id": item._id,
@@ -217,6 +211,7 @@ const DevicePickupDashboard = () => {
         getDataBySearch={getDataBySearch}
         dateValue={dateValue}
         statusValue={statusValue}
+        selectedStatus={selectedStatus}
         setStatusValue={setStatusValue}
         setDateValue={setDateValue}
         setRegion={setRegion}
@@ -430,6 +425,7 @@ const DPFilter = ({
   getDataBySearch,
   dateValue,
   statusValue,
+  selectedStatus,
   setStatusValue,
   setDateValue,
   setRegion,
@@ -447,13 +443,15 @@ const DPFilter = ({
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredStores, setFilteredStores] = useState(storeData);
   const dispatch = useDispatch();
 
   const handleRegionChange = (value) => {
     setRegionDrop(false);
     setStoreName("");
-    const filteredStores = allStore.filter((store) => store.region === value);
-    const storeNamesArray = filteredStores.map((store) => store.storeName);
+    const filteredStores1 = allStore.filter((store) => store.region === value);
+    const storeNamesArray = filteredStores1.map((store) => store.storeName);
     setStoreData(storeNamesArray);
     setRegion(value);
     dispatch(setStoreFilter({ selStore: "", selRegion: value }));
@@ -461,10 +459,8 @@ const DPFilter = ({
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore?.filter(
-      (store) => store.storeName === value
-    );
-    const newRegion = filteredStores[0].region;
+    const filteredStores2 = allStore?.filter((store) => store.storeName === value);
+    const newRegion = filteredStores2[0].region;
     setRegion(newRegion);
     setStoreName(value);
     dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
@@ -474,9 +470,29 @@ const DPFilter = ({
     setSearchValue("");
     setSelectedStatus("");
     setDateValue("");
-    getData();
+    setRegion("chandigarh");
+    setStoreName("GrestTest");
+    setSearchTerm("");
   };
+  useEffect(() => {
+    if (selectedStatus === "" && dateValue === "" && searchValue === "") {
+      getData();
+    }
+  }, [dateValue, selectedStatus, searchValue]);
 
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value === "") {
+      setFilteredStores(storeData);
+    } else {
+      const filtered = storeData.filter((store) =>
+        store.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredStores(filtered);
+    }
+  };
   const handleFilterClick = () => {
     setShowFilterDropdown(!showFilterDropdown);
   };
@@ -560,27 +576,44 @@ const DPFilter = ({
         </div>
         <div className="relative w-[70%]">
           <div
-            className={`w-[100%] ${styles.filter_button}`}
-            onClick={() => {
-              setStoreDrop(!storeDrop);
-            }}
+            className={`${styles.filter_button} w-full`}
+            onClick={() => setStoreDrop(!storeDrop)}
           >
             <p className="truncate">
-              {storeName === "" ? "Select Store" : storeName}
+              {searchTerm === "" ? "Select Store" : searchTerm}
             </p>
             <FaAngleDown size={17} className={`${storeDrop && RotateCss}`} />
           </div>
           {storeDrop && (
-            <div className={`w-[100%] ${styles.filter_drop}`}>
-              {storeData.map((item, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleStoreChange(item)}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{item}</p>
-                </div>
-              ))}
+            <div className="absolute w-full bg-white shadow-md">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 border-b border-gray-300"
+                placeholder="Search store..."
+              />
+              <div
+                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
+              >
+                {filteredStores.length > 0 ? (
+                  filteredStores.map((item, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        handleStoreChange(item);
+                        setSearchTerm(item);
+                        setStoreDrop(false);
+                      }}
+                      className={`${styles.filter_option}`}
+                    >
+                      <p className="truncate">{item}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="p-2 text-gray-500">No stores found</p>
+                )}
+              </div>
             </div>
           )}
         </div>

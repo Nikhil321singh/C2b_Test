@@ -56,6 +56,10 @@ import quesImg48 from "../../assets/2.jpg";
 import quesImg49 from "../../assets/3.jpg";
 import quesImg50 from "../../assets/4.jpg";
 import quesImg51 from "../../assets/quesImg0.png";
+import quesImg53 from "../../assets/48.jpg";
+import quesImg54 from "../../assets/49.jpg";
+import quesImg55 from "../../assets/50.jpg";
+import quesImg56 from "../../assets/51.jpg";
 
 const imageMap = {
   quesImg1,
@@ -110,6 +114,10 @@ const imageMap = {
   quesImg50,
   quesImg51,
   quesImg52: quesImg51,
+  quesImg53,
+  quesImg54,
+  quesImg55,
+  quesImg56,
 };
 
 import {
@@ -210,11 +218,19 @@ function NewDeviceqs() {
       const newPopulateAnswers = response.data.data.map((ele) => ele.default);
       if (answers.length === 0) {
         const newAnswers = newPopulateAnswers.map((answer, index) => {
-          if (response.data.data[index].yes === answer) {
+          if (response.data.data[index].yes === answer && response.data.data[index].no === answer) {
             return {
               quetion: response.data.data[index].quetion,
               answer,
-              key: response.data.data[index].yes === answer ? "yes" : "no",
+              key: "no",
+              group: response.data.data[index].group,
+              selected: Array(response.data.data[index].options.length).fill(false),
+            };
+          }else if (response.data.data[index].yes === answer) {
+            return {
+              quetion: response.data.data[index].quetion,
+              answer,
+              key: "yes",
               group: response.data.data[index].group,
               selected: Array(response.data.data[index].options.length).fill(
                 true
@@ -224,11 +240,9 @@ function NewDeviceqs() {
             return {
               quetion: response.data.data[index].quetion,
               answer,
-              key: response.data.data[index].yes === answer ? "yes" : "no",
               group: response.data.data[index].group,
-              selected: Array(response.data.data[index].options.length).fill(
-                false
-              ),
+              key: "no",
+              selected: Array(response.data.data[index].options.length).fill(false),
             };
           }
         });
@@ -452,7 +466,7 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate.Cosmetics &&
           NDstate.Cosmetics.map((data, index) => {
-            if (index < 5) {
+            if (index < 9) {
               return (
                 <React.Fragment key={data._id}>
                   {data?.options.map((option, optionIndex) => (
@@ -699,7 +713,7 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate.Cosmetics &&
           NDstate.Cosmetics.map((data, index) => {
-            if (index >= 5) {
+            if (index >= 9) {
               return (
                 <React.Fragment key={data._id}>
                   {data?.options.map((option, optionIndex) => (
@@ -841,6 +855,7 @@ const AboveSix = ({
     const finalPayload = {
       QNA: qna,
       phoneNumber: id?.phoneNumber ? id?.phoneNumber : "123456789",
+      aadharNumber: id?.aadharNumber ? id?.aadharNumber : "123456789012",
       modelId: id?.models?._id,
       storage: id?.models?.config?.storage,
       ram: id?.models?.config?.RAM,

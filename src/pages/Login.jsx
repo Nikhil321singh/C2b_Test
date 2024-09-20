@@ -10,6 +10,7 @@ import { MdOutlineMailLock } from "react-icons/md";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
+const homeroute = "/SelectDeviceType";
 
 const Login = () => {
   const [userEmail, setUserEmail] = useState("");
@@ -18,11 +19,22 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showUserPassword, setShowUserPassword] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const navigate = useNavigate(homeroute);
 
   useEffect(() => {
     sessionStorage.clear();
     localStorage.clear();
+    const currentDomain = window.location.origin;
+    const bypassedDomain = import.meta.env.BYPASSED_DOMAIN;
+    console.log(currentDomain,"  " ,bypassedDomain);
+    if (currentDomain === "https://tradein.grest.in") {
+          sessionStorage.setItem("authToken", "");
+          sessionStorage.setItem("profile", JSON.stringify({ firstName: "GREST" }));
+          sessionStorage.setItem("DeviceType", "Mobile");
+          localStorage.removeItem("formData");
+          dispatch(setUserProfile({ firstName: "GREST" }));
+          navigate();
+    }
   }, []);
 
   const userLogin = () => {
@@ -65,10 +77,10 @@ const Login = () => {
               navigate("/devicepickupdashboard");
               break;
             case "Sale User":
-              navigate("/SelectDeviceType");
+              navigate(homeroute);
               break;
             default:
-              navigate("/SelectDeviceType");
+              navigate(homeroute);
           }
         })
         .catch((err) => {
