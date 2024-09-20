@@ -418,26 +418,26 @@ const SubLeadsCompleted = ({
           {storeDrop && (
             <div className="absolute w-full bg-white shadow-md">
               <input
+                placeholder="Search store..."
                 type="text"
                 value={searchTerm}
                 onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
-                placeholder="Search store..."
+                className="w-full   p-2   border-b border-gray-300"
               />
               <div
-                className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
+                className={`overflow-y-scroll   max-h-[200px]   ${styless.filter_drop}`}
               >
                 {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
+                  filteredStores.map((item3, index) => (
                     <div
                       key={index}
                       onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item.storeName);
+                        handleStoreChange(item3);
+                        setSearchTerm(item3.storeName);
                         setStoreDrop(false);
                       }}
-                      className={`${styles.filter_option}`}
-                    ><p className="truncate">{item.storeName}</p></div>
+                      className={`  ${styles.filter_option}`}
+                    ><p className=" truncate ">{item3.storeName}</p></div>
                   ))
                 ) : (<p className="p-2 text-gray-500">No stores found</p>)}
                 <div className={`${styles.filter_option}`}
@@ -445,7 +445,7 @@ const SubLeadsCompleted = ({
                     handleStoreChange({ _id: "", storeName: ALLstore });
                     setSearchTerm(ALLstore);
                   }}
-                ><p className="truncate">{ALLstore}</p></div>
+                ><p className=" truncate ">{ALLstore}</p></div>
               </div>
             </div>
           )}
