@@ -258,28 +258,28 @@ const QuotesCreatedAdmin = () => {
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
+            <div className="absolute   w-full bg-white shadow-md">
               <input
                 type="text"
-                value={searchTerm}
                 onChange={handleSearch}
                 className="w-full p-2 border-b border-gray-300"
                 placeholder="Search store..."
+                value={searchTerm}
               />
               <div
-                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
+                className={` overflow-y-scroll  max-h-[200px] ${styles.filter_drop}`}
               >
                 {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
+                  filteredStores.map((item5, index) => (
                     <div
                       key={index}
                       onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item.storeName);
+                        handleStoreChange(item5);
+                        setSearchTerm(item5.storeName);
                         setStoreDrop(false);
                       }}
                       className={`${styles.filter_option}`}
-                    ><p className="truncate">{item.storeName}</p></div>
+                    ><p className="truncate  ">{item5.storeName}</p></div>
                   ))
                 ) : (<p className="p-2 text-gray-500">No stores found</p>)}
                 <div

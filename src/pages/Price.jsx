@@ -5,6 +5,7 @@ import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
+const pink = "bg-[#EC2752]";
 const Price = () => {
   const userName = "";
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
@@ -180,7 +181,7 @@ const Price = () => {
           onClick={() => uploadAllImages()}
           className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
             !imeinumber || !phoneFront || !phoneBack || !phoneLeft || !phoneRight ||
-            !phoneTop || !phoneBottom ? "cursor-not-allowed bg-gray-400" : " bg-[#EC2752]  "}`}
+            !phoneTop || !phoneBottom ? "cursor-not-allowed bg-gray-400" : pink}`}
         >
           {isLoading && (<CgSpinner size={20} className="absolute left-[28%] top-[8px] mt-1 animate-spin"/>)}
           <p className="w-full p-1 text-xl font-medium">{isLoading ? "Submitting" : "Submit"}</p>
@@ -248,7 +249,7 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
           maxLength={15}
         />
         <button
-          className={`px-4 py-2 font-bold text-white rounded ${!error ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
+          className={`px-4 py-2 font-bold text-white rounded ${!error ? pink : "bg-gray-400 cursor-not-allowed"
             }`}
           onClick={handleVerify}
           disabled={!!error}
@@ -309,7 +310,7 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber }) => {
         />
         <button
           className={`px-4 py-2 font-bold text-white rounded ${
-            !error ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
+            !error ? pink : "bg-gray-400 cursor-not-allowed"
           }`}
           onClick={handleVerify}
           disabled={!!error}
