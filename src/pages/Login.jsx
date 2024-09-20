@@ -19,7 +19,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showUserPassword, setShowUserPassword] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate(homeroute);
+  const navigate = useNavigate();
 
   useEffect(() => {
     sessionStorage.clear();
@@ -33,7 +33,7 @@ const Login = () => {
           sessionStorage.setItem("DeviceType", "Mobile");
           localStorage.removeItem("formData");
           dispatch(setUserProfile({ firstName: "GREST" }));
-          navigate();
+          navigate(homeroute);
     }
   }, []);
 
