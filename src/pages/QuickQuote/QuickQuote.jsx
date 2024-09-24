@@ -127,10 +127,6 @@ const QuickQuote = () => {
     };
 
     fetchData();
-    const token = sessionStorage.getItem("authToken");
-    if (!token) {
-      navigate("/");
-    }
   }, []);
 
   const handlesubmit = async () => {
