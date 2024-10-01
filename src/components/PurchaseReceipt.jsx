@@ -3,95 +3,141 @@ import Grest_Logo from "../assets/Grest_Logo.jpg";
 
 const PurchaseReceipt = ({
   imeiNumber,
+  uniqueCode,
   phoneNumber,
+  aadharNumber,
   phoneName,
   storage,
   storeName,
   RAM,
   formattedDate,
+  emailId,
+  name,
+  region,
+  address,
+  price,
 }) => {
+  // const maskPhoneNumber = (phNumber) => {
+  //   const visibleLength = Math.ceil(phNumber?.length * 0.25);
+  //   const maskedSection = phNumber?.slice(
+  //     0,
+  //     phNumber.length - visibleLength
+  //   );
+  //   const visibleSection = phNumber?.slice(
+  //     phNumber?.length - visibleLength
+  //   );
+  //   return `${maskedSection.replace(/./g, "x")}${visibleSection}`;
+  // };
+
+  // const maskEmail = (email) => {
+  //   const [namee, domain] = email.split("@");
+  //   const visibleLength = Math.ceil(namee?.length * 0.25);
+  //   const maskedName = namee?.slice(0, namee?.length - visibleLength);
+  //   const visibleName = namee?.slice(namee?.length - visibleLength);
+  //   return `${maskedName.replace(/./g, "x")}${visibleName}@${domain}`;
+  // };
+
   return (
-    <div className="w-full  p-4 bg-white border-2 text-sm">
-      <div className="flex items-center justify-center mb-2 bg-white p-[2vh] mx-[2vh] my-[2vh]">
-        <img src={Grest_Logo} alt="Grest logo" className="w-24 h-12" />
+    <div className="p-4 px-12 bg-white border-2 text-sm">
+      <div className="flex items-center justify-center gap-4 bg-white p-[1vh] mx-[2vh] my-[1vh]">
+        <img src={Grest_Logo} alt="Grest logo" className="w-80 h-24" />
       </div>
       <div className="flex flex-col items-center justify-between mb-2">
-        <p className="text-sm ">
-          <span className="font-bold"> Office Address:</span> Plot 54, Sector 44
-          Institutional Area, Gurugram 122002
+        <p className="text-sm text-[#1b0d6c]">
+          Fydox Technologies Pvt. Ltd. ,
+          <span className="text-[#1b0d6c]"> GSTIN/UIN:</span>
+          {/* unicorn no 06AAJCR2110E1ZX */}
         </p>
-        <p className="text-sm">
-          <span className="font-bold"> Phone:</span> 555-55-55-5557
+        <p className="text-sm text-[#1b0d6c]">
+          <span className="text-[#1b0d6c]"> Address:</span> 3rd Floor, 573 3rd
+          Main, 2nd Block, Above Cafe Coffee Day, R.T. Nagar, Banglore - 560032
+        </p>
+        <p className="text-sm text-[#1b0d6c]">
+          <span className="text-[#1b0d6c]"> Contact:</span> +91 88887 44444 ,
+          <span className="text-[#1b0d6c]"> E-mail:</span> support@fydox.in
         </p>
       </div>
       <div className="text-center">
-        <p className="font-bold text-3xl">PURCHASE RECEIPT</p>
+        <p className="font-bold text-xl">PURCHASE RECEIPT</p>
       </div>
-      <div className="max-w-[70%] flex items-center mt-4 justify-between mx-auto">
-        <div>
+      <div className="flex items-center mt-4 justify-between mx-auto">
+        <div className="w-[30%]">
           <p>
-            <span className="font-bold"> Service No.:</span>
+            <span className="font-bold"> Serial No.:</span> {uniqueCode}
           </p>
           <p>
             <span className="font-bold"> Date:</span> {formattedDate}
           </p>
         </div>
-        <div className=" p-4 border-2 border-black">
+        <div className=" p-4 border-2 border-black w-[70%]">
           <p>
-            <span className="font-bold"> Purchased From:</span>
+            <span className="font-bold"> Purchased From: {name}</span>
           </p>
           <p>
             <span> Contact: {phoneNumber}</span>
           </p>
           <p>
-            <span> Mail:</span>
+            <span> Mail: {emailId}</span>
+          </p>
+          <p>
+            <span> Aadhar No.: {aadharNumber}</span>
           </p>
         </div>
       </div>
-      <div className="flex gap-2">
-        <div className="flex flex-col items-center">
+      <div className="flex gap-8 flex-row justify-start">
+        <div className="flex flex-col items-start">
           <p className="font-bold">S.No.</p>
           <p>1</p>
         </div>
         <div>
-          <p className="font-bold">Item</p>
+          <p className="font-bold flex flex-col items-start">ITEM</p>
           <p>
-            {phoneName} ({storage}/{RAM})
+            {phoneName} ({RAM}/{storage})
           </p>
         </div>
+        <div>
+          <p className="font-bold flex flex-col items-start">PRICE</p>
+          <p>{"₹ " + price + "/-"}</p>
+        </div>
       </div>
+      <div className="flex gap-8 flex-row justify-start">
+        <div className="flex flex-col items-start">
+          <p className="mt-4">IMEI No./ Serial Number:</p>
+        </div>
+        <div className="flex flex-col items-start">
+          <p className="mt-4">{imeiNumber}</p>
+        </div>
+      </div>
+
       <hr className="border-black mt-10 border-1" />
       <div className="flex flex-col items-center border-b-2 border-dashed border-black py-4 ">
-        <p className="font-bold">Via Retail Store Partner:</p>
+        <p className="text-xl font-bold mt-4 mb-2">Via Retail Store Partner:</p>
         <p>{storeName}</p>
-        <p>
-          SHOP NO.T1-112, FLOOR PLAZAGOLF COURSE ROAD, SECTOR 43 Gurgaon Haryana
-        </p>
-        <p>Gurgaon, Haryana, 122002</p>
-        <p className="text-[8px]">
+        <p className="uppercase text-center">{address}</p>
+        <p className="text-sm">
           This is a Computer Generated Purchase Receipt and does not require
           signature or stamp
         </p>
       </div>
       <div className="flex flex-col items-center">
-        <p className="text-3xl font-bold my-4">IDEMNITY BOND</p>
+        <p className="text-xl font-bold my-4">IDEMNITY BOND</p>
         <p className="text-center">
           This bond of idemnity is made and executed by :{" "}
-          <span className="font-bold underline">UserName</span> Herein after
+          <span className="font-bold underline">{name}</span> Herein after
           referred to as "Seller" who has come in Retail store of{" "}
           <span className="font-bold underline">{storeName}</span> to sell
-          his/her old Gadget, to the Grest Network herein referred to as
+          his/her old Gadget, to the SwitchKart Network herein after referred to as
           "Purchaser" which expression shall mean and include its
           representative, executors, nominee, partners, affiliates and assigns
-          on day <span>date</span>
+          on day of <span className="font-bold">{formattedDate}</span>
         </p>
       </div>
 
       <div>
         <p className="mt-4">
-          <span> IMEI NO.: {imeiNumber}</span>
+          <span> Scheme Title: Buyback</span>
         </p>
-        <p className="font-bold">Seller Name and Sign</p>
+        <p className="font-bold mt-16">Seller Name and Sign</p>
       </div>
     </div>
   );
