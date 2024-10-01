@@ -6,6 +6,26 @@ import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 const pink = "bg-[#EC2752]";
+const fileUploader = async (authToken, file, fileName, fileType) => {
+  try {
+    const fileInfo = { fileName, fileType };
+    const resURL = await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`,
+      fileInfo,
+      { headers: { Authorization: authToken } }
+    );
+    if(resURL?.data?.url){
+      const presignedUrl = resURL.data.url;
+      const result = await axios.put(presignedUrl, file, {
+      headers: {
+        'Content-Type': fileType
+      }});
+      console.log("File uploaded successfully:", result);
+    }
+  } catch (error) {
+    console.log("Error uploading file:", error);
+    throw error;
+  }
+};
 const Price = () => {
   const userName = "";
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
@@ -59,35 +79,22 @@ const Price = () => {
       setIsLoading(false);
       return;
     }
+    try{
+      await fileUploader(token, file, imeinumber + "-adhaarFront", file.type);
+      await fileUploader(token, file, imeinumber + "-adhaarFront", file.type);
+      await fileUploader(token, idProofBack, imeinumber + "-adhaarBack", idProofBack.type);
+      await fileUploader(token, phoneBill, imeinumber + "-phoneBill", phoneBill.type);
+      await fileUploader(token, phoneFront, imeinumber + "-phoneFront", phoneFront.type);
+      await fileUploader(token, phoneBack, imeinumber + "-phoneBack", phoneBack.type);
+      await fileUploader(token, phoneTop, imeinumber + "-phoneTop", phoneTop.type);
+      await fileUploader(token, phoneLeft, imeinumber + "-phoneLeft", phoneLeft.type);
+      await fileUploader(token, phoneRight, imeinumber + "-phoneRight", phoneRight.type);
+      await fileUploader(token, phoneBottom, imeinumber + "-phoneBottom", phoneBottom.type);
+      await fileUploader(token, phoneBottom, imeinumber + "-signature", phoneBottom.type);
+    }catch (error) {
+      setIsLoading(false);
+    }
     const formData = new FormData();
-    if (file) {
-      formData.append("adharFront", file);
-    }
-    if (idProofBack) {
-      formData.append("adharBack", idProofBack);
-    }
-    if (phoneBill) {
-      formData.append("phoneBill", phoneBill);
-    }
-    if (phoneFront) {
-      formData.append("phoneFront", phoneFront);
-    }
-    if (phoneBack) {
-      formData.append("phoneBack", phoneBack);
-    }
-    if (phoneTop) {
-      formData.append("phoneUp", phoneTop);
-    }
-    if (phoneLeft) {
-      formData.append("phoneLeft", phoneLeft);
-    }
-    if (phoneRight) {
-      formData.append("phoneRight", phoneRight);
-    }
-    if (phoneBottom) {
-      formData.append("phoneDown", phoneBottom);
-    }
-    formData.append("signature", phoneBottom);
     formData.append("IMEI", imeinumber);
     formData.append("leadId", leadsubmitDATA?.id);
     formData.append("emailId", savedOtpData?.email);

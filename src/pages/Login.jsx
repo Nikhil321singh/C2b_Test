@@ -27,7 +27,7 @@ const Login = () => {
     const currentDomain = window.location.origin;
     const bypassedDomain = import.meta.env.BYPASSED_DOMAIN;
     console.log(currentDomain,"  " ,bypassedDomain);
-    if (currentDomain === "https://tradein.grest.in") {
+    if (currentDomain === "https://buyback.in") {
           sessionStorage.setItem("authToken", "");
           sessionStorage.setItem("profile", JSON.stringify({ firstName: "GREST" }));
           sessionStorage.setItem("DeviceType", "Mobile");
