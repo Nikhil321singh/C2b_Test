@@ -137,7 +137,7 @@ const DeviceQuote = () => {
             quoteId={quoteId}
             bonusPrice={bonus}
           ></QuoteModal>
-          {quoteSaved === false && exactQuoteValue === "true" && currentDomain !== "https://tradein.grest.in" && (
+          {quoteSaved === false && exactQuoteValue === "true" && currentDomain !== "https://buyback.in" && (
             <div className="flex flex-row items-center justify-between px-2 my-2">
               <div className="w-[40%] font-medium text-gray-700">
                 Bonus Amount :
