@@ -79,7 +79,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setLoading(true);
     const leadId = sessionStorage.getItem("LeadId");
     const currentDomain = window.location.origin;
-    if (currentDomain === "https://buyback.in" && otp === "123456") {
+    if (currentDomain === "https://buyback.grest.in" && otp === "123456") {
       const response = await axios.post(
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
@@ -99,7 +99,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
       }
       setLoading(false);
     } else if (
-      currentDomain !== "https://buyback.in" &&
+      currentDomain !== "https://buyback.grest.in" &&
       otp === "123456"
     ) {
       dispatch(setOtpVerified(true));
