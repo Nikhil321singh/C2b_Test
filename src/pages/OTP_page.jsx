@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setOtpVerified } from "../store/slices/otpSlice";
 import { setLeadOTPData } from "../store/slices/responseSlice";
 import { MainOtpUI } from "../components/ContOTP/ContOTP";
-import { auth } from "../../firebase";
+import { auth } from "../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 function OTPpage() {
