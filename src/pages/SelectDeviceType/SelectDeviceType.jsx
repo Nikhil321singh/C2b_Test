@@ -296,22 +296,6 @@ export const BrandList = ({ deviceType }) => {
       handleDeviceClick();
     }
   };
-
-  const isArray = Array.isArray(brandList);
-  const sortedModels = isArray
-    ? [...brandList].sort((a, b) => {
-        const nameA = a.name.toLowerCase();
-        const nameB = b.name.toLowerCase();
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
-        return 0;
-      })
-    : [];
-
   return (
     <>
       {popout && (
@@ -348,9 +332,9 @@ export const BrandList = ({ deviceType }) => {
           ref={brandContainerRef}
           className={`flex flex-shrink-0 gap-4 px-1 overflow-x-auto  scroll-smooth scrollbar-hide ${styles.topSell_box}`}
         >
-          {sortedModels &&
-            sortedModels.length > 0 &&
-            sortedModels.map((brandItem, index) => (
+          {brandList &&
+            brandList.length > 0 &&
+            brandList.map((brandItem, index) => (
               <div
                 key={index}
                 onClick={() => handleBrandClick(brandItem)}
@@ -763,7 +747,7 @@ const MiddlePart = ({
 }) => {
   const Device1 = sessionStorage.getItem("DeviceType");
   const [selectedBtn, setSelectedBtn] = useState(() => selBtn(Device1));
-
+  const currentDomain = window.location.origin;
   return (
     <div className={styles.des_main_wrap}>
       <div className={styles.des_lr_wrap}>
@@ -791,7 +775,7 @@ const MiddlePart = ({
             setDeviceType={setDeviceType}
           />
           <BrandList deviceType={deviceType} />
-          <div className="ml-3">
+          {currentDomain !== "https://buyback.grest.in" && <div className="ml-3">
             <select
               name=""
               id=""
@@ -838,9 +822,9 @@ const MiddlePart = ({
                 Custom
               </option>
             </select>
-          </div>
+          </div>}
 
-          <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
+          {currentDomain !== "https://buyback.grest.in" && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
             <Link className="w-[33%]" to={`/orderscreated/${days}`}>
               <OrderStatusBox
                 figures={orderCount}
@@ -862,7 +846,7 @@ const MiddlePart = ({
                 background="#FF963E"
               />
             </Link>
-          </div>
+          </div>}
           <p
             className={`${styles.topSell_head} text-lg font-bold text-[#EC2752]`}
           >
