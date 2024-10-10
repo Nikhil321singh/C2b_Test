@@ -39,20 +39,20 @@ function OTPpage() {
   }, [otpData]);
 
     function onCaptchVerify() {
-      console.log(auth);
       window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
         size: "invisible",
         callback: (response) => {
+          //abc
         },
       });
     }
 
     function onSignup(event) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (otpData.name.length < 3) {
-        setErrMsg("Name: (Size Must Be >= 3)");
-        return;
-      }
+       if (otpData.phone.length !== 10) {
+         setErrMsg("Mobile: (Must have 10 Digits)");
+         return;
+       }
 
       if (otpData.email.length < 5) {
         setErrMsg("Email: (Size Must Be >= 5)");
@@ -62,19 +62,21 @@ function OTPpage() {
         return;
       }
 
-      if (otpData.phone.length !== 10) {
-        setErrMsg("Mobile: (Must have 10 Digits)");
+      if (otpData.name.length < 3) {
+        setErrMsg("Name: (Size Must Be >= 3)");
         return;
       }
-      setErrMsg("");
+
+     
       setLoading(true);
+      setErrMsg("");
       if (firstTime) {
         onCaptchVerify();
         setFirstIme(false);
       }
 
-      const appVerifier = window.recaptchaVerifier;
       const formatPh = "+91" + ph;
+      const appVerifier = window.recaptchaVerifier;
       console.log(formatPh);
       localStorage.setItem("otpData", JSON.stringify(otpData));
       signInWithPhoneNumber(auth, formatPh, appVerifier)
@@ -101,22 +103,22 @@ function OTPpage() {
       window.confirmationResult
         .confirm(otp)
         .then(async (res) => {
-          console.log("ho gya");
           localStorage.setItem("otpData", JSON.stringify(otpData));
           dispatch(setOtpVerified(true));
           dispatch(setLeadOTPData(otpData));
+          console.log("ho gya");
         })
         .catch((err) => {
-          console.log(err);
           setLoading(false);
+          console.log(err);
         });
     }
 
     const resendOTP = () => {
       setDisableResend(true);
 
-      const appVerifier = window.recaptchaVerifier;
       const formatPh = "+91" + ph;
+      const appVerifier = window.recaptchaVerifier;
 
       signInWithPhoneNumber(auth, formatPh, appVerifier)
         .then((confirmationResult) => {
@@ -125,6 +127,7 @@ function OTPpage() {
         })
         .catch((error) => {
           console.log(error);
+          console.log(error + "");
         });
     };
 
