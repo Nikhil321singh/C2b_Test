@@ -31,7 +31,7 @@ import FromDatecom from "../../components/fromdate_todate_Com/FromDatecom";
 import { toast } from "react-hot-toast";
 import { ImCancelCircle } from "react-icons/im";
 import Oppo from "../../assets/Oppo.png";
-
+const buyback = "https://buyback.grest.in";
 export const OrderStatusBox = ({ title, figures, background }) => {
   return (
     <div
@@ -117,6 +117,36 @@ export const DeviceTypeFilter = ({
       >
         <IoIosArrowForward size={30} />
       </button>
+    </div>
+  );
+};
+
+export const DeviceTypeFilter2 = () => {
+  const categories = [
+    { name: "iPhone", image: mobile, apiType: "Mobile", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" },
+    { name: "Watch", image: watch, apiType: "Watch", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" }
+  ];
+  const navigate = useNavigate();
+  return (
+    <div className={`px-3 w-full`}>
+      <div
+        className={`flex flex-shrink-0 gap-4`}
+      >
+        {categories.map((category, index) => (
+          <div
+            key={index}
+            style={{ boxShadow: '1px 1px 2px 0px rgba(0, 0, 0, 0.158), -1px -1px 0px 0px rgba(0, 0, 0, 0.034)'}}
+            className={`flex flex-col items-center gap-1 justify-between rounded-md py-4`}
+            onClick={() => {
+              sessionStorage.setItem("DeviceType", category.apiType);
+              navigate(category.link);
+            }}
+          >
+            {category.image && <img className="w-[50%]" src={category.image} alt={category.name} />}
+            <div className="w-full text-center font-semibold text-base text-[#ec2752]">{category.name}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -769,13 +799,14 @@ const MiddlePart = ({
               </div>
             </div>
           </div>
-          <DeviceTypeFilter
+          {currentDomain === buyback && <DeviceTypeFilter2/>}
+          {currentDomain !== buyback && <DeviceTypeFilter
             selectedBtn={selectedBtn}
             setSelectedBtn={setSelectedBtn}
             setDeviceType={setDeviceType}
-          />
-          <BrandList deviceType={deviceType} />
-          {currentDomain !== "https://buyback.grest.in" && <div className="ml-3">
+          />}
+          {currentDomain !== buyback && <BrandList deviceType={deviceType} />}
+          {currentDomain !== buyback && <div className="ml-3">
             <select
               name=""
               id=""
@@ -824,7 +855,7 @@ const MiddlePart = ({
             </select>
           </div>}
 
-          {currentDomain !== "https://buyback.grest.in" && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
+          {currentDomain !== buyback && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
             <Link className="w-[33%]" to={`/orderscreated/${days}`}>
               <OrderStatusBox
                 figures={orderCount}
