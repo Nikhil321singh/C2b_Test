@@ -10,12 +10,13 @@ import { MdEdit } from "react-icons/md";
 import ProfileBox from "../ProfileBox/ProfileBox";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import axios from "axios";
+import { auth } from "../../firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 const initOtp = {
   name: "",
   email: "",
   phone: "",
 };
-
 const ContOTP = ({ setContinueOTPOpen }) => {
   const navigate = useNavigate();
   const deviceSelected = sessionStorage.getItem("DeviceType");
@@ -29,6 +30,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
   const [errMsg, setErrMsg] = useState("");
+    const [firstTime, setFirstIme] = useState(true);
 
   const handleChange = (e) => {
     setOtpData({
@@ -40,6 +42,138 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setLoading(false);
     setOtpBoxOpen(!otpBoxOpen);
   };
+
+    function onCaptchVerify() {
+      console.log(auth);
+      // For Firebase version 9 and above
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
+        size: "invisible",
+        callback: (response) => {
+          // reCAPTCHA solved, allow signInWithPhoneNumber.
+          // ...
+        },
+      });
+    }
+
+    //on submit phone number
+    function onSignup(event) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (otpData.name.length < 3) {
+        setErrMsg("Name: (Size Must Be >= 3)");
+        return;
+      }
+
+      if (otpData.email.length < 5) {
+        setErrMsg("Email: (Size Must Be >= 5)");
+        return;
+      } else if (!emailRegex.test(otpData.email)) {
+        setErrMsg("Invalid Email Format");
+        return;
+      }
+
+      if (otpData.phone.length !== 10) {
+        setErrMsg("Mobile: (Must have 10 Digits)");
+        return;
+      }
+      setErrMsg("");
+      setLoading(true);
+      if (firstTime) {
+        onCaptchVerify();
+        setFirstIme(false);
+      }
+
+      const appVerifier = window.recaptchaVerifier;
+      const formatPh = "+91" + ph;
+      console.log(formatPh);
+      //setNumber(formatPh);
+
+      signInWithPhoneNumber(auth, formatPh, appVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          setLoading(false);
+          setOtpBoxOpen(true);
+          setDisableResend(true);
+          // toast.success("OTP sended successfully!");
+          console.log("OTP sent successfully!");
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+        });
+
+      setOtpData({
+        ...otpData,
+        phone: ph,
+      });
+    }
+
+    function onOTPVerify() {
+      setLoading(true);
+          const leadId = sessionStorage.getItem("LeadId");
+          const currentDomain = window.location.origin;
+      window.confirmationResult
+        .confirm(otp)
+        .then(async (res) => {
+          // setUser(res.user);
+          // console.log("ho gya");
+          //setChange(!change);
+          console.log("ho gya");
+          // sessionStorage.setItem("otpverified", "true");
+             if (
+               currentDomain === "https://buyback.grest.in"
+             ) {
+               const response = await axios.post(
+                 `${
+                   import.meta.env.VITE_REACT_APP_ENDPOINT
+                 }/api/questionnaires/customerDetail`,
+                 {
+                   name: otpData.name,
+                   emailId: otpData.email,
+                   phoneNumber: otpData.phone,
+                   leadId,
+                 }
+               );
+               console.log(response);
+               if (response?.status === 200) {
+                 navigate("/SelectDeviceType");
+               } else {
+                 setErrMsg("Failed to Save Details");
+               }
+               setLoading(false);
+             } else if (
+               currentDomain !== "https://buyback.grest.in"
+             ) {
+               dispatch(setOtpVerified(true));
+               navigate("/inputnumber");
+             } else {
+               setLoading(false);
+             }
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
+    }
+
+    //resend otp
+    const resendOTP = () => {
+      // Start the countdown timer
+      setDisableResend(true);
+      //onCaptchVerify();
+
+      const appVerifier = window.recaptchaVerifier;
+      const formatPh = "+91" + ph;
+
+      // Resend the OTP without changing the loading state
+      signInWithPhoneNumber(auth, formatPh, appVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          console.log("OTP resent successfully!");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
   const onSignupDup = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (otpData.name.length < 3) {
@@ -141,12 +275,12 @@ const ContOTP = ({ setContinueOTPOpen }) => {
       handleChange={handleChange}
       setPh={setPh}
       setOtpData={setOtpData}
-      resendOTPDup={resendOTPDup}
+      resendOTP={resendOTP}
       disableResend={disableResend}
       timer={timer}
-      onOTPVerifyDup={onOTPVerifyDup}
+      onOTPVerify={onOTPVerify}
       loading={loading}
-      onSignupDup={onSignupDup}
+      onSignup={onSignup}
     />
   );
 };
@@ -164,12 +298,12 @@ export const MainOtpUI = ({
   handleChange,
   setPh,
   setOtpData,
-  resendOTPDup,
+  resendOTP,
   disableResend,
   timer,
-  onOTPVerifyDup,
+  onOTPVerify,
   loading,
-  onSignupDup,
+  onSignup,
 }) => {
   const navigate = useNavigate();
   return (
@@ -236,7 +370,7 @@ export const MainOtpUI = ({
               </span>
               <button
                 className=" text-left  min-w-[100px]"
-                onClick={resendOTPDup}
+                onClick={resendOTP}
                 disabled={disableResend}
               >
                 {disableResend ? `Resend in ${timer}` : "Resend OTP"}
@@ -249,7 +383,7 @@ export const MainOtpUI = ({
           {otpBoxOpen ? (
             <>
               <ActionButton
-                onClick={onOTPVerifyDup}
+                onClick={onOTPVerify}
                 loading={loading}
                 disabled={!otp}
               >
@@ -259,7 +393,7 @@ export const MainOtpUI = ({
             </>
           ) : (
             <>
-              <ActionButton onClick={onSignupDup} loading={loading}>
+              <ActionButton onClick={onSignup} loading={loading}>
                 Get OTP
               </ActionButton>
               <div id="recaptcha"></div>
