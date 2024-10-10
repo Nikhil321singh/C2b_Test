@@ -121,6 +121,36 @@ export const DeviceTypeFilter = ({
   );
 };
 
+export const DeviceTypeFilter2 = () => {
+  const categories = [
+    { name: "iPhone", image: mobile, apiType: "Mobile", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" },
+    { name: "Watch", image: watch, apiType: "Watch", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" }
+  ];
+  const navigate = useNavigate();
+  return (
+    <div className={`px-3 w-full`}>
+      <div
+        className={`flex flex-shrink-0 gap-4`}
+      >
+        {categories.map((category, index) => (
+          <div
+            key={index}
+            style={{ boxShadow: '1px 1px 2px 0px rgba(0, 0, 0, 0.158), -1px -1px 0px 0px rgba(0, 0, 0, 0.034)'}}
+            className={`flex flex-col items-center gap-1 justify-between rounded-md py-4`}
+            onClick={() => {
+              sessionStorage.setItem("DeviceType", category.apiType);
+              navigate(category.link);
+            }}
+          >
+            {category.image && <img className="w-[50%]" src={category.image} alt={category.name} />}
+            <div className="w-full text-center font-semibold text-base text-[#ec2752]">{category.name}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const ImgSelectore = (ImgItem) => {
   if (ImgItem?.phonePhotos?.front) {
     return ImgItem?.phonePhotos?.front;
@@ -769,13 +799,14 @@ const MiddlePart = ({
               </div>
             </div>
           </div>
-          <DeviceTypeFilter
+          {currentDomain === "http://localhost:4200" && <DeviceTypeFilter2/>}
+          {currentDomain !== "http://localhost:4200" && <DeviceTypeFilter
             selectedBtn={selectedBtn}
             setSelectedBtn={setSelectedBtn}
             setDeviceType={setDeviceType}
-          />
-          <BrandList deviceType={deviceType} />
-          {currentDomain !== "https://buyback.grest.in" && <div className="ml-3">
+          />}
+          {currentDomain !== "http://localhost:4200" && <BrandList deviceType={deviceType} />}
+          {currentDomain !== "http://localhost:4200" && <div className="ml-3">
             <select
               name=""
               id=""
@@ -824,7 +855,7 @@ const MiddlePart = ({
             </select>
           </div>}
 
-          {currentDomain !== "https://buyback.grest.in" && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
+          {currentDomain !== "http://localhost:4200" && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
             <Link className="w-[33%]" to={`/orderscreated/${days}`}>
               <OrderStatusBox
                 figures={orderCount}
