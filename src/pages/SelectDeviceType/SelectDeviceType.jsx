@@ -31,7 +31,7 @@ import FromDatecom from "../../components/fromdate_todate_Com/FromDatecom";
 import { toast } from "react-hot-toast";
 import { ImCancelCircle } from "react-icons/im";
 import Oppo from "../../assets/Oppo.png";
-
+const buyback = "https://buyback.grest.in";
 export const OrderStatusBox = ({ title, figures, background }) => {
   return (
     <div
@@ -799,14 +799,14 @@ const MiddlePart = ({
               </div>
             </div>
           </div>
-          {currentDomain === "https://buyback.grest.in/" && <DeviceTypeFilter2/>}
-          {currentDomain !== "https://buyback.grest.in/" && <DeviceTypeFilter
+          {currentDomain === buyback && <DeviceTypeFilter2/>}
+          {currentDomain !== buyback && <DeviceTypeFilter
             selectedBtn={selectedBtn}
             setSelectedBtn={setSelectedBtn}
             setDeviceType={setDeviceType}
           />}
-          {currentDomain !== "https://buyback.grest.in/" && <BrandList deviceType={deviceType} />}
-          {currentDomain !== "https://buyback.grest.in/" && <div className="ml-3">
+          {currentDomain !== buyback && <BrandList deviceType={deviceType} />}
+          {currentDomain !== buyback && <div className="ml-3">
             <select
               name=""
               id=""
@@ -855,7 +855,7 @@ const MiddlePart = ({
             </select>
           </div>}
 
-          {currentDomain !== "https://buyback.grest.in/" && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
+          {currentDomain !== buyback && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
             <Link className="w-[33%]" to={`/orderscreated/${days}`}>
               <OrderStatusBox
                 figures={orderCount}
