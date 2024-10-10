@@ -67,7 +67,6 @@ function OTPpage() {
         return;
       }
 
-     
       setLoading(true);
       setErrMsg("");
       if (firstTime) {
