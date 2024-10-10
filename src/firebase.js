@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDRs6Y5qyHvZT9HEEBbDJRWeLM2cTpiSWY",
-  authDomain: "otpmsg-780cd.firebaseapp.com",
-  projectId: "otpmsg-780cd",
-  storageBucket: "otpmsg-780cd.appspot.com",
-  messagingSenderId: "590087856593",
-  appId: "1:590087856593:web:50e2aa18aa18dcfcb040f0",
-  measurementId: "G-J2T71FW3KW",
+  apiKey: "AIzaSyAzgXMq9YP-KkuS7HnPzbNJq5Ua30JuB0c",
+  authDomain: "fydox-app.firebaseapp.com",
+  projectId: "fydox-app",
+  storageBucket: "fydox-app.appspot.com",
+  messagingSenderId: "133025646403",
+  appId: "1:133025646403:web:45ffd22d38d90a724191f6",
+  measurementId: "G-4BKF6TEZR2",
 };
 
 const app = initializeApp(firebaseConfig);

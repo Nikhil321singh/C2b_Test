@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setOtpVerified } from "../store/slices/otpSlice";
 import { setLeadOTPData } from "../store/slices/responseSlice";
 import { MainOtpUI } from "../components/ContOTP/ContOTP";
+import { auth } from "../../firebase";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 function OTPpage() {
   const initVal = useSelector((state) => state.responseData);
@@ -19,7 +21,7 @@ function OTPpage() {
     email: initVal.email,
     phone: initVal.phone,
   });
-
+    const [firstTime, setFirstIme] = useState(true);
   const handleNumberEdit = () => {
     setLoading(false);
     setOtpBoxOpen(!otpBoxOpen);
@@ -32,53 +34,99 @@ function OTPpage() {
     });
   };
 
-  const onSignupDup = () => {
-    const emailRegex1 = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (otpData.name.length < 3) {
-      setErrMsg("Name: (Size Must Be >= 3)");
-      return;
-    }
-    if (otpData.email.length < 5) {
-      setErrMsg("Email: (Size Must Be >= 5)");
-      return;
-    } else if (!emailRegex1.test(otpData.email)) {
-      setErrMsg("Invalid Email Format");
-      return;
-    }
-    if (otpData.phone.length !== 10) {
-      setErrMsg("Mobile: (Must have 10 Digits)");
-      return;
-    }
-
-    setErrMsg("");
-    setLoading(false);
-    setDisableResend(true);
-    setOtpBoxOpen(true);
-    setOtpData({
-      ...otpData,
-      phone: ph,
-    });
-  };
-
-  const onOTPVerifyDup = () => {
-    setLoading(true);
-    if (otp === "123456") {
-      localStorage.setItem("otpData", JSON.stringify(otpData));
-      dispatch(setOtpVerified(true));
-      dispatch(setLeadOTPData(otpData));
-    } else {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     localStorage.setItem("otpData", JSON.stringify(otpData));
   }, [otpData]);
 
-  const resendOTPDup = () => {
-    setDisableResend(true);
-  };
+    function onCaptchVerify() {
+      console.log(auth);
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
+        size: "invisible",
+        callback: (response) => {
+        },
+      });
+    }
+
+    function onSignup(event) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (otpData.name.length < 3) {
+        setErrMsg("Name: (Size Must Be >= 3)");
+        return;
+      }
+
+      if (otpData.email.length < 5) {
+        setErrMsg("Email: (Size Must Be >= 5)");
+        return;
+      } else if (!emailRegex.test(otpData.email)) {
+        setErrMsg("Invalid Email Format");
+        return;
+      }
+
+      if (otpData.phone.length !== 10) {
+        setErrMsg("Mobile: (Must have 10 Digits)");
+        return;
+      }
+      setErrMsg("");
+      setLoading(true);
+      if (firstTime) {
+        onCaptchVerify();
+        setFirstIme(false);
+      }
+
+      const appVerifier = window.recaptchaVerifier;
+      const formatPh = "+91" + ph;
+      console.log(formatPh);
+      localStorage.setItem("otpData", JSON.stringify(otpData));
+      signInWithPhoneNumber(auth, formatPh, appVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          setLoading(false);
+          setOtpBoxOpen(true);
+          setDisableResend(true);
+          console.log("OTP sent successfully!");
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+        });
+
+      setOtpData({
+        ...otpData,
+        phone: ph,
+      });
+    }
+
+    function onOTPVerify() {
+      setLoading(true);
+      window.confirmationResult
+        .confirm(otp)
+        .then(async (res) => {
+          console.log("ho gya");
+          localStorage.setItem("otpData", JSON.stringify(otpData));
+          dispatch(setOtpVerified(true));
+          dispatch(setLeadOTPData(otpData));
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
+    }
+
+    const resendOTP = () => {
+      setDisableResend(true);
+
+      const appVerifier = window.recaptchaVerifier;
+      const formatPh = "+91" + ph;
+
+      signInWithPhoneNumber(auth, formatPh, appVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          console.log("OTP resent successfully!");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
 
   useEffect(() => {
     let intrvll;
@@ -104,15 +152,15 @@ function OTPpage() {
       errMsg={errMsg}
       otp={otp}
       timer={timer}
-      onOTPVerifyDup={onOTPVerifyDup}
+      onOTPVerify={onOTPVerify}
       loading={loading}
-      onSignupDup={onSignupDup}
+      onSignup={onSignup}
       setOtp={setOtp}
       otpData={otpData}
       handleChange={handleChange}
       setPh={setPh}
       setOtpData={setOtpData}
-      resendOTPDup={resendOTPDup}
+      resendOTP={resendOTP}
       disableResend={disableResend}
     />
   );
