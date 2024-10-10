@@ -8,7 +8,7 @@ import { useNavigate } from "react-router";
 const AppFooter = ({ days }) => {
   const show = true;
   const navigate = useNavigate();
-
+  const currentDomain = window.location.origin;
   const handleHome = () => {
     navigate("/selectdevicetype");
   };
@@ -34,10 +34,10 @@ const AppFooter = ({ days }) => {
         <BiCategory size={24} />
         <button className="text-sm">Categories</button>
       </div>
-      <div onClick={handleOrders} className="flex flex-col items-center">
+      {currentDomain !== "https://buyback.grest.in" && <div onClick={handleOrders} className="flex flex-col items-center">
         <IoBagAddOutline size={24} />
         <button className="text-sm">Orders</button>
-      </div>
+      </div>}
     </div>
   );
 };
