@@ -17,6 +17,7 @@ const initOtp = {
   email: "",
   phone: "",
 };
+const buyBackUrl = "https://buyback.grest.in";
 const ContOTP = ({ setContinueOTPOpen }) => {
   const navigate = useNavigate();
   const deviceSelected = sessionStorage.getItem("DeviceType");
@@ -45,17 +46,13 @@ const ContOTP = ({ setContinueOTPOpen }) => {
 
     function onCaptchVerify() {
       console.log(auth);
-      // For Firebase version 9 and above
       window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
         size: "invisible",
         callback: (response) => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-          // ...
         },
       });
     }
 
-    //on submit phone number
     function onSignup(event) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (otpData.name.length < 3) {
@@ -85,7 +82,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
       const appVerifier = window.recaptchaVerifier;
       const formatPh = "+91" + ph;
       console.log(formatPh);
-      //setNumber(formatPh);
 
       signInWithPhoneNumber(auth, formatPh, appVerifier)
         .then((confirmationResult) => {
@@ -93,7 +89,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
           setLoading(false);
           setOtpBoxOpen(true);
           setDisableResend(true);
-          // toast.success("OTP sended successfully!");
           console.log("OTP sent successfully!");
         })
         .catch((error) => {
@@ -114,13 +109,9 @@ const ContOTP = ({ setContinueOTPOpen }) => {
       window.confirmationResult
         .confirm(otp)
         .then(async (res) => {
-          // setUser(res.user);
-          // console.log("ho gya");
-          //setChange(!change);
           console.log("ho gya");
-          // sessionStorage.setItem("otpverified", "true");
              if (
-               currentDomain === "https://buyback.grest.in"
+               currentDomain === buyBackUrl
              ) {
                const response = await axios.post(
                  `${
@@ -141,7 +132,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
                }
                setLoading(false);
              } else if (
-               currentDomain !== "https://buyback.grest.in"
+               currentDomain !== buyBackUrl
              ) {
                dispatch(setOtpVerified(true));
                navigate("/inputnumber");
@@ -155,16 +146,12 @@ const ContOTP = ({ setContinueOTPOpen }) => {
         });
     }
 
-    //resend otp
     const resendOTP = () => {
-      // Start the countdown timer
       setDisableResend(true);
-      //onCaptchVerify();
 
       const appVerifier = window.recaptchaVerifier;
       const formatPh = "+91" + ph;
 
-      // Resend the OTP without changing the loading state
       signInWithPhoneNumber(auth, formatPh, appVerifier)
         .then((confirmationResult) => {
           window.confirmationResult = confirmationResult;
@@ -174,74 +161,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
           console.log(error);
         });
     };
-  const onSignupDup = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (otpData.name.length < 3) {
-      setErrMsg("Name: (Size Must Be >= 3)");
-      return;
-    }
-
-    if (otpData.email.length < 5) {
-      setErrMsg("Email: (Size Must Be >= 5)");
-      return;
-    } else if (!emailRegex.test(otpData.email)) {
-      setErrMsg("Invalid Email Format");
-      return;
-    }
-
-    if (otpData.phone.length !== 10) {
-      setErrMsg("Mobile: (Must have 10 Digits)");
-      return;
-    }
-    setErrMsg("");
-    setLoading(true);
-    const formatPh = "+" + ph;
-    console.log(formatPh);
-    setLoading(false);
-    setOtpBoxOpen(true);
-    setDisableResend(true);
-    setOtpData({
-      ...otpData,
-      phone: ph,
-    });
-  };
-  const resendOTPDup = () => {
-    setDisableResend(true);
-  };
-
-  const onOTPVerifyDup = async () => {
-    setLoading(true);
-    const leadId = sessionStorage.getItem("LeadId");
-    const currentDomain = window.location.origin;
-    if (currentDomain === "https://buyback.grest.in" && otp === "123456") {
-      const response = await axios.post(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/customerDetail`,
-        {
-          name: otpData.name,
-          emailId: otpData.email,
-          phoneNumber: otpData.phone,
-          leadId,
-        }
-      );
-      console.log(response);
-      if (response?.status === 200) {
-        navigate("/SelectDeviceType");
-      } else {
-        setErrMsg("Failed to Save Details");
-      }
-      setLoading(false);
-    } else if (
-      currentDomain !== "https://buyback.grest.in" &&
-      otp === "123456"
-    ) {
-      dispatch(setOtpVerified(true));
-      navigate("/inputnumber");
-    } else {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     let intrvl;
