@@ -799,14 +799,14 @@ const MiddlePart = ({
               </div>
             </div>
           </div>
-          {currentDomain === "http://localhost:4200" && <DeviceTypeFilter2/>}
-          {currentDomain !== "http://localhost:4200" && <DeviceTypeFilter
+          {currentDomain === "https://buyback.grest.in/" && <DeviceTypeFilter2/>}
+          {currentDomain !== "https://buyback.grest.in/" && <DeviceTypeFilter
             selectedBtn={selectedBtn}
             setSelectedBtn={setSelectedBtn}
             setDeviceType={setDeviceType}
           />}
-          {currentDomain !== "http://localhost:4200" && <BrandList deviceType={deviceType} />}
-          {currentDomain !== "http://localhost:4200" && <div className="ml-3">
+          {currentDomain !== "https://buyback.grest.in/" && <BrandList deviceType={deviceType} />}
+          {currentDomain !== "https://buyback.grest.in/" && <div className="ml-3">
             <select
               name=""
               id=""
@@ -855,7 +855,7 @@ const MiddlePart = ({
             </select>
           </div>}
 
-          {currentDomain !== "http://localhost:4200" && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
+          {currentDomain !== "https://buyback.grest.in/" && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
             <Link className="w-[33%]" to={`/orderscreated/${days}`}>
               <OrderStatusBox
                 figures={orderCount}
