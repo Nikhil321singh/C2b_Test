@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDRs6Y5qyHvZT9HEEBbDJRWeLM2cTpiSWY",
-  authDomain: "otpmsg-780cd.firebaseapp.com",
-  projectId: "otpmsg-780cd",
-  storageBucket: "otpmsg-780cd.appspot.com",
-  messagingSenderId: "590087856593",
-  appId: "1:590087856593:web:50e2aa18aa18dcfcb040f0",
-  measurementId: "G-J2T71FW3KW",
+  apiKey: "AIzaSyC_Iu49QVLRgmI_UjUrp_v-FsUZIwKqug4",
+  authDomain: "grest-otp.firebaseapp.com",
+  projectId: "grest-otp",
+  storageBucket: "grest-otp.appspot.com",
+  messagingSenderId: "1031937795275",
+  appId: "1:1031937795275:web:dae4721dd449ea434ea74e",
+  measurementId: "G-7H0S4R7GBW",
 };
 
 const app = initializeApp(firebaseConfig);
