@@ -9,6 +9,7 @@ const PurchaseReceipt = ({
   phoneName,
   storage,
   storeName,
+  type,
   RAM,
   formattedDate,
   emailId,
@@ -63,7 +64,7 @@ const PurchaseReceipt = ({
       <div className="flex items-center mt-4 justify-between mx-auto">
         <div className="w-[30%]">
           <p>
-            <span className="font-bold"> Serial No.:</span> {uniqueCode}
+            <span className="font-bold"> Transaction ID:</span> {uniqueCode}
           </p>
           <p>
             <span className="font-bold"> Date:</span> {formattedDate}
@@ -92,7 +93,14 @@ const PurchaseReceipt = ({
         <div>
           <p className="font-bold flex flex-col items-start">ITEM</p>
           <p>
-            {phoneName} ({RAM}/{storage})
+            {phoneName}
+            {RAM && storage
+              ? ` (${RAM}/${storage})`
+              : RAM
+              ? ` (${RAM}/${storage})`
+              : storage
+              ? ` (${RAM}/${storage})`
+              : ""}
           </p>
         </div>
         <div>
@@ -102,10 +110,12 @@ const PurchaseReceipt = ({
       </div>
       <div className="flex gap-8 flex-row justify-start">
         <div className="flex flex-col items-start">
-          <p className="mt-4">IMEI No./ Serial Number:</p>
+          <p className="mt-4">IMEI No.:</p>
+          <p className="mt-4">Serial Number(if Laptop):</p>
         </div>
         <div className="flex flex-col items-start">
-          <p className="mt-4">{imeiNumber}</p>
+          <p className="mt-4">{type === "Mobile" ? imeiNumber : ""}</p>
+          <p className="mt-4">{type === "Laptop" ? imeiNumber : ""}</p>
         </div>
       </div>
 
@@ -126,8 +136,8 @@ const PurchaseReceipt = ({
           <span className="font-bold underline">{name}</span> Herein after
           referred to as "Seller" who has come in Retail store of{" "}
           <span className="font-bold underline">{storeName}</span> to sell
-          his/her old Gadget, to the SwitchKart Network herein after referred to as
-          "Purchaser" which expression shall mean and include its
+          his/her old Gadget, to the SwitchKart Network herein after referred to
+          as "Purchaser" which expression shall mean and include its
           representative, executors, nominee, partners, affiliates and assigns
           on day of <span className="font-bold">{formattedDate}</span>
         </p>

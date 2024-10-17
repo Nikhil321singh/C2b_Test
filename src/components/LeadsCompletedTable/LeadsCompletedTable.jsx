@@ -45,6 +45,7 @@ const LeadsCompletedTable = ({ data }) => {
         price={data[index]?.price}
         imeiNumber={data[index]?.documentId?.IMEI}
         phoneName={data[index]?.modelId?.name}
+        type={data[index]?.modelId?.type}
         storeName={data[index]?.store?.storeName}
         region={data[index]?.store?.region}
         address={data[index]?.store?.address}
