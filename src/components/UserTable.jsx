@@ -48,8 +48,8 @@ const UserTable = ({ data }) => {
 
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#EC2752]">
-        <thead className="bg-[#EC2752] text-white">
+      <table className="w-full border border-primary">
+        <thead className="bg-primary text-white">
           <tr className="align-top">
             <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Username</th>

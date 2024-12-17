@@ -16,10 +16,10 @@ import AdminNavbar from "../../components/Admin_Navbar";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { useDispatch, useSelector } from "react-redux";
 import { setStoreFilter } from "../../store/slices/userSlice";
-const buttonStyles = "bg-[#EC2752] text-white";
+const buttonStyles = "bg-primary text-white";
 const updateStatusError = "Failed to update status";
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
+const failTextColor = "text-primary";
 const PickupAvail = "Available For Pickup";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const RotateCss = "rotate-180";
@@ -198,7 +198,7 @@ const DevicePickupDashboard = () => {
         setSelectedRows={setSelectedRows}
       />
       <NavigateTable />
-      <div className="flex flex-row justify-end items-center py-1 px-2 font-medium text-sm text-[#EC2752]">
+      <div className="flex flex-row justify-end items-center py-1 px-2 font-medium text-sm text-primary">
         Total Device : {devicesCount} | Total Amount :{" "}
         {new Intl.NumberFormat("en-IN", {
           style: "currency",
@@ -337,7 +337,7 @@ const ExtComps = ({
     <React.Fragment>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       {successMod && (
@@ -394,7 +394,7 @@ const ExtComps = ({
                   setConfMod(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -526,7 +526,7 @@ const DPFilter = ({
           <input
             type="date"
             id="datepicker"
-            style={{ color: "#EC2752" }}
+            style={{ color: "var(--primary-color)" }}
             className=""
             value={dateValue}
             onChange={dateChangeHandler}
@@ -813,7 +813,7 @@ const PDTable = ({
       />
       <div className="mx-2 flex gap-2">
         <select
-          className="border-2 w-1/2 outline-none border-[#EC2752] bg-[#EC2752] text-white text-[12px] px-4 py-2 rounded"
+          className="border-2 w-1/2 outline-none border-primary bg-primary text-white text-[12px] px-4 py-2 rounded"
           value={selectedStatus}
           onChange={handleStatusUpdate}
         >
@@ -824,7 +824,7 @@ const PDTable = ({
         </select>
         <button
           onClick={confHandler}
-          className="border-2 w-1/2 border-[#EC2752] bg-[#EC2752] text-white text-[12px] px-4 py-2 rounded"
+          className="border-2 w-1/2 border-primary bg-primary text-white text-[12px] px-4 py-2 rounded"
         >
           Request For Pickup
         </button>
@@ -929,7 +929,7 @@ const CancelModal = ({
           type="text"
           value={cancelReason}
           onChange={(e) => setCancelReason(e.target.value)}
-          className="border-2 border-[#EC2752] rounded-md px-4 py-2 mb-4 w-full"
+          className="border-2 border-primary rounded-md px-4 py-2 mb-4 w-full"
           placeholder="Enter Reason for Cancellation"
         />
         <div className="flex flex-row gap-2">
@@ -941,7 +941,7 @@ const CancelModal = ({
               setShowCancelModal(false);
               setIsTableLoaded(false);
             }}
-            className="bg-white text-[#EC2752]"
+            className="bg-white text-primary"
           >
             Cancel
           </button>
@@ -1008,7 +1008,7 @@ const HoldModal = ({
           type="text"
           value={holdReason}
           onChange={(e) => setHoldReason(e.target.value)}
-          className="border-2 border-[#EC2752] rounded-md px-4 py-2 mb-4 w-full"
+          className="border-2 border-primary rounded-md px-4 py-2 mb-4 w-full"
           placeholder="Enter Reason for Hold"
         />
         <div className="flex flex-row gap-2">
@@ -1020,7 +1020,7 @@ const HoldModal = ({
               setShowHoldModal(false);
               setIsTableLoaded(false);
             }}
-            className="bg-white text-[#EC2752]"
+            className="bg-white text-primary"
           >
             Cancel
           </button>

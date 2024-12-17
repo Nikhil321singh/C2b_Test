@@ -127,7 +127,7 @@ const DeviceQuote = () => {
                     : ""
                 }`}
               </p>
-              <p className="text-[#EC2752] font-semibold">₹{displayPrice}</p>
+              <p className="text-primary font-semibold">₹{displayPrice}</p>
             </div>
           </div>
           <QuoteModal
@@ -142,9 +142,9 @@ const DeviceQuote = () => {
               <div className="w-[40%] font-medium text-gray-700">
                 Bonus Amount :
               </div>
-              <div className="rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-[#EC2752] flex flex-col items-center justify-center">
+              <div className="rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-primary flex flex-col items-center justify-center">
                 <input
-                  className="bg-transparent outline-none my-auto text-center font-medium text-[#EC2752]"
+                  className="bg-transparent outline-none my-auto text-center font-medium text-primary"
                   name="bonus"
                   id="bonus"
                   type="number"
@@ -184,7 +184,7 @@ const DeviceQuote = () => {
             </p>
             {quoteSaved === false && (
               <button
-                className="text-[#EC2752] border-2 border-[#EC2752] text-sm font-medium p-2 rounded-md "
+                className="text-primary border-2 border-primary text-sm font-medium p-2 rounded-md "
                 onClick={toggleModal}
               >
                 Save Quote
@@ -204,7 +204,7 @@ const DeviceQuote = () => {
             />
             <p className="font-medium">
               I agree to the
-              <span className="text-[#EC2752] cursor-pointer">
+              <span className="text-primary cursor-pointer">
                 {" "}
                 Terms & Conditions
               </span>
@@ -266,7 +266,7 @@ const SubDeviceQuote = ({
         <div
           onClick={termsChecked ? continueOTPHandler : undefined}
           className={`${
-            termsChecked ? "bg-[#EC2752]" : "bg-gray-400 cursor-not-allowed"
+            termsChecked ? "bg-primary" : "bg-gray-400 cursor-not-allowed"
           } py-1 rounded-lg cursor-pointer w-1/2 sm:max-w-[200px]  flex justify-between px-2 text-white items-center`}
         >
           <p className="font-medium mx-auto text-xl p-[6px] ">Continue</p>
@@ -275,7 +275,7 @@ const SubDeviceQuote = ({
       {quoteSaved === false && exactQuoteValue === "false" && (
         <div
           onClick={() => navigate("/device/Qestions")}
-          className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
+          className="bg-primary rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
         >
           <p className="p-2 mx-auto text-lg font-medium ">Get Exact Value</p>
         </div>
@@ -283,7 +283,7 @@ const SubDeviceQuote = ({
       {quoteSaved === true && (
         <div
           onClick={() => navigate(deviceTypePage)}
-          className="bg-[#EC2752] rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
+          className="bg-primary rounded-lg cursor-pointer w-1/2 sm:max-w-[200px] flex justify-between px-2 text-white items-center"
         >
           <p className="p-2 mx-auto text-lg font-medium ">
             Return To Home ({countdown}s){" "}

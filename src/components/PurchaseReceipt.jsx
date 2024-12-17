@@ -43,16 +43,16 @@ const PurchaseReceipt = ({
       <div className="flex flex-col items-center justify-between mb-2">
         <p className="text-sm text-[#1b0d6c]">
           Radical Aftermarket Services Pvt. Ltd. ,
-          <span className="text-[#EC2752]"> GSTIN/UIN:</span>
+          <span className="text-primary"> GSTIN/UIN:</span>
           06AAJCR2110E1ZX
         </p>
         <p className="text-sm text-[#1b0d6c]">
-          <span className="text-[#EC2752]"> Address:</span> Khasra No. 34/22,
+          <span className="text-primary"> Address:</span> Khasra No. 34/22,
           1st Floor, NK Tower, Kanhai Road, Sector-45, Gurugram, Haryana-122003
         </p>
         <p className="text-sm text-[#1b0d6c]">
-          <span className="text-[#EC2752]"> Contact:</span> +91 9818 925 900 ,
-          <span className="text-[#EC2752]"> E-mail:</span> care@grest.in
+          <span className="text-primary"> Contact:</span> +91 9818 925 900 ,
+          <span className="text-primary"> E-mail:</span> care@grest.in
         </p>
       </div>
       <div className="text-center">

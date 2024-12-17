@@ -9,8 +9,8 @@ const AdminFinalGradeTable = () => {
 
   return (
     <div className="m-2  w-[90%] overflow-x-auto md:m-5 ">
-      <table className="w-full border-2 border-[#EC2752]  ">
-        <thead className="text-white bg-[#EC2752]">
+      <table className="w-full border-2 border-primary  ">
+        <thead className="text-white bg-primary">
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Groups</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Values</th>

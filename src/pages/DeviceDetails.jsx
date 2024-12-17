@@ -95,7 +95,7 @@ const DeviceDetails = () => {
         {/* how grest works */}
         <div>
           <div className="my-4">
-            <h1 className="text-[#EC2752] font-semibold text-2xl">
+            <h1 className="text-primary font-semibold text-2xl">
               How GREST Works?
             </h1>
           </div>
@@ -107,7 +107,7 @@ const DeviceDetails = () => {
         </div>
         {/* FAQ */}
         <div className="mt-4">
-          <div className="text-[#EC2752] font-semibold text-2xl mb-2">
+          <div className="text-primary font-semibold text-2xl mb-2">
             FAQ's
           </div>
           <FAQ />

@@ -37,7 +37,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #ec275284;
+  color: var(--primary-color)84;
   background-color: white;
   height: 20px;
   width: 20px;
@@ -61,10 +61,10 @@
   width: 100px;
   padding: 7px 10px;
   color: white;
-  background-color: #ec2752;
+  background-color: var(--primary-color);
   outline: none;
   border-radius: 0.75rem;
-  filter: drop-shadow(1px 2px 2px #ec2752ac);
+  filter: drop-shadow(1px 2px 2px var(--primary-color)ac);
   cursor: pointer;
   transition: all 0.5s ease;
 }
@@ -89,9 +89,9 @@
 }
 
 .button_unchecked:hover {
-  background-color: #ec2752;
+  background-color: var(--primary-color);
   color: white;
-  filter: drop-shadow(1px 2px 2px #ec2752ac);
+  filter: drop-shadow(1px 2px 2px var(--primary-color)ac);
   scale: 1.03;
 }
 

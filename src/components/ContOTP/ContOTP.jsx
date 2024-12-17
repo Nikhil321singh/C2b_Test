@@ -248,7 +248,7 @@ export const MainOtpUI = ({
                 OTP sent to
               </span>
               <span
-                className="text-sm font-medium text-left ml-[2px] text-[#EC2752] flex items-center"
+                className="text-sm font-medium text-left ml-[2px] text-primary flex items-center"
                 onClick={handleNumberEdit}
               >
                 <span className="text-sm font-medium opacity-60 text-[#000000]">
@@ -366,7 +366,7 @@ const OTPComp = ({
             disabled={false}
             autoFocus
             inputStyles={{
-              border: "2px solid #EC2752",
+              border: "2px solid var(--primary-color)",
               borderRadius: ".55rem",
               outline: "none",
               marginRight: "10px",
@@ -383,7 +383,7 @@ const OTPComp = ({
               placeholder="Enter Name *"
               value={otpData?.name}
               onChange={handleChange}
-              className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
+              className="border-2 border-primary py-1 rounded-lg pl-[12px]"
             />
           </div>
           <div>
@@ -394,11 +394,11 @@ const OTPComp = ({
               placeholder="Enter Email *"
               value={otpData?.email}
               onChange={handleChange}
-              className="border-2 border-[#EC2752] py-1 rounded-lg pl-[12px]"
+              className="border-2 border-primary py-1 rounded-lg pl-[12px]"
             />
           </div>
           <div className="w-[100%] flex flex-row">
-            <div className="flex   border-[#EC2752] rounded-lg border-2  w-[85%] flex-row justify-start">
+            <div className="flex   border-primary rounded-lg border-2  w-[85%] flex-row justify-start">
               <span className="px-3 py-1 text-gray-600 bg-gray-200 rounded-lg">
                 +91
               </span>

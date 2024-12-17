@@ -22,7 +22,7 @@ import { CgSpinner } from "react-icons/cg";
 import useUserProfile from "../../utils/useUserProfile";
 import { setResponseData } from "../../store/slices/responseSlice";
 
-const PinkBgWhText = "bg-[#EC2752] text-white";
+const PinkBgWhText = "bg-primary text-white";
 
 const initialState = {
   Core: [],
@@ -181,7 +181,7 @@ const QuickQuote = () => {
       </div>
       <div className={`${styless.quick_page_nav}`}>
         <IoIosArrowBack
-          className="ml-2 text-[#EC2752]"
+          className="ml-2 text-primary"
           size={25}
           onClick={backHandler}
         />
@@ -210,7 +210,7 @@ const QuickQuote = () => {
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2">
         <div
           onClick={handlesubmit}
-          className="bg-[#EC2752] text-center relative  py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
+          className="bg-primary text-center relative  py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
         >
           {isLoading && (
             <CgSpinner
@@ -299,7 +299,7 @@ const QuestionList = ({
                 className="max-w-[500px] flex gap-4 ml-3 lableconatiner flex-col"
               >
                 <label
-                  className={`text-[#EC2752] font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
+                  className={`text-primary font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
                     Warranty[index].answer === data.yes ? PinkBgWhText : ""
                   }`}
                 >
@@ -341,7 +341,7 @@ const QuestionsElement = ({ State, Task, dispatch, currentIndex, taskFun }) => {
             </div>
             <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
               <label
-                className={`text-[#EC2752] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                className={`text-primary font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                   Task[index].answer === data.yes ? PinkBgWhText : ""
                 }`}
               >
@@ -363,7 +363,7 @@ const QuestionsElement = ({ State, Task, dispatch, currentIndex, taskFun }) => {
                 Yes
               </label>
               <label
-                className={`text-[#EC2752] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                className={`text-primary font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                   Task[index].answer === data.no ? PinkBgWhText : ""
                 }`}
               >

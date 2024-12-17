@@ -91,7 +91,7 @@ export default function AdminPhone_list() {
     <div className="flex flex-col w-auto h-auto overflow-auto MAIN_CONTAINER max-h-screen-4 ">
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={loading} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={loading} size={15} />
         </div>
       )}
 

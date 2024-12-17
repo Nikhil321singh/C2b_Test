@@ -129,7 +129,7 @@ const ForgetPassword = () => {
                   <div className="input">
                     <MdOutlineMailLock
                       size={25}
-                      style={{ margin: "0px 10px", color: "#EC2752" }}
+                      style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                     />
                     <input
                       id="email-address"
@@ -219,7 +219,7 @@ const OTPInput = ({ isLoading, handleOtpSubmit, otp, setOtp }) => {
               disabled={false}
               autoFocus
               inputStyles={{
-                border: "2px solid #EC2752",
+                border: "2px solid var(--primary-color)",
                 borderRadius: ".55rem",
                 outline: "none",
               }}
@@ -268,7 +268,7 @@ const PassConfirm = ({
         <div className="relative input">
           <RiLockPasswordLine
             size={25}
-            style={{ margin: "0px 10px", color: "#EC2752" }}
+            style={{ margin: "0px 10px", color: "var(--primary-color)" }}
           />
           <input
             minLength={6}
@@ -290,7 +290,7 @@ const PassConfirm = ({
         <div className="relative input">
           <RiLockPasswordLine
             size={25}
-            style={{ margin: "0px 10px", color: "#EC2752" }}
+            style={{ margin: "0px 10px", color: "var(--primary-color)" }}
           />
           <input
             minLength={6}

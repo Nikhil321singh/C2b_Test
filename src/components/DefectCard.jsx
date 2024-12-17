@@ -10,7 +10,7 @@ const DefectCard = ({ error }) => {
         />
       </div>
       <div>
-        <p className="text-center text-[#EC2752] font-semibold">{error}</p>
+        <p className="text-center text-primary font-semibold">{error}</p>
       </div>
     </div>
   );

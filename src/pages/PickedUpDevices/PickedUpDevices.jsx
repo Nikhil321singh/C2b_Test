@@ -21,7 +21,7 @@ import { setStoreFilter } from "../../store/slices/userSlice";
 
 const userRoles = ["Pickup", "Payroll"];
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
+const failTextColor = "text-primary";
 const checkOnPkd = "Check it On Picked Up";
 const PendingConf = "Pending Pickup Confirmation";
 const PickConf = "Pending Delivery At Warehouse"; //Technican Earlier - Pickup Confirmed
@@ -303,7 +303,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailMode(false);
               }}
-              className={"bg-[#EC2752] text-white"}
+              className={"bg-primary text-white"}
             >
               Okay
             </button>
@@ -322,7 +322,7 @@ const ExtComps = ({
                 onClick={() =>
                   statusUpdHandler(tempId, "Pending Admin Approval")
                 }
-                className={"bg-[#EC2752] text-white"}
+                className={"bg-primary text-white"}
               >
                 Okay
               </button>
@@ -331,7 +331,7 @@ const ExtComps = ({
                   setConfMod(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -341,7 +341,7 @@ const ExtComps = ({
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
     </React.Fragment>
@@ -446,7 +446,7 @@ const PickedUpFilter = ({
         >
           <input
             id="datepicker"
-            style={{ color: "#EC2752" }}
+            style={{ color: "var(--primary-color)" }}
             type="date"
             value={dateValue}
             onChange={dateChangeHandler}
@@ -620,8 +620,8 @@ const PickedUpDevicesTable = ({
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
           </div>
         )}
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-full border border-primary">
+          <thead className="bg-primary text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Status</th>

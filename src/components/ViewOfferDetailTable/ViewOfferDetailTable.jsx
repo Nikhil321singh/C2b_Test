@@ -5,7 +5,7 @@ import styles from "./ViewOfferDetailTable.module.css";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 import { BeatLoader } from "react-spinners";
 const successColorClass = "text-green-500";
-const errorColorClass = "text-[#EC2752]";
+const errorColorClass = "text-primary";
 
 const ViewOfferDetailTable = ({ searchValue }) => {
   const token = sessionStorage.getItem("authToken");
@@ -134,7 +134,7 @@ const ViewOfferDetailTable = ({ searchValue }) => {
                 setFailBox(false);
               }}
               className={
-                sucBox ? "bg-green-500 text-white" : "bg-[#EC2752] text-white"
+                sucBox ? "bg-green-500 text-white" : "bg-primary text-white"
               }
             >
               Okay
@@ -152,7 +152,7 @@ const ViewOfferDetailTable = ({ searchValue }) => {
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => handleDelete(selectedOffId)}
-                className={"bg-[#EC2752] text-white"}
+                className={"bg-primary text-white"}
               >
                 Okay
               </button>
@@ -161,7 +161,7 @@ const ViewOfferDetailTable = ({ searchValue }) => {
                   setConfBox(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -171,7 +171,7 @@ const ViewOfferDetailTable = ({ searchValue }) => {
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <ViewOfferDetailTableSub
@@ -192,8 +192,8 @@ const ViewOfferDetailTableSub = ({
 }) => {
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#EC2752]">
-        <thead className="bg-[#EC2752] text-white">
+      <table className="w-full border border-primary">
+        <thead className="bg-primary text-white">
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Offer Name</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Price</th>

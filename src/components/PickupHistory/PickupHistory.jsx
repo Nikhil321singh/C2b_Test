@@ -142,8 +142,8 @@ const [filteredStores, setFilteredStores] = useState(storeData);
   return (
     <div>
       {isTableLoaded && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 text-primary">
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
@@ -239,8 +239,8 @@ const [filteredStores, setFilteredStores] = useState(storeData);
 
 const PickupTable = ({ pickupData, viewHandler }) => {
   return (
-    <table className="w-full border border-[#EC2752]">
-      <thead className="bg-[#EC2752] text-white">
+    <table className="w-full border border-primary">
+      <thead className="bg-primary text-white">
         <tr>
           <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Status</th>

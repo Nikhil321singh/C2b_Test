@@ -5,7 +5,7 @@ import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
-const pink = "bg-[#EC2752]";
+const pink = "bg-primary";
 const fileUploader = async (authToken, file, fileName, fileType) => {
   try {
     const fileInfo = { fileName, fileType };
@@ -264,7 +264,7 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
           Verify
         </button>
       </div>
-      {error && <p className="text-[#ec275271] mt-2 text-sm">{error}</p>}
+      {error && <p className="text-primary mt-2 text-sm">{error}</p>}
     </div>
   );
 };
@@ -325,7 +325,7 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber }) => {
           Verify
         </button>
       </div>
-      {error && <p className="text-[#ec275271] mt-2 text-sm">{error}</p>}
+      {error && <p className="text-primary mt-2 text-sm">{error}</p>}
     </div>
   );
 };
@@ -349,11 +349,11 @@ const AdharField = ({
           </p>
         </div>
       </div>
-      <p className="mt-2 text-sm text-[#ec275271]">
+      <p className="mt-2 text-sm text-primary">
         Note: Image size should not exceed 2MB
       </p>
       <div className="flex inputAADHAR justify-evenly">
-        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center">Adhaar(Front)</p>
           <input
             type="file"
@@ -373,7 +373,7 @@ const AdharField = ({
             )}
           </button>
         </div>
-        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center">Adhaar(Back)</p>
           <input
             type="file"
@@ -420,12 +420,12 @@ const PhoneBill = ({
           </p>
         </div>
       </div>
-      <p className="mt-2 text-sm text-[#ec275271]">
+      <p className="mt-2 text-sm text-primary">
         Note: Image size should not exceed 2MB
       </p>
       <div className="flex justify-start ml-3 inputAADHAR">
         {/* 1 */}
-        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center">
             {Device === "Mobile" && "Phone"}
             {Device === "Watch" && "Smartwatch"} Bill
@@ -493,11 +493,11 @@ const PhonePhotos1 = ({
           />
         </div>
       </div>
-      <p className="mt-2 text-sm text-[#ec275271]">
+      <p className="mt-2 text-sm text-primary">
         Note: Image size should not exceed 2MB
       </p>
       <div className="flex flex-wrap inputAADHAR justify-evenly">
-        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="text-center font-semibold">{`${Device} Front`}</p>
           <input
             onChange={(e) => handleChange(setPhoneFront, e)}
@@ -517,7 +517,7 @@ const PhonePhotos1 = ({
             )}
           </button>
         </div>
-        <div className="p-1 text-center mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 text-center mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="text-center font-semibold">{`${Device} Back`}</p>
           <input
             ref={phoneBackRef}
@@ -540,7 +540,7 @@ const PhonePhotos1 = ({
 
         {/* 3 */}
 
-        <div className="text-center p-1 mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
+        <div className="text-center p-1 mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
           <p className="text-center font-semibold tracking-tighter">
             {`${Device} Left Side`}
           </p>
@@ -564,7 +564,7 @@ const PhonePhotos1 = ({
         </div>
 
         {/* 4 */}
-        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg w-[40vw] h-[15vh] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg w-[40vw] h-[15vh] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="text-center font-semibold tracking-tighter">
             {`${Device} Right Side`}
           </p>
@@ -588,7 +588,7 @@ const PhonePhotos1 = ({
         </div>
 
         {/* 5 */}
-        <div className="border-2 p-1 mt-4 text-center justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="border-2 p-1 mt-4 text-center justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center tracking-tighter">
             {`${Device} Top Side`}
           </p>
@@ -612,7 +612,7 @@ const PhonePhotos1 = ({
         </div>
 
         {/* 6 */}
-        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-[#EC2752] shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+        <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center tracking-tighter">
             {`${Device} Bottom Side`}
           </p>

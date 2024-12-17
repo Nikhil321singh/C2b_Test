@@ -72,8 +72,8 @@ const getRowClass = (selectmodel, selectstorage, selectram, val) => {
 };
 
 const getTextColorClass = (isSuccess) =>
-  isSuccess ? "text-green-500" : "text-[#EC2752]";
-const grestTheme = "bg-[#EC2752] text-white";
+  isSuccess ? "text-green-500" : "text-primary";
+const grestTheme = "bg-primary text-white";
 const errMsg = "";
 const selectedModel = "";
 
@@ -292,7 +292,7 @@ const ExtComps = ({
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       {(sucBox || failBox) && (
@@ -344,7 +344,7 @@ const ExtComps = ({
                   setConfBox(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -356,18 +356,18 @@ const ExtComps = ({
         <div className="flex gap-2">
           <p className="font-medium">Select Category</p>
           <select
-            className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
+            className="bg-primary text-white rounded-lg outline-none px-2 py-1"
             onChange={(e) => setCategory(e.target.value)}
             value={category}
           >
             <option
-              className="bg-white text-[#EC2752] font-medium"
+              className="bg-white text-primary font-medium"
               value="Mobile"
             >
               Mobile
             </option>
             <option
-              className="bg-white text-[#EC2752] font-medium"
+              className="bg-white text-primary font-medium"
               value="Watch"
             >
               Watch
@@ -411,7 +411,7 @@ const AdminModelsTable = ({
 
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#EC2752]">
+      <table className="w-full border border-primary">
         <thead className={grestTheme1}>
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
@@ -479,7 +479,7 @@ const AdminModelsTable = ({
       <div className="flex justify-center mb-2">
         <button
           onClick={handleNext}
-          className="text-center  mx-2 px-4 py-2 rounded-lg bg-[#EC2752] text-white cursor-pointer mt-3"
+          className="text-center  mx-2 px-4 py-2 rounded-lg bg-primary text-white cursor-pointer mt-3"
         >
           Next
         </button>

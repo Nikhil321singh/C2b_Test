@@ -4,8 +4,8 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
   return (
     <div>
       <div className="m-2 overflow-x-scroll  md:m-5 ">
-        <table className="w-[220vh]  border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-[220vh]  border border-primary">
+          <thead className="bg-primary text-white">
             <tr className="">
               <th className="p-2  text-sm  ">Sr. No.</th>
               <th className="p-2 text-sm  ">Purchase In Date</th>

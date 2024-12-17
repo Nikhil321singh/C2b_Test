@@ -65,7 +65,7 @@ const handleDownload = (totalCount) => {
 };
 
 const getTextColorClass = (isSuccess) =>
-  isSuccess ? "text-green-500" : "text-[#EC2752]";
+  isSuccess ? "text-green-500" : "text-primary";
 const pageLimit = 10;
 
 const CompanyListingDetails = () => {
@@ -307,7 +307,7 @@ const ExtComps = ({
       )}
       {isTableLoading && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoading} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoading} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -344,7 +344,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailBox(false);
               }}
-              className={"bg-[#EC2752] text-white"}
+              className={"bg-primary text-white"}
             >
               Okay
             </button>
@@ -361,7 +361,7 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => deleteHandler(selectedCompany?._id)}
-                className={"bg-[#EC2752] text-white"}
+                className={"bg-primary text-white"}
               >
                 Okay
               </button>
@@ -370,7 +370,7 @@ const ExtComps = ({
                   setConfBox(false);
                   setIsTableLoading(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -397,7 +397,7 @@ const ExtComps = ({
             </div>
             <button
               onClick={() => setViewDocsModalOpen(false)}
-              className="border border-[#EC2752] text-[#EC2752] px-4 py-2 rounded"
+              className="border border-primary text-primary px-4 py-2 rounded"
             >
               Close
             </button>
@@ -420,8 +420,8 @@ const CompanyTable = ({
   return (
     <React.Fragment>
       <div className="m-2 overflow-x-auto md:m-5">
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-full border border-primary">
+          <thead className="bg-primary text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Company Name</th>
@@ -505,7 +505,7 @@ const CompanyTable = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              : "bg-primary text-white cursor-pointer"
           }`}
           onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
@@ -516,7 +516,7 @@ const CompanyTable = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#EC2752] text-white cursor-pointer"
+              : "bg-primary text-white cursor-pointer"
           }`}
           onClick={() => setCurrentPage(currentPage + 1)}
           disabled={currentPage === maxPages - 1}

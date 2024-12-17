@@ -18,7 +18,7 @@ import RegisterUserEdit from "../../components/RegisterUserEdit/RegisterUserEdit
 import { useNavigate } from "react-router-dom";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
+const failTextColor = "text-primary";
 
 const downloadExcel = (dataDown) => {
   const fileType =
@@ -218,7 +218,7 @@ const RegisterUserDetails = () => {
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <TableFilters
@@ -254,7 +254,7 @@ const FailBox = ({ errMsg, setFailBox }) => {
           onClick={() => {
             setFailBox(false);
           }}
-          className={"bg-[#EC2752] text-white"}
+          className={"bg-primary text-white"}
         >
           Okay
         </button>
@@ -279,7 +279,7 @@ const ConfBox = ({
         <div className="flex flex-row gap-2">
           <button
             onClick={() => deleteHandler(selectedUser)}
-            className={"bg-[#EC2752] text-white"}
+            className={"bg-primary text-white"}
           >
             Okay
           </button>
@@ -288,7 +288,7 @@ const ConfBox = ({
               setConfBox(false);
               setIsTableLoaded(false);
             }}
-            className="bg-white text-[#EC2752]"
+            className="bg-white text-primary"
           >
             Cancel
           </button>
@@ -375,8 +375,8 @@ const TableFilters = ({
 const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#EC2752]">
-        <thead className="bg-[#EC2752] text-white">
+      <table className="w-full border border-primary">
+        <thead className="bg-primary text-white">
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Name</th>

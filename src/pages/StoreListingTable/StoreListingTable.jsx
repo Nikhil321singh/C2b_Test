@@ -19,7 +19,7 @@ import StoreEdit from "../../components/StoreEdit/StoreEdit";
 import { useNavigate } from "react-router-dom";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
+const failTextColor = "text-primary";
 
 const downloadExcel = (dataDown, curPage) => {
   const fileType =
@@ -368,7 +368,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailBox(false);
               }}
-              className={"text-white bg-[#EC2752]"}
+              className={"text-white bg-primary"}
             >
               Okay
             </button>
@@ -383,7 +383,7 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => deleteHandler(selectedStr?._id)}
-                className={"bg-[#EC2752] text-white"}
+                className={"bg-primary text-white"}
               >
                 Okay
               </button>
@@ -392,7 +392,7 @@ const ExtComps = ({
                   setConfBox(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#EC2752]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -410,7 +410,7 @@ const ExtComps = ({
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
     </React.Fragment>
@@ -442,7 +442,7 @@ const BulkUploadBox = ({
             />
           </div>
           <div className="flex flex-row gap-2">
-            <button type="submit" className={"bg-[#EC2752] text-white"}>
+            <button type="submit" className={"bg-primary text-white"}>
               Upload
             </button>
             <button
@@ -451,7 +451,7 @@ const BulkUploadBox = ({
                 setUploadBox(false);
                 setIsTableLoaded(false);
               }}
-              className="bg-white text-[#EC2752]"
+              className="bg-white text-primary"
             >
               Cancel
             </button>
@@ -494,8 +494,8 @@ const StoreTable = ({
   return (
     <div className={`${styles.pd_cont}`}>
       <div className="m-2 overflow-x-auto md:m-5">
-        <table className="w-full border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-full border border-primary">
+          <thead className="bg-primary text-white">
             <tr>
               <th className="text-sm p-2 md:p-3 md:text-base">Action</th>
               <th className="text-sm p-2 md:p-3 md:text-base">Store Name</th>
