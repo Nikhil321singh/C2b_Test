@@ -32,7 +32,7 @@ const downloadExcelStoreWise = (apiData) => {
       Price: item?.actualPrice,
       "Price Offered To Customer": item?.price,
       "Unique ID": item?.uniqueCode,
-      "GREST Received": item?.grestReceived || "NA",
+      [`${import.meta.env.VITE_WEBSITE_SHORT_NAME} Received`]: item?.grestReceived || "NA",
       "Receiving Date": item?.grestRecDate || "NA",
       "New Prices As Per New Range": "NA",
       "Store Payment Status": "NA",
@@ -559,7 +559,7 @@ const MainFilterSub = ({
           }}
         >
           <p className="truncate">
-            {grestRec === "" ? "Grest Received ?" : "Grest Rec. " + grestRec}
+            {grestRec === "" ? `${import.meta.env.VITE_WEBSITE_SHORT_NAME} Received ?` : `${import.meta.env.VITE_WEBSITE_SHORT_NAME} Rec. ` + grestRec}
           </p>
           <FaAngleDown size={17} className={`${grestDrop && rotateCss}`} />
         </div>

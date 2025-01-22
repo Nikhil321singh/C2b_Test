@@ -19,7 +19,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
               <th className="p-2 text-sm  ">Price</th>
               <th className="p-2 text-sm  ">Price Offered to Customer</th>
               <th className="p-2 text-sm  ">Unique ID</th>
-              <th className="p-2 text-sm  ">GREST Received</th>
+              <th className="p-2 text-sm  ">{import.meta.env.VITE_WEBSITE_SHORT_NAME} Received</th>
               <th className="p-2 text-sm  ">Receiving Date</th>
               <th className="p-2 text-sm  ">New Prices As Per New Range</th>
               <th className="p-2 text-sm  ">Store Payment Status</th>

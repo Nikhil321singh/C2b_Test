@@ -136,7 +136,7 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
       />
       <div className="m-2  w-[90%] overflow-x-auto md:m-5">
         <div className="min-w-max">
-          {category === "Mobile" && (
+          {category === "CTG1" && (
             <table className="w-full border border-primary">
               <thead className="bg-primary text-white">
                 <tr>

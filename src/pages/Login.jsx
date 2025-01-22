@@ -29,10 +29,10 @@ const Login = () => {
     console.log(currentDomain,"  " ,bypassedDomain);
     if (currentDomain === "https://buyback.grest.in") {
           sessionStorage.setItem("authToken", "");
-          sessionStorage.setItem("profile", JSON.stringify({ firstName: "GREST" }));
+          sessionStorage.setItem("profile", JSON.stringify({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
           sessionStorage.setItem("DeviceType", "Mobile");
           localStorage.removeItem("formData");
-          dispatch(setUserProfile({ firstName: "GREST" }));
+          dispatch(setUserProfile({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
           navigate(homeroute);
     }
   }, []);

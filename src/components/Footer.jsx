@@ -3,7 +3,7 @@ function Footer() {
     <>
       <div className="footer h-[70px] w-screen bg-primary flex justify-center items-center flex-col  bottom-[0px] mt-auto ">
         <p className="text-white">
-          &copy;{new Date().getFullYear()} Grest | All Rights Reserved
+          &copy;{new Date().getFullYear()} {import.meta.env.VITE_WEBSITE_SHORT_NAME} | All Rights Reserved
         </p>
       </div>
     </>

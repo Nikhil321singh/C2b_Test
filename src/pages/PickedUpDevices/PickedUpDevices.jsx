@@ -374,7 +374,7 @@ const PickedUpFilter = ({
  setSearchTerm("");
  setDateValue("");
  setRegion("");
- setStoreName("GrestTest");
+ setStoreName(import.meta.env.VITE_USER_STORE_NAME);
   };
 
   useEffect(() => {

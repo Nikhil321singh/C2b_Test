@@ -38,21 +38,23 @@ const PurchaseReceipt = ({
   return (
     <div className="p-4 px-12 bg-white border-2 text-sm">
       <div className="flex items-center justify-center bg-white p-[1vh] mx-[2vh] my-[1vh]">
-        <img src={Grest_Logo} alt="Grest logo" className="w-80 h-24" />
+        <img src={Grest_Logo} alt="App logo" className="w-80 h-24" />
       </div>
       <div className="flex flex-col items-center justify-between mb-2">
         <p className="text-sm text-[#1b0d6c]">
-          Radical Aftermarket Services Pvt. Ltd. ,
+          {import.meta.env.VITE_COMPANY_NAME} ,
           <span className="text-primary"> GSTIN/UIN:</span>
-          06AAJCR2110E1ZX
+          {import.meta.env.VITE_COMPANY_GSTIN}
         </p>
         <p className="text-sm text-[#1b0d6c]">
-          <span className="text-primary"> Address:</span> Khasra No. 34/22,
-          1st Floor, NK Tower, Kanhai Road, Sector-45, Gurugram, Haryana-122003
+          <span className="text-primary"> Address:</span>{" "}
+          {import.meta.env.VITE_COMPANY_ADDRESS}
         </p>
         <p className="text-sm text-[#1b0d6c]">
-          <span className="text-primary"> Contact:</span> +91 9818 925 900 ,
-          <span className="text-primary"> E-mail:</span> care@grest.in
+          <span className="text-primary"> Contact:</span>{" "}
+          {import.meta.env.VITE_COMPANY_CONTACT} ,
+          <span className="text-primary"> E-mail:</span>{" "}
+          {import.meta.env.VITE_COMPANY_EMAIL}
         </p>
       </div>
       <div className="text-center">
@@ -108,7 +110,7 @@ const PurchaseReceipt = ({
           <span className="font-bold underline">{name}</span> Herein after
           referred to as "Seller" who has come in Retail store of{" "}
           <span className="font-bold underline">{storeName}</span> to sell
-          his/her old Gadget, to the Grest Network herein after referred to as
+          his/her old Gadget, to the {import.meta.env.VITE_WEBSITE_SHORT_NAME} Network herein after referred to as
           "Purchaser" which expression shall mean and include its
           representative, executors, nominee, partners, affiliates and assigns
           on day of <span className="font-bold">{formattedDate}</span>

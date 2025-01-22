@@ -896,7 +896,7 @@ const MiddlePart = ({
       <p
         className={`${styles.topSell_head} text-lg font-bold mt-2 text-primary`}
       >
-        How Grest Works?
+        How {import.meta.env.VITE_WEBSITE_SHORT_NAME} Works?
       </p>
       <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
         <div className="flex flex-col min-w-[30%]  items-center  ">

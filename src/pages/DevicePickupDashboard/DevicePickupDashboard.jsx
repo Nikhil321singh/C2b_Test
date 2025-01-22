@@ -471,7 +471,7 @@ const DPFilter = ({
     setSelectedStatus("");
     setDateValue("");
     setRegion("chandigarh");
-    setStoreName("GrestTest");
+    setStoreName(import.meta.env.VITE_USER_STORE_NAME);
     setSearchTerm("");
   };
   useEffect(() => {
