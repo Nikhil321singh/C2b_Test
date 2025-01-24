@@ -32,21 +32,16 @@ const downloadExcel = (dataDown, curPage) => {
       "Unique Code": item?.uniqueCode,
       Email: item.email,
       "Phone Number": item.phoneNumber,
-      Address: item.address,
       "Created At": new Date(item.createdAt).toLocaleDateString("en-GB"),
+      Address: item.address,
     };
   });
 
-  const ws = XLSX.utils.json_to_sheet(formattedData);
-  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  const dataFile = new Blob([excelBuffer], { type: fileType });
+  const wss = XLSX.utils.json_to_sheet(formattedData);
+  const wbb = { Sheets: { data: wss }, SheetNames: ["data"] };
+  const excelBufferr = XLSX.write(wbb, { bookType: "xlsx", type: "array" });
+  const dataFile = new Blob([excelBufferr], { type: fileType });
   saveAs(dataFile, `Liquidators_Data_${curPage}${fileExtension}`);
-};
-
-const sampleDownloadHandler = () => {
-  const sampleFilePath = "sample-file-store.xlsx";
-  saveAs(sampleFilePath, "sample-file-store.xlsx");
 };
 
 const LiquidatorListingTable = () => {
@@ -56,16 +51,16 @@ const LiquidatorListingTable = () => {
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [liquidatorEditData, setLiquidatorEditData] = useState();
   const [searchValue, setSearchValue] = useState("");
-  const [editBoxOpen, setEditBoxOpen] = useState(false);
   const [editSuccess, setEditSuccess] = useState(false);
-  const [curPage, setCurPage] = useState(0);
+  const [editBoxOpen, setEditBoxOpen] = useState(false);
   const [selectedStr, setSelectedStr] = useState();
-  const [errMsg, setErrMsg] = useState("");
+  const [curPage, setCurPage] = useState(0);
   const [sucBox, setSucBox] = useState(false);
-  const [failBox, setFailBox] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
   const [confBox, setConfBox] = useState(false);
+  const [failBox, setFailBox] = useState(false);
   const [uploadBox, setUploadBox] = useState(false);
-
+  
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
@@ -117,7 +112,14 @@ const LiquidatorListingTable = () => {
         setIsTableLoaded(false);
       });
   };
+  useEffect(() => {
+    getData();
+  }, [curPage]);
 
+  const handleSearchClear = () => {
+    getData();
+    setSearchValue("");
+  };
   useEffect(() => {
     if (editSuccess) {
       if (searchValue === "") {
@@ -138,17 +140,8 @@ const LiquidatorListingTable = () => {
   };
 
   const deleteConfHandler = (liquidatorData) => {
-    setSelectedStr(liquidatorData);
     setConfBox(true);
-  };
-
-  useEffect(() => {
-    getData();
-  }, [curPage]);
-
-  const handleSearchClear = () => {
-    setSearchValue("");
-    getData();
+    setSelectedStr(liquidatorData);
   };
 
   return (
@@ -204,17 +197,17 @@ const LiquidatorListingTable = () => {
               onChange={(e) => setSearchValue(e.target.value)}
               className="text-sm"
               type="text"
-              placeholder="Search liquidator Name/Email/Id"
               value={searchValue}
+              placeholder="Search liquidator Name/Email/Id"
             />
-            <IoMdSearch onClick={() => getDataBySearch()} size={25} />
+            <IoMdSearch  size={25}  onClick={() => getDataBySearch()}/>
           </div>
           <div className={styles.icons_box}>
-            <IoRefresh onClick={handleSearchClear} className="" size={25} />
+            <IoRefresh  size={25} onClick={handleSearchClear} className="" />
           </div>
           <button
-            className={`${styles.bulkdown_button}`}
             onClick={() => downloadExcel(data, curPage)}
+            className={`${styles.bulkdown_button}`}
           >
             <FaDownload /> Bulk Download
           </button>
@@ -280,24 +273,21 @@ const ExtComps = ({
         } else {
           getDataBySearch();
         }
-        setErrMsg(`Succesfully deleted liquidator`);
         setSucBox(true);
+        setErrMsg(`Succesfully deleted liquidator`);
         setIsTableLoaded(false);
       })
       .catch((error) => {
         setErrMsg("Failed to deleted liquidator");
-        setFailBox(true);
         setIsTableLoaded(false);
+        setFailBox(true);
       });
   };
-  const handleExcelFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-  };
+
 
   const handleBulkSubmit = (event) => {
-    setIsTableLoaded(true);
     event.preventDefault();
+    setIsTableLoaded(true);
     const formData = new FormData();
     formData.append("file", file);
     axios
@@ -314,19 +304,22 @@ const ExtComps = ({
         }
       )
       .then((res) => {
-        getData();
         setErrMsg("Succesfully uploaded liquidators data");
-        setSucBox(true);
+        getData();
         setIsTableLoaded(false);
+        setSucBox(true);
       })
       .catch((error) => {
         console.log(error);
-        setErrMsg("Failed to upload liquidator data");
         setFailBox(true);
+        setErrMsg("Failed to upload liquidator data");
         setIsTableLoaded(false);
       });
   };
-
+  const handleExcelFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+  };
   return (
     <React.Fragment>
       {editBoxOpen && (
@@ -338,21 +331,21 @@ const ExtComps = ({
           />
         </div>
       )}
-      <div className="flex items-center w-screen border-b-2 py-4 h-16 bg-white HEADER ">
+      <div className="flex items-center py-4  w-screen border-b-2h-16 bg-white HEADER ">
         <div className="navbar">
-          <AdminNavbar sideMenu={sideMenu} setsideMenu={setsideMenu} />
+          <AdminNavbar setsideMenu={setsideMenu}  sideMenu={sideMenu}/>
           <SideMenu sideMenu={sideMenu} setsideMenu={setsideMenu} />
         </div>
       </div>
       {sucBox && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div className="fixed top-0 left-0 z-50  w-full  flex items-center justify-centerh-full bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
-            <IoIosCheckmarkCircle className={succTextColor} size={90} />
+            <IoIosCheckmarkCircle  size={90}  className={succTextColor}/>
             <h6 className={succTextColor}>Success!</h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
-              onClick={() => setSucBox(false)}
               className={"bg-green-500 text-white"}
+              onClick={() => setSucBox(false)}
             >
               Okay
             </button>
@@ -361,15 +354,15 @@ const ExtComps = ({
       )}
       {failBox && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
+          <div className={`${styles.err_mod_box}   ${failTextColor}`}>
             <IoIosCloseCircle className={failTextColor} size={90} />
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
+                className={"text-white bg-[#EC2752]"}
               onClick={() => {
                 setFailBox(false);
               }}
-              className={"text-white bg-[#EC2752]"}
             >
               Okay
             </button>
@@ -465,22 +458,14 @@ const BulkUploadBox = ({
 
 const LiquidatorTable = ({
   data,
-  searchValue,
   curPage,
   setCurPage,
-  setIsTableLoaded,
+  searchValue,
   editHandler,
+  setIsTableLoaded,
   deleteConfHandler,
 }) => {
-  const nextHandler = () => {
-    setIsTableLoaded(true);
-    if (data.length >= 10 && searchValue === "") {
-      const temp = curPage + 1;
-      setCurPage(temp);
-    } else {
-      setIsTableLoaded(false);
-    }
-  };
+
 
   const prevHandler = () => {
     setIsTableLoaded(true);
@@ -491,31 +476,39 @@ const LiquidatorTable = ({
       setIsTableLoaded(false);
     }
   };
-
+  const nextHandler = () => {
+    setIsTableLoaded(true);
+    if (data.length >= 10 && searchValue === "") {
+      const temp = curPage + 1;
+      setCurPage(temp);
+    } else {
+      setIsTableLoaded(false);
+    }
+  };
   return (
     <div className={`${styles.pd_cont}`}>
       <div className="m-2 overflow-x-auto md:m-5">
-        <table className="w-full border border-[#EC2752]">
+        <table className=" border-[#EC2752] w-full border ">
           <thead className="bg-[#EC2752] text-white">
             <tr>
-              <th className="text-sm p-2 md:p-3 md:text-base">Action</th>
-              <th className="text-sm p-2 md:p-3 md:text-base">Company Name</th>
-              <th className="text-sm p-2 md:p-3 md:text-base">Unique Code</th>
-              <th className="text-sm p-2 md:p-3 md:text-base">Email</th>
-              <th className="text-sm p-2 md:p-3 md:text-base">Phone Number</th>
-              <th className="text-sm p-2 md:p-3 md:text-base">Address</th>
+              <th className="text-sm p-2 md:text-base md:p-3">Action</th>
+              <th className="text-sm p-2 md:text-base md:p-3">Company Name</th>
+              <th className="text-sm p-2 md:text-base md:p-3">Unique Code</th>
+              <th className="text-sm p-2 md:text-base md:p-3">Email</th>
+              <th className="text-sm p-2 md:text-base md:p-3">Phone Number</th>
+              <th className="text-sm p-2 md:text-base md:p-3">Address</th>
             </tr>
           </thead>
           <tbody>
             {data.map((val, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
-                <td className="text-sm p-2 text-center md:p-3 md:text-base">
+              <tr key={index} className={index % 2 === 0 ? "bg-gray-200 " : ""}>
+                <td className=" text-center  text-sm p-2 md:p-3 md:text-base">
                   <div className="flex flex-col  gap-1">
                     <button
+                        className={`${styles.view_btn}`}
                       onClick={() => {
                         editHandler(val);
                       }}
-                      className={`${styles.view_btn}`}
                     >
                       Edit
                     </button>
@@ -529,19 +522,19 @@ const LiquidatorTable = ({
                     </button>
                   </div>
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-sm  md:text-base text-center md:p-3">
                   {val?.name}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-sm  md:text-base text-center md:p-3">
                   {val?.uniqueCode}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-sm  md:text-base text-center md:p-3">
                   {val?.email}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-sm  md:text-base text-center md:p-3">
                   {val?.phoneNumber}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className="p-2 text-sm  md:text-base text-center md:p-3">
                   {val?.address}
                 </td>
               </tr>
@@ -551,14 +544,14 @@ const LiquidatorTable = ({
       </div>
       <div className="flex flex-row justify-center items-center gap-2 mb-5">
         <button
-          className={`${styles.view_btn} text-lg px-6 py-2`}
+          className={` py-2 ${styles.view_btn} text-lg px-6`}
           onClick={prevHandler}
         >
           Previous
         </button>
         <button
-          className={`${styles.acpt_btn} text-lg px-6 py-2`}
           onClick={nextHandler}
+          className={`${styles.acpt_btn} text-lg px-6 py-2`}
         >
           Next
         </button>

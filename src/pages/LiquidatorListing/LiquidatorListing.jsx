@@ -19,34 +19,25 @@ const initStoreForm = {
 };
 
 const LiquidatorListing = () => {
-  const token = sessionStorage.getItem("authToken");
   const [sideMenu, setsideMenu] = useState(false);
-  const [isTableLoaded, setIsTableLoaded] = useState(false);
+  const token = sessionStorage.getItem("authToken");
   const navigate = useNavigate();
+  const [isTableLoaded, setIsTableLoaded] = useState(false);
   const [formData, setFormData] = useState(initStoreForm);
-  const [errMsg, setErrMsg] = useState("");
   const [sucBox, setSucBox] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
   const [failBox, setFailBox] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
-
-    setFormData({
-      ...formData,
-      [name]: newValue,
-    });
-  };
 
   const submitHandler = (event) => {
     event.preventDefault();
     setIsTableLoaded(true);
     const data = {
       name: formData.name,
-      email: formData.email,
       phoneNumber: formData.phoneNumber,
-      address: formData.address,
+      email: formData.email,
       uniqueCode: formData.uniqueCode,
+      address: formData.address,
     };
     const config = {
       method: "post",
@@ -61,8 +52,8 @@ const LiquidatorListing = () => {
       .request(config)
       .then((response) => {
         setErrMsg("Successfully added new liquidator");
-        setSucBox(true);
         setIsTableLoaded(false);
+        setSucBox(true);
         navigate("/liquidatorlistingtable");
       })
       .catch((error) => {
@@ -72,6 +63,15 @@ const LiquidatorListing = () => {
       });
   };
 
+  const handleChange = (e) => {
+    const { value, name, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+
+    setFormData({
+      ...formData,
+      [name]: newValue,
+    });
+  };
   return (
     <div className="min-h-screen bg-[#F5F4F9] pb-8">
       <div className="navbar">
@@ -171,10 +171,10 @@ const LiquidatorListingForm = ({ submitHandler, formData, handleChange }) => {
           id="uniqueCode"
           value={formData.uniqueCode}
           name="uniqueCode"
-          className="border-2 px-2 py-2 rounded-lg outline-none"
           onChange={handleChange}
-          type="text"
+          className="border-2 px-2 py-2 rounded-lg outline-none"
           required={true}
+          type="text"
         />
       </div>
       <div className="flex flex-col w-[70%] gap-2 ">
@@ -182,19 +182,19 @@ const LiquidatorListingForm = ({ submitHandler, formData, handleChange }) => {
         <input
           id="email"
           minLength={6}
-          name="email"
           value={formData.email}
-          onChange={handleChange}
+          name="email"
           className="border-2 px-2 py-2 rounded-lg  outline-none"
-          type="email"
+          onChange={handleChange}
           required={true}
+          type="email"
         />
       </div>
       <div className="flex flex-col w-[70%] gap-2">
         <span className="font-medium text-xl">Contact Number*</span>
         <input
-          id="phoneNumber"
           name="phoneNumber"
+          id="phoneNumber"
           minLength={10}
           className="border-2 px-2 py-2 rounded-lg  outline-none"
           onChange={handleChange}

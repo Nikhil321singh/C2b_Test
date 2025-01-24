@@ -311,13 +311,13 @@ const ExtComps = ({
           />
         </div>
       )}
-      {(sucBox || failBox) && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      {(failBox || sucBox ) && (
+        <div className="fixed z-50  top-0 left-0 flex items-center justify-center h-full w-full  bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
             {sucBox ? (
               <IoIosCheckmarkCircle
-                className={`${getTextColorClass(sucBox)}`}
-                size={90}
+              size={90}
+              className={`${getTextColorClass(sucBox)}`}
               />
             ) : (
               <IoIosCloseCircle
@@ -325,16 +325,16 @@ const ExtComps = ({
                 size={90}
               />
             )}
-            <h6 className={`${getTextColorClass(sucBox)}`}>
+            <h6 className={`${getTextColorClass(sucBox)} `}>
               {sucBox ? "Success!" : "Error!"}
             </h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
               onClick={() => {
-                setSucBox(false);
                 setFailBox(false);
+                setSucBox(false);
               }}
-              className={sucBox ? "bg-green-500 text-white" : grestTheme}
+              className={sucBox ? "text-white bg-green-500 " : grestTheme}
             >
               Okay
             </button>
@@ -342,16 +342,16 @@ const ExtComps = ({
         </div>
       )}
       {confBox && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
-            <h6 className={`${getTextColorClass(sucBox)}`}>Confirmation!</h6>
-            <p className="text-slate-500">
+        <div className="fixed top-0 left-0 z-50 flex  justify-center items-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box}  ${getTextColorClass(sucBox)}`}>
+            <h6 className={`${getTextColorClass(sucBox)} `}>Confirmation!</h6>
+            <p className="text-slate-500 ">
               {`Do you want to delete store - ${selectedModel} ?`} ?
             </p>
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-row  gap-2">
               <button
-                onClick={() => deleteHandler(selectedModel)}
                 className={grestTheme}
+                onClick={() => deleteHandler(selectedModel)}
               >
                 Okay
               </button>

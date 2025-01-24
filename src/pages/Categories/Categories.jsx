@@ -16,36 +16,30 @@ export const DeviceTypeFilter = ({
   setDeviceType,
   selectedBtn,
 }) => {
-    const token = sessionStorage.getItem("authToken");
 
-    const [categories, setCategories] = useState([]);
-
+  const [categories, setCategories] = useState([]);
+  const token = sessionStorage.getItem("authToken");
+  useEffect(() => {
+    getCategories();
+  }, []);
     const staticCategories = [
-      { name: "Mobiles", image: mobile, apiType: "Mobile" },
       { name: "Laptops", image: laptop, apiType: "Laptop" },
+      { name: "Mobiles", image: mobile, apiType: "Mobile" },
       { name: "Watches", image: watch, apiType: "Watch" },
       { name: "More", image: null },
     ];
-    useEffect(() => {
-      getCategories();
-    }, []);
+
     const getCategories = async () => {
+
       try {
         const { data } = await axios.get(
           `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
-          {
-            headers: { Authorization: token },
-          }
+          {headers: { Authorization: token },}
         );
-
-        // Map API data and merge with static data
         const mergedCategories = data.data.map((apiCat) => {
-          // Find a matching category in static categories
           const match = staticCategories.find(
             (staticCat) => staticCat.apiType === apiCat.categoryName
           );
-
-          // Merge data if match found, otherwise keep API category
           return {
             ...apiCat,
             image: match?.image || null, // Use the image from static data if available

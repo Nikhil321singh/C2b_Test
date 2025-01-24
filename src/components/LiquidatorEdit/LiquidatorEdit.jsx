@@ -5,15 +5,12 @@ import { IoClose } from "react-icons/io5";
 
 const LiquidatorEdit = ({ liquidatorData, setEditBoxOpen, setEditSuccess }) => {
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [formData, setFormData] = useState(liquidatorData);
   const [response, setResponse] = useState("");
+  const [formData, setFormData] = useState(liquidatorData);
 
-  const closeHandler = () => {
-    setEditBoxOpen(false);
-  };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { checked, name, value, type} = e.target;
     const newValue = type === "checkbox" ? checked : value;
 
     setFormData({
@@ -22,22 +19,25 @@ const LiquidatorEdit = ({ liquidatorData, setEditBoxOpen, setEditSuccess }) => {
     });
   };
 
+  const closeHandler = () => {
+    setEditBoxOpen(false);
+  };
   const submitHandler = (event) => {
     event.preventDefault();
     setIsTableLoaded(true);
-    const token = sessionStorage.getItem("authToken");
-
+    if (formData.phoneNumber.length <= 5) {
+      setResponse("Phone number is invalid, size must be more than 5");
+      setIsTableLoaded(false);
+      return;
+    }
     if (formData.email.length <= 5) {
       setResponse("Email size is too small, must be more than 5");
       setIsTableLoaded(false);
       return;
     }
 
-    if (formData.phoneNumber.length <= 5) {
-      setResponse("Phone number is invalid, size must be more than 5");
-      setIsTableLoaded(false);
-      return;
-    }
+
+    const token = sessionStorage.getItem("authToken");
 
     const data = {
       id: formData._id,
@@ -55,8 +55,8 @@ const LiquidatorEdit = ({ liquidatorData, setEditBoxOpen, setEditSuccess }) => {
       maxBodyLength: Infinity,
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/liquidators/update`,
       headers: {
-        Authorization: token,
         "Content-Type": "application/json",
+        Authorization: token,
       },
       data: data,
     };
@@ -64,20 +64,20 @@ const LiquidatorEdit = ({ liquidatorData, setEditBoxOpen, setEditSuccess }) => {
     axios
       .request(config)
       .then((response1) => {
-        console.log(response1);
         setIsTableLoaded(false);
         setResponse(response1.data.msg);
+        console.log(response1);
         setEditSuccess(true);
       })
       .catch((error) => {
-        console.log(error);
         setIsTableLoaded(false);
+        console.log(error);
         setResponse("Failed to update data");
       });
   };
 
   return (
-    <div className="min-h-screen  pb-8 bg-[#F5F4F9]">
+    <div className=" pb-8 min-h-screen  bg-[#F5F4F9]">
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />

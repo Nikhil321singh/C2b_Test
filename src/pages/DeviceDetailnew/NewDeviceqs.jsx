@@ -452,15 +452,15 @@ const FirstPart = ({ NDstate, slice }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex] ? whiteBg : pinkBg
+                    className={`px-3 flex flex-col items-center  w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex] ? whiteBg : pinkBg
                       }`}
                   >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                    <div className=" mb-1  mt-3 rounded-md overflow-hidden bg-white">
                       <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
-                    <div className="border-t-[1.5px] w-full py-2">
+                    <div className="border-t-[1.5px]   w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
+                        className={`font-medium  text-xs text-center ${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
                           }`}
@@ -474,7 +474,7 @@ const FirstPart = ({ NDstate, slice }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -562,30 +562,30 @@ const ThirdPart = ({ NDstate, slice }) => {
                   <div
                     onClick={(e) => {
                       console.log(slice);
-                      console.log("assssaaaaa", option);
                       console.log("assssaaaaa", data);
+                      console.log("assssaaaaa", option);
                       console.log(optionIndex + "ok");
                       store.dispatch(
                         updateDisplayObject({
                           index: index,
-                          yesKey: data.yes,
                           noKey: data.no,
+                          yesKey: data.yes,
                           newKey: "yes",
                           selectedIndex: optionIndex,
                         })
                       );
                     }}
-                   className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
+                   className={`min-h-[150px] flex flex-col items-center px-3 w-[48%]  shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
                             ? whiteBg
                             : pinkBg
                           }`}
                   >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                    <div className="  overflow-hidden mt-3 mb-1 rounded-md bg-white">
                       <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
-                    <div className="border-t-[1.5px] w-full py-2">
+                    <div className="w-full py-2 border-t-[1.5px] ">
                       <p
-                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
+                        className={`text-center text-xs font-medium  ${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
                           }`}
@@ -599,7 +599,7 @@ const ThirdPart = ({ NDstate, slice }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex bg-primary mt-4  text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -630,25 +630,25 @@ const FourthPart = ({ NDstate, slice }) => {
                           index: index,
                           yesKey: data.yes,
                           noKey: data.no,
-                          newKey: "yes",
                           selectedIndex: optionIndex,
+                          newKey: "yes",
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
+                    className={`flex  px-3  flex-col min-h-[150px] items-centerw-[48%]  shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
                             ? whiteBg
                             : pinkBg
                           }`}
                   >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                    <div className="mt-3 mb-1 rounded-md bg-white overflow-hidden">
                       <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
+                        className={`text-xs font-medium ${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
-                          }`}
+                          } text-center `}
                       >
                         {option.caption}
                       </p>
@@ -659,7 +659,7 @@ const FourthPart = ({ NDstate, slice }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex mt-4 bg-primary  px-3 text-white font-medium py-2 text-sm text-pretty rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -680,6 +680,10 @@ const FifthPart = ({ NDstate, slice }) => {
               {data?.options.map((option, optionIndex) => (
                 <React.Fragment key={optionIndex}>
                   <div
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
+                      ? whiteBg
+                      : pinkBg
+                    }`}
                     onClick={(e) => {
                       console.log(slice);
                       console.log("assssaaaaa", option);
@@ -695,17 +699,13 @@ const FifthPart = ({ NDstate, slice }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
-                            ? whiteBg
-                            : pinkBg
-                          }`}
                   >
                     <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
                       <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
-                    <div className="border-t-[1.5px] w-full py-2">
+                    <div className="border-t-[1.5px]   py-2 w-full ">
                       <p
-                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
+                        className={`text-xs    text-center  font-medium${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
                           }`}
@@ -719,7 +719,7 @@ const FifthPart = ({ NDstate, slice }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+      <div className="flex  mt-4 bg-primary text-white font-medium text-pretty  py-2 px-3  text-sm rounded-md">
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -873,20 +873,20 @@ const EighthPart = ({ NDstate, slice }) => {
                       store.dispatch(
                         updateWarrantyObject({
                           index: index,
-                          newAnswer: data.yes,
                           newKey: "yes",
+                          newAnswer: data.yes,
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex] ? whiteBg : pinkBg
+                    className={` w-[48%]  flex flex-col items-center px-3min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex] ? whiteBg : pinkBg
                       }`}
                   >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                    <div className="mt-3 mb-1overflow-hidden bg-white  rounded-md ">
                       <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
+                        className={`text-xs text-center  font-medium ${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
                           }`}

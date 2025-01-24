@@ -39,39 +39,39 @@ function FromDatecom({
               <div className="flex inputbox  w-[250px] bg-white border-2 items-center rounded-md justify-between px-[5px]">
                 <DatePicker
                   getPopupContainer={() => document.getElementById("date-popup")}
-                  popupStyle={{ position: "relative" }}
                   selected={fromDate}
-                  onChange={handleFromDateChange}
+                  popupStyle={{ position: "relative" }}
                   // onChangeRaw={handleInputChange}
+                  onChange={handleFromDateChange}
                   dateFormat="yyyy-MM-dd"
-                  className="mt-1 p-2 w-[150px] sm:w-[250px]  rounded-md outline-none"
                   placeholderText="Select from date"
+                  className="mt-1 p-2 w-[150px] sm:w-[250px]  rounded-md outline-none"
                   popperPlacement="top-start"
                 />
                 <BsCalendar3 size={18}/>
               </div>
               <div id="date-popup" />
             </div>
-            <div className="flex items-center outline-none">
-              <p className="block text-xl font-medium text-gray-600 w-[63px] ">
+            <div className=" outline-none flex items-center">
+              <p className=" font-medium block text-xl text-gray-600 w-[63px] ">
                 To :{" "}
               </p>
-              <div className="flex inputbox  w-[250px] bg-white border-2 items-center rounded-md justify-between px-[5px]">
+              <div className=" px-[5px] flex inputbox  w-[250px] bg-white border-2 items-center rounded-md justify-between">
               <DatePicker
                 selected={toDate}
                 onChange={handleToDateChange}
-                dateFormat="yyyy-MM-dd"
                 className="mt-1 p-2 w-[150px] sm:w-[250px]  rounded-md outline-none"
+                dateFormat="yyyy-MM-dd"
                 placeholderText="Select to date"
                 popperPlacement="top-start"
               />
                 <BsCalendar3 size={18}/>
               </div>
             </div>
-            <div className="b flex items-center justify-center"> 
+            <div className="flex items-center justify-center b "> 
             <div
-              onClick={searchCustom}
               className="bg-[#EC2752] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center mt-1"
+              onClick={searchCustom}
             >
               <p className="w-full p-1 text-xl font-medium">Search</p>
             </div>
