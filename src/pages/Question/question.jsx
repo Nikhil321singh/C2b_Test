@@ -91,98 +91,16 @@ const AdminQuestion = () => {
   const [uploadBox, setUploadBox] = useState(false);
   const [file, setFile] = useState(null);
 
-  const fetchModels = () => {
-    const config = {
-      method: "post",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/brands/getNewSelectedBrandModels`,
-      headers: {
-        Authorization: `${token}`,
-      },
-      data: {
-        brandId: selectedBrand?._id,
-        deviceType: "CTG1",
-        series: "",
-        search: "",
-      },
-    };
-    axios
-      .request(config)
-      .then((res) => {
-        console.log("asd", res?.data);
-        setDeviceList(res.data.models);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  useEffect(() => {
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/brands/getBrands?deviceType=CTG1`,
-        {
-          headers: {
-            authorization: `${token}`,
-          },
-        }
-      )
-      .then((res) => {
-        const brands = res.data.data;
-        setBrandList(brands);
-
-        // Check if there are any brands and set the first one as selected
-        if (brands.length > 0) {
-          setSelectedBrand(brands[0]);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
   // Add this useEffect to call getData whenever the selected brand changes
   useEffect(() => {
     if (selectedBrand) {
       getData();
-      fetchModels();
     }
   }, [selectedBrand]);
 
   const handleExcelFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
-  };
-
-  const handleBulkSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("brandId", brandID);
-
-    const url = `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/questionnaires/uploadQNA`;
-
-    axios
-      .post(url, formData, {
-        headers: {
-          Authorization: `${token}`,
-        },
-      })
-      .then(() => {
-        toast.success("Succussfully Uploaded");
-        setUploadBox(false);
-        getData();
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Failed to submit");
-        setUploadBox(false);
-      })
   };
 
   // State to track the selected answers
@@ -217,32 +135,6 @@ const AdminQuestion = () => {
         ];
       }
     });
-  };
-
-  const handleBrandChange = (e) => {
-    const selectedId = e.target.value;
-    const selectedObject = brandList.find((item) => item._id === selectedId);
-    setSelectedBrand(selectedObject);
-    setSelectedDevice(null);
-    setDeviceList([]);
-    setAnswers([]);
-  };
-
-  const handleModelChange = (e) => {
-    const [deviceId, configId] = e.target.value.split("|"); // Split the value to get both device and config ID
-
-    const selectDevices = deviceList.find((item) => item._id === deviceId); // Find the device by _id
-    const selectedConfig = selectDevices?.config.find(
-      (conf) => conf._id === configId
-    ); // Find the config by its ID
-
-    if (selectDevices && selectedConfig) {
-      setSelectedDevice({
-        ...selectDevices,
-        selectedConfig, // Add the selected config to the selected device object
-      });
-    }
-    setAnswers([]); // Clear answers
   };
 
   const profile = useUserProfile();
@@ -289,156 +181,48 @@ const AdminQuestion = () => {
         setConfBox={setConfBox}
         setCategory={setCategory}
       />
-      <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
-        <div className="flex gap-2 items-center justify-between px-8 outline-none mt-5 w-[100%]">
-          {/* <div className={`${styles.search_bar_wrap}`}>
-            <input
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="text-sm"
-              type="text"
-              placeholder="Search Model"
-              value={searchValue}
-            />
-            <IoMdSearch onClick={() => getDataBySearch()} />
-          </div>
-          <div className={styles.icons_box}>
-            <IoRefresh onClick={handleSearchClear} className="" size={25} />
-          </div> */}
-          {/* <button
-            className={`${styles.bulkdown_button}`}
-            onClick={() => downloadExcel(data)}
-          >
-            <FaDownload /> Bulk Download
-          </button> */}
+      <BrandList
+        brandList={brandList}
+        setBrandList={setBrandList}
+        setUploadBox={setUploadBox}
+        deviceList={deviceList}
+        selectedDevice={selectedDevice}
+        selectedBrand={selectedBrand}
+        setSelectedBrand={setSelectedBrand}
+        setSelectedDevice={setSelectedDevice}
+        setDeviceList={setDeviceList}
+        setAnswers={setAnswers}
+      />
 
-          <div className="flex gap-2 my-4">
-            <p className="font-medium">Select Brand</p>
-            <select
-              name=""
-              id=""
-              className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
-              onChange={handleBrandChange}
-              value={selectedBrand?._id || ""}
-            >
-              <option value="" className="bg-white text-[#EC2752] font-medium">
-                Choose Brand
-              </option>
-              {brandList?.map((item, index) => (
-                <option
-                  key={index}
-                  className="bg-white text-[#EC2752] font-medium"
-                  value={item._id}
-                >
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex gap-2 my-4">
-            <p className="font-medium">Select Device</p>
-            <select
-              className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
-              onChange={handleModelChange}
-              value={
-                selectedDevice?._id
-                  ? `${selectedDevice._id}|${selectedDevice.selectedConfig?._id}`
-                  : ""
-              }
-            >
-              <option value="" className="bg-white text-[#EC2752] font-medium">
-                Choose Device
-              </option>
-              {deviceList?.map((device) =>
-                device.config.map((config) => (
-                  <option
-                    key={config._id}
-                    className="bg-white text-[#EC2752] font-medium"
-                    value={`${device._id}|${config._id}`} // Pass both device and config IDs
-                  >
-                    {`${device.name} (${config.storage} , ${config.RAM})`}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={() => {
-              setUploadBox(true);
-            }}
-          >
-            <FaUpload /> Bulk Upload
-          </button>
-        </div>
-      </div>
-
-      {uploadBox && (
-        <div className="fixed top-0 left-0 z-48 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div
-            className={`${styles.err_mod_box} w-full max-w-lg p-6 bg-white rounded-lg shadow-lg`}
-          >
-            <form className="flex flex-col gap-4" onSubmit={handleBulkSubmit}>
-              <div className="flex flex-col">
-                <p className="mb-1 text-lg text-center text-slate-500">
-                  Upload QNA Sheet
-                </p>
-                <div className="flex gap-2 my-4">
-                  <p className="font-medium">Select Brand</p>
-                  <select
-                    name=""
-                    id=""
-                    className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
-                    onChange={(e) => setBrandID(e.target.value)}
-                  >
-                    <option
-                      value=""
-                      className="bg-white text-[#EC2752] font-medium"
-                    >
-                      Choose Brand
-                    </option>
-                    {brandList?.map((item, index) => (
-                      <option
-                        key={index}
-                        className="bg-white text-[#EC2752] font-medium"
-                        value={item._id}
-                      >
-                        {item.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <input
-                  type="file"
-                  name="excelFile"
-                  id="excelFile"
-                  accept=".xlsx, .xls"
-                  onChange={(e) => handleExcelFileChange(e)}
-                  required={true}
-                />
-              </div>
-              <div className="flex flex-row gap-2">
-                <button
-                  type="submit"
-                  className="bg-[#EC2752] text-white px-4 py-2 rounded"
-                >
-                  Upload
-                </button>
-                <button
-                  type="reset"
-                  onClick={() => {
-                    setUploadBox(false);
-                  }}
-                  className="bg-white text-[#EC2752] px-4 py-2 rounded"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-      {selectedBrand && selectedDevice ? (
+      <UploadBox 
+        setUploadBox={setUploadBox}
+        uploadBox={uploadBox}
+        handleExcelFileChange={handleExcelFileChange}
+        brandList={brandList}
+        setBrandID={setBrandID}
+        file={file}
+        brandID={brandID}
+        getData={getData}
+      />
+     <SelectBrand
+      selectedBrand={selectedBrand}
+      selectedDevice={selectedDevice}
+      questions={questions}
+      answers={answers}
+      handleChange={handleChange}
+      page={page}
+      handlePrev={handlePrev}
+      maxPages={maxPages}
+      handleSubmit={handleSubmit}
+      handleNext={handleNext} 
+     />
+    </div>
+  );
+};
+const SelectBrand = ({ selectedBrand, selectedDevice, questions, answers, handleChange, page, handlePrev, maxPages, handleSubmit, handleNext }) => {
+  return(
+    <React.Fragment>
+       {selectedBrand && selectedDevice ? (
         <div className={`${styles.pd_cont}`}>
           {questions?.length > 0 ? (
             <div className="flex flex-col gap-2 mt-4 px-2 md:flex-row justify-between space-y-4 md:space-y-0">
@@ -548,10 +332,258 @@ const AdminQuestion = () => {
           Please select a brand and a device
         </h3>
       )}
-    </div>
-  );
-};
+      </React.Fragment>
+  )
+}
+const BrandList = ({ brandList, setBrandList,setUploadBox, deviceList, selectedDevice, selectedBrand, setSelectedBrand, setSelectedDevice, setDeviceList, setAnswers }) => {
+  const token = sessionStorage.getItem("authToken");
+  const fetchModels = () => {
+    const config = {
+      method: "post",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/brands/getNewSelectedBrandModels`,
+      headers: {
+        Authorization: `${token}`,
+      },
+      data: {
+        brandId: selectedBrand?._id,
+        deviceType: "CTG1",
+        series: "",
+        search: "",
+      },
+    };
+    axios
+      .request(config)
+      .then((res) => {
+        console.log("asd", res?.data);
+        setDeviceList(res.data.models);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  useEffect(() => {
+    if (selectedBrand) {
+      fetchModels();
+    }
+  }, [selectedBrand]);
+  useEffect(() => {
+    axios
+      .get(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/brands/getBrands?deviceType=CTG1`,
+        {
+          headers: {
+            authorization: `${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        const brands = res.data.data;
+        setBrandList(brands);
 
+        // Check if there are any brands and set the first one as selected
+        if (brands.length > 0) {
+          setSelectedBrand(brands[0]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  const handleBrandChange = (e) => {
+    const selectedId = e.target.value;
+    const selectedObject = brandList.find((item) => item._id === selectedId);
+    setSelectedBrand(selectedObject);
+    setSelectedDevice(null);
+    setDeviceList([]);
+    setAnswers([]);
+  };
+
+  const handleModelChange = (e) => {
+    const [deviceId, configId] = e.target.value.split("|"); // Split the value to get both device and config ID
+
+    const selectDevices = deviceList.find((item) => item._id === deviceId); // Find the device by _id
+    const selectedConfig = selectDevices?.config.find(
+      (conf) => conf._id === configId
+    ); // Find the config by its ID
+
+    if (selectDevices && selectedConfig) {
+      setSelectedDevice({
+        ...selectDevices,
+        selectedConfig, // Add the selected config to the selected device object
+      });
+    }
+    setAnswers([]); // Clear answers
+  };
+  return (
+    <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
+    <div className="flex gap-2 items-center justify-between px-8 outline-none mt-5 w-[100%]">
+      <div className="flex gap-2 my-4">
+        <p className="font-medium">Select Brand</p>
+        <select
+          name=""
+          id=""
+          className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
+          onChange={handleBrandChange}
+          value={selectedBrand?._id || ""}
+        >
+          <option value="" className="bg-white text-[#EC2752] font-medium">
+            Choose Brand
+          </option>
+          {brandList?.map((item, index) => (
+            <option
+              key={index}
+              className="bg-white text-[#EC2752] font-medium"
+              value={item._id}
+            >
+              {item.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="flex gap-2 my-4">
+        <p className="font-medium">Select Device</p>
+        <select
+          className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
+          onChange={handleModelChange}
+          value={
+            selectedDevice?._id
+              ? `${selectedDevice._id}|${selectedDevice.selectedConfig?._id}`
+              : ""
+          }
+        >
+          <option value="" className="bg-white text-[#EC2752] font-medium">
+            Choose Device
+          </option>
+          {deviceList?.map((device) =>
+            device.config.map((config) => (
+              <option
+                key={config._id}
+                className="bg-white text-[#EC2752] font-medium"
+                value={`${device._id}|${config._id}`} // Pass both device and config IDs
+              >
+                {`${device.name} (${config.storage} , ${config.RAM})`}
+              </option>
+            ))
+          )}
+        </select>
+      </div>
+
+      <button
+        className={`${styles.bulkdown_button}`}
+        onClick={() => {
+          setUploadBox(true);
+        }}
+      >
+        <FaUpload /> Bulk Upload
+      </button>
+    </div>
+  </div>
+  )
+}
+
+const UploadBox = ({ setUploadBox, uploadBox,handleExcelFileChange, brandList,setBrandID, file, brandID, getData}) => {
+  const token = sessionStorage.getItem("authToken");
+  const handleBulkSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("brandId", brandID);
+
+    const url = `${
+      import.meta.env.VITE_REACT_APP_ENDPOINT
+    }/api/questionnaires/uploadQNA`;
+
+    axios
+      .post(url, formData, {
+        headers: {
+          Authorization: `${token}`,
+        },
+      })
+      .then(() => {
+        toast.success("Succussfully Uploaded");
+        setUploadBox(false);
+        getData();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to submit");
+        setUploadBox(false);
+      })
+  };
+  return (
+    <React.Fragment>
+    {uploadBox && (
+      <div className="fixed top-0 left-0 z-48 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div
+          className={`${styles.err_mod_box} w-full max-w-lg p-6 bg-white rounded-lg shadow-lg`}
+        >
+          <form className="flex flex-col gap-4" onSubmit={handleBulkSubmit}>
+            <div className="flex flex-col">
+              <p className="mb-1 text-lg text-center text-slate-500">
+                Upload QNA Sheet
+              </p>
+              <div className="flex gap-2 my-4">
+                <p className="font-medium">Select Brand</p>
+                <select
+                  name=""
+                  id=""
+                  className="bg-[#EC2752] text-white rounded-lg outline-none px-2 py-1"
+                  onChange={(e) => setBrandID(e.target.value)}
+                >
+                  <option
+                    value=""
+                    className="bg-white text-[#EC2752] font-medium"
+                  >
+                    Choose Brand
+                  </option>
+                  {brandList?.map((item, index) => (
+                    <option
+                      key={index}
+                      className="bg-white text-[#EC2752] font-medium"
+                      value={item._id}
+                    >
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <input
+                type="file"
+                name="excelFile"
+                id="excelFile"
+                accept=".xlsx, .xls"
+                onChange={(e) => handleExcelFileChange(e)}
+                required={true}
+              />
+            </div>
+            <div className="flex flex-row gap-2">
+              <button
+                type="submit"
+                className="bg-[#EC2752] text-white px-4 py-2 rounded"
+              >
+                Upload
+              </button>
+              <button
+                type="reset"
+                onClick={() => {
+                  setUploadBox(false);
+                }}
+                className="bg-white text-[#EC2752] px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+        </ React.Fragment>
+  )
+}
 const ExtComps = ({
   isTableLoaded,
   setIsTableLoaded,

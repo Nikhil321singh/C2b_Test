@@ -225,41 +225,6 @@ const LeadsCompleted = () => {
     }
   };
 
-   const handleBulkDownloadReceipts = () => {
-     if (!fromDate || !toDate) {
-       alert("Please select and search valid date range Leads.");
-       return;
-     }
-     tableData.forEach((item, index) => {
-       const dateString = item?.updatedAt;
-       const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
-         day: "numeric",
-         month: "short",
-         year: "numeric",
-       });
-       const printElement = ReactDOMServer.renderToString(
-         <PurchaseReceipt
-           phoneNumber={item?.phoneNumber}
-           aadharNumber={item?.aadharNumber}
-           uniqueCode={item?.uniqueCode}
-           emailId={item?.emailId}
-           name={item?.name}
-           imeiNumber={item?.documentId?.IMEI}
-           phoneName={item?.modelId?.name}
-           type={item?.categoryInfo?.categoryName}
-           storeName={item?.store?.storeName}
-           region={item?.store?.region}
-           address={item?.store?.address}
-           storage={item?.storage}
-           RAM={item?.ram}
-           formattedDate={formattedDate}
-         />
-       );
-       html2pdf()
-         .from(printElement)
-         .save(`purchase_receipt_${index + 1}.pdf`);
-     });
-   };
 useEffect(() => {
   if (
     search === "" &&
@@ -289,7 +254,6 @@ const handleSearch = (e) => {
   return (
     <div>
       <SubLeadsCompleted
-        handleBulkDownloadReceipts={handleBulkDownloadReceipts}
         loading={loading}
         setsideMenu={setsideMenu}
         sideMenu={sideMenu}
@@ -350,7 +314,6 @@ const fetchDownloadData = (totalCount, deviceType, Str) => {
 };
 
 const SubLeadsCompleted = ({
-  handleBulkDownloadReceipts,
   loading,
   setsideMenu,
   sideMenu,
@@ -399,117 +362,24 @@ const SubLeadsCompleted = ({
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
       <NavigateListing />
-      <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
-        <div className="flex gap-4">
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={() =>
-              fetchDownloadData(totalCount, deviceType, selStoreId)
-            }
-          >
-            <FaDownload /> Bulk Download
-          </button>
-          <div className="mt-2 ml-4">
-            <button
-              className={`${styles.bulkdown_button}`}
-              onClick={handleBulkDownloadReceipts}
-            >
-              <FaDownload /> Download Receipts
-            </button>
-          </div>
-        </div>
-        <div className="[bg-[#F5F4F9]">
-          <DatePicker
-            selected={fromDate}
-            onChange={handleFromDateChange}
-            dateFormat="yyyy-MM-dd"
-            className={` mt-1 py-[6px] border px-[15px]  rounded-md`}
-            placeholderText="Select from date"
-          />
-        </div>
-        <div>
-          <DatePicker
-            selected={toDate}
-            dateFormat="yyyy-MM-dd"
-            onChange={handleToDateChange}
-            className="mt-1 py-[6px] px-[15px]  border rounded-md"
-            placeholderText="Select to date"
-          />
-        </div>
-        <div className="w-[250px] relative">
-          <div
-            className={`${styless.filter_button}`}
-            onClick={() => setStoreDrop(!storeDrop)}
-          >
-            <p className="truncate">
-              {searchTerm === "" ? "Select Store" : searchTerm}
-            </p>
-            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
-          </div>
-          {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
-              <input
-                placeholder="Search store..."
-                type="text"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="w-full   p-2   border-b border-gray-300"
-              />
-              <div
-                className={`overflow-y-scroll   max-h-[200px]   ${styless.filter_drop}`}
-              >
-                {filteredStores.length > 0 ? (
-                  filteredStores.map((item3, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        handleStoreChange(item3);
-                        setSearchTerm(item3.storeName);
-                        setStoreDrop(false);
-                      }}
-                      className={`  ${styles.filter_option}`}
-                    >
-                      <p className=" truncate ">{item3.storeName}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
-                )}
-                <div
-                  className={`${styles.filter_option}`}
-                  onClick={() => {
-                    handleStoreChange({ _id: "", storeName: ALLstore });
-                    setSearchTerm(ALLstore);
-                  }}
-                >
-                  <p className=" truncate ">{ALLstore}</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="w-[250px] h-[35px] relative">
-          <select
-            name=""
-            id=""
-            className="bg-primary text-white rounded-lg outline-none px-2 py-1 w-full h-full"
-            onChange={(e) => {
-              setDeviceType(e.target.value);
-            }}
-          >
-            {categories.map((cat) => (
-              <option
-                className="bg-white text-primary font-medium"
-                key={cat?._id}
-                value={cat?.categoryCode}
-              >
-                {cat?.categoryName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-      </div>
+      <SubLeadsCompletedBtns
+        handleFromDateChange={handleFromDateChange}
+        fromDate={fromDate}
+        totalCount={totalCount}
+        deviceType={deviceType}
+        selStoreId={selStoreId}
+        toDate={toDate}
+        handleToDateChange={handleToDateChange}
+        setStoreDrop={setStoreDrop}
+        storeDrop={storeDrop}
+        searchTerm={searchTerm}
+        handleSearch={handleSearch}
+        filteredStores={filteredStores}
+        handleStoreChange={handleStoreChange}
+        setSearchTerm={setSearchTerm}
+        setDeviceType={setDeviceType}
+        categories={categories}
+        tableData={tableData}/>
       <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
         <div className={`${styles.search_bar_wrap}`}>
           <input
@@ -563,5 +433,156 @@ const SubLeadsCompleted = ({
     </div>
   );
 };
+const SubLeadsCompletedBtns = ({ handleFromDateChange,fromDate, totalCount, deviceType, selStoreId, toDate, handleToDateChange, setStoreDrop, storeDrop, searchTerm, handleSearch, filteredStores, handleStoreChange, setSearchTerm, setDeviceType, categories, tableData}) => {
 
+  const handleBulkDownloadReceipts = () => {
+    if (!fromDate || !toDate) {
+      alert("Please select and search valid date range Leads.");
+      return;
+    }
+    tableData.forEach((item, index) => {
+      const dateString = item?.updatedAt;
+      const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+      const printElement = ReactDOMServer.renderToString(
+        <PurchaseReceipt
+          phoneNumber={item?.phoneNumber}
+          aadharNumber={item?.aadharNumber}
+          uniqueCode={item?.uniqueCode}
+          emailId={item?.emailId}
+          name={item?.name}
+          imeiNumber={item?.documentId?.IMEI}
+          phoneName={item?.modelId?.name}
+          type={item?.categoryInfo?.categoryName}
+          storeName={item?.store?.storeName}
+          region={item?.store?.region}
+          address={item?.store?.address}
+          storage={item?.storage}
+          RAM={item?.ram}
+          formattedDate={formattedDate}
+        />
+      );
+      html2pdf()
+        .from(printElement)
+        .save(`purchase_receipt_${index + 1}.pdf`);
+    });
+  };
+
+  return (
+    <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
+    <div className="flex gap-4">
+      <button
+        className={`${styles.bulkdown_button}`}
+        onClick={() =>
+          fetchDownloadData(totalCount, deviceType, selStoreId)
+        }
+      >
+        <FaDownload /> Bulk Download
+      </button>
+      <div className="mt-2 ml-4">
+        <button
+          className={`${styles.bulkdown_button}`}
+          onClick={handleBulkDownloadReceipts}
+        >
+          <FaDownload /> Download Receipts
+        </button>
+      </div>
+    </div>
+    <div className="[bg-[#F5F4F9]">
+      <DatePicker
+        selected={fromDate}
+        onChange={handleFromDateChange}
+        dateFormat="yyyy-MM-dd"
+        className={` mt-1 py-[6px] border px-[15px]  rounded-md`}
+        placeholderText="Select from date"
+      />
+    </div>
+    <div>
+      <DatePicker
+        selected={toDate}
+        dateFormat="yyyy-MM-dd"
+        onChange={handleToDateChange}
+        className="mt-1 py-[6px] px-[15px]  border rounded-md"
+        placeholderText="Select to date"
+      />
+    </div>
+    <div className="w-[250px] relative">
+      <div
+        className={`${styless.filter_button}`}
+        onClick={() => setStoreDrop(!storeDrop)}
+      >
+        <p className="truncate">
+          {searchTerm === "" ? "Select Store" : searchTerm}
+        </p>
+        <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
+      </div>
+      {storeDrop && (
+        <div className="absolute w-full bg-white shadow-md">
+          <input
+            placeholder="Search store..."
+            type="text"
+            value={searchTerm}
+            onChange={handleSearch}
+            className="w-full   p-2   border-b border-gray-300"
+          />
+          <div
+            className={`overflow-y-scroll   max-h-[200px]   ${styless.filter_drop}`}
+          >
+            {filteredStores.length > 0 ? (
+              filteredStores.map((item3, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    handleStoreChange(item3);
+                    setSearchTerm(item3.storeName);
+                    setStoreDrop(false);
+                  }}
+                  className={`  ${styles.filter_option}`}
+                >
+                  <p className=" truncate ">{item3.storeName}</p>
+                </div>
+              ))
+            ) : (
+              <p className="p-2 text-gray-500">No stores found</p>
+            )}
+            <div
+              className={`${styles.filter_option}`}
+              onClick={() => {
+                handleStoreChange({ _id: "", storeName: ALLstore });
+                setSearchTerm(ALLstore);
+              }}
+            >
+              <p className=" truncate ">{ALLstore}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+    <div className="w-[250px] h-[35px] relative">
+      <select
+        name=""
+        id=""
+        className="bg-primary text-white rounded-lg outline-none px-2 py-1 w-full h-full"
+        onChange={(e) => {
+          setDeviceType(e.target.value);
+        }}
+      >
+        {categories.map((cat) => (
+          <option
+            className="bg-white text-primary font-medium"
+            key={cat?._id}
+            value={cat?.categoryCode}
+          >
+            {cat?.categoryName}
+          </option>
+        ))}
+      </select>
+    </div>
+
+  </div>
+  );
+  };
 export default LeadsCompleted;
