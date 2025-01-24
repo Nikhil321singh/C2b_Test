@@ -15,11 +15,11 @@ import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { resetAdminAnswer } from "../../store/slices/newAdminGrade";
 import {
   setMobileID,
   setRam,
-  setStorage,
+  setStorage, 
+  resetAdminAnswer
 } from "../../store/slices/newAdminGrade";
 import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
 
@@ -94,25 +94,18 @@ const AdminModels = () => {
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [confBox, setConfBox] = useState(false);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(resetAdminAnswer());
-  }, []);
   useEffect(() => {
     sessionStorage.setItem("admincategory", category);
     getData();
     setAdminCategory(sessionStorage.getItem("admincategory"));
   }, [category]);
-
   useEffect(() => {
+    dispatch(resetAdminAnswer());
     sessionStorage.setItem("admincategory", "CTG1");
     getCategories();
   }, []);
 
-  function handleNext() {
-    navigate("/adminhome");
-  }
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
@@ -195,13 +188,13 @@ const AdminModels = () => {
   };
   const getCategories = async () => {
     try {
-      const { data } = await axios.get(
+      const response = await axios.get(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
         {
           headers: { Authorization: token },
         }
       );
-      setCategories(data.data);
+      setCategories(response.data.data);
     } catch (err) {
       console.log(err)
     }
@@ -280,7 +273,6 @@ const AdminModels = () => {
           selectHandler={selectHandler}
           deleteHandler={deleteHandler}
           category={category}
-          handleNext={handleNext}
         />
       </div>
     </div>
@@ -408,9 +400,8 @@ const AdminModelsTable = ({
   selectram,
   selectHandler,
   deleteHandler,
-  category,
-  handleNext,
 }) => {
+  const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const openDeleteModal = (item) => {
@@ -429,7 +420,9 @@ const AdminModelsTable = ({
     setIsDeleteModalOpen(false);
     setItemToDelete(null);
   };
-
+  function handleNext() {
+    navigate("/adminhome");
+  }
   return (
     <div className="m-2 overflow-x-auto md:m-5">
       <table className="w-full border border-primary">

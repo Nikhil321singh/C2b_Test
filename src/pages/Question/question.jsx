@@ -9,7 +9,6 @@ import {
 import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { FaUpload } from "react-icons/fa";
 import { toast } from "react-toastify";
 import useUserProfile from "../../utils/useUserProfile";
@@ -38,8 +37,8 @@ const AdminQuestion = () => {
   const [selectedDevice, setSelectedDevice] = useState(null);
 
   const getData = async () => {
-    const brandID = selectedBrand?._id;
-    if (!brandID) {
+    const slectedBrandID = selectedBrand?._id;
+    if (!slectedBrandID) {
       return;
     } else {
       setIsTableLoaded(true);
@@ -47,7 +46,7 @@ const AdminQuestion = () => {
         const response = await axios.get(
           `${
             import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/questionnaires/getQNA?page=${page}&limit=10&brandId=${brandID}`,
+          }/api/questionnaires/getQNA?page=${page}&limit=10&brandId=${slectedBrandID}`,
           { headers: { Authorization: token } }
         );
         setQuestions(response.data.data);
@@ -232,14 +231,14 @@ const AdminQuestion = () => {
   const handleModelChange = (e) => {
     const [deviceId, configId] = e.target.value.split("|"); // Split the value to get both device and config ID
 
-    const selectedDevice = deviceList.find((item) => item._id === deviceId); // Find the device by _id
-    const selectedConfig = selectedDevice?.config.find(
+    const selectDevices = deviceList.find((item) => item._id === deviceId); // Find the device by _id
+    const selectedConfig = selectDevices?.config.find(
       (conf) => conf._id === configId
     ); // Find the config by its ID
 
-    if (selectedDevice && selectedConfig) {
+    if (selectDevices && selectedConfig) {
       setSelectedDevice({
-        ...selectedDevice,
+        ...selectDevices,
         selectedConfig, // Add the selected config to the selected device object
       });
     }
@@ -273,12 +272,6 @@ const AdminQuestion = () => {
     sessionStorage.setItem("selectedDevice", JSON.stringify(selectedDevice));
     sessionStorage.setItem("calculatedAdminPrice", response?.data?.data?.price);
     navigate("/adminfinalprice");
-    // sessionStorage.setItem(
-    //   "responsedatadata",
-    //   JSON.stringify({ ...response.data.data, bonus: 0 })
-    // );
-    // store.dispatch(setResponseData({ ...response.data.data, bonus: 0 }));
-    // setIsLoading(false);
   };
 
   return (
@@ -522,53 +515,7 @@ const AdminQuestion = () => {
                     </button>
                   )}
                 </div>
-                {/* {page === maxPages ? (
-                  <div className="fixed bottom-0 flex justify-center gap-2 p-3 bg-white border-t-2">
-                    <div
-                      onClick={handleSubtract}
-                      className={`bg-[#EC2752] w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
-                    >
-                      <ImArrowLeft color="white" size={20} />
-                    </div>
-                    <div
-                      onClick={handlesubmit}
-                      className="bg-[#EC2752] w-[70%] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
-                    >
-                      {isLoading && (
-                        <CgSpinner
-                          size={20}
-                          className="absolute left-[18%] top-[8px] mt-1 animate-spin"
-                        />
-                      )}
-                      <p className="w-full p-1 text-xl font-medium">
-                        {isLoading ? "Submitting" : "Submit"}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="fixed bottom-0 justify-center flex w-full gap-2 p-3 bg-white border-t-2">
-                    {page > 0 && page <= 6 && (
-                      <button
-                        onClick={handlePrev}
-                        className={`  ${
-                          page < 2
-                            ? "bg-slate-400 cursor-not-allowed"
-                            : "bg-[#EC2752] cursor-pointer"
-                        }  w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
-                      >
-                        <ImArrowLeft color="white" size={20} />
-                      </button>
-                    )}
-                    <div
-                      onClick={handleNext}
-                      className="bg-[#EC2752] w-[70%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
-                    >
-                      <p className="w-full p-1 text-xl font-medium">Continue</p>
-                    </div>
-                  </div>
-                )} */}
               </div>
-
               <div className="md:w-1/3 p-4 bg-blue-50 rounded-lg shadow-md">
                 <div className="flex gap-2 items-center justify-center border-b-2 pb-2">
                   <img src={selectedBrand?.logo} alt="" className="h-10 w-10" />
@@ -576,9 +523,6 @@ const AdminQuestion = () => {
                     {selectedBrand?.name}
                   </h2>
                 </div>
-                {/* {Object.keys(answers).length > 0 && (
-              <h2 className="text-xl font-semibold mb-4">Device Evaluation</h2>
-            )} */}
                 <div className="pt-2">
                   {answers.map((answerData, index) => (
                     <div key={index} className="mb-4 text-sm">

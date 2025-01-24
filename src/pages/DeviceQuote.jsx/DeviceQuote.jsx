@@ -49,7 +49,6 @@ const DeviceQuote = () => {
   const ResponseData = useSelector((state) => state.responseData);
   const Price = useSelector((state) => state.responseData.price);
   const uniqueCode = useSelector((state) => state.responseData.uniqueCode);
-  console.log(savedBonus, Price);
   useEffect(() => {
     setQuoteId(uniqueCode);
   }, [uniqueCode]);
@@ -71,7 +70,6 @@ const DeviceQuote = () => {
     };
     resData.price = Number(ResponseData.price);
     resData.bonus = Number(bonus);
-    console.log(resData);
     sessionStorage.setItem("responsedatadata", JSON.stringify(resData));
     dispatch(setResponseData(resData));
     setContinueOTPOpen(!continueOTPOpen);
@@ -80,15 +78,13 @@ const DeviceQuote = () => {
   const showDeviceReportHandler = () => {
     setShowDeviceReport(!showDeviceReport);
   };
-
   const navigate = useNavigate();
   const toggleModal = () => {
     setShowModal(!showModal);
   };
 
   useEffect(() => {
-    if(quoteSaved === false &&
-      exactQuoteValue === "true") {
+    if(quoteSaved === false && exactQuoteValue === "true") {
         toast.error("Bonus Must Be Less Than ₹2000.");
       }
   }, []);
@@ -115,7 +111,6 @@ const DeviceQuote = () => {
           />
         </div>
       </div>
-
       <div className="max-w-[900px]  md:mx-auto">
         <p className="mx-2 my-4 text-xl font-medium">Device Quote Details</p>
         <div className={` ${styles.QuoteCardShadow} rounded-md p-2 mx-2`}>
@@ -203,7 +198,6 @@ const DeviceQuote = () => {
           </div>
         </div>
       </div>
-
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2">
         {quoteSaved === false && exactQuoteValue === "true" && (
           <div className="flex gap-1">
@@ -215,7 +209,6 @@ const DeviceQuote = () => {
             <p className="font-medium">
               I agree to the
               <span className="text-primary cursor-pointer">
-                {" "}
                 Terms & Conditions
               </span>
             </p>

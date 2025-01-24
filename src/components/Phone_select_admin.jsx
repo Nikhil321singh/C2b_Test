@@ -19,8 +19,6 @@ export default function AdminPhone_list() {
   const [loading, setLoading] = useState(false);
 
   function handlebrandClick(index) {
-    // console.log('first');
-    // console.log(index);
     if (selectedPhone === index) {
       setselectedPhone(null);
     } else {
@@ -33,10 +31,6 @@ export default function AdminPhone_list() {
 
     setdataModel(shallowCopy);
   }
-
-  //brandid
-
-  // console.log(dataModel?._id);
 
   function handlemodel(index) {
     console.log(index);
@@ -83,7 +77,6 @@ export default function AdminPhone_list() {
           },
         });
         setData(response.data.data);
-        // console.log("mobile data", response.data.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -102,69 +95,67 @@ export default function AdminPhone_list() {
         </div>
       )}
 
-      <div className="relative w-auto md:w-[80%] md:mx-auto h-screen  LIST_MODELS max-h-screen-4 transition ease-in-out duration-500">
-        {data.map((data, index) => (
+      <div className="relative w-auto md:w-[80%] md:mx-auto h-screen LIST_MODELS max-h-screen-4 transition ease-in-out duration-500">
+        {data.map((brandData, brandIndex) => (
           <div
-            key={data.brand._id}
+            key={brandData.brand._id}
             className="relative flex flex-col h-auto mx-6 model mt-7"
           >
             <div
-              className={`flex  items-center justify-between p-3  bg-white rounded-lg  h-21 px-22 model  ${
-                selectedPhone === index ? "bg-blue-300 " : ""
-              }  `}
+              className={`flex items-center justify-between p-3 bg-white rounded-lg h-21 px-22 model ${
+                selectedPhone === brandIndex ? "bg-blue-300 " : ""
+              }`}
               onClick={() => {
-                handlebrandClick(index);
+                handlebrandClick(brandIndex);
               }}
             >
-              <img src={data.brand.logo} alt="logo" className="w-24 h-12" />
+              <img src={brandData.brand.logo} alt="logo" className="w-24 h-12" />
 
-              <p className="text-2xl ">{data.brand.name}</p>
+              <p className="text-2xl">{brandData.brand.name}</p>
             </div>
-            {selectedPhone === index && (
+            {selectedPhone === brandIndex && (
               <div className="z-10 flex flex-col items-center justify-between text-xl h-21 px-22 top-20 md:text-3xl">
-                {data.models.map((data, index) => (
+                {brandData.models.map((modelData, modelIndex) => (
                   <div
-                    key={data._id}
+                    key={modelData._id}
                     className="flex flex-col items-center justify-between w-full gap-2 p-3 bg-white border-t-2 rounded h-21 px-22"
                   >
-                    <div className="flex justify-between w-11/12 ">
-                      <p className="">{data.name}</p>
+                    <div className="flex justify-between w-11/12">
+                      <p>{modelData.name}</p>
                       <img
                         src={downArrow}
                         alt="arrow"
                         className={`h-5 w-12.5 transform -rotate-90 transition ease-in-out duration-500 ${
-                          selectedphone === index ? "rotate-[-180]" : ""
+                          selectedphone === modelIndex ? "rotate-[-180]" : ""
                         }`}
                         onClick={() => {
-                          handlemodel(index);
+                          handlemodel(modelIndex);
                         }}
                       />
                     </div>
                     <div className="flex flex-wrap justify-between w-11/12 gap-2">
-                      {selectedphone === index &&
-                        Array.isArray(data.config) &&
-                        data.config.map((option, i) => (
+                      {selectedphone === modelIndex &&
+                        Array.isArray(modelData.config) &&
+                        modelData.config.map((option, optionIndex) => (
                           <div
-                            key={i}
+                            key={optionIndex}
                             className="flex items-center"
                             onClick={() => {
-                              handleData(i);
+                              handleData(optionIndex);
                             }}
                           >
                             <input
                               type="radio"
-                              name="storage "
+                              name="storage"
                               value={option.storage}
-                              id={i}
-                              className="w-4 h-5 border rounded-full outline-none sm:w-5 "
+                              id={`option-${optionIndex}`}
+                              className="w-4 h-5 border rounded-full outline-none sm:w-5"
                             />
                             <label
-                              htmlFor={i}
-                              className="ml-1 text-xl cursor-pointer sm:ml-3 sm:text-xl md:text-3x"
+                              htmlFor={`option-${optionIndex}`}
+                              className="ml-1 text-xl cursor-pointer sm:ml-3 sm:text-xl md:text-3xl"
                             >
-                              {/* uncomment */}
                               {option.RAM}/{option.storage}
-                              {/* {option.storage} */}
                             </label>
                           </div>
                         ))}
@@ -176,6 +167,7 @@ export default function AdminPhone_list() {
           </div>
         ))}
       </div>
+
     </div>
   );
 }

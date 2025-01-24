@@ -12,7 +12,7 @@ const sucTextColor = "text-green-500";
 const failTextColor = "text-primary";
 const defaultRoles = ["Super Admin", "Admin Manager", "Technician"];
 const role = import.meta.env.VITE_REACT_APP_ROLES
-  ? import.meta.env.VITE_REACT_APP_ROLES.split(",").map(role => role.trim())
+  ? import.meta.env.VITE_REACT_APP_ROLES.split(",").map(item => item.trim())
   : defaultRoles;
 const getStore = async () => {
   const token1 = sessionStorage.getItem("authToken");

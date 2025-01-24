@@ -230,9 +230,6 @@ const LeadsCompleted = () => {
        alert("Please select and search valid date range Leads.");
        return;
      }
-
-     // Filter data by date
-     // Generate receipts for the filtered data
      tableData.forEach((item, index) => {
        const dateString = item?.updatedAt;
        const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {

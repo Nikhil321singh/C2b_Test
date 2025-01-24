@@ -663,9 +663,6 @@ const PhonePhotos1 = ({
       {showHoldModal &&  (
         <MobileMoldModel setShowHoldModal={setShowHoldModal} />
       )}
-      {/* {showHoldModal && Device !== "CTG1" && (
-        <WatchMoldModel setShowHoldModal={setShowHoldModal}/>
-      )} */}
     </div>
   );
 };

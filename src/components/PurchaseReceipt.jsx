@@ -95,13 +95,12 @@ const PurchaseReceipt = ({
           <p className="font-bold flex flex-col items-start">ITEM</p>
           <p>
             {phoneName}
-            {RAM && storage
-              ? ` (${RAM}/${storage})`
-              : RAM
-              ? ` (${RAM}/${storage})`
-              : storage
-              ? ` (${RAM}/${storage})`
-              : ""}
+            {(() => {
+              if (RAM && storage) return ` (${RAM}/${storage})`;
+              if (RAM) return ` (${RAM}/)`;
+              if (storage) return ` (/${storage})`;
+              return "";
+            })()}
           </p>
         </div>
         <div>
