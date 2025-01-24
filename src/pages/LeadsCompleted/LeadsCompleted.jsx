@@ -433,7 +433,7 @@ const SubLeadsCompleted = ({
     </div>
   );
 };
-const SubLeadsCompletedBtns = ({ handleFromDateChange,fromDate, totalCount, deviceType, selStoreId, toDate, handleToDateChange, setStoreDrop, 
+const SubLeadsCompletedBtns = ({ handleFromDateChange,fromDate, totalCount, deviceType, selStoreId, toDate, handleToDateChange, setStoreDrop,
   storeDrop, searchTerm, handleSearch, filteredStores, handleStoreChange, setSearchTerm, setDeviceType, categories, tableData}) => {
 
   const handleBulkDownloadReceipts = () => {

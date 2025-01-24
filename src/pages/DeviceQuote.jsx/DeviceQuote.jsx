@@ -11,6 +11,8 @@ import apple_watch from "../../assets/apple_watch.png";
 import { setResponseData } from "../../store/slices/responseSlice";
 import { toast } from "react-hot-toast";
 
+const deviceTypePage = "/selectdevicetype";
+
 const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) => {
   if (quoteSaved) {
     return savedBonus
@@ -27,8 +29,7 @@ const DeviceQuote = () => {
   const currentDomain = window.location.origin;
   const dispatch = useDispatch();
   const Device = sessionStorage.getItem("DeviceType");
-  const DummyImg =
-    Device === "CTG1"
+  const DummyImg = Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
@@ -52,7 +53,6 @@ const DeviceQuote = () => {
   useEffect(() => {
     setQuoteId(uniqueCode);
   }, [uniqueCode]);
-  const deviceTypePage = "/selectdevicetype";
   const displayPrice = calculateDisplayPrice({
     quoteSaved,
     savedBonus,
@@ -218,7 +218,6 @@ const DeviceQuote = () => {
           exactQuoteValue={exactQuoteValue}
           termsChecked={termsChecked}
           continueOTPHandler={continueOTPHandler}
-          deviceTypePage={deviceTypePage}
         />
       </div>
     </div>
@@ -233,7 +232,6 @@ const SubDeviceQuote = ({
   exactQuoteValue,
   termsChecked,
   continueOTPHandler,
-  deviceTypePage,
 }) => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(10); // 10 seconds countdown
