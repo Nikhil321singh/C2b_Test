@@ -16,7 +16,7 @@ const AdminFinalPriceTable = () => {
             <th className="p-2 text-sm md:p-3 md:text-base">Values</th>
           </tr>
         </thead>
-        {category === "Mobile" && (
+        {category === "CTG1" && (
           <tbody>
             <tr className="bg-gray-200 ">
               <td className="p-2 text-sm text-center md:p-3 md:text-base">

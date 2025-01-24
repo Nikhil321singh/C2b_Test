@@ -23,9 +23,9 @@ export const DeviceTypeFilter = ({
     getCategories();
   }, []);
     const staticCategories = [
-      { name: "Laptops", image: laptop, apiType: "Laptop" },
-      { name: "Mobiles", image: mobile, apiType: "Mobile" },
-      { name: "Watches", image: watch, apiType: "Watch" },
+      { name: "Laptops", image: laptop, apiType: "CTG3" },
+      { name: "Mobiles", image: mobile, apiType: "CTG1" },
+      { name: "Watches", image: watch, apiType: "CTG2" },
       { name: "More", image: null },
     ];
 
@@ -122,11 +122,11 @@ export const DeviceTypeFilter = ({
 };
 
 function deviceSetter(DevType) {
-  if (DevType === "Mobile") {
+  if (DevType === "CTG1") {
     return "Mobiles";
-  } else if (DevType === "Laptop") {
+  } else if (DevType === "CTG3") {
     return "Laptops";
-  } else if (DevType === "Watch") {
+  } else if (DevType === "CTG2") {
     return "Watches";
   }
   return "More";
