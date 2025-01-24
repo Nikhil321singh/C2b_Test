@@ -225,7 +225,7 @@ const OrdersCard = ({
         <div className="font-medium w-[78%]">
           <p className="text-black text-wrap">
             {deviceName}
-            {deviceSelected === "Mobile" && `(${deviceRam}/${deviceStorage})`}
+            {deviceSelected === "CTG1" && `(${deviceRam}/${deviceStorage})`}
           </p>
           <p className="text-primary">₹{price}</p>
         </div>

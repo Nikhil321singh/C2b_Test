@@ -60,9 +60,9 @@ export const DeviceTypeFilter = ({
   const [categories, setCategories] = useState([]);
 
   const staticCategories = [
-    { name: "Mobiles", image: mobile, apiType: "Mobile" },
-    { name: "Laptops", image: laptop, apiType: "Laptop" },
-    { name: "Watches", image: watch, apiType: "Watch" },
+    { name: "Mobiles", image: mobile, apiType: "CTG1" },
+    { name: "Laptops", image: laptop, apiType: "CTG3" },
+    { name: "Watches", image: watch, apiType: "CTG2" },
     { name: "More", image: null },
   ];
   useEffect(() => {
@@ -165,8 +165,8 @@ const getCategories = async () => {
 
 export const DeviceTypeFilter2 = () => {
   const categories = [
-    { name: "iPhone", image: mobile, apiType: "Mobile", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" },
-    { name: "Watch", image: watch, apiType: "Watch", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" }
+    { name: "iPhone", image: mobile, apiType: "CTG1", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" },
+    { name: "Watch", image: watch, apiType: "CTG2", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" }
   ];
   const navigate = useNavigate();
   return (
@@ -441,11 +441,11 @@ export const BrandList = ({ deviceType }) => {
 };
 
 const selBtn = (Device) => {
-  if (Device === "Mobile") {
+  if (Device === "CTG1") {
     return "Mobiles";
-  } else if (Device === "Laptop") {
+  } else if (Device === "CTG3") {
     return "Laptops";
-  } else if (Device === "Watch") {
+  } else if (Device === "CTG2") {
     return "Watches";
   } else {
     return "More";

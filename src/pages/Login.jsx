@@ -30,7 +30,7 @@ const Login = () => {
     if (currentDomain === "https://buyback.grest.in") {
           sessionStorage.setItem("authToken", "");
           sessionStorage.setItem("profile", JSON.stringify({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
-          sessionStorage.setItem("DeviceType", "Mobile");
+          sessionStorage.setItem("DeviceType", "CTG1");
           localStorage.removeItem("formData");
           dispatch(setUserProfile({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
           navigate(homeroute);
@@ -55,7 +55,7 @@ const Login = () => {
           const { profile, authToken } = response.data;
           sessionStorage.setItem("authToken", authToken);
           sessionStorage.setItem("profile", JSON.stringify(profile));
-          sessionStorage.setItem("DeviceType", "Mobile");
+          sessionStorage.setItem("DeviceType", "CTG1");
           localStorage.removeItem("formData");
           dispatch(setUserProfile(profile));
           dispatch(
