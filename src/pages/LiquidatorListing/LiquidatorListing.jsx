@@ -84,35 +84,34 @@ const LiquidatorListing = () => {
         </div>
       )}
       {(sucBox || failBox) && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full bg-black bg-opacity-50 w-full">
+        <div className="fixed top-0 left-0 z-50 bg-black  flex items-center justify-center h-full bg-opacity-50 w-full">
           <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? succTextColor : failTextColor
-            }`}
+            className={`${sucBox ? succTextColor : failTextColor
+            } ${styles.err_mod_box} `}
           >
             {sucBox ? (
               <IoIosCheckmarkCircle
+              size={90}
                 className={sucBox ? succTextColor : failTextColor}
-                size={90}
               />
             ) : (
               <IoIosCloseCircle
-                className={sucBox ? succTextColor : failTextColor}
-                size={90}
+              size={90}
+              className={sucBox ? succTextColor : failTextColor}
               />
             )}
             <h6 className={sucBox ? succTextColor : failTextColor}>
               {sucBox ? "Success!" : "Error!"}
             </h6>
-            <p className="text-slate-500">{errMsg}</p>
+            <p className=" text-slate-500 ">{errMsg}</p>
             <button
+                className={
+                  sucBox ? "bg-green-500 text-white" : "bg-[#EC2752] text-white"
+                }
               onClick={() => {
-                setSucBox(false);
                 setFailBox(false);
+                setSucBox(false);
               }}
-              className={
-                sucBox ? "bg-green-500 text-white" : "bg-[#EC2752] text-white"
-              }
             >
               Okay
             </button>
@@ -120,14 +119,14 @@ const LiquidatorListing = () => {
         </div>
       )}
       <div
+        className="items-center  mx-auto  bg-white max-w-[900px] flex py-8mt-4 justify-center flex-col"
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px",
         }}
-        className="items-center bg-white max-w-[900px] flex py-8 mx-auto mt-4 justify-center flex-col"
       >
         <div className="flex flex-col  w-[900px]">
-          <div className="mb-6 flex flex-col gap-2 border-b-2 mr-10 pb-2 ml-10">
+          <div className="mb-6  ml-10 flex flex-col gap-2 border-b-2 mr-10 pb-2">
             <p className="text-4xl font-bold">Liquidator Listing</p>
             <p className="text-lg">All fields marked with * are required</p>
           </div>

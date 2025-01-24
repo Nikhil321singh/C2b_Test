@@ -68,7 +68,7 @@ function FromDatecom({
                 <BsCalendar3 size={18}/>
               </div>
             </div>
-            <div className="flex items-center justify-center b "> 
+            <div className="flex items-center justify-center b ">
             <div
               className="bg-[#EC2752] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center mt-1"
               onClick={searchCustom}

@@ -96,9 +96,9 @@ const PurchaseReceipt = ({
           <p>
             {phoneName}
             {(() => {
-              if (RAM && storage) return ` (${RAM}/${storage})`;
-              if (RAM) return ` (${RAM}/)`;
-              if (storage) return ` (/${storage})`;
+              if (RAM && storage) {return ` (${RAM}/${storage})`}
+              if (RAM) {return ` (${RAM}/)`}
+              if (storage) {return ` (/${storage})`}
               return "";
             })()}
           </p>

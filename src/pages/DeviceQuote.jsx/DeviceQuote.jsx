@@ -74,7 +74,6 @@ const DeviceQuote = () => {
     dispatch(setResponseData(resData));
     setContinueOTPOpen(!continueOTPOpen);
   };
-
   const showDeviceReportHandler = () => {
     setShowDeviceReport(!showDeviceReport);
   };
@@ -82,13 +81,11 @@ const DeviceQuote = () => {
   const toggleModal = () => {
     setShowModal(!showModal);
   };
-
   useEffect(() => {
     if(quoteSaved === false && exactQuoteValue === "true") {
         toast.error("Bonus Must Be Less Than ₹2000.");
       }
   }, []);
-
   return (
     <div className={`bg-white min-h-screen ${styles.page_wrap}`}>
       {continueOTPOpen && <ContOTP setContinueOTPOpen={setContinueOTPOpen} />}

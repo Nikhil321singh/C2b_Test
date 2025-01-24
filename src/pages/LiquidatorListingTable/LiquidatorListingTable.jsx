@@ -60,7 +60,7 @@ const LiquidatorListingTable = () => {
   const [confBox, setConfBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [uploadBox, setUploadBox] = useState(false);
-  
+
   const getData = () => {
     setIsTableLoaded(true);
     const config = {

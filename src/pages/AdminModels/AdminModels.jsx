@@ -18,7 +18,7 @@ import { useDispatch } from "react-redux";
 import {
   setMobileID,
   setRam,
-  setStorage, 
+  setStorage,
   resetAdminAnswer
 } from "../../store/slices/newAdminGrade";
 import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";

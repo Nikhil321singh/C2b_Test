@@ -13,7 +13,6 @@ export default function AdminPhone_list() {
   const { dataModel, setdataModel } = useDataContext();
   const [selectedphone, setSelectedphone] = useState(null);
 
-  
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
