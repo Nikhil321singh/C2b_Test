@@ -1,3 +1,5 @@
+import tailwindScrollbarHide from "tailwind-scrollbar-hide";
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", "*"],
@@ -6,7 +8,12 @@ export default {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
       },
+      colors: {
+        primary: "var(--primary-color)",
+        secondary: "var(--secondary-color)",
+        tertiary: "var(--tertiary-color)",
+      },
     },
   },
-  plugins: [require("tailwind-scrollbar-hide")],
+  plugins: [tailwindScrollbarHide],
 };

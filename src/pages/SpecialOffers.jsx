@@ -245,7 +245,7 @@ const SubSpecialOffers = ({
   const navigate = useNavigate();
   const Device = sessionStorage.getItem("DeviceType");
   const DummyImg =
-    Device === "Mobile"
+    Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
@@ -292,14 +292,14 @@ const SubSpecialOffers = ({
           <p className="text-xl">₹{Number(phonePrice)}</p>
           <p
             onClick={handleViewSummary}
-            className="text-[#EC2752] cursor-pointer"
+            className="text-primary cursor-pointer"
           >
             View Summary
           </p>
         </div>
         <div
           onClick={handleSubmit}
-          className="bg-[#EC2752] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
+          className="bg-primary relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
         >
           {isLoading && (
             <CgSpinner

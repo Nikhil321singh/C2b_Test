@@ -1,5 +1,5 @@
 .prof_button {
-  background-color: #ec2752;
+  background-color: var(--primary-color);
   color: white;
   border-radius: 0.55rem;
   font-size: 0.9rem;
@@ -20,7 +20,7 @@
 }
 
 .prof_button2 {
-  color: #ec2752;
+  color: var(--primary-color);
   border-radius: 0.55rem;
   font-size: 0.9rem;
   font-weight: bold;

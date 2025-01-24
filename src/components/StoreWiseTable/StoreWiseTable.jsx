@@ -4,8 +4,8 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
   return (
     <div>
       <div className="m-2 overflow-x-scroll  md:m-5 ">
-        <table className="w-[220vh]  border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-[220vh]  border border-primary">
+          <thead className="bg-primary text-white">
             <tr className="">
               <th className="p-2  text-sm  ">Sr. No.</th>
               <th className="p-2 text-sm  ">Purchase In Date</th>
@@ -19,7 +19,9 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
               <th className="p-2 text-sm  ">Price</th>
               <th className="p-2 text-sm  ">Price Offered to Customer</th>
               <th className="p-2 text-sm  ">Unique ID</th>
-              <th className="p-2 text-sm  ">GREST Received</th>
+              <th className="p-2 text-sm  ">
+                {import.meta.env.VITE_WEBSITE_SHORT_NAME} Received
+              </th>
               <th className="p-2 text-sm  ">Receiving Date</th>
               <th className="p-2 text-sm  ">New Prices As Per New Range</th>
               <th className="p-2 text-sm  ">Store Payment Status</th>
@@ -48,7 +50,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                     {data.userId?.firstName}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {data.modelId?.type}
+                    {data.categoryInfo?.categoryName}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
                     {data.documentId?.IMEI}

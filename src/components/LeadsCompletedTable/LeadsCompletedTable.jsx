@@ -38,11 +38,14 @@ const LeadsCompletedTable = ({ data }) => {
     const printElement = ReactDOMServer.renderToString(
       <PurchaseReceipt
         phoneNumber={data[index]?.phoneNumber}
+        aadharNumber={data[index]?.aadharNumber}
         uniqueCode={data[index]?.uniqueCode}
         emailId={data[index]?.emailId}
         name={data[index]?.name}
+        price={data[index]?.price}
         imeiNumber={data[index]?.documentId?.IMEI}
         phoneName={data[index]?.modelId?.name}
+        type={data[index]?.modelId?.type}
         storeName={data[index]?.store?.storeName}
         region={data[index]?.store?.region}
         address={data[index]?.store?.address}
@@ -65,7 +68,7 @@ const LeadsCompletedTable = ({ data }) => {
   };
 
   const getStorage = (val) => {
-    if (val?.modelId?.type === "Mobile") {
+    if (val?.modelId?.type === "CTG1") {
       return `${
         val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
       }`;
@@ -75,8 +78,8 @@ const LeadsCompletedTable = ({ data }) => {
   };
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#EC2752]">
-        <thead className="bg-[#EC2752] text-white">
+      <table className="w-full border border-primary">
+        <thead className="bg-primary text-white">
           <tr className="align-top">
             <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Username</th>
@@ -111,7 +114,7 @@ const LeadsCompletedTable = ({ data }) => {
                 {getUserName(val)}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {val?.modelId?.type}
+                {val?.categoryInfo?.categoryName}
               </td>
               <td className="p-2 min-w-[200px] text-sm text-center md:p-3 md:text-base">
                 {val?.modelId?.name}

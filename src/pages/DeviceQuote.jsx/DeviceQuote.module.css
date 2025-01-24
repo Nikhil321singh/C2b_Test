@@ -6,7 +6,7 @@
   position: fixed;
   width: 100.1vw;
   height: 100vh;
-  background-color: #ec2752;
+  background-color: var(--primary-color);
   display: flex;
   flex-direction: column;
   justify-content: center;

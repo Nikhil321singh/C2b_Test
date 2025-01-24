@@ -74,16 +74,20 @@ const downloadExcelCustomerTable = (apiData) => {
     let index = 1;
     console.log(element?.lead?.QNA[0]);
     let questionsKeys = "";
-    for (const group in element?.lead?.QNA[0]) {
-      element.lead.QNA[0][group].forEach((qna) => {
-        questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
-        index++;
-      });
+    if (element?.lead?.QNA?.[0] && typeof element.lead.QNA[0] === 'object') {
+      for (const group in element.lead.QNA[0]) {
+        if (Array.isArray(element.lead.QNA[0][group])) {
+          element.lead.QNA[0][group].forEach((qna) => {
+            questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
+            index++;
+          });
+        }
+      }
     }
     return {
       "Date Created": new Date(element?.createdAt).toLocaleDateString("en-IN"),
       "User Name": element?.user?.name,
-      category: element?.lead?.model?.type,
+      category: element?.categoryInfo?.categoryName,
       "Product Name": element?.lead?.model?.name,
       Variant: element?.lead?.storage,
       Price: element?.lead?.actualPrice,
@@ -208,8 +212,8 @@ const CustomerTable = () => {
   return (
     <div>
       {loading && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={loading} size={15} />
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 text-primary">
+          <BeatLoader color="var(--primary-color)" loading={loading} size={15} />
         </div>)}
       <div className="navbar">
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />

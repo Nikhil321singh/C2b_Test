@@ -72,7 +72,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
     <div>
       {isTableLoading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoading} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoading} size={15} />
         </div>
       )}
       <div
@@ -86,7 +86,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
           <div className="relative mb-6 flex flex-col gap-2 border-b-2 mr-10 pb-2 ml-10">
             <IoClose
               size={35}
-              className="absolute right-0 text-[#EC2752] transition ease hover:rotate-[360deg] duration-500"
+              className="absolute right-0 text-primary transition ease hover:rotate-[360deg] duration-500"
               onClick={closeHandler}
             />
             <p className="text-4xl font-bold">Update Company Listing</p>
@@ -188,7 +188,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
             <div className="mt-8">
               <button
                 type="submit"
-                className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+                className="font-medium text-sm text-white p-3 rounded bg-primary"
               >
                 Update Details
               </button>

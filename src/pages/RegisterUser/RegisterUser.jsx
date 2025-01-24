@@ -9,9 +9,11 @@ import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 
 const sucTextColor = "text-green-500";
-const failTextColor = "text-[#EC2752]";
-const role = ["Admin Manager", "Technician", "Sale User"];
-
+const failTextColor = "text-primary";
+const defaultRoles = ["Super Admin", "Admin Manager", "Technician"];
+const role = import.meta.env.VITE_REACT_APP_ROLES
+  ? import.meta.env.VITE_REACT_APP_ROLES.split(",").map(item => item.trim())
+  : defaultRoles;
 const getStore = async () => {
   const token1 = sessionStorage.getItem("authToken");
   const config = {
@@ -133,7 +135,7 @@ const RegisterUser = () => {
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       {(sucBox || failBox) && (
@@ -164,7 +166,7 @@ const RegisterUser = () => {
                 setFailBox(false);
               }}
               className={
-                sucBox ? "bg-green-500 text-white" : "text-white bg-[#EC2752]"
+                sucBox ? "bg-green-500 text-white" : "text-white bg-primary"
               }
             >
               Okay
@@ -187,7 +189,7 @@ const RegisterUser = () => {
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <button
               onClick={() => navigate("/registeruserdetails")}
-              className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+              className="font-medium text-sm text-white p-3 rounded bg-primary"
             >
               View Details
             </button>
@@ -359,7 +361,7 @@ const UserForm = ({ formData, submitHandler, handleChange, storeData }) => {
       <div className="mt-8">
         <button
           type="submit"
-          className="font-medium text-sm text-white p-3 rounded bg-[#EC2752]"
+          className="font-medium text-sm text-white p-3 rounded bg-primary"
         >
           Submit Form
         </button>

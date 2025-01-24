@@ -41,9 +41,9 @@ const DeviceCard = (props) => {
         <div>
           <select
             onChange={handleBrandConfigChange}
-            className=" rounded bg-[#F5F4F9] text-[#EC2752] w-[180px] sm:w-[300px] md:w-[400px] md:h-12 p-[5px] focus:outline-none"
+            className=" rounded bg-[#F5F4F9] text-primary w-[180px] sm:w-[300px] md:w-[400px] md:h-12 p-[5px] focus:outline-none"
           >
-            {/* <option className="text-[#EC2752]">
+            {/* <option className="text-primary">
               {dataModel?.models?.config.RAM}/
               {dataModel?.models?.config.storage}
             </option> */}
@@ -51,7 +51,7 @@ const DeviceCard = (props) => {
             {brandDataModel.config?.map((phoneItem, index) => (
               <option
                 key={phoneItem._id}
-                className="text-[#EC2752]"
+                className="text-primary"
                 selected={
                   dataModel?.models?.config?.storage === phoneItem.storage &&
                   dataModel?.models?.config?.RAM === phoneItem.RAM
@@ -64,7 +64,7 @@ const DeviceCard = (props) => {
         </div>
         <div>
           <p className="text-xs md:text-lg text-[#9C9C9C]">Get Upto</p>
-          <p className="font-bold text-2xl md:text-4xl text-[#EC2752]">
+          <p className="font-bold text-2xl md:text-4xl text-primary">
             ₹{selectedBrandConfig?.price || props.price}
           </p>
         </div>

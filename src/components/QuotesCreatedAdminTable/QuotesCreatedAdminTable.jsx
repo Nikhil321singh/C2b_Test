@@ -29,8 +29,8 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
   return (
     <div>
       <div className="m-2  md:m-5 overflow-x-auto">
-        <table className="w-[220vh]  border border-[#EC2752]">
-          <thead className="bg-[#EC2752] text-white">
+        <table className="w-[220vh]  border border-primary">
+          <thead className="bg-primary text-white">
             <tr className="align-top">
               <th className="p-2 text-sm md:p-3 md:text-base align-top">
                 Date

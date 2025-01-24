@@ -5,7 +5,9 @@ const PurchaseReceipt = ({
   imeiNumber,
   uniqueCode,
   phoneNumber,
+  aadharNumber,
   phoneName,
+  type,
   storage,
   storeName,
   RAM,
@@ -14,6 +16,7 @@ const PurchaseReceipt = ({
   name,
   region,
   address,
+  price,
 }) => {
   const maskPhoneNumber = (phNumber) => {
     const visibleLength = Math.ceil(phNumber?.length * 0.25);
@@ -38,21 +41,23 @@ const PurchaseReceipt = ({
   return (
     <div className="p-4 px-12 bg-white border-2 text-sm">
       <div className="flex items-center justify-center bg-white p-[1vh] mx-[2vh] my-[1vh]">
-        <img src={Grest_Logo} alt="Grest logo" className="w-80 h-24" />
+        <img src={Grest_Logo} alt="App logo" className="w-80 h-24" />
       </div>
       <div className="flex flex-col items-center justify-between mb-2">
         <p className="text-sm text-[#1b0d6c]">
-          Radical Aftermarket Services Pvt. Ltd. ,
-          <span className="text-[#EC2752]"> GSTIN/UIN:</span>
-          06AAJCR2110E1ZX
+          {import.meta.env.VITE_COMPANY_NAME} ,
+          <span className="text-primary"> GSTIN/UIN:</span>
+          {import.meta.env.VITE_COMPANY_GSTIN}
         </p>
         <p className="text-sm text-[#1b0d6c]">
-          <span className="text-[#EC2752]"> Address:</span> Khasra No. 34/22,
-          1st Floor, NK Tower, Kanhai Road, Sector-45, Gurugram, Haryana-122003
+          <span className="text-primary"> Address:</span>{" "}
+          {import.meta.env.VITE_COMPANY_ADDRESS}
         </p>
         <p className="text-sm text-[#1b0d6c]">
-          <span className="text-[#EC2752]"> Contact:</span> +91 9818 925 900 ,
-          <span className="text-[#EC2752]"> E-mail:</span> care@grest.in
+          <span className="text-primary"> Contact:</span>{" "}
+          {import.meta.env.VITE_COMPANY_CONTACT} ,
+          <span className="text-primary"> E-mail:</span>{" "}
+          {import.meta.env.VITE_COMPANY_EMAIL}
         </p>
       </div>
       <div className="text-center">
@@ -61,7 +66,7 @@ const PurchaseReceipt = ({
       <div className="flex items-center mt-4 justify-between mx-auto">
         <div className="w-[30%]">
           <p>
-            <span className="font-bold"> Serial No.:</span> {uniqueCode}
+            <span className="font-bold"> Transaction ID:</span> {uniqueCode}
           </p>
           <p>
             <span className="font-bold"> Date:</span> {formattedDate}
@@ -71,26 +76,55 @@ const PurchaseReceipt = ({
           <p>
             <span className="font-bold"> Purchased From: {name}</span>
           </p>
-          <p>
-            <span> Contact: {maskPhoneNumber(phoneNumber)}</span>
-          </p>
+          <p></p>
+          <span> Contact: {maskPhoneNumber(phoneNumber)}</span>
           <p>
             <span> Mail: {maskEmail(emailId)}</span>
           </p>
+          <p>
+            <span> Aadhar No.: {aadharNumber}</span>
+          </p>
         </div>
       </div>
-      <div className="flex gap-2">
-        <div className="flex flex-col items-center">
+      <div className="flex gap-8 flex-row justify-start">
+        <div className="flex flex-col items-start">
           <p className="font-bold">S.No.</p>
           <p>1</p>
         </div>
         <div>
-          <p className="font-bold">Item</p>
+          <p className="font-bold flex flex-col items-start">ITEM</p>
           <p>
-            {phoneName} ({storage}/{RAM})
+            {phoneName}
+            {(() => {
+              if (RAM && storage) {
+                return ` (${RAM}/${storage})`
+              }
+              if (RAM) {
+                return ` (${RAM}/)`
+              }
+              if (storage) {
+                return ` (/${storage})`
+              }
+              return "";
+            })()}
           </p>
         </div>
+        <div>
+          <p className="font-bold flex flex-col items-start">PRICE</p>
+          <p>{`₹ ${Math.floor(price)}/-`}</p>
+        </div>
       </div>
+      <div className="flex gap-8 flex-row justify-start">
+        <div className="flex flex-col items-start">
+          <p className="mt-4">IMEI No.:</p>
+          <p className="mt-4">Serial Number(if Laptop):</p>
+        </div>
+        <div className="flex flex-col items-start">
+          <p className="mt-4">{type ? imeiNumber : ""}</p>
+          <p className="mt-4">{type === "Laptop" ? imeiNumber : ""}</p>
+        </div>
+      </div>
+
       <hr className="border-black mt-10 border-1" />
       <div className="flex flex-col items-center border-b-2 border-dashed border-black py-4 ">
         <p className="text-xl font-bold mt-4 mb-2">Via Retail Store Partner:</p>
@@ -108,7 +142,7 @@ const PurchaseReceipt = ({
           <span className="font-bold underline">{name}</span> Herein after
           referred to as "Seller" who has come in Retail store of{" "}
           <span className="font-bold underline">{storeName}</span> to sell
-          his/her old Gadget, to the Grest Network herein after referred to as
+          his/her old Gadget, to the {import.meta.env.VITE_WEBSITE_SHORT_NAME} Network herein after referred to as
           "Purchaser" which expression shall mean and include its
           representative, executors, nominee, partners, affiliates and assigns
           on day of <span className="font-bold">{formattedDate}</span>
@@ -116,9 +150,6 @@ const PurchaseReceipt = ({
       </div>
 
       <div>
-        <p className="mt-4">
-          <span> IMEI No./ Serial Number: {imeiNumber}</span>
-        </p>
         <p className="mt-4">
           <span> Scheme Title: Buyback</span>
         </p>

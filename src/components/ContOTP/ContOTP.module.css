@@ -2,7 +2,7 @@
   position: fixed;
   width: 100vw;
   height: 100vh;
-  background-color: #ff3864;
+  background-color: var(--quaternary-color);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -81,7 +81,7 @@
 .form_fields_wrap input {
   width: 85%;
   /* padding: 7px;
-  border: 2px solid #EC2752; */
+  border: 2px solid var(--primary-color); */
   display: flex;
   /* text-align: center; */
   font-size: medium;
@@ -99,7 +99,7 @@
 .resend_otp_wrap button {
   transition: all 0.5s ease;
   cursor: pointer;
-  color: #ec2752;
+  color: var(--primary-color);
   opacity: 1;
 }
 
@@ -124,7 +124,7 @@
   border-radius: 0.55rem;
   font-weight: 500;
   transition: all 0.5s ease;
-  background-color: #ec2752;
+  background-color: var(--primary-color);
   color: white;
 }
 
@@ -200,7 +200,7 @@
 
   .form_fields_wrap input {
     width: 85%;
-    /* border-bottom: 2px solid #EC2752; */
+    /* border-bottom: 2px solid var(--primary-color); */
     display: flex;
     /* text-align: center; */
     font-size: medium;

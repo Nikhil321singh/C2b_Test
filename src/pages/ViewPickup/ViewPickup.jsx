@@ -31,7 +31,7 @@ const ViewPickup = () => {
     <div className="min-h-screen bg-white pb-8 ">
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">

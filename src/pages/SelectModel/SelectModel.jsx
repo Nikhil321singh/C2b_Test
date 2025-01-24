@@ -15,7 +15,7 @@ const SelectModel = () => {
     phoneImg?.models?.phonePhotos?.upFront;
   const Device = sessionStorage.getItem("DeviceType");
   const DummyImg =
-    Device === "Mobile"
+    Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const [modelData, setModelData] = useState();
@@ -57,12 +57,7 @@ const SelectModel = () => {
 
     store.dispatch({ type: "RESET_STATE" });
     resetState();
-
-    if (Device === "Mobile") {
-      navigate("/device/Qestions");
-    } else {
-      navigate("/watchQs");
-    }
+    navigate("/device/Qestions");
   };
 
   const handleQuickQuote = () => {
@@ -77,7 +72,7 @@ const SelectModel = () => {
     sessionStorage.setItem("dataModel", JSON.stringify(updatedData));
     store.dispatch({ type: "RESET_STATE" });
     resetState();
-    if (Device === "Mobile") {
+    if (Device === "CTG1") {
       navigate("/quickquote");
     } else {
       console.log("watch");
@@ -116,7 +111,7 @@ const SelectModel = () => {
 
               <div>
                 <p>Get Upto</p>
-                <p className="font-bold text-2xl md:text-4xl text-[#EC2752]">
+                <p className="font-bold text-2xl md:text-4xl text-primary">
                   {selectedConfig?.price ? `₹${selectedConfig.price}` : "₹6000"}
                 </p>
               </div>
@@ -144,17 +139,17 @@ const SelectModel = () => {
               Device === "Watch" && "justify-start"
             }`}
           >
-            {Device === "Mobile" && (
+            {Device === "CTG1" && (
               <button
                 onClick={handleQuickQuote}
-                className="border-2 border-[#EC2752] w-[48%] bg-white text-[#EC2752]  text-[12px]  px-4 py-2 rounded"
+                className="border-2 border-primary w-[48%] bg-white text-primary  text-[12px]  px-4 py-2 rounded"
               >
                 Quick Quote
               </button>
             )}
             <button
               onClick={handleExactValue}
-              className={`border-2 border-[#EC2752] bg-[#EC2752] text-white text-[12px] px-4 py-2 rounded ${
+              className={`border-2 border-primary bg-primary text-white text-[12px] px-4 py-2 rounded ${
                 Device === "Watch" ? "w-full" : "w-[48%]"
               }`}
             >
@@ -170,7 +165,7 @@ const SelectModel = () => {
           </div>
 
           <div className="mx-2 mt-2">
-            <div className="text-[#EC2752] font-semibold text-2xl mb-2">
+            <div className="text-primary font-semibold text-2xl mb-2">
               FAQ's
             </div>
             <FAQ />

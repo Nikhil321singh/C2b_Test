@@ -8,14 +8,13 @@ import { setBrandID } from "../store/slices/adminAnswerSlice";
 import { setMobileID, setStorage } from "../store/slices/newAdminGrade";
 
 export default function AdminPhone_list() {
-  const [selectedPhone, setselectedPhone] = useState(null);
   const [data, setData] = useState([]);
-  const [selectedphone, setSelectedphone] = useState(null);
+  const [selectedPhone, setselectedPhone] = useState(null);
   const { dataModel, setdataModel } = useDataContext();
-
-  const dispatch = useDispatch();
+  const [selectedphone, setSelectedphone] = useState(null);
 
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   function handlebrandClick(index) {
     if (selectedPhone === index) {
@@ -23,15 +22,11 @@ export default function AdminPhone_list() {
     } else {
       setselectedPhone(index);
     }
-
     const shallowCopy = { ...data[index] };
-
-    dispatch(setBrandID(shallowCopy?._id));
-
     setdataModel(shallowCopy);
+    dispatch(setBrandID(shallowCopy?._id));
   }
   function handlemodel(index) {
-    console.log(index);
     if (selectedphone === index) {
       setSelectedphone(null);
     } else {
@@ -41,9 +36,9 @@ export default function AdminPhone_list() {
     const updatedDataModel = { ...dataModel };
     updatedDataModel.models = { ...data[selectedPhone].models[index] };
 
-    dispatch(setMobileID(updatedDataModel?.models?._id));
 
     setdataModel(updatedDataModel);
+    dispatch(setMobileID(updatedDataModel?.models?._id));
   }
 
   // where we fetch data
@@ -54,12 +49,10 @@ export default function AdminPhone_list() {
     };
 
     dispatch(setStorage(updatedDataModel?.models?.config?.storage));
-    console.log(updatedDataModel?.models?.config?.storage);
-
     setdataModel(updatedDataModel);
 
-    setselectedPhone(null);
     setSelectedphone(null);
+    setselectedPhone(null);
   }
 
   useEffect(() => {
@@ -67,20 +60,18 @@ export default function AdminPhone_list() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const apiUrl = `${
+        const response = await axios.get(`${
           import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/brands/getAllBrandsModels`;
-
-        const response = await axios.get(apiUrl, {
+        }/api/brands/getAllBrandsModels`, {
           headers: {
             authorization: `${userToken}`,
           },
         });
+        setLoading(false);
         setData(response.data.data);
-        setLoading(false);
       } catch (error) {
-        console.error("Error fetching data:", error);
         setLoading(false);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -91,7 +82,7 @@ export default function AdminPhone_list() {
     <div className="flex flex-col w-auto h-auto overflow-auto MAIN_CONTAINER max-h-screen-4 ">
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={loading} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={loading} size={15} />
         </div>
       )}
 

@@ -28,35 +28,35 @@ const DevicePriceCards = (props) => {
           <p className="text-xl font-medium md:text-3xl">{props.model}</p>
         </div>
         <div>
-          <p className="text-[#EC2752] text-lg md:text-2xl">
-            {props.type === "Mobile" && `${props.ram}/${props.storage}`}
+          <p className="text-primary text-lg md:text-2xl">
+            {props.type === "CTG1" && `${props.ram}/${props.storage}`}
           </p>
-          {/* <select className=" rounded bg-[#F5F4F9] text-[#EC2752] w-[220px] p-[5px] focus:outline-none"></select> */}
+          {/* <select className=" rounded bg-[#F5F4F9] text-primary w-[220px] p-[5px] focus:outline-none"></select> */}
         </div>
         <div>
           <p className="text-xs md:text-lg text-[#9C9C9C]">Selling Price</p>
-          <p className="font-bold text-2xl md:text-4xl text-[#EC2752]">
+          <p className="font-bold text-2xl md:text-4xl text-primary">
             ₹{props.price}
           </p>
         </div>
         {props.showReport === true && (
           <>
-            {/* <button className="p-1 font-semibold text-sm text-left bg-[#EC2752] hover:bg-[#fd4b71]   text-white rounded">
+            {/* <button className="p-1 font-semibold text-sm text-left bg-primary hover:bg-[#fd4b71]   text-white rounded">
               Show Device Report
             </button> */}
             <div className="text-sm flex gap-1">
-              {/* <button className="p-1 font-semibold text-sm text-left bg-[#EC2752]   hover:bg-[#fd4b71]  text-white rounded">
+              {/* <button className="p-1 font-semibold text-sm text-left bg-primary   hover:bg-[#fd4b71]  text-white rounded">
                 Requote
               </button> */}
               <button
                 onClick={() => props.setShowReportModel(true)}
-                className="p-1 font-semibold text-sm text-left bg-[#EC2752] hover:bg-[#fd4b71]   text-white rounded"
+                className="p-1 font-semibold text-sm text-left bg-primary hover:bg-[#fd4b71]   text-white rounded"
               >
                 Show Device Report
               </button>
               <button
                 onClick={handleModify}
-                className="p-1 font-semibold text-sm text-left bg-[#EC2752] hover:bg-[#fd4b71]   text-white rounded"
+                className="p-1 font-semibold text-sm text-left bg-primary hover:bg-[#fd4b71]   text-white rounded"
               >
                 Modify
               </button>

@@ -11,7 +11,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice }) => {
           <IoCloseCircle
             onClick={onClose}
             size={24}
-            className="text-[#EC2752] absolute top-5 right-4"
+            className="text-primary absolute top-5 right-4"
           />
         </div>
         <div>
@@ -26,7 +26,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice }) => {
             <div className="flex justify-between">
               <p>Pickup Charges</p>
               <div className="flex gap-2">
-                <p className="text-[#EC2752]">Free</p>
+                <p className="text-primary">Free</p>
                 <p className="line-through">₹100</p>
               </div>
             </div>
@@ -42,7 +42,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice }) => {
         </div>
       </div>
       <button
-        className="bg-[#EC2752] fixed bottom-0 mb-4 rounded text-white px-4 py-2 mt-4"
+        className="bg-primary fixed bottom-0 mb-4 rounded text-white px-4 py-2 mt-4"
         onClick={onClose}
       >
         Close

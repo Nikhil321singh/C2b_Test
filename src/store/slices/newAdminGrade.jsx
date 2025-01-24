@@ -1,15 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  Core: "C1",
-  Cosmetics: "A1",
-  Display: "D1",
-  Functional_major: "F1.1",
-  Functional_minor: "F2.1",
-  Warranty: "W1",
-  Accessories: "A1.1",
-  Functional: "F",
-  Physical: "A1",
+  Core: "",
+  Cosmetics: "",
+  Display: "",
+  Functional_major: "",
+  Functional_minor: "",
+  Warranty: "",
+  Accessories: "",
+  Functional: "",
+  Physical: "",
   MobileID: "",
   storage: "",
   ram: "",
@@ -32,10 +32,16 @@ const optionsSlice = createSlice({
     setRam: (state, action) => {
       state.ram = action.payload;
     },
+    resetAdminAnswer: () => initialState, // Reset action
   },
 });
 
-export const { setSelectedOptions, setMobileID, setStorage, setRam } =
-  optionsSlice.actions;
+export const {
+  setSelectedOptions,
+  setMobileID,
+  setStorage,
+  setRam,
+  resetAdminAnswer,
+} = optionsSlice.actions;
 
 export default optionsSlice.reducer;

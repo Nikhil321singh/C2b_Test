@@ -36,8 +36,8 @@
 }
 
 .option_selected {
-  background-color: #ec2752;
-  border: 1px solid #ec2752;
+  background-color: var(--primary-color);
+  border: 1px solid var(--primary-color);
   color: white;
   border-radius: 0.55rem;
   overflow: hidden;

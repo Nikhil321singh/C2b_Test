@@ -11,7 +11,7 @@
 }
 
 .acpt_btn {
-  background-color: #ec2752;
+  background-color: var(--primary-color);
   color: white;
   padding: 1px 7px;
   border-radius: 0.25rem;
@@ -24,12 +24,12 @@
 }
 
 .acpt_btn:hover {
-  box-shadow: 0px 0px 0px 1px red, 0px 0px 0px 1px red;
+  box-shadow: 0px 0px 0px 1px var(--secondary-color), 0px 0px 0px 1px var(--secondary-color);
 }
 
 .view_btn {
   background-color: white;
-  color: #ec2752;
+  color: var(--primary-color);
   padding: 1px 7px;
   border-radius: 0.25rem;
   box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.158),
@@ -41,16 +41,16 @@
 }
 
 .view_btn:hover {
-  box-shadow: 0px 0px 0px 1px red, 0px 0px 0px 1px red;
+  box-shadow: 0px 0px 0px 1px var(--secondary-color), 0px 0px 0px 1px var(--secondary-color);
   scale: 1.03;
 }
 
 .rjct_btn {
   background-color: white;
-  color: red;
+  color: var(--secondary-color);
   padding: 1px 7px;
   border-radius: 0.25rem;
-  box-shadow: 0px 0px 0px 1px red, 0px 0px 0px 1px red;
+  box-shadow: 0px 0px 0px 1px var(--secondary-color), 0px 0px 0px 1px var(--secondary-color);
   cursor: pointer;
   transition: all 0.5s ease;
   font-weight: 500;
@@ -84,11 +84,11 @@
 .search_bar_wrap svg {
   margin-right: -5px;
   transition: all 0.5s ease;
-  color: #ec2752;
+  color: var(--primary-color);
   border-radius: 0.25rem;
 }
 .search_bar_wrap svg:hover {
-  background-color: #ec2752;
+  background-color: var(--primary-color);
   color: white;
 }
 
@@ -101,7 +101,7 @@
 
 .icons_box {
   color: white;
-  background-color: #ec2752;
+  background-color: var(--primary-color);
   border-radius: 0.55rem;
   padding: 4px;
   display: flex;
@@ -113,7 +113,7 @@
 }
 
 .bulkdown_button {
-  color: #ec2752;
+  color: var(--primary-color);
   border-radius: 0.55rem;
   font-size: 0.9rem;
   font-weight: bold;

@@ -16,12 +16,51 @@ export const DeviceTypeFilter = ({
   setDeviceType,
   selectedBtn,
 }) => {
-  const categories = [
-    { name: "Watches", image: watch, apiType: "Watch" },
-    { name: "Mobiles", image: mobile, apiType: "Mobile" },
-    { name: "Laptops", image: laptop, apiType: "Laptop" },
-    { name: "More", image: null },
-  ];
+
+  const [categories, setCategories] = useState([]);
+  const token = sessionStorage.getItem("authToken");
+  useEffect(() => {
+    getCategories();
+  }, []);
+    const staticCategories = [
+      { name: "Laptops", image: laptop, apiType: "Laptop" },
+      { name: "Mobiles", image: mobile, apiType: "Mobile" },
+      { name: "Watches", image: watch, apiType: "Watch" },
+      { name: "More", image: null },
+    ];
+
+    const getCategories = async () => {
+
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+          {headers: { Authorization: token },}
+        );
+        const mergedCategories = data.data.map((apiCat) => {
+          const match = staticCategories.find(
+            (staticCat) => staticCat.apiType === apiCat.categoryName
+          );
+          return {
+            ...apiCat,
+            image: match?.image || null, // Use the image from static data if available
+            apiType: apiCat.categoryCode, // Ensure `apiType` is consistent
+          };
+        });
+
+        // Append static categories that are not present in API data
+        const additionalCategories = staticCategories.filter(
+          (staticCat) =>
+            !data.data.some(
+              (apiCat) => apiCat.categoryName === staticCat.apiType
+            )
+        );
+
+        // Update state with the merged categories
+        setCategories([...mergedCategories, ...additionalCategories]);
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
   const categoryContainerRef = useRef(null);
 
@@ -57,18 +96,18 @@ export const DeviceTypeFilter = ({
         {categories.map((category, index) => (
           <div
             onClick={() => {
-              setSelectedBtn(category.name);
+              setSelectedBtn(category.categoryCode);
               setDeviceType(category.apiType);
             }}
             key={index}
             className={
-              selectedBtn === category.name
+              selectedBtn === category.categoryCode
                 ? styles.button_checked
                 : styles.button_unchecked
             }
           >
             {category.image && <img src={category.image} alt={category.name} />}
-            <span>{category.name}</span>
+            <span>{category?.categoryName || category?.name}</span>
           </div>
         ))}
       </div>
@@ -161,10 +200,10 @@ function Categories() {
               size={25}
               onClick={hanldeclose}
             />
-            <div className="text-4xl font-bold text-[#EC2752] p text-center">
+            <div className="text-4xl font-bold text-primary p text-center">
               Coming
             </div>
-            <div className="text-4xl font-bold text-[#EC2752] p text-center">
+            <div className="text-4xl font-bold text-primary p text-center">
               Soon !
             </div>
           </div>

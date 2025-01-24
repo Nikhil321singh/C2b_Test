@@ -44,10 +44,10 @@
   /* width: 120px; */
   padding: 5px 10px;
   color: white;
-  background-color: #ec2752;
+  background-color: var(--primary-color);
   outline: none;
   border-radius: 0.55rem;
-  box-shadow: #ec275265 0px 1px 4px, #ec2752c0 0px 2px 8px;
+  box-shadow: var(--primary-color)65 0px 1px 4px, var(--primary-color)c0 0px 2px 8px;
   cursor: pointer;
   transition: all 0.5s ease;
 }
@@ -67,7 +67,7 @@
   /* width: 120px; */
   padding: 5px 10px;
   color: black;
-  /* background-color: #EC2752; */
+  /* background-color: var(--primary-color); */
   outline: none;
   border-radius: 0.55rem;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 4px, rgba(0, 0, 0, 0.16) 0px 2px 8px;
@@ -76,8 +76,8 @@
 }
 
 .button_unchecked:hover {
-  background-color: #ec2752;
-  box-shadow: #ec275265 0px 1px 4px, #ec2752c0 0px 2px 8px;
+  background-color: var(--primary-color);
+  box-shadow: var(--primary-color)65 0px 1px 4px, var(--primary-color)c0 0px 2px 8px;
   /* scale: 1.03; */
 }
 
@@ -151,7 +151,7 @@
     justify-content: center;
     display: flex;
     width: 50%;
-    /* border: 2px solid red; */
+    /* border: 2px solid var(--secondary-color); */
   }
 
   .mobile_img_wrap img {

@@ -86,7 +86,7 @@ const SelectDevice = () => {
   const [searchModel, setSearchModel] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const DummyImg =
-    Device === "Mobile"
+    Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const { brandId } = useParams();
@@ -152,7 +152,7 @@ const SelectDevice = () => {
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         {isTableLoaded && (
           <div className="fixed top-0 left-0 z-100 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-            <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+            <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
           </div>
         )}
         <div className="flex items-center justify-between w-full pr-2">
@@ -166,11 +166,7 @@ const SelectDevice = () => {
         </div>
       </div>
       <div className="ml-5">
-        {Device === "Mobile" ? (
-          <p className="text-2xl font-bold">Select Mobile Phone</p>
-        ) : (
-          <p className="text-2xl font-bold">Select Smartwatches</p>
-        )}
+          <p className="text-2xl font-bold">Select Device</p>
       </div>
       {seriesList.length > 1 && (
         <SeriesFilter
@@ -197,7 +193,7 @@ const SelectDevice = () => {
           type="text"
         />
         <div
-          className="flex items-center justify-center bg-[#EC2752] h-[40px] w-[50px] cursor-pointer"
+          className="flex items-center justify-center bg-primary h-[40px] w-[50px] cursor-pointer"
           onClick={fetchModels}
         >
           <IoMdSearch size={25} className="inline text-white" />

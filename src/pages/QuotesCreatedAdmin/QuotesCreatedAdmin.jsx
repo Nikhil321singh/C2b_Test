@@ -24,11 +24,15 @@ const downloadExcelQuotesAdminCreated = (apiData) => {
     let questionsKeys = "";
     let index = 1;
     console.log(item?.lead?.QNA[0]);
-    for (const group in item?.lead?.QNA[0]) {
-      item.lead.QNA[0][group].forEach((qna) => {
-        questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
-        index++;
-      });
+    if (item?.lead?.QNA?.[0] && typeof item.lead.QNA[0] === 'object') {
+      for (const group in item.lead.QNA[0]) {
+        if (Array.isArray(item.lead.QNA[0][group])) {
+          item.lead.QNA[0][group].forEach((qna) => {
+            questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
+            index++;
+          });
+        }
+      }
     }
     return {
       "Date Created": new Date(item.createdAt).toLocaleDateString("en-IN"),
@@ -202,7 +206,7 @@ const QuotesCreatedAdmin = () => {
     <div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#EC2752"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="navbar">

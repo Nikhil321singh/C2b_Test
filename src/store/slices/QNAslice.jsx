@@ -4,7 +4,9 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   Core: [],
   Cosmetics: [],
+  Accessories: [],
   Display: [],
+  Functional: [],
   Functional_major: [],
   Functional_minor: [],
   Warranty: [],
@@ -63,6 +65,28 @@ const qnaSlice = createSlice({
         }
       }
     },
+      updateAccessoriesObject: (state, action) => {
+      const { index, noKey, yesKey, selectedIndex } = action.payload;
+      let loopEntered = false;
+      state.Accessories[index].selected[selectedIndex] =
+        !state.Accessories[index].selected[selectedIndex];
+      state.Accessories[index].selected.forEach((element) => {
+        if (element) {
+          if (state.Accessories[index]) {
+            state.Accessories[index].answer = yesKey;
+            state.Accessories[index].key = "yes";
+            loopEntered = true;
+          }
+        }
+      });
+      if (!loopEntered) {
+        if (state.Accessories[index]) {
+          state.Accessories[index].answer = noKey;
+          state.Accessories[index].key = "no";
+          loopEntered = false;
+        }
+      }
+    },
     updateDisplayObject: (state, action) => {
       const { index, noKey, yesKey, selectedIndex } = action.payload;
       let loopEntered = false;
@@ -83,6 +107,13 @@ const qnaSlice = createSlice({
           state.Display[index].key = "no";
           loopEntered = false;
         }
+      }
+    },
+    updateFunctionalObject: (state, action) => {
+      const { index, newAnswer, newKey } = action.payload;
+      if (state.Functional[index]) {
+        state.Functional[index].answer = newAnswer;
+        state.Functional[index].key = newKey;
       }
     },
     updateFunctionalMajorObject: (state, action) => {
@@ -170,7 +201,9 @@ export const {
   setGroupAnswers,
   updateCoreObject,
   updateCosmeticsObject,
+  updateAccessoriesObject,
   updateDisplayObject,
+  updateFunctionalObject,
   updateFunctionalMajorObject,
   updateFunctionalMinorObject,
   updateWarrantyObject,
