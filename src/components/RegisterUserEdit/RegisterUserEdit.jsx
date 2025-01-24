@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import axios from "axios";
 import { IoClose } from "react-icons/io5";
-const role = ["Admin Manager", "Technician", "Sale User"];
+const role = ["Super Admin", "Admin Manager", "Technician", "Sale User", "Super_Admin_Unicorn", "Admin_Manager_Unicorn"];
 
 const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
   const token = sessionStorage.getItem("authToken");

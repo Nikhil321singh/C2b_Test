@@ -5,7 +5,9 @@ const PurchaseReceipt = ({
   imeiNumber,
   uniqueCode,
   phoneNumber,
+  aadharNumber,
   phoneName,
+  type,
   storage,
   storeName,
   RAM,
@@ -14,6 +16,7 @@ const PurchaseReceipt = ({
   name,
   region,
   address,
+  price,
 }) => {
   const maskPhoneNumber = (phNumber) => {
     const visibleLength = Math.ceil(phNumber?.length * 0.25);
@@ -63,7 +66,7 @@ const PurchaseReceipt = ({
       <div className="flex items-center mt-4 justify-between mx-auto">
         <div className="w-[30%]">
           <p>
-            <span className="font-bold"> Serial No.:</span> {uniqueCode}
+            <span className="font-bold"> Transaction ID:</span> {uniqueCode}
           </p>
           <p>
             <span className="font-bold"> Date:</span> {formattedDate}
@@ -73,26 +76,50 @@ const PurchaseReceipt = ({
           <p>
             <span className="font-bold"> Purchased From: {name}</span>
           </p>
-          <p>
-            <span> Contact: {maskPhoneNumber(phoneNumber)}</span>
-          </p>
+          <p></p>
+          <span> Contact: {maskPhoneNumber(phoneNumber)}</span>
           <p>
             <span> Mail: {maskEmail(emailId)}</span>
           </p>
+          <p>
+            <span> Aadhar No.: {aadharNumber}</span>
+          </p>
         </div>
       </div>
-      <div className="flex gap-2">
-        <div className="flex flex-col items-center">
+      <div className="flex gap-8 flex-row justify-start">
+        <div className="flex flex-col items-start">
           <p className="font-bold">S.No.</p>
           <p>1</p>
         </div>
         <div>
-          <p className="font-bold">Item</p>
+          <p className="font-bold flex flex-col items-start">ITEM</p>
           <p>
-            {phoneName} ({storage}/{RAM})
+            {phoneName}
+            {RAM && storage
+              ? ` (${RAM}/${storage})`
+              : RAM
+              ? ` (${RAM}/${storage})`
+              : storage
+              ? ` (${RAM}/${storage})`
+              : ""}
           </p>
         </div>
+        <div>
+          <p className="font-bold flex flex-col items-start">PRICE</p>
+          <p>{"₹ " + Math.floor(price) + "/-"}</p>
+        </div>
       </div>
+      <div className="flex gap-8 flex-row justify-start">
+        <div className="flex flex-col items-start">
+          <p className="mt-4">IMEI No.:</p>
+          <p className="mt-4">Serial Number(if Laptop):</p>
+        </div>
+        <div className="flex flex-col items-start">
+          <p className="mt-4">{type ? imeiNumber : ""}</p>
+          <p className="mt-4">{type === "Laptop" ? imeiNumber : ""}</p>
+        </div>
+      </div>
+      
       <hr className="border-black mt-10 border-1" />
       <div className="flex flex-col items-center border-b-2 border-dashed border-black py-4 ">
         <p className="text-xl font-bold mt-4 mb-2">Via Retail Store Partner:</p>
@@ -118,9 +145,6 @@ const PurchaseReceipt = ({
       </div>
 
       <div>
-        <p className="mt-4">
-          <span> IMEI No./ Serial Number: {imeiNumber}</span>
-        </p>
         <p className="mt-4">
           <span> Scheme Title: Buyback</span>
         </p>

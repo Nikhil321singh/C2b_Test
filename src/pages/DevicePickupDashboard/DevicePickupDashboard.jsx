@@ -22,6 +22,7 @@ const succTextColor = "text-green-500";
 const failTextColor = "text-primary";
 const PickupAvail = "Available For Pickup";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+const id = LoggedInUser?._id || LoggedInUser?.id;
 const RotateCss = "rotate-180";
 
 const downloadExcel = (pendDataDown) => {

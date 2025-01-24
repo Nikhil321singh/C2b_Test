@@ -9,6 +9,7 @@ import DeviceReport from "../../components/DeviceReport/DeviceReport";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import apple_watch from "../../assets/apple_watch.png";
 import { setResponseData } from "../../store/slices/responseSlice";
+import { toast } from "react-hot-toast";
 
 const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) => {
   if (quoteSaved) {
@@ -27,7 +28,7 @@ const DeviceQuote = () => {
   const dispatch = useDispatch();
   const Device = sessionStorage.getItem("DeviceType");
   const DummyImg =
-    Device === "Mobile"
+    Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
@@ -85,6 +86,13 @@ const DeviceQuote = () => {
     setShowModal(!showModal);
   };
 
+  useEffect(() => {
+    if(quoteSaved === false &&
+      exactQuoteValue === "true") {  
+        toast.error("Bonus Must Be Less Than ₹2000.");
+      }
+  }, []);
+
   return (
     <div className={`bg-white min-h-screen ${styles.page_wrap}`}>
       {continueOTPOpen && <ContOTP setContinueOTPOpen={setContinueOTPOpen} />}
@@ -122,7 +130,7 @@ const DeviceQuote = () => {
             <div className="flex flex-col gap-[2px]">
               <p className="font-medium text-gray-700">
                 {`${deviceModalInfo.models?.name}${
-                  deviceModalInfo.models?.type === "Mobile"
+                  deviceModalInfo.models?.type === "CTG1"
                     ? `(${deviceModalInfo.models?.config?.RAM}/${deviceModalInfo.models?.config?.storage})`
                     : ""
                 }`}
@@ -137,43 +145,45 @@ const DeviceQuote = () => {
             quoteId={quoteId}
             bonusPrice={bonus}
           ></QuoteModal>
-          {quoteSaved === false && exactQuoteValue === "true" && currentDomain !== "https://buyback.grest.in" && (
-            <div className="flex flex-row items-center justify-between px-2 my-2">
-              <div className="w-[40%] font-medium text-gray-700">
-                Bonus Amount :
+          {quoteSaved === false &&
+            exactQuoteValue === "true" &&
+            currentDomain !== "https://buyback.grest.in" && (
+              <div className="flex flex-row items-center justify-between px-2 my-2">
+                <div className="w-[40%] font-medium text-gray-700">
+                  Bonus Amount :
+                </div>
+                <div className="rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-primary flex flex-col items-center justify-center">
+                  <input
+                    className="bg-transparent outline-none my-auto text-center font-medium text-primary"
+                    name="bonus"
+                    id="bonus"
+                    type="number"
+                    placeholder="Enter Bonus Amount"
+                    value={bonus}
+                    maxLength={6}
+                    onKeyDown={(e) => {
+                      if (
+                        e.key === "-" ||
+                        e.key === "+" ||
+                        e.key === "e" ||
+                        e.key === "." ||
+                        e.key === "E"
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    onChange={(e) => {
+                      if (
+                        Number(e.target.value) >= 0 &&
+                        Number(e.target.value) < 100001
+                      ) {
+                        setBonus(e.target.value);
+                      }
+                    }}
+                  />
+                </div>
               </div>
-              <div className="rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-primary flex flex-col items-center justify-center">
-                <input
-                  className="bg-transparent outline-none my-auto text-center font-medium text-primary"
-                  name="bonus"
-                  id="bonus"
-                  type="number"
-                  placeholder="Enter Bonus Amount"
-                  value={bonus}
-                  maxLength={6}
-                  onKeyDown={(e) => {
-                    if (
-                      e.key === "-" ||
-                      e.key === "+" ||
-                      e.key === "e" ||
-                      e.key === "." ||
-                      e.key === "E"
-                    ) {
-                      e.preventDefault();
-                    }
-                  }}
-                  onChange={(e) => {
-                    if (
-                      Number(e.target.value) >= 0 &&
-                      Number(e.target.value) < 100001
-                    ) {
-                      setBonus(e.target.value);
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          )}
+            )}
           <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed "></div>
           <div className="flex items-center justify-between">
             <p

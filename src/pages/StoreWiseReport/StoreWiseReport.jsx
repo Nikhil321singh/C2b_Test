@@ -25,14 +25,15 @@ const downloadExcelStoreWise = (apiData) => {
     return {
       "Purchase Date": new Date(item.createdAt).toLocaleDateString("en-IN"),
       Technicians: item.userId?.firstName,
-      Category: item.modelId?.type,
+      Category: item.categoryInfo?.categoryName,
       "IMEI No.": item.documentId?.IMEI,
       "Product Details": item.modelId?.name,
       Location: item?.store?.storeName,
       Price: item?.actualPrice,
       "Price Offered To Customer": item?.price,
       "Unique ID": item?.uniqueCode,
-      [`${import.meta.env.VITE_WEBSITE_SHORT_NAME} Received`]: item?.grestReceived || "NA",
+      [`${import.meta.env.VITE_WEBSITE_SHORT_NAME} Received`]:
+        item?.grestReceived || "NA",
       "Receiving Date": item?.grestRecDate || "NA",
       "New Prices As Per New Range": "NA",
       "Store Payment Status": "NA",
@@ -97,8 +98,9 @@ const StoreWiseReport = () => {
   const [allUser, setAllUser] = useState([]);
   const [techId, setTechId] = useState("");
   const [techName, setTechName] = useState("");
-  const [deviceCategory, setDeviceCategory] = useState("Mobile");
+  const [deviceCategory, setDeviceCategory] = useState("CTG1");
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]);
   const fetchStoreData = () => {
     setIsTableLoaded(true);
     axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll?page=${currentPage}
@@ -164,9 +166,22 @@ const StoreWiseReport = () => {
         setIsTableLoaded(false);
       });
   };
-
+  const getCategories = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+        {
+          headers: { Authorization: token },
+        }
+      );
+      setCategories(data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   useEffect(() => {
     getStore();
+    getCategories();
     getTechnicians();
   }, []);
 
@@ -224,6 +239,7 @@ const StoreWiseReport = () => {
         toDate={toDate}
         handleSearchClear={handleSearchClear}
         fetchStoreData={fetchStoreData}
+        categories={categories}
       />
       <MainFilter
         techName={techName}
@@ -271,13 +287,18 @@ const UpperFilter = ({
   toDate,
   handleSearchClear,
   fetchStoreData,
+  categories
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
   return (
     <React.Fragment>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
+          <BeatLoader
+            color="var(--primary-color)"
+            loading={isTableLoaded}
+            size={15}
+          />
         </div>
       )}
       <div className="navbar">
@@ -293,18 +314,15 @@ const UpperFilter = ({
             className="bg-primary text-white rounded-lg outline-none px-2 py-1"
             onChange={(e) => setDeviceCategory(e.target.value)}
           >
-            <option
-              className="bg-white text-primary font-medium"
-              value="Mobile"
-            >
-              Mobile
-            </option>
-            <option
-              className="bg-white text-primary hover:bg-primary font-medium"
-              value="Watch"
-            >
-              Watch
-            </option>
+            {categories.map((cat) => (
+              <option
+                className="bg-white text-primary font-medium"
+                key={cat?._id}
+                value={cat?.categoryCode}
+              >
+                {cat?.categoryName}
+              </option>
+            ))}
           </select>
         </div>
         <div className={`${styles.search_bar_wrap}`}>

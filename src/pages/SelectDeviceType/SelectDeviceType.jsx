@@ -55,13 +55,55 @@ export const DeviceTypeFilter = ({
   setSelectedBtn,
   setDeviceType,
 }) => {
-  const categories = [
+    const token = sessionStorage.getItem("authToken");
+
+  const [categories, setCategories] = useState([]);
+
+  const staticCategories = [
     { name: "Mobiles", image: mobile, apiType: "Mobile" },
     { name: "Laptops", image: laptop, apiType: "Laptop" },
     { name: "Watches", image: watch, apiType: "Watch" },
     { name: "More", image: null },
   ];
+  useEffect(() => {
+    getCategories();
+  }, []);
+const getCategories = async () => {
+  try {
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+      {
+        headers: { Authorization: token },
+      }
+    );
+    sessionStorage.setItem("Categories", JSON.stringify(data?.data));
+    // Map API data and merge with static data
+    const mergedCategories = data.data.map((apiCat) => {
+      // Find a matching category in static categories
+      const match = staticCategories.find(
+        (staticCat) => staticCat.apiType === apiCat.categoryName
+      );
 
+      // Merge data if match found, otherwise keep API category
+      return {
+        ...apiCat,
+        image: match?.image || null, // Use the image from static data if available
+        apiType: apiCat.categoryCode, // Ensure `apiType` is consistent
+      };
+    });
+
+    // Append static categories that are not present in API data
+    const additionalCategories = staticCategories.filter(
+      (staticCat) =>
+        !data.data.some((apiCat) => apiCat.categoryName === staticCat.apiType)
+    );
+
+    // Update state with the merged categories
+    setCategories([...mergedCategories, ...additionalCategories]);
+  } catch (err) {
+    console.log(err);
+  }
+};
   const categoryContainerRef = useRef(null);
 
   const scrollCategory = (direction) => {
@@ -97,17 +139,17 @@ export const DeviceTypeFilter = ({
           <div
             key={index}
             className={
-              selectedBtn === category.name
+              selectedBtn === category.categoryCode
                 ? styles.button_checked
                 : styles.button_unchecked
             }
             onClick={() => {
-              setSelectedBtn(category.name);
+              setSelectedBtn(category.categoryCode);
               setDeviceType(category.apiType);
             }}
           >
             {category.image && <img src={category.image} alt={category.name} />}
-            <span>{category.name}</span>
+            <span>{category?.categoryName || category?.name}</span>
           </div>
         ))}
       </div>
@@ -154,7 +196,7 @@ export const DeviceTypeFilter2 = () => {
 const ImgSelectore = (ImgItem) => {
   if (ImgItem?.phonePhotos?.front) {
     return ImgItem?.phonePhotos?.front;
-  } else if (ImgItem?.type === "Mobile") {
+  } else if (ImgItem?.type === "CTG1") {
     return mobile;
   } else {
     return appleWatch;
@@ -317,7 +359,16 @@ export const BrandList = ({ deviceType }) => {
       brandItem.name === "Xiaomi" ||
       brandItem.name === "Samsung" ||
       brandItem.name === "Vivo" ||
-      brandItem.name === "OPPO"
+      brandItem.name === "iQOO" ||
+      brandItem.name === "Infinix" ||
+      brandItem.name === "Tecno" ||
+      brandItem.name === "Google" ||
+      brandItem.name === "Nothing" ||
+      brandItem.name === "Honor" ||
+      brandItem.name === "Motorola" ||
+      brandItem.name === "Nokia" ||
+      brandItem.name === "OPPO"||
+      brandItem.name === "Lenovo"
     ) {
       const detail = { brand: brandItem, models: {}, _id: brandItem._id };
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
@@ -539,7 +590,7 @@ const SelectDeviceType = () => {
 
   useEffect(() => {
     if (data) {
-      searchPhone(data, "Mobile");
+      searchPhone(data, "CTG1");
     }
   }, [data]);
 

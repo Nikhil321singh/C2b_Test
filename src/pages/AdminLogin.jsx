@@ -13,7 +13,6 @@ import {
 } from "react-icons/md";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { FaRegUser } from "react-icons/fa";
-const iconStyle = { margin: "0px 10px", color: "var(--primary-color)" };
 
 const AdminLogin = () => {
   const [userEmail, setUserEmail] = useState("");
@@ -76,7 +75,7 @@ const AdminLogin = () => {
               <div className="input">
                 <MdOutlineLocationOn
                   size={25}
-                  style={iconStyle}
+                  style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                 />
                 <input
                   type="text"
@@ -94,7 +93,7 @@ const AdminLogin = () => {
               <div className="input">
                 <MdOutlineStorefront
                   size={25}
-                  style={iconStyle}
+                  style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                 />
                 <select
                   id="store"
@@ -125,7 +124,7 @@ const AdminLogin = () => {
               <div className="input">
                 <FaRegUser
                   size={25}
-                  style={iconStyle}
+                  style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                 />
                 <select
                   id="user"
@@ -153,7 +152,7 @@ const AdminLogin = () => {
               <div className="input">
                 <MdOutlineMailLock
                   size={25}
-                  style={iconStyle}
+                  style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                 />
                 <input
                   type="text"
@@ -172,7 +171,7 @@ const AdminLogin = () => {
               <div className="input">
                 <RiLockPasswordLine
                   size={25}
-                  style={iconStyle}
+                  style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                 />
                 <input
                   type="password"

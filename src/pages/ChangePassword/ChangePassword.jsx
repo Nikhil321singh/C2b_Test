@@ -8,7 +8,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
-const iconStyle = { margin: "0px 10px", color: "var(--primary-color)" };
 
 const ChangePassword = () => {
   const [password, setPassword] = useState("");
@@ -226,7 +225,7 @@ const PasswordChange = ({
                 <div className="input">
                   <MdOutlineMailLock
                     size={25}
-                    style={iconStyle}
+                    style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                   />
                   <input
                     id="email"
@@ -241,7 +240,7 @@ const PasswordChange = ({
                 <div className="relative input">
                   <RiLockPasswordLine
                     size={25}
-                    style={iconStyle}
+                    style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                   />
                   <input
                     id="password"
@@ -264,7 +263,7 @@ const PasswordChange = ({
                 <div className="relative input">
                   <RiLockPasswordLine
                     size={25}
-                    style={iconStyle}
+                    style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                   />
                   <input
                     id="new-password"
@@ -284,7 +283,7 @@ const PasswordChange = ({
                 <div className="relative input">
                   <RiLockPasswordLine
                     size={25}
-                    style={iconStyle}
+                    style={{ margin: "0px 10px", color: "var(--primary-color)" }}
                   />
                   <input
                     id="confirm-password"

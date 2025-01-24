@@ -65,8 +65,9 @@ const GradePricingSheet = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [searchValue, setSearchValue] = useState("");
   const [uploadBox, setUploadBox] = useState(false);
-  const [deviceCategory, setDeviceCategory] = useState("Mobile");
+  const [deviceCategory, setDeviceCategory] = useState("CTG1");
   const [file, setFile] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   const fetchData = () => {
     setIsTableLoading(true);
@@ -100,7 +101,9 @@ const GradePricingSheet = () => {
       getDataBySearch();
     }
   }, [currentPage, pageLimit, deviceCategory]);
-
+  useEffect(() => {
+    getCategories();
+  },[])
   const getDataBySearch = () => {
     setIsTableLoading(true);
     const config = {
@@ -121,7 +124,19 @@ const GradePricingSheet = () => {
         setIsTableLoading(false);
       });
   };
-
+  const getCategories = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+        {
+          headers: { Authorization: userToken },
+        }
+      );
+      setCategories(data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const handleSearchClick = () => {
     getDataBySearch();
   };
@@ -214,6 +229,7 @@ const GradePricingSheet = () => {
         setCurrentPage={setCurrentPage}
         currentPage={currentPage}
         maxPages={maxPages}
+        categories={categories}
       />
     </div>
   );
@@ -239,6 +255,7 @@ const GradePricingSheetSub = ({
   setCurrentPage,
   currentPage,
   maxPages,
+  categories
 }) => {
   return (
     <div>
@@ -250,7 +267,11 @@ const GradePricingSheetSub = ({
       {/* <Searchbar /> */}
       {isTableLoading && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color="var(--primary-color)" loading={isTableLoading} size={15} />
+          <BeatLoader
+            color="var(--primary-color)"
+            loading={isTableLoading}
+            size={15}
+          />
         </div>
       )}
 
@@ -300,18 +321,15 @@ const GradePricingSheetSub = ({
             className="bg-primary text-white rounded-lg outline-none px-2 py-1"
             onChange={handleDeviceCategory}
           >
-            <option
-              className="bg-white text-primary font-medium"
-              value="Mobile"
-            >
-              Mobile
-            </option>
-            <option
-              className="bg-white text-primary hover:bg-primary font-medium"
-              value="Watch"
-            >
-              Watch
-            </option>
+            {categories.map((cat) => (
+              <option
+                className="bg-white text-primary font-medium"
+                key={cat?._id}
+                value={cat?.categoryCode}
+              >
+                {cat?.categoryName}
+              </option>
+            ))}
           </select>
         </div>
         <div className={`${styles.search_bar_wrap}`}>

@@ -74,16 +74,20 @@ const downloadExcelCustomerTable = (apiData) => {
     let index = 1;
     console.log(element?.lead?.QNA[0]);
     let questionsKeys = "";
-    for (const group in element?.lead?.QNA[0]) {
-      element.lead.QNA[0][group].forEach((qna) => {
-        questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
-        index++;
-      });
+    if (element?.lead?.QNA?.[0] && typeof element.lead.QNA[0] === 'object') {
+      for (const group in element.lead.QNA[0]) {
+        if (Array.isArray(element.lead.QNA[0][group])) {
+          element.lead.QNA[0][group].forEach((qna) => {
+            questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
+            index++;
+          });
+        }
+      }
     }
     return {
       "Date Created": new Date(element?.createdAt).toLocaleDateString("en-IN"),
       "User Name": element?.user?.name,
-      category: element?.lead?.model?.type,
+      category: element?.categoryInfo?.categoryName,
       "Product Name": element?.lead?.model?.name,
       Variant: element?.lead?.storage,
       Price: element?.lead?.actualPrice,

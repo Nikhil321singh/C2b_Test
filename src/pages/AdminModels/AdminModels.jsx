@@ -15,6 +15,7 @@ import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { resetAdminAnswer } from "../../store/slices/newAdminGrade";
 import {
   setMobileID,
   setRam,
@@ -79,7 +80,7 @@ const selectedModel = "";
 
 const AdminModels = () => {
   const [admincategory, setAdminCategory] = useState(
-    sessionStorage.getItem("admincategory") === "Watch" ? "Watch" : "Mobile"
+    sessionStorage.getItem("admincategory") === "CTG2" ? "CTG2" : "CTG1"
   );
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -87,14 +88,17 @@ const AdminModels = () => {
   const [selectmodel, setSelectModel] = useState("");
   const [selectstorage, setSelectstorage] = useState("");
   const [selectram, setSelectram] = useState("");
-  const [category, setCategory] = useState("Mobile");
+  const [category, setCategory] = useState("CTG1");
+  const [categories, setCategories] = useState([]);
   const token = sessionStorage.getItem("authToken");
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [confBox, setConfBox] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  useEffect(() => {
+    dispatch(resetAdminAnswer());
+  }, []);
   useEffect(() => {
     sessionStorage.setItem("admincategory", category);
     getData();
@@ -102,7 +106,8 @@ const AdminModels = () => {
   }, [category]);
 
   useEffect(() => {
-    sessionStorage.setItem("admincategory", "Mobile");
+    sessionStorage.setItem("admincategory", "CTG1");
+    getCategories();
   }, []);
 
   function handleNext() {
@@ -188,12 +193,25 @@ const AdminModels = () => {
         setIsTableLoaded(false);
       });
   };
+  const getCategories = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+        {
+          headers: { Authorization: token },
+        }
+      );
+      setCategories(data.data);
+    } catch (err) {
+      console.log(err)
+    }
+  }
   const selectHandler = (modelId, modelStorage, ram, modelName) => {
     sessionStorage.setItem(
       "adminModelName",
       `${modelName} (${ram}/${modelStorage})`
     );
-    if (category === "Watch") {
+    if (category === "CTG2") {
       sessionStorage.setItem("adminModelName", modelName);
     }
     setSelectModel(modelId);
@@ -227,6 +245,7 @@ const AdminModels = () => {
         category={category}
         setConfBox={setConfBox}
         setCategory={setCategory}
+        categories={categories}
       />
       <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
         <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
@@ -280,6 +299,7 @@ const ExtComps = ({
   setConfBox,
   category,
   setCategory,
+  categories,
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
   return (
@@ -292,7 +312,11 @@ const ExtComps = ({
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
+          <BeatLoader
+            color="var(--primary-color)"
+            loading={isTableLoaded}
+            size={15}
+          />
         </div>
       )}
       {(sucBox || failBox) && (
@@ -360,18 +384,15 @@ const ExtComps = ({
             onChange={(e) => setCategory(e.target.value)}
             value={category}
           >
-            <option
-              className="bg-white text-primary font-medium"
-              value="Mobile"
-            >
-              Mobile
-            </option>
-            <option
-              className="bg-white text-primary font-medium"
-              value="Watch"
-            >
-              Watch
-            </option>
+            {categories.map((cat) => (
+              <option
+                className="bg-white text-primary font-medium"
+                key={cat?._id}
+                value={cat?.categoryCode}
+              >
+                {cat?.categoryName}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -464,10 +485,10 @@ const AdminModelsTable = ({
                 {val?.modelName}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {category === "Mobile" ? val?.RAM : "-"}
+                {val?.RAM ? val?.RAM : "-"}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {category === "Mobile" ? val?.storage : "-"}
+                {val?.RAM ? val?.storage : "-"}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.price}

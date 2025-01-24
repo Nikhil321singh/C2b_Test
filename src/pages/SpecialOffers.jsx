@@ -245,7 +245,7 @@ const SubSpecialOffers = ({
   const navigate = useNavigate();
   const Device = sessionStorage.getItem("DeviceType");
   const DummyImg =
-    Device === "Mobile"
+    Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));

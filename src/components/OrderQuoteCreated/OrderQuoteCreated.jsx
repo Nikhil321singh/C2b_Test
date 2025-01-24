@@ -140,6 +140,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
       <div className="flex flex-col gap-4 mt-4">
         {data.map((item, index) => (
           <OrdersCard
+            allData={item}
             key={index}
             itemData={item}
             title={orderType === "quoteData" ? "Quote Saved" : "Order Saved"}

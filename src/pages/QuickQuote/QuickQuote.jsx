@@ -127,6 +127,10 @@ const QuickQuote = () => {
     };
 
     fetchData();
+    const token = sessionStorage.getItem("authToken");
+    if (!token) {
+      navigate("/");
+    }
   }, []);
 
   const handlesubmit = async () => {
@@ -141,7 +145,7 @@ const QuickQuote = () => {
       modelId: id?.models?._id,
       storage: id?.models?.config?.storage,
       ram: id?.models?.config?.RAM,
-
+      aadharNumber: "1234567890",
       name: profile?.name,
     };
     const response = await axios.post(

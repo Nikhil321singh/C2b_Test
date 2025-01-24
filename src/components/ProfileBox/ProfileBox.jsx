@@ -4,6 +4,23 @@ import { IoClose } from "react-icons/io5";
 import styles from "./ProfileBox.module.css";
 import { useNavigate } from "react-router";
 
+function setName(firstName, lastName) {
+  if (!firstName && !lastName) {
+      return "Sale User";
+  }
+  
+  const fullName = firstName + " " + lastName;
+  if (fullName.length > 20) {
+      if (firstName.length > 20) {
+          return firstName.charAt(0) + ". " + lastName;
+      } else {
+          return firstName + " " + lastName.charAt(0) + ".";
+      }
+  }else{
+    return fullName;
+  }
+}
+
 const ProfileBox = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState();
@@ -14,7 +31,7 @@ const ProfileBox = () => {
 
   useEffect(() => {
     const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    setUserName(LoggedInUser?.name);
+    setUserName(setName(LoggedInUser?.firstName, LoggedInUser?.lastName));
     setUserEmail(LoggedInUser?.email);
     setUserRole(LoggedInUser?.role);
     if (LoggedInUser?.name) {

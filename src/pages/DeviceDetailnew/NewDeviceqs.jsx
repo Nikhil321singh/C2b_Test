@@ -58,10 +58,35 @@ import quesImg50 from "../../assets/4.jpg";
 import quesImg51 from "../../assets/quesImg0.png";
 import quesImg53 from "../../assets/48.jpg";
 import quesImg54 from "../../assets/49.jpg";
-import quesImg55 from "../../assets/50.jpg";
-import quesImg56 from "../../assets/51.jpg";
-
+import quesImg55 from "../../assets/major.jpeg";
+import quesImg56 from "../../assets/minor.jpeg";
+import question1 from "../../assets/question1.png";
+import question2 from "../../assets/question2.png";
+import question3 from "../../assets/question3.png";
+import question4 from "../../assets/question4.png";
+import question5 from "../../assets/question5.png";
+import question6 from "../../assets/question6.png";
+import question7 from "../../assets/question7.png";
+import question8 from "../../assets/question8.png";
+import question9 from "../../assets/question9.png";
+import acces1 from "../../assets/access1.png";
+import acces2 from "../../assets/access2.png";
+import acces3 from "../../assets/access3.png";
+import acces4 from "../../assets/access4.png";
 const imageMap = {
+  acces1,
+  acces2,
+  acces3,
+  acces4,
+  question1,
+  question2,
+  question3,
+  question4,
+  question5,
+  question6,
+  question7,
+  question8,
+  question9,
   quesImg1,
   quesImg2,
   quesImg3,
@@ -125,6 +150,8 @@ import {
   updateCoreObject,
   updateCosmeticsObject,
   updateDisplayObject,
+  updateFunctionalObject,
+  updateAccessoriesObject,
   updateFunctionalMajorObject,
   updateFunctionalMinorObject,
   updateWarrantyObject,
@@ -140,6 +167,8 @@ const initialState = {
   Core: [],
   Cosmetics: [],
   Display: [],
+  Functional: [],
+  Accessories: [],
   Functional_major: [],
   Functional_minor: [],
   Warranty: [],
@@ -169,8 +198,9 @@ const handleSkip = (visible, updateAns) => {
   }
 };
 
-function NewDeviceqs() {
+const NewDeviceqs = () => {
   const userToken = sessionStorage.getItem("authToken");
+  const DeviceType = sessionStorage.getItem("DeviceType");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { answers, setAnswers } = useQuestionContext();
   const [visible, setVisible] = useState(1);
@@ -179,6 +209,8 @@ function NewDeviceqs() {
   const core = useSelector((state) => state.qna.Core);
   const Cosmetics = useSelector((state) => state.qna.Cosmetics);
   const Display = useSelector((state) => state.qna.Display);
+  const Accessories = useSelector((state) => state.qna.Accessories);
+  const Functional = useSelector((state) => state.qna.Functional);
   const FunctionalMajor = useSelector((state) => state.qna.Functional_major);
   const FunctionalMinor = useSelector((state) => state.qna.Functional_minor);
   const Warranty = useSelector((state) => state.qna.Warranty);
@@ -195,8 +227,9 @@ function NewDeviceqs() {
   }
   const fetchData = async () => {
     try {
-      const apiUrl = `${import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/findAll?page=0&limit=31`;
+      const apiUrl = `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/questionnaires/findAll?page=0&limit=99&type=${DeviceType}`;
       const response = await axios.get(apiUrl, {
         headers: {
           authorization: `${userToken}`,
@@ -206,6 +239,8 @@ function NewDeviceqs() {
         "Core",
         "Cosmetics",
         "Display",
+        "Accessories",
+        "Functional",
         "Functional_major",
         "Functional_minor",
         "Warranty",
@@ -252,6 +287,8 @@ function NewDeviceqs() {
           "Core",
           "Cosmetics",
           "Display",
+          "Accessories",
+          "Functional",
           "Functional_major",
           "Functional_minor",
           "Warranty",
@@ -285,6 +322,19 @@ function NewDeviceqs() {
     }
   };
 
+  const parts = [
+    { component: FirstPart, data: NDstate.Core, slice: core },
+    { component: SecondPart, data: NDstate.Cosmetics, slice: Cosmetics },
+    { component: ThirdPart, data: NDstate.Display, slice: Display },
+    { component: FourthPart, data: NDstate.Functional_major, slice: FunctionalMajor },
+    { component: FifthPart, data: NDstate.Functional_minor, slice: FunctionalMinor },
+    { component: SixthPart, data: NDstate.Functional, slice: Functional },
+    { component: SeventhPart, data: NDstate.Accessories, slice: Accessories },
+    { component: EighthPart, data: NDstate.Warranty, slice: Warranty },
+  ];
+
+  const availableParts = parts.filter(part => part.data && part.data.length > 0);
+
   return (
     <>
       <div className={`popup ${showPopup ? "show" : ""}`}>
@@ -301,12 +351,7 @@ function NewDeviceqs() {
         isSearchOpen={isSearchOpen}
         dispatch={dispatch}
         visible={visible}
-        core={core}
-        Cosmetics={Cosmetics}
-        Display={Display}
-        FunctionalMajor={FunctionalMajor}
-        FunctionalMinor={FunctionalMinor}
-        Warranty={Warranty}
+        availableParts={availableParts}
         setVisible={setVisible}
         updateAns={updateAns}
         showPopup={showPopup}
@@ -315,22 +360,15 @@ function NewDeviceqs() {
       />
     </>
   );
-}
-
+};
 export default NewDeviceqs;
-
 const MainQContainer = ({
   NDstate,
   setIsSearchOpen,
   isSearchOpen,
   dispatch,
   visible,
-  core,
-  Cosmetics,
-  Display,
-  FunctionalMajor,
-  FunctionalMinor,
-  Warranty,
+  availableParts,
   setVisible,
   updateAns,
   showPopup,
@@ -338,6 +376,8 @@ const MainQContainer = ({
   profile,
 }) => {
   const navigate = useNavigate();
+  const CurrentPart = availableParts[visible - 1]?.component;
+
   return (
     <div className="mainQContainer">
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
@@ -366,23 +406,7 @@ const MainQContainer = ({
           </div>
           <div className="underline"></div>
           <div className="questionList">
-            {visible === 1 && <FirstPart NDstate={NDstate} core={core} />}
-            {visible === 2 && (
-              <SecondPart Cosmetics={Cosmetics} NDstate={NDstate} />
-            )}
-            {visible === 3 && <ThirdPart Display={Display} NDstate={NDstate} />}
-            {visible === 4 && (
-              <FourthPart FunctionalMajor={FunctionalMajor} NDstate={NDstate} />
-            )}
-            {visible === 5 && (
-              <FifthPart FunctionalMinor={FunctionalMinor} NDstate={NDstate} />
-            )}
-            {visible === 6 && (
-              <SixthPart Cosmetics={Cosmetics} NDstate={NDstate} />
-            )}
-            {visible === 7 && (
-              <SeventhPart Warranty={Warranty} NDstate={NDstate} />
-            )}
+            {CurrentPart && <CurrentPart NDstate={NDstate} slice={availableParts[visible - 1]?.slice} />}
           </div>
         </div>
       </div>
@@ -393,12 +417,13 @@ const MainQContainer = ({
         showPopup={showPopup}
         qna={qna}
         profile={profile}
+        availableParts={availableParts}
       />
     </div>
   );
 };
 
-const FirstPart = ({ NDstate, core }) => {
+const FirstPart = ({ NDstate, slice }) => {
   return (
     <div className="containClass">
       <div className="subheading">
@@ -413,7 +438,7 @@ const FirstPart = ({ NDstate, core }) => {
                 <React.Fragment key={optionIndex}>
                   <div
                     onClick={(e) => {
-                      console.log(core);
+                      console.log(slice);
                       console.log("assssaaaaa", option);
                       console.log("assssaaaaa", data);
                       console.log(optionIndex + "ok");
@@ -427,15 +452,15 @@ const FirstPart = ({ NDstate, core }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!core[index].selected[optionIndex] ? whiteBg : pinkBg
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex] ? whiteBg : pinkBg
                       }`}
                   >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                      <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${!core[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
                           }`}
@@ -456,7 +481,7 @@ const FirstPart = ({ NDstate, core }) => {
   );
 };
 
-const SecondPart = ({ NDstate, Cosmetics }) => {
+const SecondPart = ({ NDstate, slice }) => {
   return (
     <div className="containClass">
       <div className="subheading">
@@ -466,14 +491,13 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
         {NDstate.Cosmetics &&
           NDstate.Cosmetics.map((data, index) => {
-            if (index < 9) {
               return (
                 <React.Fragment key={data._id}>
                   {data?.options.map((option, optionIndex) => (
                     <React.Fragment key={optionIndex}>
                       <div
                         onClick={(e) => {
-                          console.log(Cosmetics);
+                          console.log(slice);
                           console.log("assssaaaaa", option);
                           console.log("assssaaaaa", data);
                           console.log(optionIndex + "ok");
@@ -487,20 +511,20 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
                             })
                           );
                         }}
-                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!Cosmetics[index].selected[optionIndex]
+                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
                             ? whiteBg
                             : pinkBg
                           }`}
                       >
-                        <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                        <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
                           <img
-                            src={imageMap[option.img]}
+                            src={imageMap[option?.img] || option?.img}
                             className="scale-[1.2]"
                           />
                         </div>
                         <div className="w-full border-t-[1.5px] py-2">
                           <p
-                            className={`text-xs font-medium text-center ${!Cosmetics[index].selected[optionIndex]
+                            className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
                                 ? blackText
                                 : whiteText
                               }`}
@@ -513,9 +537,6 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
                   ))}
                 </React.Fragment>
               );
-            } else {
-              return null;
-            }
           })}
       </div>
       <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
@@ -525,7 +546,7 @@ const SecondPart = ({ NDstate, Cosmetics }) => {
   );
 };
 
-const ThirdPart = ({ NDstate, Display }) => {
+const ThirdPart = ({ NDstate, slice }) => {
   return (
     <div className="containClass">
       <div className="subheading">
@@ -540,7 +561,7 @@ const ThirdPart = ({ NDstate, Display }) => {
                 <React.Fragment key={optionIndex}>
                   <div
                     onClick={(e) => {
-                      console.log(Display);
+                      console.log(slice);
                       console.log("assssaaaaa", option);
                       console.log("assssaaaaa", data);
                       console.log(optionIndex + "ok");
@@ -554,15 +575,17 @@ const ThirdPart = ({ NDstate, Display }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!Display[index].selected[optionIndex] ? whiteBg : pinkBg
-                      }`}
+                   className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
+                            ? whiteBg
+                            : pinkBg
+                          }`}
                   >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                      <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${!Display[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
                           }`}
@@ -583,7 +606,7 @@ const ThirdPart = ({ NDstate, Display }) => {
   );
 };
 
-const FourthPart = ({ FunctionalMajor, NDstate }) => {
+const FourthPart = ({ NDstate, slice }) => {
   return (
     <div className="containClass">
       <div className="subheading">
@@ -598,7 +621,7 @@ const FourthPart = ({ FunctionalMajor, NDstate }) => {
                 <React.Fragment key={optionIndex}>
                   <div
                     onClick={(e) => {
-                      console.log(FunctionalMajor);
+                      console.log(slice);
                       console.log("assssaaaaa", option);
                       console.log("assssaaaaa", data);
                       console.log(optionIndex + "ok");
@@ -612,17 +635,17 @@ const FourthPart = ({ FunctionalMajor, NDstate }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!FunctionalMajor[index].selected[optionIndex]
-                        ? whiteBg
-                        : pinkBg
-                      }`}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
+                            ? whiteBg
+                            : pinkBg
+                          }`}
                   >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                      <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${!FunctionalMajor[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
                           }`}
@@ -643,7 +666,7 @@ const FourthPart = ({ FunctionalMajor, NDstate }) => {
   );
 };
 
-const FifthPart = ({ FunctionalMinor, NDstate }) => {
+const FifthPart = ({ NDstate, slice }) => {
   return (
     <div className="containClass">
       <div className="subheading">
@@ -658,7 +681,7 @@ const FifthPart = ({ FunctionalMinor, NDstate }) => {
                 <React.Fragment key={optionIndex}>
                   <div
                     onClick={(e) => {
-                      console.log(FunctionalMinor);
+                      console.log(slice);
                       console.log("assssaaaaa", option);
                       console.log("assssaaaaa", data);
                       console.log(optionIndex + "ok");
@@ -672,17 +695,17 @@ const FifthPart = ({ FunctionalMinor, NDstate }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!FunctionalMinor[index].selected[optionIndex]
-                        ? whiteBg
-                        : pinkBg
-                      }`}
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
+                            ? whiteBg
+                            : pinkBg
+                          }`}
                   >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                      <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${!FunctionalMinor[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
                           }`}
@@ -702,8 +725,66 @@ const FifthPart = ({ FunctionalMinor, NDstate }) => {
     </div>
   );
 };
+const SixthPart = ({ NDstate, slice }) => {
+  return (
+    <div className="containClass">
+      <div className="text-sm text-[#676767] py-1 font-medium text-center text-pretty">
+        <p>Please choose appropriate condition to get accurate quote</p>
+      </div>
+      <div className="grid grid-cols-2 gap-y-3 gap-x-[4%]">
+        {NDstate?.Functional &&
+          NDstate?.Functional.map((data, index) => (
+            <div
+              key={data._id}
+              className={`${
+                slice[index]?.answer === data.yes ? whiteBg : pinkBg
+              } flex flex-col justify-start items-center shadow-lg rounded-lg px-3`}
+              onClick={() => {
+                if (slice[index]?.answer === data.yes) {
+                  store.dispatch(
+                    updateFunctionalObject({
+                      index: index,
+                      newAnswer: data.no,
+                      newKey: "no",
+                    })
+                  );
+                } else {
+                  store.dispatch(
+                    updateFunctionalObject({
+                      index: index,
+                      newAnswer: data.yes,
+                      newKey: "yes",
+                    })
+                  );
+                }
+              }}
+            >
+              <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                <img
+                  className="scale-[1.2]"
+                  src={imageMap[data?.options[0]?.img] || data?.options[0]?.img}
+                />
+              </div>
+              <div className="w-full border-t-[1.5px] py-2">
+                <p
+                  className={`${
+                    slice[index]?.answer === data.yes ? blackText : whiteText
+                  } text-xs font-medium text-center`}
+                >
+                  {data.quetion}
+                </p>
+              </div>
+            </div>
+          ))}
+      </div>
+      <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
+      </div>
+    </div>
+  );
+};
 
-const SixthPart = ({ NDstate, Cosmetics }) => {
+const SeventhPart = ({ NDstate, slice }) => {
   return (
     <div className="containClass">
       <div className="subheading">
@@ -711,25 +792,25 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
         <h2>Select Accessories Not Available with Device</h2>
       </div>
       <div className="w-full flex flex-wrap gap-y-3 gap-x-[4%] justify-start flex-row">
-        {NDstate.Cosmetics &&
-          NDstate.Cosmetics.map((data, index) => {
-            if (index >= 9) {
+        {NDstate.Accessories &&
+          NDstate.Accessories.map((data, index) => {
               return (
                 <React.Fragment key={data._id}>
                   {data?.options.map((option, optionIndex) => (
                     <React.Fragment key={optionIndex}>
                       <div
-                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!Cosmetics[index].selected[optionIndex]
+                        className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                          !slice[index].selected[optionIndex]
                             ? whiteBg
                             : pinkBg
-                          }`}
+                        }`}
                         onClick={(e) => {
-                          console.log(Cosmetics);
+                          console.log(slice);
                           console.log("assssaaaaa", option);
                           console.log("assssaaaaa", data);
                           console.log(optionIndex + "ok");
                           store.dispatch(
-                            updateCosmeticsObject({
+                            updateAccessoriesObject({
                               noKey: data.no,
                               index: index,
                               yesKey: data.yes,
@@ -739,18 +820,19 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
                           );
                         }}
                       >
-                        <div className="mt-3 mb-1 rounded-md overflow-hidden">
+                        <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
                           <img
                             className="scale-[1.2]"
-                            src={imageMap[option.img]}
+                            src={imageMap[option?.img] || option?.img}
                           />
                         </div>
                         <div className="border-t-[1.5px] w-full py-2">
                           <p
-                            className={`text-xs font-medium text-center ${!Cosmetics[index].selected[optionIndex]
+                            className={`text-xs font-medium text-center ${
+                              !slice[index].selected[optionIndex]
                                 ? blackText
                                 : whiteText
-                              }`}
+                            }`}
                           >
                             {option.caption}
                           </p>
@@ -758,11 +840,8 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
                       </div>
                     </React.Fragment>
                   ))}
-                </React.Fragment>
-              );
-            } else {
-              return null;
-            }
+              </React.Fragment>
+            );
           })}
       </div>
       <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
@@ -772,7 +851,7 @@ const SixthPart = ({ NDstate, Cosmetics }) => {
   );
 };
 
-const SeventhPart = ({ Warranty, NDstate }) => {
+const EighthPart = ({ NDstate, slice }) => {
   return (
     <div className="containClass">
       <div className="subheading">
@@ -787,7 +866,7 @@ const SeventhPart = ({ Warranty, NDstate }) => {
                 <React.Fragment key={optionIndex}>
                   <div
                     onClick={(e) => {
-                      console.log(Warranty);
+                      console.log(slice);
                       console.log("assssaaaaa", option);
                       console.log("assssaaaaa", data);
                       console.log(optionIndex + "ok");
@@ -799,15 +878,15 @@ const SeventhPart = ({ Warranty, NDstate }) => {
                         })
                       );
                     }}
-                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!Warranty[index].selected[optionIndex] ? whiteBg : pinkBg
+                    className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex] ? whiteBg : pinkBg
                       }`}
                   >
-                    <div className="mt-3 mb-1 rounded-md overflow-hidden">
-                      <img className="scale-[1.2]" src={imageMap[option.img]} />
+                    <div className="mt-3 mb-1 rounded-md overflow-hidden bg-white">
+                      <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">
                       <p
-                        className={`text-xs font-medium text-center ${!Warranty[index].selected[optionIndex]
+                        className={`text-xs font-medium text-center ${!slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
                           }`}
@@ -832,12 +911,13 @@ const AboveSix = ({
   showPopup,
   qna,
   profile,
+  availableParts,
 }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   function handleADD() {
-    if (showPopup === false) {
+    if (showPopup === false && visible < availableParts.length) {
       setVisible(visible + 1);
     }
   }
@@ -882,7 +962,7 @@ const AboveSix = ({
 
   return (
     <React.Fragment>
-      {visible >= 7 ? (
+      {visible >= availableParts.length ? (
         <div className="fixed bottom-0 flex justify-center w-full gap-2 p-3 bg-white border-t-2">
           <div
             onClick={handleSubtract}
@@ -890,13 +970,6 @@ const AboveSix = ({
           >
             <ImArrowLeft color="white" size={20} />
           </div>
-          {/* <button
-              onClick={() => handleSkip(visible, updateAns)}
-              disabled
-              className={` bg-slate-400  w-[30%] py-1 px-2 text-center rounded-lg cursor-not-allowed flex justify-between text-white items-center`}
-            >
-              <p className="w-full p-1 text-xl font-medium">Skip</p>
-            </button> */}
           <div
             onClick={handlesubmit}
             className="bg-primary w-[70%] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
@@ -914,7 +987,7 @@ const AboveSix = ({
         </div>
       ) : (
         <div className="fixed bottom-0 justify-center flex w-full gap-2 p-3 bg-white border-t-2">
-          {visible > 0 && visible <= 6 && (
+          {visible > 0 && visible <= availableParts.length && (
             <button
               onClick={handleSubtract}
               className={`  ${visible < 2
@@ -925,12 +998,6 @@ const AboveSix = ({
               <ImArrowLeft color="white" size={20} />
             </button>
           )}
-          {/* <div
-            onClick={() => handleSkip(visible, updateAns)}
-            className="bg-primary w-[30%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
-          >
-            <p className="w-full p-1 text-xl font-medium">Skip</p>
-          </div> */}
           <div
             onClick={handleADD}
             className="bg-primary w-[70%] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"

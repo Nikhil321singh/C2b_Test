@@ -29,7 +29,7 @@ const DevicePriceCards = (props) => {
         </div>
         <div>
           <p className="text-primary text-lg md:text-2xl">
-            {props.type === "Mobile" && `${props.ram}/${props.storage}`}
+            {props.type === "CTG1" && `${props.ram}/${props.storage}`}
           </p>
           {/* <select className=" rounded bg-[#F5F4F9] text-primary w-[220px] p-[5px] focus:outline-none"></select> */}
         </div>

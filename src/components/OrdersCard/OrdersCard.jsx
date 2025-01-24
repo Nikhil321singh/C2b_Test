@@ -5,6 +5,10 @@ import { setLeadOTPData, setResponseData } from "../../store/slices/responseSlic
 import { useDispatch } from "react-redux";
 import watch from "../../assets/apple_watch.png";
 import { setOtpVerified } from "../../store/slices/otpSlice";
+import PurchaseReceipt from "../PurchaseReceipt";
+import ReactDOMServer from "react-dom/server";
+import html2pdf from "html2pdf.js";
+import { FaDownload } from "react-icons/fa6";
 
 const quoteSaved = "Quote Saved";
 export const DeleteModal = ({ onCancel, onConfirm }) => {
@@ -32,7 +36,39 @@ export const DeleteModal = ({ onCancel, onConfirm }) => {
   );
 };
 
+function hanldlejsx_pdf(item) {
+  console.log("store is");
+  console.log(item)
+  const dateString = item.updatedAt;
+  const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  const printElement = ReactDOMServer.renderToString(
+    <PurchaseReceipt
+      phoneNumber={item.phoneNumber}
+      aadharNumber={item?.aadharNumber}
+      uniqueCode={item.uniqueCode}
+      emailId={item.emailId}
+      name={item.name}
+      imeiNumber={item.doc.IMEI}
+      phoneName={item.model.name}
+      type={item?.model?.type}
+      storeName={item.store.storeName}
+      region={item.store.region}
+      address={item.store.address}
+      storage={item.model.config?.storage}
+      RAM={item.model.config?.RAM}
+      formattedDate={formattedDate}
+      price={item.price}
+    />
+  );
+  html2pdf().from(printElement).save('purchase_receipt.pdf');
+}
+
 const OrdersCard = ({
+  allData,
   itemData,
   title,
   customerName,
@@ -77,7 +113,7 @@ const OrdersCard = ({
     const currentDate = new Date();
     const timeDiff = currentDate - createdDate;
     const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
-    const threeDays = 3 * oneDay; // 3 days in milliseconds
+    const threeDays = 6 * oneDay; // 6 days in milliseconds
 
     if (title === quoteSaved) {
       return timeDiff > oneDay;
@@ -166,6 +202,11 @@ const OrdersCard = ({
         <div className="flex items-center py-1 px-2 text-white bg-primary rounded-xl">
           <p className="text-sm font-medium">{title}</p>
         </div>
+        {
+          title === "Order Completed" &&
+        <div onClick={() => {hanldlejsx_pdf(allData)}} className="flex items-center h-full px-4 text-white bg-[#EC2752] rounded-xl">
+          <FaDownload size={15} />
+        </div>}
         <div className="">
           <p className="text-sm font-medium text-gray-400">
             {formatDateTime(dateTime)}

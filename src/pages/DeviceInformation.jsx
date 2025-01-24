@@ -94,6 +94,7 @@ const DeviceInformation = () => {
         phoneNumber: phoneNumber,
         modelId: id?.models?._id,
         storage: id?.models?.config?.storage,
+        aadharNumber: "1234567890",
         ram: id?.models?.config?.RAM,
         name: profile.name,
       };

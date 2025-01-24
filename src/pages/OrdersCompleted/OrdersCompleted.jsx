@@ -112,6 +112,7 @@ const OrdersCompleted = ({ daysfilters, head }) => {
       <div className="flex flex-col gap-4 mt-4">
         {newOrderCompletedData.map((item, index) => (
           <OrdersCard
+            allData={item}
             key={index}
             itemData={item}
             title={"Order Completed"}

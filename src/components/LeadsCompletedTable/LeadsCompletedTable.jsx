@@ -7,6 +7,7 @@ import CustomerFormDetails from "../CustomerFormDetails";
 import PurchaseReceipt from "../PurchaseReceipt";
 
 const LeadsCompletedTable = ({ data }) => {
+  const role = JSON.parse(sessionStorage.getItem("profile")).role;
   const [showModal, setShowModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [QNAData, setQNAData] = useState([]);
@@ -38,11 +39,14 @@ const LeadsCompletedTable = ({ data }) => {
     const printElement = ReactDOMServer.renderToString(
       <PurchaseReceipt
         phoneNumber={data[index]?.phoneNumber}
+        aadharNumber={data[index]?.aadharNumber}
         uniqueCode={data[index]?.uniqueCode}
         emailId={data[index]?.emailId}
         name={data[index]?.name}
+        price={data[index]?.price}
         imeiNumber={data[index]?.documentId?.IMEI}
         phoneName={data[index]?.modelId?.name}
+        type={data[index]?.modelId?.type}
         storeName={data[index]?.store?.storeName}
         region={data[index]?.store?.region}
         address={data[index]?.store?.address}
@@ -65,7 +69,7 @@ const LeadsCompletedTable = ({ data }) => {
   };
 
   const getStorage = (val) => {
-    if (val?.modelId?.type === "Mobile") {
+    if (val?.modelId?.type === "CTG1") {
       return `${
         val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
       }`;
@@ -111,7 +115,7 @@ const LeadsCompletedTable = ({ data }) => {
                 {getUserName(val)}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {val?.modelId?.type}
+                {val?.categoryInfo?.categoryName}
               </td>
               <td className="p-2 min-w-[200px] text-sm text-center md:p-3 md:text-base">
                 {val?.modelId?.name}

@@ -583,7 +583,9 @@ const OutstandingTable = ({
               <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {(userRole === "Super Admin" ||
-                    userRole === "Admin Manager") && (
+                    userRole === "Admin Manager" ||
+                    userRole === "Super_Admin_Unicorn" ||
+                    userRole === "Admin_Manager_Unicorn") && (
                     <div className="flex flex-col gap-1">
                       <button
                         className={`${styles.view_btn}`}

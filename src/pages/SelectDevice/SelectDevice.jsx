@@ -86,7 +86,7 @@ const SelectDevice = () => {
   const [searchModel, setSearchModel] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const DummyImg =
-    Device === "Mobile"
+    Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const { brandId } = useParams();
@@ -166,11 +166,7 @@ const SelectDevice = () => {
         </div>
       </div>
       <div className="ml-5">
-        {Device === "Mobile" ? (
-          <p className="text-2xl font-bold">Select Mobile Phone</p>
-        ) : (
-          <p className="text-2xl font-bold">Select Smartwatches</p>
-        )}
+          <p className="text-2xl font-bold">Select Device</p>
       </div>
       {seriesList.length > 1 && (
         <SeriesFilter

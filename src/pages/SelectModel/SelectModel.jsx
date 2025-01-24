@@ -15,7 +15,7 @@ const SelectModel = () => {
     phoneImg?.models?.phonePhotos?.upFront;
   const Device = sessionStorage.getItem("DeviceType");
   const DummyImg =
-    Device === "Mobile"
+    Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const [modelData, setModelData] = useState();
@@ -57,12 +57,7 @@ const SelectModel = () => {
 
     store.dispatch({ type: "RESET_STATE" });
     resetState();
-
-    if (Device === "Mobile") {
-      navigate("/device/Qestions");
-    } else {
-      navigate("/watchQs");
-    }
+    navigate("/device/Qestions");
   };
 
   const handleQuickQuote = () => {
@@ -77,7 +72,7 @@ const SelectModel = () => {
     sessionStorage.setItem("dataModel", JSON.stringify(updatedData));
     store.dispatch({ type: "RESET_STATE" });
     resetState();
-    if (Device === "Mobile") {
+    if (Device === "CTG1") {
       navigate("/quickquote");
     } else {
       console.log("watch");
@@ -144,7 +139,7 @@ const SelectModel = () => {
               Device === "Watch" && "justify-start"
             }`}
           >
-            {Device === "Mobile" && (
+            {Device === "CTG1" && (
               <button
                 onClick={handleQuickQuote}
                 className="border-2 border-primary w-[48%] bg-white text-primary  text-[12px]  px-4 py-2 rounded"

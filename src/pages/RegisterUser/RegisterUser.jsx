@@ -10,8 +10,10 @@ import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 
 const sucTextColor = "text-green-500";
 const failTextColor = "text-primary";
-const role = ["Admin Manager", "Technician", "Sale User"];
-
+const defaultRoles = ["Super Admin", "Admin Manager", "Technician"];
+const role = import.meta.env.VITE_REACT_APP_ROLES
+  ? import.meta.env.VITE_REACT_APP_ROLES.split(",").map(role => role.trim())
+  : defaultRoles;
 const getStore = async () => {
   const token1 = sessionStorage.getItem("authToken");
   const config = {

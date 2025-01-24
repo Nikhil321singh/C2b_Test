@@ -37,7 +37,6 @@ const AdminHome = () => {
   const [updateTable, steUpdatetable] = useState(false);
 
   const handleNext = () => {
-    if (storedCategory === "Mobile" || storedCategory === "Watch") {
       const userToken = sessionStorage.getItem("authToken");
       axios
         .post(
@@ -64,9 +63,6 @@ const AdminHome = () => {
           toast.error("error occur");
           navigate(navAdminFnlGrd);
         });
-    } else {
-      navigate(navAdminFnlGrd);
-    }
   };
 
   function handleEdit() {

@@ -73,6 +73,12 @@ const Login = () => {
             case "Admin Manager":
               navigate("/customertable");
               break;
+            case "Super_Admin_Unicorn":
+              navigate("/customertable");
+              break;
+            case "Admin_Manager_Unicorn":
+              navigate("/customertable");
+              break;
             case "Technician":
               navigate("/devicepickupdashboard");
               break;

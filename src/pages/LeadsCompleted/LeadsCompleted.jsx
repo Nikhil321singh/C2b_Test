@@ -54,16 +54,21 @@ const downloadExcelLeadsompleted = (apiData) => {
     const questionData = {};
     let index = 1;
 
-    for (const group in item?.QNA[0]) {
-      item?.QNA[0][group].forEach((qna) => {
-        // Create a column for each question with its answer
-        questionData[`Q${index}. ${qna?.quetion}`] = qna?.key;
-        index++;
-      });
+    if (item?.QNA?.[0] && typeof item.QNA[0] === 'object') {
+      for (const group in item.QNA[0]) {
+        // Check if item.QNA[0][group] is an array before calling forEach
+        if (Array.isArray(item.QNA[0][group])) {
+          item.QNA[0][group].forEach((qna) => {
+            // Create a column for each question with its answer
+            questionData[`Q${index}. ${qna?.quetion}`] = qna?.key;
+            index++;
+          });
+        }
+      }
     }
 
     return {
-      "Date Created": new Date(item?.createdAt).toLocaleDateString("en-IN"),
+      "Date Created": new Date(item?.updatedAt).toLocaleDateString("en-IN"),
       "Store user Mobile No.": item.phoneNumber,
       "User Email": item.userId?.email,
       "Customer Mobile No.": item.phoneNumber,
@@ -94,7 +99,7 @@ const downloadExcelLeadsompleted = (apiData) => {
 };
 
 const LeadsCompleted = () => {
-  const [deviceType, setDeviceType] = useState("Mobile");
+  const [deviceType, setDeviceType] = useState("CTG1");
   const userToken = sessionStorage.getItem("authToken");
   const [loading, setLoading] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
@@ -114,6 +119,7 @@ const LeadsCompleted = () => {
   const [storeName, setStoreName] = useState(ALLstore);
   const [selStoreId, setSelStoreId] = useState("");
   const [storeData, setStoreData] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [reset, setReset] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredStores, setFilteredStores] = useState(storeData);
@@ -123,8 +129,21 @@ const LeadsCompleted = () => {
   };
   useEffect(() => {
     saveStore();
+    getCategories();
   }, []);
-
+  const getCategories = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+        {
+          headers: { Authorization: userToken },
+        }
+      );
+      setCategories(data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   function getSalesData() {
     setLoading(true);
     const endpoint = `${
@@ -224,11 +243,13 @@ const LeadsCompleted = () => {
        const printElement = ReactDOMServer.renderToString(
          <PurchaseReceipt
            phoneNumber={item?.phoneNumber}
+           aadharNumber={item?.aadharNumber}
            uniqueCode={item?.uniqueCode}
            emailId={item?.emailId}
            name={item?.name}
            imeiNumber={item?.documentId?.IMEI}
            phoneName={item?.modelId?.name}
+           type={item?.categoryInfo?.categoryName}
            storeName={item?.store?.storeName}
            region={item?.store?.region}
            address={item?.store?.address}
@@ -302,6 +323,7 @@ const handleSearch = (e) => {
         setSearchTerm={setSearchTerm}
         handleSearch={handleSearch}
         filteredStores={filteredStores}
+        categories={categories}
       />
     </div>
   );
@@ -362,13 +384,18 @@ const SubLeadsCompleted = ({
   setSearchTerm,
   handleSearch,
   filteredStores,
+  categories
 }) => {
   const [deviceDrop, setDeviceDrop] = useState(false);
   return (
     <div className="overflow-y-hidden">
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color="var(--primary-color)" loading={loading} size={15} />
+          <BeatLoader
+            color="var(--primary-color)"
+            loading={loading}
+            size={15}
+          />
         </div>
       )}
       <div className="navbar">
@@ -380,13 +407,19 @@ const SubLeadsCompleted = ({
         <div className="flex gap-4">
           <button
             className={`${styles.bulkdown_button}`}
-            onClick={() =>fetchDownloadData(totalCount, deviceType, selStoreId)}
-          ><FaDownload /> Bulk Download</button>
+            onClick={() =>
+              fetchDownloadData(totalCount, deviceType, selStoreId)
+            }
+          >
+            <FaDownload /> Bulk Download
+          </button>
           <div className="mt-2 ml-4">
             <button
               className={`${styles.bulkdown_button}`}
               onClick={handleBulkDownloadReceipts}
-            ><FaDownload /> Download Receipts</button>
+            >
+              <FaDownload /> Download Receipts
+            </button>
           </div>
         </div>
         <div className="[bg-[#F5F4F9]">
@@ -412,7 +445,9 @@ const SubLeadsCompleted = ({
             className={`${styless.filter_button}`}
             onClick={() => setStoreDrop(!storeDrop)}
           >
-            <p className="truncate">{searchTerm === "" ? "Select Store" : searchTerm}</p>
+            <p className="truncate">
+              {searchTerm === "" ? "Select Store" : searchTerm}
+            </p>
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
@@ -437,46 +472,48 @@ const SubLeadsCompleted = ({
                         setStoreDrop(false);
                       }}
                       className={`  ${styles.filter_option}`}
-                    ><p className=" truncate ">{item3.storeName}</p></div>
+                    >
+                      <p className=" truncate ">{item3.storeName}</p>
+                    </div>
                   ))
-                ) : (<p className="p-2 text-gray-500">No stores found</p>)}
-                <div className={`${styles.filter_option}`}
+                ) : (
+                  <p className="p-2 text-gray-500">No stores found</p>
+                )}
+                <div
+                  className={`${styles.filter_option}`}
                   onClick={() => {
                     handleStoreChange({ _id: "", storeName: ALLstore });
                     setSearchTerm(ALLstore);
                   }}
-                ><p className=" truncate ">{ALLstore}</p></div>
+                >
+                  <p className=" truncate ">{ALLstore}</p>
+                </div>
               </div>
             </div>
           )}
         </div>
-        <div className="w-[250px] relative">
-          <div
-            className={`${styless.filter_button}`}
-            onClick={() => setDeviceDrop(!deviceDrop)}
+        <div className="w-[250px] h-[35px] relative">
+          <select
+            name=""
+            id=""
+            className="bg-primary text-white rounded-lg outline-none px-2 py-1 w-full h-full"
+            onChange={(e) => {
+              setDeviceType(e.target.value);
+              setDeviceDrop(false);
+            }}
           >
-            <p className="truncate">{deviceType}</p>
-            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
-          </div>
-          {deviceDrop && (
-            <div
-              className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
-            >
-              <div className={`${styless.filter_option}`}
-                onClick={() => {
-                  setDeviceType("Mobile");
-                  setDeviceDrop(false);
-                }}
-              ><p className="truncate">Mobile</p></div>
-              <div className={`${styless.filter_option}`}
-                onClick={() => {
-                  setDeviceType("Watch");
-                  setDeviceDrop(false);
-                }}
-              ><p className="truncate">Watch</p></div>
-            </div>
-          )}
+            {categories.map((cat) => (
+              <option
+                className="bg-white text-primary font-medium"
+                key={cat?._id}
+                value={cat?.categoryCode}
+              >
+                {cat?.categoryName}
+              </option>
+            ))}
+          </select>
         </div>
+
       </div>
       <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
         <div className={`${styles.search_bar_wrap}`}>
@@ -489,7 +526,9 @@ const SubLeadsCompleted = ({
           />
           <IoMdSearch size={25} onClick={() => getSalesData()} />
         </div>
-        <div className={styles.icons_box}><IoRefresh onClick={() => handleSearchClear()} size={25}/></div>
+        <div className={styles.icons_box}>
+          <IoRefresh onClick={() => handleSearchClear()} size={25} />
+        </div>
         <div className={`${styles.search_bar_wrap}`}>
           <input
             onChange={(e) => setSearch1(e.target.value)}
@@ -497,16 +536,34 @@ const SubLeadsCompleted = ({
             type="text"
             placeholder="Search Customer Name/Mobile No./Email"
             value={search1}
-          /><IoMdSearch size={25} onClick={() => getSalesData()} /></div>
+          />
+          <IoMdSearch size={25} onClick={() => getSalesData()} />
+        </div>
       </div>
       <LeadsCompletedTable data={tableData} />
       <div className="flex justify-center mt-0 mb-4">
-        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 0}
-          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === 0 ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-primary text-white cursor-pointer"}`}>Previous</button>
-        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === maxPages - 1}
-          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === maxPages - 1 ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-primary text-white cursor-pointer"}`}>Next</button>
+        <button
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 0}
+          className={`mx-2 px-4 py-2 rounded-lg ${
+            currentPage === 0
+              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+              : "bg-primary text-white cursor-pointer"
+          }`}
+        >
+          Previous
+        </button>
+        <button
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === maxPages - 1}
+          className={`mx-2 px-4 py-2 rounded-lg ${
+            currentPage === maxPages - 1
+              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+              : "bg-primary text-white cursor-pointer"
+          }`}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

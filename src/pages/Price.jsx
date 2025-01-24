@@ -54,6 +54,9 @@ const Price = () => {
   const phoneTopRef = useRef(null);
   const phoneBottomRef = useRef(null);
   const [isBillRequired, setIsBillRequired] = useState(false);
+    const Device = sessionStorage.getItem("DeviceType");
+    const categories = JSON.parse(sessionStorage.getItem("Categories"));
+    const prod = categories.filter((elem) => elem.categoryCode === Device);
   useEffect(() => {
     const billData = JSON.parse(sessionStorage.getItem("billData"));
     if (billData && billData?.selected[0] === false) {
@@ -131,14 +134,21 @@ const Price = () => {
       <div className="w-[90%] md:w-[90%] mx-auto h-[auto] mb-[93px]">
         <div className="mt-3 text-center relative">
           <h1 className="text-2xl font-semibold">Upload Documents</h1>
-          <p className="mt-4 text-gray-600">Regulations require you to upload a national identity card.
-           Don't worry, your data will stay safe and private.</p>
+          <p className="mt-4 text-gray-600">
+            Regulations require you to upload a national identity card. Don't
+            worry, your data will stay safe and private.
+          </p>
         </div>
         <div className="flex flex-col">
-          <ImeiField setImeiNumber={setImeiNumber} imeinumber={imeinumber} />
+          <ImeiField
+            setImeiNumber={setImeiNumber}
+            imeinumber={imeinumber}
+            prod={prod}
+          />
           <AadharNumberField
             setAadharNumber={setAadharNumber}
             aadharNumber={aadharNumber}
+            prod={prod}
           />
           <AdharField
             handleChange={handleChange}
@@ -149,6 +159,7 @@ const Price = () => {
             setIdProofBack={setIdProofBack}
             idProofBack={idProofBack}
             idproofBackRef={idproofBackRef}
+            prod={prod}
           />
           <PhoneBill
             handleChange={handleChange}
@@ -158,6 +169,7 @@ const Price = () => {
             phoneBillRef={phoneBillRef}
             phoneBill={phoneBill}
             isBillRequired={isBillRequired}
+            prod={prod}
           />
           <PhonePhotos1
             handleCameraButtonClick={handleCameraButtonClick}
@@ -180,6 +192,7 @@ const Price = () => {
             phoneRightRef={phoneRightRef}
             setPhoneRight={setPhoneRight}
             phoneLeftRef={phoneLeftRef}
+            prod={prod}
           />
         </div>
       </div>
@@ -187,11 +200,26 @@ const Price = () => {
         <div
           onClick={() => uploadAllImages()}
           className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
-            !imeinumber || !phoneFront || !phoneBack || !phoneLeft || !phoneRight ||
-            !phoneTop || !phoneBottom ? "cursor-not-allowed bg-gray-400" : pink}`}
+            !imeinumber ||
+            !phoneFront ||
+            !phoneBack ||
+            !phoneLeft ||
+            !phoneRight ||
+            !phoneTop ||
+            !phoneBottom
+              ? "cursor-not-allowed bg-gray-400"
+              : pink
+          }`}
         >
-          {isLoading && (<CgSpinner size={20} className="absolute left-[28%] top-[8px] mt-1 animate-spin"/>)}
-          <p className="w-full p-1 text-xl font-medium">{isLoading ? "Submitting" : "Submit"}</p>
+          {isLoading && (
+            <CgSpinner
+              size={20}
+              className="absolute left-[28%] top-[8px] mt-1 animate-spin"
+            />
+          )}
+          <p className="w-full p-1 text-xl font-medium">
+            {isLoading ? "Submitting" : "Submit"}
+          </p>
         </div>
       </div>
     </div>
@@ -199,12 +227,14 @@ const Price = () => {
 };
 export default Price;
 
-const ImeiField = ({ imeinumber, setImeiNumber }) => {
+const ImeiField = ({ imeinumber, setImeiNumber, prod }) => {
+  
   const [error, setError] = useState(true);
   const Device = sessionStorage.getItem("DeviceType");
 
+
   const validateImeiNumber = (value) => {
-    if (Device === "Mobile") {
+    if (Device === "CTG1") {
       if (value.length !== 15) {
         setError("IMEI number must be exactly 15 digits.");
         return false;
@@ -212,7 +242,7 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
         setError("IMEI number must only contain digits.");
         return false;
       }
-    } else if (Device === "Watch") {
+    } else if (Device !== "CTG1") {
       if (value.length < 6) {
         setError("IMEI number must be between 6 to 15 digits.");
         return false;
@@ -240,8 +270,7 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
       <div className="flex gap-1 two">
         <p className="text-base font-medium">1.</p>
         <p className="text-base font-medium three">
-          Enter your{" "}
-          {Device === "Mobile" ? "phone's IMEI No." : "smartwatch's serial no."}{" "}
+          Enter your {prod[0]?.categoryName} IMEI No./serial no.
           <span className="text-red-500">*</span>
         </p>
       </div>
@@ -251,13 +280,14 @@ const ImeiField = ({ imeinumber, setImeiNumber }) => {
           type="text"
           className="w-auto p-2 border-2 border-gray-300 rounded"
           value={imeinumber}
-          placeholder={Device === "Mobile" ? "IMEI no." : "Serial no."}
+          placeholder="IMEI no./Serial no."
           onChange={handleChange}
           maxLength={15}
         />
         <button
-          className={`px-4 py-2 font-bold text-white rounded ${!error ? pink : "bg-gray-400 cursor-not-allowed"
-            }`}
+          className={`px-4 py-2 font-bold text-white rounded ${
+            !error ? pink : "bg-gray-400 cursor-not-allowed"
+          }`}
           onClick={handleVerify}
           disabled={!!error}
         >
@@ -406,6 +436,7 @@ const PhoneBill = ({
   phoneBillRef,
   phoneBill,
   isBillRequired,
+  prod
 }) => {
   const Device = sessionStorage.getItem("DeviceType");
   return (
@@ -414,8 +445,7 @@ const PhoneBill = ({
         <p className="text-base font-medium">4.</p>
         <div className="flex items-center">
           <p className="text-base font-medium three">
-            Upload your {Device === "Mobile" && "phone's"}
-            {Device === "Watch" && "smartwatch's"} bill
+            Upload your {prod[0]?.categoryName} bill
             {isBillRequired && <span className="text-red-500">*</span>}
           </p>
         </div>
@@ -427,8 +457,7 @@ const PhoneBill = ({
         {/* 1 */}
         <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center">
-            {Device === "Mobile" && "Phone"}
-            {Device === "Watch" && "Smartwatch"} Bill
+            {prod[0]?.categoryName} Bill
           </p>
           <input
             type="file"
@@ -474,6 +503,7 @@ const PhonePhotos1 = ({
   phoneRight,
   phoneRightRef,
   setPhoneRight,
+  prod,
 }) => {
   const Device = sessionStorage.getItem("DeviceType");
   const [showHoldModal, setShowHoldModal] = useState(false);
@@ -484,7 +514,7 @@ const PhonePhotos1 = ({
         <p className="text-base font-medium">5.</p>
         <div className="flex items-center">
           <p className="text-base font-medium three">
-            {`Upload Your ${Device}'s Images`}{" "}
+            {`Upload Your ${prod[0]?.categoryName}'s Images`}{" "}
             <span className="text-red-500">*</span>
           </p>
           <FaInfoCircle
@@ -498,7 +528,7 @@ const PhonePhotos1 = ({
       </p>
       <div className="flex flex-wrap inputAADHAR justify-evenly">
         <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-          <p className="text-center font-semibold">{`${Device} Front`}</p>
+          <p className="text-center font-semibold">{`${prod[0]?.categoryName} Front`}</p>
           <input
             onChange={(e) => handleChange(setPhoneFront, e)}
             type="file"
@@ -518,7 +548,7 @@ const PhonePhotos1 = ({
           </button>
         </div>
         <div className="p-1 text-center mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
-          <p className="text-center font-semibold">{`${Device} Back`}</p>
+          <p className="text-center font-semibold">{`${prod[0]?.categoryName} Back`}</p>
           <input
             ref={phoneBackRef}
             type="file"
@@ -542,7 +572,7 @@ const PhonePhotos1 = ({
 
         <div className="text-center p-1 mt-4 border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ">
           <p className="text-center font-semibold tracking-tighter">
-            {`${Device} Left Side`}
+            {`${prod[0]?.categoryName} Left Side`}
           </p>
           <input
             onChange={(e) => handleChange(setPhoneLeft, e)}
@@ -566,7 +596,7 @@ const PhonePhotos1 = ({
         {/* 4 */}
         <div className="p-1 mt-4 text-center border-2 justify-between rounded-lg w-[40vw] h-[15vh] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="text-center font-semibold tracking-tighter">
-            {`${Device} Right Side`}
+            {`${prod[0]?.categoryName} Right Side`}
           </p>
           <input
             onChange={(e) => handleChange(setPhoneRight, e)}
@@ -590,7 +620,7 @@ const PhonePhotos1 = ({
         {/* 5 */}
         <div className="border-2 p-1 mt-4 text-center justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center tracking-tighter">
-            {`${Device} Top Side`}
+            {`${prod[0]?.categoryName} Top Side`}
           </p>
           <input
             type="file"
@@ -614,7 +644,7 @@ const PhonePhotos1 = ({
         {/* 6 */}
         <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="font-semibold text-center tracking-tighter">
-            {`${Device} Bottom Side`}
+            {`${prod[0]?.categoryName} Bottom Side`}
           </p>
           <input
             onChange={(e) => handleChange(setPhoneBottom, e)}
@@ -635,12 +665,12 @@ const PhonePhotos1 = ({
           </button>
         </div>
       </div>
-      {showHoldModal && Device === "Mobile" && (
+      {showHoldModal &&  (
         <MobileMoldModel setShowHoldModal={setShowHoldModal} />
       )}
-      {showHoldModal && Device === "Watch" && (
-        <WatchMoldModel setShowHoldModal={setShowHoldModal} />
-      )}
+      {/* {showHoldModal && Device !== "CTG1" && (
+        <WatchMoldModel setShowHoldModal={setShowHoldModal}/>
+      )} */}
     </div>
   );
 };
@@ -658,7 +688,7 @@ const MobileMoldModel = ({ setShowHoldModal }) => {
           from approximately 30 cm away.
         </p>
         <p className="mt-2">
-          <strong>Front Side:</strong> Ensure the entire front of the phone is
+          <strong>Front Side:</strong> Ensure the entire front of the device is
           visible with the display on and a black screen background. Include the
           full screen and bezels.
         </p>
@@ -675,7 +705,7 @@ const MobileMoldModel = ({ setShowHoldModal }) => {
           buttons and any ports.
         </p>
         <p className="mt-2">
-          <strong>Top Side:</strong> Show the full top edge of the phone,
+          <strong>Top Side:</strong> Show the full top edge of the device,
           including any ports or sensors.
         </p>
         <p className="mt-2">

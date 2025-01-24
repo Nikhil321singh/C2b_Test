@@ -10,9 +10,8 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
               <th className="p-2 text-sm md:p-3 md:text-base">Model Details</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Brand</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Updated At</th>
-              {deviceCategory === "Mobile" && (
-                <th className="p-2 text-sm md:p-3 md:text-base">Storage</th>
-              )}
+              <th className="p-2 text-sm md:p-3 md:text-base">Storage</th>
+
               <th className="p-2 text-sm md:p-3 md:text-base">
                 <p>A+</p>
                 <p>(0.00%)</p>
@@ -26,50 +25,43 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
                 <p>(15.00%)</p>
               </th>
 
-              {deviceCategory === "Mobile" && (
-                <th className="p-2 text-sm md:p-3 md:text-base">
-                  <p>B-</p>
-                  <p>(20.00%)</p>
-                </th>
-              )}
-              {deviceCategory === "Mobile" && (
-                <th className="p-2 text-sm md:p-3 md:text-base">
-                  <p>C+</p>
-                  <p>(40.00%)</p>
-                </th>
-              )}
+              <th className="p-2 text-sm md:p-3 md:text-base">
+                <p>B-</p>
+                <p>(20.00%)</p>
+              </th>
+
+              <th className="p-2 text-sm md:p-3 md:text-base">
+                <p>C+</p>
+                <p>(40.00%)</p>
+              </th>
               <th className="p-2 text-sm md:p-3 md:text-base">
                 <p>C</p>
                 <p>(50.00%)</p>
               </th>
-              {deviceCategory === "Mobile" && (
-                <th className="p-2 text-sm md:p-3 md:text-base">
-                  <p>C-</p>
-                  <p>(60.00%)</p>
-                </th>
-              )}
-              {deviceCategory === "Mobile" && (
-                <th className="p-2 text-sm md:p-3 md:text-base">
-                  <p>D+</p>
-                  <p>(65.00%)</p>
-                </th>
-              )}
+
+              <th className="p-2 text-sm md:p-3 md:text-base">
+                <p>C-</p>
+                <p>(60.00%)</p>
+              </th>
+
+              <th className="p-2 text-sm md:p-3 md:text-base">
+                <p>D+</p>
+                <p>(65.00%)</p>
+              </th>
               <th className="p-2 text-sm md:p-3 md:text-base">
                 <p>D</p>
                 <p>(70.00%)</p>
               </th>
-              {deviceCategory === "Mobile" && (
-                <th className="p-2 text-sm md:p-3 md:text-base">
-                  <p>D-</p>
-                  <p>(70.00%)</p>
-                </th>
-              )}
-              {deviceCategory === "Mobile" && (
-                <th className="p-2 text-sm md:p-3 md:text-base">
-                  <p>E</p>
-                  <p>(90.00%)</p>
-                </th>
-              )}
+
+              <th className="p-2 text-sm md:p-3 md:text-base">
+                <p>D-</p>
+                <p>(70.00%)</p>
+              </th>
+
+              <th className="p-2 text-sm md:p-3 md:text-base">
+                <p>E</p>
+                <p>(90.00%)</p>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -84,56 +76,43 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {new Date(listItem.updatedAt).toLocaleDateString("en-GB")}
                 </td>
-                {deviceCategory === "Mobile" && (
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {listItem.storage}
-                  </td>
-                )}
+
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {listItem.grades?.A_PLUS}
+                  {listItem.storage}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {listItem.grades?.A}
+                  {listItem.grades?.A_PLUS || "-"}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {listItem.grades?.B}
+                  {listItem.grades?.A || "-"}
                 </td>
-                {deviceCategory === "Mobile" && (
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {listItem.grades?.B_MINUS}
-                  </td>
-                )}
-                {deviceCategory === "Mobile" && (
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {listItem.grades?.C_PLUS}
-                  </td>
-                )}
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {listItem.grades?.C}
+                  {listItem.grades?.B || "-"}
                 </td>
-                {deviceCategory === "Mobile" && (
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {listItem.grades?.C_MINUS}
-                  </td>
-                )}
-                {deviceCategory === "Mobile" && (
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {listItem.grades?.D_PLUS}
-                  </td>
-                )}
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {listItem.grades?.D}
+                  {listItem.grades?.B_MINUS || "-"}
                 </td>
-                {deviceCategory === "Mobile" && (
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {listItem.grades?.D_MINUS}
-                  </td>
-                )}
-                {deviceCategory === "Mobile" && (
-                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {listItem.grades?.E}
-                  </td>
-                )}
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {listItem.grades?.C_PLUS || "-"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {listItem.grades?.C || "-"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {listItem.grades?.C_MINUS || "-"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {listItem.grades?.D_PLUS || "-"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {listItem.grades?.D || "-"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {listItem.grades?.D_MINUS || "-"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {listItem.grades?.E || "-"}
+                </td>
               </tr>
             ))}
           </tbody>
