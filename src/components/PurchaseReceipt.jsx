@@ -106,7 +106,7 @@ const PurchaseReceipt = ({
         </div>
         <div>
           <p className="font-bold flex flex-col items-start">PRICE</p>
-          <p>{"₹ " + Math.floor(price) + "/-"}</p>
+          <p>{`₹ ${Math.floor(price)}/-`}</p>
         </div>
       </div>
       <div className="flex gap-8 flex-row justify-start">
@@ -119,7 +119,7 @@ const PurchaseReceipt = ({
           <p className="mt-4">{type === "Laptop" ? imeiNumber : ""}</p>
         </div>
       </div>
-      
+
       <hr className="border-black mt-10 border-1" />
       <div className="flex flex-col items-center border-b-2 border-dashed border-black py-4 ">
         <p className="text-xl font-bold mt-4 mb-2">Via Retail Store Partner:</p>

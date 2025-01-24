@@ -1,13 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import downArrow from "../assets/down.png";
-import { useEffect } from "react";
 import axios from "axios";
-
-import { useNavigate } from "react-router-dom";
 import { useDataContext } from "../components/dataContext";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { BeatLoader } from "react-spinners";
-import { setBrandID, setconfigID } from "../store/slices/adminAnswerSlice";
+import { setBrandID } from "../store/slices/adminAnswerSlice";
 import { setMobileID, setStorage } from "../store/slices/newAdminGrade";
 import { baseUrl } from "../utils/baseUrl";
 

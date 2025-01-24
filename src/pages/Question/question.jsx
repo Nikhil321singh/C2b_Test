@@ -5,72 +5,14 @@ import { BeatLoader } from "react-spinners";
 import {
   IoIosCheckmarkCircle,
   IoIosCloseCircle,
-  IoMdSearch,
 } from "react-icons/io";
-import { IoRefresh } from "react-icons/io5";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import { FaDownload } from "react-icons/fa6";
 import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import {
-  setMobileID,
-  setRam,
-  setStorage,
-} from "../../store/slices/newAdminGrade";
-import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
 import { FaUpload } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { CgSpinner } from "react-icons/cg";
-import { ImArrowLeft } from "react-icons/im";
 import useUserProfile from "../../utils/useUserProfile";
-
-const getEvenRowClass = (index, selectmodel, selectstorage, selectram, val) => {
-  if (index % 2 === 0) {
-    if (
-      selectmodel === val.modelId &&
-      selectstorage === val?.storage &&
-      selectram === val?.RAM
-    ) {
-      return "bg-[#eb869c]";
-    }
-    return "bg-gray-200";
-  }
-  return "";
-};
-
-const downloadExcel = (data) => {
-  const fileType =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = ".xlsx";
-
-  const formattedData = data.map((item) => {
-    return {
-      "Brand Id": item.brandId?._id,
-      "Brand Name": item.brandId?.name,
-      Question: item?.question,
-    };
-  });
-
-  const ws = XLSX.utils.json_to_sheet(formattedData);
-  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  const dataFile = new Blob([excelBuffer], { type: fileType });
-  saveAs(dataFile, "All_Models_Data" + fileExtension);
-};
-
-const getRowClass = (selectmodel, selectstorage, selectram, val) => {
-  if (
-    selectmodel === val.modelId &&
-    selectstorage === val?.storage &&
-    selectram === val?.RAM
-  ) {
-    return "bg-[#eb869c]";
-  }
-  return "";
-};
 
 const getTextColorClass = (isSuccess) =>
   isSuccess ? "text-green-500" : "text-[#EC2752]";
@@ -79,22 +21,14 @@ const errMsg = "";
 const selectedModel = "";
 
 const AdminQuestion = () => {
-  const [admincategory, setAdminCategory] = useState(
-    sessionStorage.getItem("admincategory") === "CTG2" ? "CTG2" : "CTG1"
-  );
   const [questions, setQuestions] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [selectmodel, setSelectModel] = useState("");
-  const [selectstorage, setSelectstorage] = useState("");
-  const [selectram, setSelectram] = useState("");
   const [category, setCategory] = useState("CTG1");
   const token = sessionStorage.getItem("authToken");
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [confBox, setConfBox] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [page, setPage] = useState(0);
   const [maxPages, setMaxPage] = useState(0);
   const [brandList, setBrandList] = useState([]);
@@ -130,72 +64,9 @@ const AdminQuestion = () => {
     getData();
   }, [page, selectedBrand]);
 
-  const getDataBySearch = () => {
-    setIsTableLoaded(true);
-    const config = {
-      method: "post",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/user/Dashboard/search/phones`,
-      headers: {
-        Authorization: token,
-        "Content-Type": "application/json",
-      },
-      data: {
-        name: searchValue,
-        deviceType: admincategory,
-      },
-    };
-    axios
-      .request(config)
-      .then((response) => {
-        const responseData = response.data;
-        const allConfigurations = [];
-        responseData.forEach((model) => {
-          const brandName = model.name.split(" ")[0];
-          model.config.forEach((conf) => {
-            const newConfig = {
-              brandId: model.brandId,
-              modelId: model._id,
-              brandName: brandName,
-              modelName: model.name,
-              storage: conf.storage,
-              RAM: conf.RAM,
-              price: conf.price,
-            };
-            allConfigurations.push(newConfig);
-          });
-        });
-        setQuestions(allConfigurations);
-        setIsTableLoaded(false);
-      })
-      .catch((error) => {
-        setIsTableLoaded(false);
-      });
-  };
-  const selectHandler = (modelId, modelStorage, ram, modelName) => {
-    sessionStorage.setItem(
-      "adminModelName",
-      `${modelName} (${ram}/${modelStorage})`
-    );
-    if (category === "Watch") {
-      sessionStorage.setItem("adminModelName", modelName);
-    }
-    setSelectModel(modelId);
-    setSelectstorage(modelStorage);
-    setSelectram(ram);
-    dispatch(setMobileID(modelId));
-    dispatch(setStorage(modelStorage));
-    dispatch(setRam(ram));
-  };
-  const deleteHandler = (userID) => {
+  const deleteHandler = () => {
     setIsTableLoaded(true);
     setIsTableLoaded(false);
-  };
-
-  const handleSearchClear = () => {
-    setSearchValue("");
-    getData();
   };
 
   function handleNext() {
@@ -219,11 +90,9 @@ const AdminQuestion = () => {
     }
   }
   const [uploadBox, setUploadBox] = useState(false);
-  const [isTableLoading, setIsTableLoading] = useState(false);
   const [file, setFile] = useState(null);
 
   const fetchModels = () => {
-    setIsTableLoading(true);
     const config = {
       method: "post",
       url: `${
@@ -244,11 +113,9 @@ const AdminQuestion = () => {
       .then((res) => {
         console.log("asd", res?.data);
         setDeviceList(res.data.models);
-        setIsTableLoading(false);
       })
       .catch((err) => {
         console.log(err);
-        setIsTableLoading(false);
       });
   };
 
@@ -292,13 +159,12 @@ const AdminQuestion = () => {
   };
 
   const handleBulkSubmit = (e) => {
-    setIsTableLoading(true);
     e.preventDefault();
     const formData = new FormData();
     formData.append("file", file);
     formData.append("brandId", brandID);
 
-    let url = `${
+    const url = `${
       import.meta.env.VITE_REACT_APP_ENDPOINT
     }/api/questionnaires/uploadQNA`;
 
@@ -308,7 +174,7 @@ const AdminQuestion = () => {
           Authorization: `${token}`,
         },
       })
-      .then((res) => {
+      .then(() => {
         toast.success("Succussfully Uploaded");
         setUploadBox(false);
         getData();
@@ -318,9 +184,6 @@ const AdminQuestion = () => {
         toast.error("Failed to submit");
         setUploadBox(false);
       })
-      .finally(() => {
-        setIsTableLoading(false);
-      });
   };
 
   // State to track the selected answers
@@ -383,11 +246,9 @@ const AdminQuestion = () => {
     setAnswers([]); // Clear answers
   };
 
-  const [isLoading, setIsLoading] = useState(false);
   const profile = useUserProfile();
 
   const handleSubmit = async () => {
-    setIsLoading(true);
     console.log(selectedDevice, "arijit");
 
     const payload = {
@@ -407,7 +268,6 @@ const AdminQuestion = () => {
       payload,
       { headers: { Authorization: token } }
     );
-    setIsLoading(false);
     toast.success(response?.data?.message);
 
     sessionStorage.setItem("selectedDevice", JSON.stringify(selectedDevice));
@@ -575,7 +435,6 @@ const AdminQuestion = () => {
                   type="reset"
                   onClick={() => {
                     setUploadBox(false);
-                    setIsTableLoading(false);
                   }}
                   className="bg-white text-[#EC2752] px-4 py-2 rounded"
                 >
@@ -815,7 +674,7 @@ const ExtComps = ({
             </p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() => deleteHandler(selectedModel)}
+                onClick={() => deleteHandler()}
                 className={grestTheme}
               >
                 Okay

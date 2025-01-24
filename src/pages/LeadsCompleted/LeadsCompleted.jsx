@@ -386,7 +386,6 @@ const SubLeadsCompleted = ({
   filteredStores,
   categories
 }) => {
-  const [deviceDrop, setDeviceDrop] = useState(false);
   return (
     <div className="overflow-y-hidden">
       {loading && (
@@ -499,7 +498,6 @@ const SubLeadsCompleted = ({
             className="bg-primary text-white rounded-lg outline-none px-2 py-1 w-full h-full"
             onChange={(e) => {
               setDeviceType(e.target.value);
-              setDeviceDrop(false);
             }}
           >
             {categories.map((cat) => (

@@ -11,7 +11,7 @@ import {
 import { IoRefresh } from "react-icons/io5";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { FaDownload, FaUpload } from "react-icons/fa6";
+import { FaDownload } from "react-icons/fa6";
 
 import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";

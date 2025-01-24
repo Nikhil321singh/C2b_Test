@@ -228,11 +228,8 @@ const Price = () => {
 export default Price;
 
 const ImeiField = ({ imeinumber, setImeiNumber, prod }) => {
-  
   const [error, setError] = useState(true);
   const Device = sessionStorage.getItem("DeviceType");
-
-
   const validateImeiNumber = (value) => {
     if (Device === "CTG1") {
       if (value.length !== 15) {
@@ -438,7 +435,6 @@ const PhoneBill = ({
   isBillRequired,
   prod
 }) => {
-  const Device = sessionStorage.getItem("DeviceType");
   return (
     <div className="flex flex-col adharcard mt-[10px]">
       <div className="flex gap-1 two">
@@ -505,7 +501,6 @@ const PhonePhotos1 = ({
   setPhoneRight,
   prod,
 }) => {
-  const Device = sessionStorage.getItem("DeviceType");
   const [showHoldModal, setShowHoldModal] = useState(false);
 
   return (

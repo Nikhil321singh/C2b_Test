@@ -88,7 +88,7 @@ const DeviceQuote = () => {
 
   useEffect(() => {
     if(quoteSaved === false &&
-      exactQuoteValue === "true") {  
+      exactQuoteValue === "true") {
         toast.error("Bonus Must Be Less Than ₹2000.");
       }
   }, []);

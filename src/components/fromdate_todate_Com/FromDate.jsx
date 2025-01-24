@@ -13,8 +13,6 @@ function FromDatecom({
   searchCustom
 }) {
 
-    
-
     const onClose=()=>{
         setshowFromdate(false)
     }
@@ -39,7 +37,6 @@ function FromDatecom({
                 From :{" "}
               </p>
               <div className="flex inputbox  w-[250px] bg-white border-2 items-center rounded-md justify-between px-[5px]">
-              
                 <DatePicker
                   getPopupContainer={() => document.getElementById("date-popup")}
                   popupStyle={{ position: "relative" }}
@@ -60,7 +57,6 @@ function FromDatecom({
                 To :{" "}
               </p>
               <div className="flex inputbox  w-[250px] bg-white border-2 items-center rounded-md justify-between px-[5px]">
-              
               <DatePicker
                 selected={toDate}
                 onChange={handleToDateChange}
@@ -71,23 +67,14 @@ function FromDatecom({
               />
                 <BsCalendar3 size={18}/>
               </div>
-
-             
-              
             </div>
-
-            <div className="b flex items-center justify-center">
-             
-           
+            <div className="b flex items-center justify-center">           
             <div
               onClick={searchCustom}
               className="bg-[#EC2752] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center mt-1"
             >
               <p className="w-full p-1 text-xl font-medium">Search</p>
-              {/* <FaArrowRight /> */}
-            </div>
-         
-           
+            </div>           
                </div>
           </div>
         </div>

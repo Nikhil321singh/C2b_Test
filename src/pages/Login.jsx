@@ -65,19 +65,19 @@ const Login = () => {
             })
           );
           console.log(profile.role);
-
+          const customTable = "/customertable";
           switch (profile.role) {
             case "Super Admin":
               navigate("/adminmodels");
               break;
             case "Admin Manager":
-              navigate("/customertable");
+              navigate(customTable);
               break;
             case "Super_Admin_Unicorn":
-              navigate("/customertable");
+              navigate(customTable);
               break;
             case "Admin_Manager_Unicorn":
-              navigate("/customertable");
+              navigate(customTable);
               break;
             case "Technician":
               navigate("/devicepickupdashboard");

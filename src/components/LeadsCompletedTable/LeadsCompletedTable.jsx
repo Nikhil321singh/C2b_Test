@@ -7,7 +7,6 @@ import CustomerFormDetails from "../CustomerFormDetails";
 import PurchaseReceipt from "../PurchaseReceipt";
 
 const LeadsCompletedTable = ({ data }) => {
-  const role = JSON.parse(sessionStorage.getItem("profile")).role;
   const [showModal, setShowModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [QNAData, setQNAData] = useState([]);

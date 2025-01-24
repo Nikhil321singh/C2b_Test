@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./newDeviceqs.scss";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +8,6 @@ import Grest_Logo from "../../assets/Grest_Logo_2.jpg";
 import { useSelector } from "react-redux";
 import banner from "../../assets/banner.jpg";
 import { setGroupAnswers } from "../../store/slices/QNAslice";
-import { setResponseData } from "../../store/slices/responseSlice";
 import useUserProfile from "../../utils/useUserProfile";
 import { CgSpinner } from "react-icons/cg";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
@@ -20,10 +19,8 @@ function NewDeviceqs() {
   const userToken = sessionStorage.getItem("authToken");
   const [answers, setAnswers] = useState([]); // Proper state initialization
   const [visible, setVisible] = useState(1);
-  const [newGroupanswers, setNewGroupAnswers] = useState();
   const profile = useUserProfile();
   const [showPopup, setShowPopup] = useState(true);
-  const qna = useSelector((state) => state.qna);
   const [questions, setQuestions] = useState([]);
   const [maxPages, setMaxPage] = useState(0);
 
@@ -58,17 +55,7 @@ function NewDeviceqs() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [visible]);
-
-  const updateAns = (group) => {
-    const filteredAnswers = newGroupanswers.filter(
-      (question) => question.group === group
-    );
-    store.dispatch(setGroupAnswers({ group, filteredAnswers }));
-    if (showPopup === false) {
-      setVisible(visible + 1);
-    }
-  };
-
+  
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 

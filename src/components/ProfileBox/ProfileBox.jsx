@@ -8,13 +8,13 @@ function setName(firstName, lastName) {
   if (!firstName && !lastName) {
       return "Sale User";
   }
-  
-  const fullName = firstName + " " + lastName;
+
+  const fullName = `${firstName} ${lastName}`;
   if (fullName.length > 20) {
       if (firstName.length > 20) {
-          return firstName.charAt(0) + ". " + lastName;
+          return `${firstName.charAt(0)}. ${lastName}`;
       } else {
-          return firstName + " " + lastName.charAt(0) + ".";
+          return `${firstName} ${lastName.charAt(0)}.`;
       }
   }else{
     return fullName;

@@ -57,7 +57,6 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
   const [selectedUser, setSelectedUser] = useState();
   const [selectedUserqs, setSelectedUserqs] = useState();
   const [mobiledata, setMobile] = useState([]);
-  const [watchdata, setWatch] = useState([]);
   const dispatch = useDispatch();
   const [group, setGroup] = useState("");
   const [question, setQuestion] = useState("");
@@ -99,10 +98,8 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
       }
     }
     async function handleQuestionnaires() {
-      const data = await getQuestionnaires(); 
+      const data = await getQuestionnaires();
       const sortedData = sortQuestionnaires(data);
-      // const dummyMobile = filterQuestionnairesByType(sortedData, Mobile);
-      // const dummyWatch = filterQuestionnairesByType(sortedData, Watch);
       setMobile(sortedData);
     }
     handleQuestionnaires();
