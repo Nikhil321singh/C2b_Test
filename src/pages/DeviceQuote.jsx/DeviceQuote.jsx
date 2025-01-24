@@ -59,7 +59,6 @@ const DeviceQuote = () => {
     Price,
     bonus
   });
-
   const continueOTPHandler = () => {
     const resData = {
       grade: ResponseData.grade,

@@ -194,7 +194,7 @@ const AdminQuestion = () => {
         setAnswers={setAnswers}
       />
 
-      <UploadBox 
+      <UploadBox
         setUploadBox={setUploadBox}
         uploadBox={uploadBox}
         handleExcelFileChange={handleExcelFileChange}
@@ -214,7 +214,7 @@ const AdminQuestion = () => {
       handlePrev={handlePrev}
       maxPages={maxPages}
       handleSubmit={handleSubmit}
-      handleNext={handleNext} 
+      handleNext={handleNext}
      />
     </div>
   );
