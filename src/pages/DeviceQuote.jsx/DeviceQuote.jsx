@@ -85,7 +85,7 @@ const DeviceQuote = () => {
       toast.error("Bonus Must Be Less Than ₹2000.");
     }
   }, [quoteSaved, exactQuoteValue]);
-  
+
   return (
     <div className={`bg-white min-h-screen ${styles.page_wrap}`}>
       {continueOTPOpen && <ContOTP setContinueOTPOpen={setContinueOTPOpen} />}

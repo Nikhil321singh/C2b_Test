@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Grest_Logo from "../assets/Grest_Logo.jpg";
-import User_Logo from "../assets/User_Logo.jpg";
 import { useNavigate } from "react-router-dom";
 import { BsCartCheckFill } from "react-icons/bs";
 const navtoSelDevTP = "/selectdevicetype";
 
 const ThankYou = () => {
-
-  const navigate = useNavigate();
   const [countdown, setCountdown] = useState(10); // 10 seconds countdown
+  const navigate = useNavigate();
 
   useEffect(() => {
     let timer;
     if ( countdown > 0) {
       timer = setInterval(() => {
         setCountdown((prevCount) => {
-          console.log("Countdown:", prevCount - 1); // Log the countdown
           return prevCount - 1;
         });
       }, 1000);
@@ -23,23 +20,23 @@ const ThankYou = () => {
       navigate("/selectdevicetype");
     }
     return () => clearInterval(timer);
-  }, [countdown, navigate]);
+  }, [navigate, countdown]);
+
+  const handleReturn = () => {
+    navigate(navtoSelDevTP);
+  };
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       navigate(navtoSelDevTP);
     }, 30000);
-
     return () => clearInterval(timeout);
   }, [navigate]);
 
-  const handleReturn = () => {
-    navigate(navtoSelDevTP);
-  };
   return (
-    <div className="bg-white min-h-screen">
-      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full ">
+    <div className=" min-h-screen bg-white">
+      <div className="w-screen flex items-center h-16 py-4 bg-white border-b-2 HEADER ">
+        <div className="flex items-center w-full justify-between ">
 
           <img
             onClick={() => navigate(navtoSelDevTP)}

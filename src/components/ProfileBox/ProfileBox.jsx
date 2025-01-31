@@ -20,7 +20,6 @@ function setName(firstName, lastName) {
   } else {
       return fullName;
   }
-  
 }
 
 const ProfileBox = () => {
