@@ -7,7 +7,6 @@
 
 .des_main_wrap {
   display: flex;
-  padding-left: 100px;
   flex-direction: column;
   margin: 10px 50px;
 }

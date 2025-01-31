@@ -324,11 +324,11 @@ const NewDeviceqs = () => {
 
   const parts = [
     { component: FirstPart, data: NDstate.Core, slice: core },
+    { component: SixthPart, data: NDstate.Functional, slice: Functional },
     { component: SecondPart, data: NDstate.Cosmetics, slice: Cosmetics },
     { component: ThirdPart, data: NDstate.Display, slice: Display },
     { component: FourthPart, data: NDstate.Functional_major, slice: FunctionalMajor },
     { component: FifthPart, data: NDstate.Functional_minor, slice: FunctionalMinor },
-    { component: SixthPart, data: NDstate.Functional, slice: Functional },
     { component: SeventhPart, data: NDstate.Accessories, slice: Accessories },
     { component: EighthPart, data: NDstate.Warranty, slice: Warranty },
   ];
@@ -635,7 +635,7 @@ const FourthPart = ({ NDstate, slice }) => {
                         })
                       );
                     }}
-                    className={`flex  px-3  flex-col min-h-[150px] items-centerw-[48%]  shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
+                    className={`flex  px-3  flex-col min-h-[150px] items-center w-[48%]  shadow-lg rounded-lg ${!slice[index].selected[optionIndex]
                             ? whiteBg
                             : pinkBg
                           }`}
@@ -878,10 +878,10 @@ const EighthPart = ({ NDstate, slice }) => {
                         })
                       );
                     }}
-                    className={` w-[48%]  flex flex-col items-center px-3min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex] ? whiteBg : pinkBg
+                    className={` w-[48%]  flex flex-col items-center px-3 min-h-[150px] shadow-lg rounded-lg ${!slice[index].selected[optionIndex] ? whiteBg : pinkBg
                       }`}
                   >
-                    <div className="mt-3 mb-1overflow-hidden bg-white  rounded-md ">
+                    <div className="mt-3 mb-1 overflow-hidden bg-white  rounded-md ">
                       <img className="scale-[1.2]" src={imageMap[option?.img] || option?.img} />
                     </div>
                     <div className="border-t-[1.5px] w-full py-2">

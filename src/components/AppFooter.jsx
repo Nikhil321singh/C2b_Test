@@ -30,11 +30,11 @@ const AppFooter = ({ days }) => {
         <MdOutlineHome size={24} />
         <button className="text-sm">Home</button>
       </div>
-      <div onClick={handleCategories} className="flex flex-col items-center">
+      {currentDomain !== import.meta.env.VITE_BUYBACK_URL && <div onClick={handleCategories} className="flex flex-col items-center">
         <BiCategory size={24} />
         <button className="text-sm">Categories</button>
-      </div>
-      {currentDomain !== "https://buyback.grest.in" && <div onClick={handleOrders} className="flex flex-col items-center">
+      </div>}
+      {currentDomain !== import.meta.env.VITE_BUYBACK_URL && <div onClick={handleOrders} className="flex flex-col items-center">
         <IoBagAddOutline size={24} />
         <button className="text-sm">Orders</button>
       </div>}

@@ -81,10 +81,11 @@ const DeviceQuote = () => {
     setShowModal(!showModal);
   };
   useEffect(() => {
-    if(quoteSaved === false && exactQuoteValue === "true") {
-        toast.error("Bonus Must Be Less Than ₹2000.");
-      }
-  }, []);
+    if (quoteSaved === false && exactQuoteValue === "true") {
+      toast.error("Bonus Must Be Less Than ₹2000.");
+    }
+  }, [quoteSaved, exactQuoteValue]);
+  
   return (
     <div className={`bg-white min-h-screen ${styles.page_wrap}`}>
       {continueOTPOpen && <ContOTP setContinueOTPOpen={setContinueOTPOpen} />}
@@ -100,7 +101,7 @@ const DeviceQuote = () => {
         <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
           <img
-            onClick={() => navigate({ deviceTypePage })}
+            onClick={() => navigate(deviceTypePage)}
             className="w-40"
             src={Grest_Logo}
             alt="app logo"
@@ -126,7 +127,7 @@ const DeviceQuote = () => {
                     : ""
                 }`}
               </p>
-              <p className="text-primary font-semibold">₹{displayPrice}</p>
+              <p className="text-primary font-semibold">₹{displayPrice.toLocaleString("en-IN")}</p>
             </div>
           </div>
           <QuoteModal
@@ -138,7 +139,7 @@ const DeviceQuote = () => {
           ></QuoteModal>
           {quoteSaved === false &&
             exactQuoteValue === "true" &&
-            currentDomain !== "https://buyback.grest.in" && (
+            currentDomain !== import.meta.env.VITE_BUYBACK_URL && (
               <div className="flex flex-row items-center justify-between px-2 my-2">
                 <div className="w-[40%] font-medium text-gray-700">
                   Bonus Amount :

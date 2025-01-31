@@ -54,6 +54,7 @@ import LeadsCompleted from "./pages/LeadsCompleted/LeadsCompleted";
 import Categories from "./pages/Categories/Categories";
 import Watchqs from "./pages/Watch_Exact_qs/Watch_qs";
 import Orders from "./pages/Orders/Orders";
+import ThankYou from "./pages/ThankYou";
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function App() {
                 ></Route>
 
                 <Route path="/inputnumber" element={<InputNumber />} />
+                <Route path="/thankyou" element={<ThankYou />} />
 
                 <Route path="/" element={<Login />}></Route>
 

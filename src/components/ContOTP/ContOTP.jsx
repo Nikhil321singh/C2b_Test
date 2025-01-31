@@ -17,7 +17,7 @@ const initOtp = {
   email: "",
   phone: "",
 };
-const buyBackUrl = "https://buyback.grest.in";
+const buyBackUrl = import.meta.env.VITE_BUYBACK_URL;
 const ContOTP = ({ setContinueOTPOpen }) => {
   const navigate = useNavigate();
   const deviceSelected = sessionStorage.getItem("DeviceType");
@@ -126,7 +126,7 @@ const ContOTP = ({ setContinueOTPOpen }) => {
                );
                console.log(response);
                if (response?.status === 200) {
-                 navigate("/SelectDeviceType");
+                 navigate("/thankyou");
                } else {
                  setErrMsg("Failed to Save Details");
                }
