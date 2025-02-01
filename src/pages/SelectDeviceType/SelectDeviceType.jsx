@@ -31,7 +31,7 @@ import FromDatecom from "../../components/fromdate_todate_Com/FromDatecom";
 import { toast } from "react-hot-toast";
 import { ImCancelCircle } from "react-icons/im";
 import Oppo from "../../assets/Oppo.png";
-const buyback = "https://buyback.grest.in";
+const buyback = import.meta.env.VITE_BUYBACK_URL;
 export const OrderStatusBox = ({ title, figures, background }) => {
   return (
     <div

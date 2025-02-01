@@ -27,7 +27,7 @@ const Login = () => {
     const currentDomain = window.location.origin;
     const bypassedDomain = import.meta.env.BYPASSED_DOMAIN;
     console.log(currentDomain,"  " ,bypassedDomain);
-    if (currentDomain === "https://buyback.grest.in") {
+    if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
           sessionStorage.setItem("authToken", "");
           sessionStorage.setItem("profile", JSON.stringify({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
           sessionStorage.setItem("DeviceType", "CTG1");

@@ -9,15 +9,16 @@ function setName(firstName, lastName) {
       return "Sale User";
   }
 
-  const fullName = `${firstName} ${lastName}`;
+  const fullName = lastName ? `${firstName} ${lastName}` : firstName;
+
   if (fullName.length > 20) {
       if (firstName.length > 20) {
-          return `${firstName.charAt(0)}. ${lastName}`;
+          return lastName ? `${firstName.charAt(0)}. ${lastName}` : `${firstName.charAt(0)}.`;
       } else {
-          return `${firstName} ${lastName.charAt(0)}.`;
+          return lastName ? `${firstName} ${lastName.charAt(0)}.` : firstName;
       }
-  }else{
-    return fullName;
+  } else {
+      return fullName;
   }
 }
 
@@ -28,6 +29,8 @@ const ProfileBox = () => {
   const [userRole, setUserRole] = useState();
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLoggenIn, setIsLoggedIn] = useState(false);
+  const currentDomain = window.location.origin;
+
 
   useEffect(() => {
     const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
@@ -56,6 +59,11 @@ const ProfileBox = () => {
   const handlePwdChange = () => {
     navigate("/changepassword");
   };
+  if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
+    return     <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
+          </div>
+  }
+
   return (
     <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
       <p className="mr-4 text-base  md:text-xl">{userName}</p>
