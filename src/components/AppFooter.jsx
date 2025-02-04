@@ -22,7 +22,7 @@ const AppFooter = ({ days }) => {
   const handleSearch = () => {
     navigate(`/selectdevicetype`, { state: { openSearch: true } });
   };
- 
+
   return (
     <div
       className={`${
