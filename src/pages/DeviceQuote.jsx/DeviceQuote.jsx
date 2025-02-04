@@ -10,6 +10,7 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import apple_watch from "../../assets/apple_watch.png";
 import { setResponseData } from "../../store/slices/responseSlice";
 import { toast } from "react-hot-toast";
+const buyback = import.meta.env.VITE_BUYBACK_URL;
 
 const deviceTypePage = "/selectdevicetype";
 
@@ -81,7 +82,7 @@ const DeviceQuote = () => {
     setShowModal(!showModal);
   };
   useEffect(() => {
-    if (quoteSaved === false && exactQuoteValue === "true") {
+    if (quoteSaved === false && exactQuoteValue === "true" && currentDomain !== buyback) {
       toast.error("Bonus Must Be Less Than ₹2000.");
     }
   }, [quoteSaved, exactQuoteValue]);
@@ -139,7 +140,7 @@ const DeviceQuote = () => {
           ></QuoteModal>
           {quoteSaved === false &&
             exactQuoteValue === "true" &&
-            currentDomain !== import.meta.env.VITE_BUYBACK_URL && (
+            currentDomain !== buyback && (
               <div className="flex flex-row items-center justify-between px-2 my-2">
                 <div className="w-[40%] font-medium text-gray-700">
                   Bonus Amount :

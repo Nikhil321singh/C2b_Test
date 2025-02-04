@@ -5,7 +5,7 @@ import { IoClose } from "react-icons/io5";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import AppFooter from "../../components/AppFooter";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import styles from "./SelectDeviceType.module.css";
 import apple from "../../assets/apple-logo.png";
 import poco from "../../assets/POCO.png";
@@ -525,6 +525,7 @@ const SelectDeviceType = () => {
   const { fromDateDup, setFromDateDup, toDateDup, setToDateDup } =
     useQuestionContext();
   const [showFromdate, setshowFromdate] = useState(false);
+  const location = useLocation();
   const [isSearchBoxOpen, setIsSearchBoxOpen] = useState(false);
   const [days, setDays] = useState("today");
   const [orderSaled, setOrderSaled] = useState(0);
@@ -536,6 +537,12 @@ const SelectDeviceType = () => {
   const [imei, setImei] = useState("");
   const [data, setData] = useState(null);
   const [modelsL, setModel] = useState([]);
+
+  useEffect(() => {
+    if (location.state?.openSearch) {
+      setIsSearchBoxOpen(true);
+    }
+  }, [location.state]);
 
   const searchBoxSwitch = () => {
     setModel([]);
@@ -766,7 +773,7 @@ const SearchBox = ({
               </div>
             </div>
           </div>
-          {imei.length > 0 && sortedModels.length > 0 ? (
+          {imei.length > 0 && sortedModels.length > 0 && (
             <div
               className={`   mx-auto mt-4 justify-center  w-full  flex flex-wrap gap-2  max-h-screen overflow-y-scroll pb-[15vh] `}
             >
@@ -787,7 +794,16 @@ const SearchBox = ({
                   </div>
                 ))}
             </div>
-          ) : (
+          ) }
+          
+          {imei.length > 0 && sortedModels.length === 0 && (
+            <div className="flex flex-col my-auto text-sm font-medium text-gray-500">
+              <img className="w-[250px] mx-auto" src={searchImage} />
+              <div className="mt-[50%] font-bold text-4xl">No Product Found</div>
+            </div>
+          )}
+          
+          {imei.length === 0 && (
             <div className="flex flex-col my-auto text-sm font-medium text-gray-500">
               <img className="w-[250px] mx-auto" src={searchImage} />
               <div>
