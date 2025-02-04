@@ -795,14 +795,14 @@ const SearchBox = ({
                 ))}
             </div>
           ) }
-          
+
           {imei.length > 0 && sortedModels.length === 0 && (
             <div className="flex flex-col my-auto text-sm font-medium text-gray-500">
               <img className="w-[250px] mx-auto" src={searchImage} />
               <div className="mt-[50%] font-bold text-4xl">No Product Found</div>
             </div>
           )}
-          
+
           {imei.length === 0 && (
             <div className="flex flex-col my-auto text-sm font-medium text-gray-500">
               <img className="w-[250px] mx-auto" src={searchImage} />

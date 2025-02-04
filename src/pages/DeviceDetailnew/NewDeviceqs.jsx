@@ -230,16 +230,16 @@ const NewDeviceqs = () => {
       const apiUrl = `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/questionnaires/findAll?page=0&limit=99&type=${DeviceType}`;
-      
+
       const response = await axios.get(apiUrl, {
         headers: {
           authorization: `${userToken}`,
         },
       });
-  
+
       // Sort by viewOn field (assuming it's a number; modify for strings)
       const sortedData = response.data.data.sort((a, b) => a.viewOn - b.viewOn);
-  
+
       [
         "Core",
         "Cosmetics",
@@ -255,13 +255,13 @@ const NewDeviceqs = () => {
         );
         dispatch({ type: "SET_GROUP_ANSWERS", group, answers: answersTemp });
       });
-  
+
       const newPopulateAnswers = sortedData.map((ele) => ele.default);
-      
+
       if (answers.length === 0) {
         const newAnswers = newPopulateAnswers.map((answer, index) => {
           const questionData = sortedData[index];
-          
+
           if (questionData.yes === answer && questionData.no === answer) {
             return {
               quetion: questionData.quetion,
@@ -288,10 +288,10 @@ const NewDeviceqs = () => {
             };
           }
         });
-  
+
         setAnswers(newAnswers);
         setNewGroupAnswers(newAnswers);
-  
+
         [
           "Core",
           "Cosmetics",
@@ -312,7 +312,6 @@ const NewDeviceqs = () => {
       console.error("Error fetching data:", error);
     }
   };
-  
 
   useEffect(() => {
     fetchData();
