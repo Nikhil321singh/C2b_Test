@@ -230,11 +230,16 @@ const NewDeviceqs = () => {
       const apiUrl = `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/questionnaires/findAll?page=0&limit=99&type=${DeviceType}`;
+
       const response = await axios.get(apiUrl, {
         headers: {
           authorization: `${userToken}`,
         },
       });
+
+      // Sort by viewOn field (assuming it's a number; modify for strings)
+      const sortedData = response.data.data.sort((a, b) => a.viewOn - b.viewOn);
+
       [
         "Core",
         "Cosmetics",
@@ -245,44 +250,48 @@ const NewDeviceqs = () => {
         "Functional_minor",
         "Warranty",
       ].forEach((group) => {
-        const answersTemp = response.data.data.filter(
+        const answersTemp = sortedData.filter(
           (question) => question.group === group
         );
         dispatch({ type: "SET_GROUP_ANSWERS", group, answers: answersTemp });
       });
-      const newPopulateAnswers = response.data.data.map((ele) => ele.default);
+
+      const newPopulateAnswers = sortedData.map((ele) => ele.default);
+
       if (answers.length === 0) {
         const newAnswers = newPopulateAnswers.map((answer, index) => {
-          if (response.data.data[index].yes === answer && response.data.data[index].no === answer) {
+          const questionData = sortedData[index];
+
+          if (questionData.yes === answer && questionData.no === answer) {
             return {
-              quetion: response.data.data[index].quetion,
+              quetion: questionData.quetion,
               answer,
               key: "no",
-              group: response.data.data[index].group,
-              selected: Array(response.data.data[index].options.length).fill(false),
+              group: questionData.group,
+              selected: Array(questionData.options.length).fill(false),
             };
-          }else if (response.data.data[index].yes === answer) {
+          } else if (questionData.yes === answer) {
             return {
-              quetion: response.data.data[index].quetion,
+              quetion: questionData.quetion,
               answer,
               key: "yes",
-              group: response.data.data[index].group,
-              selected: Array(response.data.data[index].options.length).fill(
-                true
-              ),
+              group: questionData.group,
+              selected: Array(questionData.options.length).fill(true),
             };
           } else {
             return {
-              quetion: response.data.data[index].quetion,
+              quetion: questionData.quetion,
               answer,
-              group: response.data.data[index].group,
+              group: questionData.group,
               key: "no",
-              selected: Array(response.data.data[index].options.length).fill(false),
+              selected: Array(questionData.options.length).fill(false),
             };
           }
         });
+
         setAnswers(newAnswers);
         setNewGroupAnswers(newAnswers);
+
         [
           "Core",
           "Cosmetics",
