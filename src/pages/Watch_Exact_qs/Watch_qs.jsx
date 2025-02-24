@@ -11,13 +11,11 @@ import {
   updateWatchWarrantyObject,
 } from "../../store/slices/WatchQna_slice";
 import styles from "./Watch_qs.module.css";
-import { CiSearch } from "react-icons/ci";
 import { setResponseData } from "../../store/slices/responseSlice";
 import useUserProfile from "../../utils/useUserProfile";
 import { CgSpinner } from "react-icons/cg";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack } from "react-icons/io";
-import QuestionSearch from "../../components/QuestionSearch/QuestionSearch";
 import store from "../../store/store";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import question1 from "../../assets/question1.png";
@@ -52,7 +50,6 @@ import {
   MdRadioButtonUnchecked,
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
-import WatchQuestionSearch from "../../components/WatchQuestionSearch";
 
 const initialState = {
   Functional: [],
@@ -189,7 +186,7 @@ function Watchqs() {
           <div className="flex items-center justify-center underline underline-offset-4 pt-4 text-lg font-medium tracking-tight text-{1.325rem}">
             {visible > 1 && visible <= 3 && (
               <div
-                className="text-white rounded-[.45rem] flex flex-row justify-center items-center mr-2 bg-[#4900A8]"
+                className="text-white rounded-[.45rem] flex flex-row justify-center items-center mr-2 bg-primary"
                 onClick={() => setVisible(visible - 1)}
               >
                 <MdOutlineKeyboardBackspace size={30} />
@@ -222,7 +219,7 @@ function Watchqs() {
           <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2">
             <div
               onClick={handlesubmit}
-              className="bg-[#4900A8] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
+              className="bg-primary relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center"
             >
               {isLoading && (
                 <CgSpinner
@@ -239,7 +236,7 @@ function Watchqs() {
           <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2">
             <div
               onClick={() => setVisible(visible + 1)}
-              className="bg-[#4900A8] py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
+              className="bg-primary py-1 px-2 text-center rounded-lg cursor-pointer flex justify-between text-white items-center"
             >
               <p className="w-full p-1 text-xl font-medium">Continue</p>
             </div>
@@ -254,7 +251,6 @@ export default Watchqs;
 
 const WatchHeader = ({ WTCstate, dispatch }) => {
   const navigate = useNavigate();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <React.Fragment>
@@ -273,33 +269,10 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
         <IoIosArrowBack
           onClick={() => navigate("/selectmodel")}
           size={25}
-          className="ml-2 text-[#4900A8]"
+          className="ml-2 text-primary"
         />
         <p className="ml-2 text-xl font-medium">Device Details</p>
       </div>
-      {/* <div className={`${styles.search_box_wrap} mt-[15px] mb-[5px] w-[90vw]`}>
-        <div
-          className={`flex items-center bg-gray-200  p-2 mb-1 rounded-lg w-[100%] ${styles.search_box}`}
-        >
-          <div className="flex items-center">
-            <CiSearch size={20} className="inline ml-1" />
-          </div>
-          <input
-            placeholder="Search Question"
-            onChange={() => console.log("state is ", WTCstate)}
-            onClick={() => setIsSearchOpen(true)}
-            className="inline w-full mx-2 bg-gray-200 outline-none"
-            type="text"
-          />
-          {isSearchOpen && (
-            <WatchQuestionSearch
-              setIsSearchOpen={setIsSearchOpen}
-              state={WTCstate}
-              dispatch={dispatch}
-            />
-          )}
-        </div>
-      </div> */}
     </React.Fragment>
   );
 };
@@ -347,8 +320,8 @@ const FirstPart = ({ WTCstate, Functional }) => {
             </div>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
-          Continue, If you don't have any Above-Mentioned Issues.
+      <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
   );
@@ -382,7 +355,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[0]?.answer === WTCstate?.Physical[0]?.yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#4900A8]"
+                  className="mr-2 text-primary"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -417,7 +390,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[1]?.answer === WTCstate?.Physical[1]?.yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#4900A8]"
+                  className="mr-2 text-primary"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -453,7 +426,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[2]?.answer === WTCstate?.Physical[2].yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#4900A8]"
+                  className="mr-2 text-primary"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -488,7 +461,7 @@ const SecondPart = ({ WTCstate, Physical }) => {
               {Physical[3]?.answer === WTCstate?.Physical[3].yes ? (
                 <MdRadioButtonChecked
                   size={20}
-                  className="mr-2 text-[#4900A8]"
+                  className="mr-2 text-primary"
                 />
               ) : (
                 <MdRadioButtonUnchecked
@@ -506,8 +479,8 @@ const SecondPart = ({ WTCstate, Physical }) => {
           </div>
         </div>
       )}
-      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
-          Continue, If you don't have any Above-Mentioned Issues.
+      <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
   );
@@ -556,8 +529,8 @@ const ThirdPart = ({ WTCstate, Accessories }) => {
             </div>
           ))}
       </div>
-      <div className="flex flex mt-4 bg-[#8080FF] text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
-          Continue, If you don't have any Above-Mentioned Issues.
+      <div className="flex flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md">
+        Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
   );
@@ -582,11 +555,11 @@ const FourthPart = ({ WTCstate, Warranty }) => {
               className="max-w-[500px]  flex gap-4 ml-3 flex-col"
             >
               <label
-                className={`text-[#4900A8] ${
+                className={`text-primary ${
                   styles.ansBox
                 } font-medium  justify-center w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
                   Warranty[index]?.answer === data.yes
-                    ? "bg-[#4900A8] text-white"
+                    ? "bg-primary text-white"
                     : ""
                 }`}
               >

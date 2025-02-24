@@ -4,11 +4,7 @@ import NavigateTable from "../../components/NavigateTable/NavigateTable";
 import PendingDevicesTable from "../../components/PendingDevicesTable/PendingDevicesTable";
 import axios from "axios";
 import { BeatLoader } from "react-spinners";
-import {
-  IoIosCheckmarkCircle,
-  IoIosCloseCircle,
-  IoMdSearch,
-} from "react-icons/io";
+import {IoIosCheckmarkCircle, IoIosCloseCircle, IoMdSearch} from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
 import { BsCalendarDate } from "react-icons/bs";
 import styles from "./DevicePickupDashboard.module.css";
@@ -20,9 +16,10 @@ import AdminNavbar from "../../components/Admin_Navbar";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { useDispatch, useSelector } from "react-redux";
 import { setStoreFilter } from "../../store/slices/userSlice";
-
+const buttonStyles = "bg-primary text-white";
+const updateStatusError = "Failed to update status";
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#4900A8]";
+const failTextColor = "text-primary";
 const PickupAvail = "Available For Pickup";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const id = LoggedInUser?._id || LoggedInUser?.id;
@@ -32,7 +29,6 @@ const downloadExcel = (pendDataDown) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
-
   const formattedData = pendDataDown.map((item) => {
     return {
       "Lead Id": item._id,
@@ -203,7 +199,7 @@ const DevicePickupDashboard = () => {
         setSelectedRows={setSelectedRows}
       />
       <NavigateTable />
-      <div className="flex flex-row justify-end items-center py-1 px-2 font-medium text-sm text-[#4900A8]">
+      <div className="flex flex-row justify-end items-center py-1 px-2 font-medium text-sm text-primary">
         Total Device : {devicesCount} | Total Amount :{" "}
         {new Intl.NumberFormat("en-IN", {
           style: "currency",
@@ -212,11 +208,11 @@ const DevicePickupDashboard = () => {
       </div>
       <DPFilter
         setSearchValue={setSearchValue}
-        selectedStatus={selectedStatus}
         searchValue={searchValue}
         getDataBySearch={getDataBySearch}
         dateValue={dateValue}
         statusValue={statusValue}
+        selectedStatus={selectedStatus}
         setStatusValue={setStatusValue}
         setDateValue={setDateValue}
         setRegion={setRegion}
@@ -342,7 +338,7 @@ const ExtComps = ({
     <React.Fragment>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       {successMod && (
@@ -350,7 +346,7 @@ const ExtComps = ({
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
             <IoIosCheckmarkCircle className={succTextColor} size={90} />
             <h6 className={succTextColor}>Success!</h6>
-            <p className="text-green-500">{errorMsg}</p>
+            <p className="text-slate-500">{errorMsg}</p>
             {errorMsg1 && <p className="text-slate-500">{errorMsg1}</p>}
             {errorMsg2 && <p className="text-slate-500">{errorMsg2}</p>}
             <button
@@ -373,7 +369,7 @@ const ExtComps = ({
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
-              className={"bg-[#4900A8] text-white"}
+              className={buttonStyles}
               onClick={() => {
                 setFailMode(false);
               }}
@@ -391,10 +387,7 @@ const ExtComps = ({
               {`Do you want to send ${selectedIds.length} devices for Pickup ?`}
             </p>
             <div className="flex flex-row gap-2">
-              <button
-                onClick={reqPickupHandler}
-                className={"bg-[#4900A8] text-white"}
-              >
+              <button onClick={reqPickupHandler} className={buttonStyles}>
                 Okay
               </button>
               <button
@@ -402,7 +395,7 @@ const ExtComps = ({
                   setConfMod(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#4900A8]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -429,11 +422,11 @@ const ExtComps = ({
 
 const DPFilter = ({
   setSearchValue,
-  selectedStatus,
   searchValue,
   getDataBySearch,
   dateValue,
   statusValue,
+  selectedStatus,
   setStatusValue,
   setDateValue,
   setRegion,
@@ -451,16 +444,15 @@ const DPFilter = ({
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
-     const [searchTerm, setSearchTerm] = useState("");
-     const [filteredStores, setFilteredStores] = useState(storeData);
-
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredStores, setFilteredStores] = useState(storeData);
   const dispatch = useDispatch();
 
   const handleRegionChange = (value) => {
     setRegionDrop(false);
     setStoreName("");
-    const filteredStores = allStore.filter((store) => store.region === value);
-    const storeNamesArray = filteredStores.map((store) => store.storeName);
+    const filteredStores1 = allStore.filter((store) => store.region === value);
+    const storeNamesArray = filteredStores1.map((store) => store.storeName);
     setStoreData(storeNamesArray);
     setRegion(value);
     dispatch(setStoreFilter({ selStore: "", selRegion: value }));
@@ -468,10 +460,8 @@ const DPFilter = ({
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore?.filter(
-      (store) => store.storeName === value
-    );
-    const newRegion = filteredStores[0].region;
+    const filteredStores2 = allStore?.filter((store) => store.storeName === value);
+    const newRegion = filteredStores2[0].region;
     setRegion(newRegion);
     setStoreName(value);
     dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
@@ -479,21 +469,17 @@ const DPFilter = ({
 
   const handleSearchClear = () => {
     setSearchValue("");
-    setRegion("chandigarh");
-    setStoreName("Switchkart");
-    setSearchTerm("");
     setSelectedStatus("");
     setDateValue("");
+    setRegion("chandigarh");
+    setStoreName(import.meta.env.VITE_USER_STORE_NAME);
+    setSearchTerm("");
   };
-    useEffect(() => {
-      if (selectedStatus === "" && dateValue === "" && searchValue === "") {
-        getData();
-      }
-    }, [
-      dateValue,
-      selectedStatus,
-      searchValue
-    ]);
+  useEffect(() => {
+    if (selectedStatus === "" && dateValue === "" && searchValue === "") {
+      getData();
+    }
+  }, [dateValue, selectedStatus, searchValue]);
 
   const handleSearch = (e) => {
     const value = e.target.value;
@@ -508,7 +494,6 @@ const DPFilter = ({
       setFilteredStores(filtered);
     }
   };
-
   const handleFilterClick = () => {
     setShowFilterDropdown(!showFilterDropdown);
   };
@@ -542,7 +527,7 @@ const DPFilter = ({
           <input
             type="date"
             id="datepicker"
-            style={{ color: "#4900A8" }}
+            style={{ color: "var(--primary-color)" }}
             className=""
             value={dateValue}
             onChange={dateChangeHandler}
@@ -728,8 +713,6 @@ const PDTable = ({
   getData,
 }) => {
   const token2 = sessionStorage.getItem("authToken");
-  const [cancelReason, setCancelReason] = useState("");
-  const [holdReason, setHoldReason] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showHoldModal, setShowHoldModal] = useState(false);
 
@@ -802,11 +785,105 @@ const PDTable = ({
       })
       .catch((error) => {
         setIsTableLoaded(false);
-        setErrorMsg("Failed to update status");
+        setErrorMsg(updateStatusError);
         setFailMode(true);
       });
     setSelectedStatus("");
   };
+
+  const confHandler = () => {
+    setIsTableLoaded(true);
+    if (selectedIds.length === 0) {
+      setIsTableLoaded(false);
+      setErrorMsg("No device selected");
+      setFailMode(true);
+    } else {
+      setConfMod(true);
+    }
+  };
+
+  return (
+    <React.Fragment>
+      <PendingDevicesTable
+        pendingTableData={pendingTableData}
+        setSelectedIds={setSelectedIds}
+        setSelectedData={setSelectedData}
+        setSelectedRows={setSelectedRows}
+        selectedData={selectedData}
+        selectedRows={selectedRows}
+      />
+      <div className="mx-2 flex gap-2">
+        <select
+          className="border-2 w-1/2 outline-none border-primary bg-primary text-white text-[12px] px-4 py-2 rounded"
+          value={selectedStatus}
+          onChange={handleStatusUpdate}
+        >
+          <option value="">Status</option>
+          <option value={PickupAvail}>Available For Pickup</option>
+          <option value="On Hold">On Hold</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+        <button
+          onClick={confHandler}
+          className="border-2 w-1/2 border-primary bg-primary text-white text-[12px] px-4 py-2 rounded"
+        >
+          Request For Pickup
+        </button>
+      </div>
+
+      {showCancelModal && (
+        <CancelModal
+          setShowCancelModal={setShowCancelModal}
+          setIsTableLoaded={setIsTableLoaded}
+          token2={token2}
+          selectedIds={selectedIds}
+          getData={getData}
+          setSelectedIds={setSelectedIds}
+          setSelectedData={setSelectedData}
+          setSelectedRows={setSelectedRows}
+          setErrorMsg={setErrorMsg}
+          setErrorMsg1={setErrorMsg1}
+          setErrorMsg2={setErrorMsg2}
+          setSuccessMod={setSuccessMod}
+          setFailMode={setFailMode}
+        />
+      )}
+
+      {showHoldModal && (
+        <HoldModal
+          setShowHoldModal={setShowHoldModal}
+          setIsTableLoaded={setIsTableLoaded}
+          token2={token2}
+          selectedIds={selectedIds}
+          getData={getData}
+          setSelectedIds={setSelectedIds}
+          setSelectedData={setSelectedData}
+          setSelectedRows={setSelectedRows}
+          setErrorMsg={setErrorMsg}
+          setSuccessMod={setSuccessMod}
+          setFailMode={setFailMode}
+        />
+      )}
+    </React.Fragment>
+  );
+};
+
+const CancelModal = ({
+  setShowCancelModal,
+  setIsTableLoaded,
+  token2,
+  selectedIds,
+  getData,
+  setSelectedIds,
+  setSelectedData,
+  setSelectedRows,
+  setErrorMsg,
+  setErrorMsg1,
+  setErrorMsg2,
+  setSuccessMod,
+  setFailMode,
+}) => {
+  const [cancelReason, setCancelReason] = useState("");
 
   const handleCancelSubmit = () => {
     setIsTableLoaded(true);
@@ -831,21 +908,64 @@ const PDTable = ({
         setSelectedIds([]);
         setSelectedData([]);
         setSelectedRows([]);
-        setErrorMsg(
-          `Successfully Updated status to Cancelled`
-        );
+        setErrorMsg(`Successfully Updated status to Cancelled`);
         setErrorMsg1(`Lot No. not updated yet.`);
-        // setErrorMsg2(`Check it on Outstanding`);
+        setErrorMsg2(`Check it on Outstanding`);
         setSuccessMod(true);
       })
       .catch((error) => {
         setIsTableLoaded(false);
-        setErrorMsg("Failed to update status");
+        setErrorMsg(updateStatusError);
         setFailMode(true);
       });
     setShowCancelModal(false);
     setCancelReason("");
   };
+
+  return (
+    <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>Cancellation Reason</h6>
+        <input
+          type="text"
+          value={cancelReason}
+          onChange={(e) => setCancelReason(e.target.value)}
+          className="border-2 border-primary rounded-md px-4 py-2 mb-4 w-full"
+          placeholder="Enter Reason for Cancellation"
+        />
+        <div className="flex flex-row gap-2">
+          <button onClick={handleCancelSubmit} className={buttonStyles}>
+            Okay
+          </button>
+          <button
+            onClick={() => {
+              setShowCancelModal(false);
+              setIsTableLoaded(false);
+            }}
+            className="bg-white text-primary"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const HoldModal = ({
+  setShowHoldModal,
+  setIsTableLoaded,
+  token2,
+  selectedIds,
+  getData,
+  setSelectedIds,
+  setSelectedData,
+  setSelectedRows,
+  setErrorMsg,
+  setSuccessMod,
+  setFailMode,
+}) => {
+  const [holdReason, setHoldReason] = useState("");
 
   const handleHoldSubmit = () => {
     setIsTableLoaded(true);
@@ -875,116 +995,38 @@ const PDTable = ({
       })
       .catch((error) => {
         setIsTableLoaded(false);
-        setErrorMsg("Failed to update status");
+        setErrorMsg(updateStatusError);
         setFailMode(true);
       });
     setShowHoldModal(false);
     setHoldReason("");
   };
-
-  const confHandler = () => {
-    setIsTableLoaded(true);
-    if (selectedIds.length === 0) {
-      setIsTableLoaded(false);
-      setErrorMsg("No device selected");
-      setFailMode(true);
-    } else {
-      setConfMod(true);
-    }
-  };
-
   return (
-    <React.Fragment>
-      <PendingDevicesTable
-        pendingTableData={pendingTableData}
-        setSelectedIds={setSelectedIds}
-        setSelectedData={setSelectedData}
-        setSelectedRows={setSelectedRows}
-        selectedData={selectedData}
-        selectedRows={selectedRows}
-      />
-      <div className="mx-2 flex gap-2">
-        <select
-          className="border-2 w-1/2 outline-none border-[#4900A8] bg-[#4900A8] text-white text-[12px] px-4 py-2 rounded"
-          value={selectedStatus}
-          onChange={handleStatusUpdate}
-        >
-          <option value="">Status</option>
-          <option value={PickupAvail}>Available For Pickup</option>
-          <option value="On Hold">On Hold</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
-        <button
-          onClick={confHandler}
-          className="border-2 w-1/2 border-[#4900A8] bg-[#4900A8] text-white text-[12px] px-4 py-2 rounded"
-        >
-          Request For Pickup
-        </button>
+    <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>Hold Reason</h6>
+        <input
+          type="text"
+          value={holdReason}
+          onChange={(e) => setHoldReason(e.target.value)}
+          className="border-2 border-primary rounded-md px-4 py-2 mb-4 w-full"
+          placeholder="Enter Reason for Hold"
+        />
+        <div className="flex flex-row gap-2">
+          <button onClick={handleHoldSubmit} className={buttonStyles}>
+            Okay
+          </button>
+          <button
+            onClick={() => {
+              setShowHoldModal(false);
+              setIsTableLoaded(false);
+            }}
+            className="bg-white text-primary"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
-
-      {showCancelModal && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <h6 className={failTextColor}>Cancellation Reason</h6>
-            <input
-              type="text"
-              value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
-              className="border-2 border-[#4900A8] rounded-md px-4 py-2 mb-4 w-full"
-              placeholder="Enter Reason for Cancellation"
-            />
-            <div className="flex flex-row gap-2">
-              <button
-                onClick={handleCancelSubmit}
-                className={"bg-[#4900A8] text-white"}
-              >
-                Okay
-              </button>
-              <button
-                onClick={() => {
-                  setShowCancelModal(false);
-                  setIsTableLoaded(false);
-                }}
-                className="bg-white text-[#4900A8]"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showHoldModal && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <h6 className={failTextColor}>Hold Reason</h6>
-            <input
-              type="text"
-              value={holdReason}
-              onChange={(e) => setHoldReason(e.target.value)}
-              className="border-2 border-[#4900A8] rounded-md px-4 py-2 mb-4 w-full"
-              placeholder="Enter Reason for Hold"
-            />
-            <div className="flex flex-row gap-2">
-              <button
-                onClick={handleHoldSubmit}
-                className={"bg-[#4900A8] text-white"}
-              >
-                Okay
-              </button>
-              <button
-                onClick={() => {
-                  setShowHoldModal(false);
-                  setIsTableLoaded(false);
-                }}
-                className="bg-white text-[#4900A8]"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </React.Fragment>
+    </div>
   );
 };

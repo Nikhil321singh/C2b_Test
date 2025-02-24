@@ -1,9 +1,6 @@
 import React from "react";
 import { IoCloseCircle } from "react-icons/io5";
-import { useSelector } from "react-redux";
 const SummaryModal = ({ show, onClose, price, bonus, sellingPrice }) => {
-  const BasePrice = useSelector((state) => state.responseData.price);
-
   return (
     <div
       className={`fixed bg-white rounded-l-3xl rounded-r-3xl bottom-0 left-0 w-full p-4 transition-all 
@@ -14,7 +11,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice }) => {
           <IoCloseCircle
             onClick={onClose}
             size={24}
-            className="text-[#4900A8] absolute top-5 right-4"
+            className="text-primary absolute top-5 right-4"
           />
         </div>
         <div>
@@ -29,7 +26,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice }) => {
             <div className="flex justify-between">
               <p>Pickup Charges</p>
               <div className="flex gap-2">
-                <p className="text-[#4900A8]">Free</p>
+                <p className="text-primary">Free</p>
                 <p className="line-through">₹100</p>
               </div>
             </div>
@@ -45,7 +42,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice }) => {
         </div>
       </div>
       <button
-        className="bg-[#4900A8] fixed bottom-0 mb-4 rounded text-white px-4 py-2 mt-4"
+        className="bg-primary fixed bottom-0 mb-4 rounded text-white px-4 py-2 mt-4"
         onClick={onClose}
       >
         Close

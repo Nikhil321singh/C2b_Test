@@ -1,5 +1,5 @@
 .bulkdown_button {
-  color: #4900a8;
+  color: var(--primary-color);
   font-weight: bold;
   display: flex;
   flex-direction: row;

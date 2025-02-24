@@ -5,7 +5,7 @@ import { IoClose } from "react-icons/io5";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import AppFooter from "../../components/AppFooter";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import styles from "./SelectDeviceType.module.css";
 import apple from "../../assets/apple-logo.png";
 import poco from "../../assets/POCO.png";
@@ -31,7 +31,7 @@ import FromDatecom from "../../components/fromdate_todate_Com/FromDatecom";
 import { toast } from "react-hot-toast";
 import { ImCancelCircle } from "react-icons/im";
 import Oppo from "../../assets/Oppo.png";
-
+const buyback = import.meta.env.VITE_BUYBACK_URL;
 export const OrderStatusBox = ({ title, figures, background }) => {
   return (
     <div
@@ -55,13 +55,55 @@ export const DeviceTypeFilter = ({
   setSelectedBtn,
   setDeviceType,
 }) => {
-  const categories = [
-    { name: "Mobiles", image: mobile, apiType: "Mobile" },
-    { name: "Laptops", image: laptop, apiType: "Laptop" },
-    { name: "Watches", image: watch, apiType: "Watch" },
+    const token = sessionStorage.getItem("authToken");
+
+  const [categories, setCategories] = useState([]);
+
+  const staticCategories = [
+    { name: "Mobiles", image: mobile, apiType: "CTG1" },
+    { name: "Laptops", image: laptop, apiType: "CTG3" },
+    { name: "Watches", image: watch, apiType: "CTG2" },
     { name: "More", image: null },
   ];
+  useEffect(() => {
+    getCategories();
+  }, []);
+const getCategories = async () => {
+  try {
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+      {
+        headers: { Authorization: token },
+      }
+    );
+    sessionStorage.setItem("Categories", JSON.stringify(data?.data));
+    // Map API data and merge with static data
+    const mergedCategories = data.data.map((apiCat) => {
+      // Find a matching category in static categories
+      const match = staticCategories.find(
+        (staticCat) => staticCat.apiType === apiCat.categoryName
+      );
 
+      // Merge data if match found, otherwise keep API category
+      return {
+        ...apiCat,
+        image: match?.image || null, // Use the image from static data if available
+        apiType: apiCat.categoryCode, // Ensure `apiType` is consistent
+      };
+    });
+
+    // Append static categories that are not present in API data
+    const additionalCategories = staticCategories.filter(
+      (staticCat) =>
+        !data.data.some((apiCat) => apiCat.categoryName === staticCat.apiType)
+    );
+
+    // Update state with the merged categories
+    setCategories([...mergedCategories, ...additionalCategories]);
+  } catch (err) {
+    console.log(err);
+  }
+};
   const categoryContainerRef = useRef(null);
 
   const scrollCategory = (direction) => {
@@ -97,17 +139,17 @@ export const DeviceTypeFilter = ({
           <div
             key={index}
             className={
-              selectedBtn === category.name
+              selectedBtn === category.categoryCode
                 ? styles.button_checked
                 : styles.button_unchecked
             }
             onClick={() => {
-              setSelectedBtn(category.name);
+              setSelectedBtn(category.categoryCode);
               setDeviceType(category.apiType);
             }}
           >
             {category.image && <img src={category.image} alt={category.name} />}
-            <span>{category.name}</span>
+            <span>{category?.categoryName || category?.name}</span>
           </div>
         ))}
       </div>
@@ -121,10 +163,40 @@ export const DeviceTypeFilter = ({
   );
 };
 
+export const DeviceTypeFilter2 = () => {
+  const categories = [
+    { name: "iPhone", image: mobile, apiType: "CTG1", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" },
+    { name: "Watch", image: watch, apiType: "CTG2", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" }
+  ];
+  const navigate = useNavigate();
+  return (
+    <div className={`px-3 w-full`}>
+      <div
+        className={`flex flex-shrink-0 gap-4`}
+      >
+        {categories.map((category, index) => (
+          <div
+            key={index}
+            style={{ boxShadow: '1px 1px 2px 0px rgba(0, 0, 0, 0.158), -1px -1px 0px 0px rgba(0, 0, 0, 0.034)'}}
+            className={`flex flex-col items-center gap-1 justify-between rounded-md py-4`}
+            onClick={() => {
+              sessionStorage.setItem("DeviceType", category.apiType);
+              navigate(category.link);
+            }}
+          >
+            {category.image && <img className="w-[50%]" src={category.image} alt={category.name} />}
+            <div className="w-full text-center font-semibold text-base text-primary">{category.name}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const ImgSelectore = (ImgItem) => {
   if (ImgItem?.phonePhotos?.front) {
     return ImgItem?.phonePhotos?.front;
-  } else if (ImgItem?.type === "Mobile") {
+  } else if (ImgItem?.type === "CTG1") {
     return mobile;
   } else {
     return appleWatch;
@@ -287,7 +359,16 @@ export const BrandList = ({ deviceType }) => {
       brandItem.name === "Xiaomi" ||
       brandItem.name === "Samsung" ||
       brandItem.name === "Vivo" ||
-      brandItem.name === "OPPO"
+      brandItem.name === "iQOO" ||
+      brandItem.name === "Infinix" ||
+      brandItem.name === "Tecno" ||
+      brandItem.name === "Google" ||
+      brandItem.name === "Nothing" ||
+      brandItem.name === "Honor" ||
+      brandItem.name === "Motorola" ||
+      brandItem.name === "Nokia" ||
+      brandItem.name === "OPPO"||
+      brandItem.name === "Lenovo"
     ) {
       const detail = { brand: brandItem, models: {}, _id: brandItem._id };
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
@@ -296,8 +377,6 @@ export const BrandList = ({ deviceType }) => {
       handleDeviceClick();
     }
   };
-
-  const allBrands = [...brandList];
   return (
     <>
       {popout && (
@@ -313,10 +392,10 @@ export const BrandList = ({ deviceType }) => {
                 size={25}
                 onClick={hanldeclose}
               />
-              <div className="text-4xl font-bold text-[#4900AD] p text-center">
+              <div className="text-4xl font-bold text-primary p text-center">
                 Coming
               </div>
-              <div className="text-4xl font-bold text-[#4900AD] p text-center">
+              <div className="text-4xl font-bold text-primary p text-center">
                 Soon !
               </div>
             </div>
@@ -334,15 +413,21 @@ export const BrandList = ({ deviceType }) => {
           ref={brandContainerRef}
           className={`flex flex-shrink-0 gap-4 px-1 overflow-x-auto  scroll-smooth scrollbar-hide ${styles.topSell_box}`}
         >
-          {allBrands.map((brandItem, index) => (
-            <div
-              key={index}
-              onClick={() => handleBrandClick(brandItem)}
-              className={`flex-shrink-0  ${styles.brand_card} px-[20px] py-[10px]`}
-            >
-              <img className=" w-[50px]" src={brandItem.logo} alt={brandItem.name} />
-            </div>
-          ))}
+          {brandList &&
+            brandList.length > 0 &&
+            brandList.map((brandItem, index) => (
+              <div
+                key={index}
+                onClick={() => handleBrandClick(brandItem)}
+                className={`flex-shrink-0  ${styles.brand_card} px-[20px] py-[10px]`}
+              >
+                <img
+                  className=" w-[50px]"
+                  src={brandItem.logo}
+                  alt={brandItem.name}
+                />
+              </div>
+            ))}
         </div>
         <button
           className={`-translate-x-3 ${styles.scroll_button}`}
@@ -356,11 +441,11 @@ export const BrandList = ({ deviceType }) => {
 };
 
 const selBtn = (Device) => {
-  if (Device === "Mobile") {
+  if (Device === "CTG1") {
     return "Mobiles";
-  } else if (Device === "Laptop") {
+  } else if (Device === "CTG3") {
     return "Laptops";
-  } else if (Device === "Watch") {
+  } else if (Device === "CTG2") {
     return "Watches";
   } else {
     return "More";
@@ -440,6 +525,7 @@ const SelectDeviceType = () => {
   const { fromDateDup, setFromDateDup, toDateDup, setToDateDup } =
     useQuestionContext();
   const [showFromdate, setshowFromdate] = useState(false);
+  const location = useLocation();
   const [isSearchBoxOpen, setIsSearchBoxOpen] = useState(false);
   const [days, setDays] = useState("today");
   const [orderSaled, setOrderSaled] = useState(0);
@@ -451,6 +537,12 @@ const SelectDeviceType = () => {
   const [imei, setImei] = useState("");
   const [data, setData] = useState(null);
   const [modelsL, setModel] = useState([]);
+
+  useEffect(() => {
+    if (location.state?.openSearch) {
+      setIsSearchBoxOpen(true);
+    }
+  }, [location.state]);
 
   const searchBoxSwitch = () => {
     setModel([]);
@@ -498,14 +590,14 @@ const SelectDeviceType = () => {
     setData(`${temp?.brand} ${temp?.model}`);
   };
 
-  const searchPhone = async (tempData, deviceType) => {
-    const tempRes = await searchPhoneAPI(tempData, deviceType);
+  const searchPhone = async (tempData, typeDevice) => {
+    const tempRes = await searchPhoneAPI(tempData, typeDevice);
     setModel(tempRes || []);
   };
 
   useEffect(() => {
     if (data) {
-      searchPhone(data, "Mobile");
+      searchPhone(data, "CTG1");
     }
   }, [data]);
 
@@ -642,16 +734,14 @@ const SearchBox = ({
     navigate("/selectmodel");
     addPhoneView(model._id);
   };
-
-   const isArray = Array.isArray(modelsL);
-   const sortedModels = isArray
-     ? [...modelsL].sort((a, b) => {
-         const numA = parseInt(a.name.match(/\d+/), 10);
-         const numB = parseInt(b.name.match(/\d+/), 10);
-         return numA - numB;
-       })
-     : [];
-
+  const isArray = Array.isArray(modelsL);
+  const sortedModels = isArray
+    ? [...modelsL].sort((a, b) => {
+        const numA = parseInt(a.name.match(/\d+/), 10);
+        const numB = parseInt(b.name.match(/\d+/), 10);
+        return numA - numB;
+      })
+    : [];
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
@@ -679,11 +769,11 @@ const SearchBox = ({
                 className="flex items-center"
                 onClick={() => setIsScanOpen(!isScanOpen)}
               >
-                <CiBarcode size={20} className={"inline mr-1 text-[#4900AD]"} />
+                <CiBarcode size={20} className={"inline mr-1 text-primary"} />
               </div>
             </div>
           </div>
-          {imei.length > 0 && sortedModels.length > 0 ? (
+          {imei.length > 0 && sortedModels.length > 0 && (
             <div
               className={`   mx-auto mt-4 justify-center  w-full  flex flex-wrap gap-2  max-h-screen overflow-y-scroll pb-[15vh] `}
             >
@@ -692,7 +782,9 @@ const SearchBox = ({
                   <div
                     key={model._id}
                     className={` ${
-                      sortedModels.length < 3 ? "min-w-[30%] max-w-[30%]" : "w-[30%]"
+                      sortedModels.length < 3
+                        ? "min-w-[30%] max-w-[30%]"
+                        : "w-[30%]"
                     }  h-auto  gap-2 flex flex-col items-center px-2 py-4  text-center`}
                     style={{ boxShadow: "0 0 10px 0 rgb(0 0 0 / 0.1)" }}
                     onClick={() => handleDeviceClick(model)}
@@ -702,16 +794,25 @@ const SearchBox = ({
                   </div>
                 ))}
             </div>
-          ) : (
+          ) }
+
+          {imei.length > 0 && sortedModels.length === 0 && (
+            <div className="flex flex-col my-auto text-sm font-medium text-gray-500">
+              <img className="w-[250px] mx-auto" src={searchImage} />
+              <div className="mt-[50%] font-bold text-4xl">No Product Found</div>
+            </div>
+          )}
+
+          {imei.length === 0 && (
             <div className="flex flex-col my-auto text-sm font-medium text-gray-500">
               <img className="w-[250px] mx-auto" src={searchImage} />
               <div>
-                Dial <span className="text-[#4900AD]">*#06#</span> on customer's
+                Dial <span className="text-primary">*#06#</span> on customer's
                 old device and
               </div>
               <div>
                 Scan the IMEI using the{" "}
-                <CiBarcode className="inline text-[#4900AD]" size={20} /> on top
+                <CiBarcode className="inline text-primary" size={20} /> on top
                 right.
               </div>
             </div>
@@ -743,7 +844,7 @@ const MiddlePart = ({
 }) => {
   const Device1 = sessionStorage.getItem("DeviceType");
   const [selectedBtn, setSelectedBtn] = useState(() => selBtn(Device1));
-
+  const currentDomain = window.location.origin;
   return (
     <div className={styles.des_main_wrap}>
       <div className={styles.des_lr_wrap}>
@@ -761,25 +862,26 @@ const MiddlePart = ({
                 type="text"
               />
               <div className="flex items-center">
-                <CiBarcode size={20} className="inline mr-1 text-[#4900AD]" />
+                <CiBarcode size={20} className="inline mr-1 text-primary" />
               </div>
             </div>
           </div>
-          <DeviceTypeFilter
+          {currentDomain === buyback && <DeviceTypeFilter2/>}
+          {currentDomain !== buyback && <DeviceTypeFilter
             selectedBtn={selectedBtn}
             setSelectedBtn={setSelectedBtn}
             setDeviceType={setDeviceType}
-          />
-          <BrandList deviceType={deviceType} />
-          <div className="ml-3">
+          />}
+          {currentDomain !== buyback && <BrandList deviceType={deviceType} />}
+          {currentDomain !== buyback && <div className="ml-3">
             <select
               name=""
               id=""
               onChange={(e) => {
                 handlepick(e);
               }}
-              className="p-2 border-2 rounded-lg shadow-md outline-none bg-[#8080ff] text-white"
-              style={{ backgroundColor: "#8080ff", color: "white" }}
+              className="p-2 border-2 rounded-lg shadow-md outline-none bg-primary text-white"
+              // style={{ backgroundColor: "var(--primary-color)71", color: "white" }}
             >
               <option
                 value="today"
@@ -818,14 +920,14 @@ const MiddlePart = ({
                 Custom
               </option>
             </select>
-          </div>
+          </div>}
 
-          <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
+          {currentDomain !== buyback && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
             <Link className="w-[33%]" to={`/orderscreated/${days}`}>
               <OrderStatusBox
                 figures={orderCount}
                 title="Order Created"
-                background="#0275F2"
+                background="rgb(2, 117, 242)"
               />
             </Link>
             <Link className="w-[33%]" to={`/orderscompleted/${days}`}>
@@ -842,9 +944,9 @@ const MiddlePart = ({
                 background="#FF963E"
               />
             </Link>
-          </div>
+          </div>}
           <p
-            className={`${styles.topSell_head} text-lg font-bold text-[#4900AD]`}
+            className={`${styles.topSell_head} text-lg font-bold text-primary`}
           >
             Top Selling Models
           </p>
@@ -859,9 +961,9 @@ const MiddlePart = ({
         </div>
       </div>
       <p
-        className={`${styles.topSell_head} text-lg font-bold mt-2 text-[#4900AD]`}
+        className={`${styles.topSell_head} text-lg font-bold mt-2 text-primary`}
       >
-        How SwitchKart Works?
+        How {import.meta.env.VITE_WEBSITE_SHORT_NAME} Works?
       </p>
       <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
         <div className="flex flex-col min-w-[30%]  items-center  ">

@@ -13,6 +13,7 @@ import { BeatLoader } from "react-spinners";
 import QuotesCreatedAdminTable from "../../components/QuotesCreatedAdminTable/QuotesCreatedAdminTable";
 import * as XLSX from "xlsx";
 const ALLstore = "All Stores";
+const initDate = "2023-01-01";
 
 const downloadExcelQuotesAdminCreated = (apiData) => {
   const fileType =
@@ -23,11 +24,15 @@ const downloadExcelQuotesAdminCreated = (apiData) => {
     let questionsKeys = "";
     let index = 1;
     console.log(item?.lead?.QNA[0]);
-    for (const group in item?.lead?.QNA[0]) {
-      item.lead.QNA[0][group].forEach((qna) => {
-        questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
-        index++;
-      });
+    if (item?.lead?.QNA?.[0] && typeof item.lead.QNA[0] === 'object') {
+      for (const group in item.lead.QNA[0]) {
+        if (Array.isArray(item.lead.QNA[0][group])) {
+          item.lead.QNA[0][group].forEach((qna) => {
+            questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`;
+            index++;
+          });
+        }
+      }
     }
     return {
       "Date Created": new Date(item.createdAt).toLocaleDateString("en-IN"),
@@ -118,20 +123,14 @@ const QuotesCreatedAdmin = () => {
   const [toDate, setToDate] = useState(null);
   const [fromDate, setFromDate] = useState(null);
   const [filFlag, setFilFlag] = useState(true);
-  const [fromDateDup, setFromDateDup] = useState("2023-01-01");
-  const [toDateDup, setToDateDup] = useState(
-    new Date().toISOString().split("T")[0]
-  );
-   const [searchTerm, setSearchTerm] = useState("");
-   const [filteredStores, setFilteredStores] = useState(storeData);
-  
+  const [fromDateDup, setFromDateDup] = useState(initDate);
+  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredStores, setFilteredStores] = useState(storeData);
   const getTableData = () => {
     setIsTableLoaded(true);
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll/quotecreated?fromdate=${fromDateDup}&todate=${toDateDup}&search=${searchValue}&store=${storeId}`,
+    axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll/quotecreated?fromdate=${fromDateDup
+      }&todate=${toDateDup}&search=${searchValue}&store=${storeId}`,
         { headers: { authorization: userToken } }
       )
       .then((res) => {
@@ -143,24 +142,16 @@ const QuotesCreatedAdmin = () => {
         setIsTableLoaded(false);
       });
   };
-
   useEffect(() => {
     getTableData();
   }, [storeId, fromDateDup, toDateDup, filFlag]);
-
   const saveStore = async () => {
     const temparr = await getStore();
     setStoreData(temparr);
   };
-
   useEffect(() => {
     saveStore();
   }, []);
-
-  const handleSearchClick = () => {
-    getTableData();
-  };
-
   const handleSearchClear = () => {
     setSearchValue("");
     setStoreId("");
@@ -168,68 +159,54 @@ const QuotesCreatedAdmin = () => {
     setToDate("");
     setToDateDup(new Date().toISOString().split("T")[0]);
     setFromDate("");
-    setFromDateDup("2023-01-01");
+    setFromDateDup(initDate);
     setFilFlag(!filFlag);
   };
-  useEffect(() => {
-    if (
-      searchValue === "" &&
-      storeName == ALLstore &&
-      storeId === "" &&
-      fromDateDup === "2023-01-01"
-    ) {
-getTableData();
-    }
-  }, [searchValue, storeName, storeId, fromDateDup]);
+ useEffect(() => {
+   if (
+     searchValue === "" &&
+     storeName === ALLstore &&
+     storeId === "" &&
+     fromDateDup === initDate
+   ) {
+     getTableData();
+   }
+ }, [searchValue, storeName, storeId, fromDateDup]);
 
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-
-    if (value === "") {
-      setFilteredStores(storeData);
-    } else {
-      const filtered = storeData.filter((store) =>
-        store.storeName.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredStores(filtered);
-    }
-  };
+ const handleSearch = (e) => {
+   const value = e.target.value;
+   setSearchTerm(value);
+   if (value === "") {
+     setFilteredStores(storeData);
+   } else {
+     const filtered = storeData.filter((store) => store.storeName.toLowerCase().includes(value.toLowerCase()));
+     setFilteredStores(filtered);
+   }
+ };
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     setStoreName(value.storeName);
     setStoreId(value._id);
   };
-
   const handleFromDateChange = (date) => {
     if (date !== null) {
       setFromDate(date);
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split("T")[0];
+      const formattedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[0];
       setFromDateDup(formattedDate);
     }
   };
-
   const handleToDateChange = (date) => {
     if (date !== null) {
       setToDate(date);
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split("T")[0];
+      const formattedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().split("T")[0];
       setToDateDup(formattedDate);
     }
   };
-
   return (
     <div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="navbar">
@@ -246,17 +223,16 @@ getTableData();
             value={searchValue}
             placeholder="Search...."
           />
-          <IoMdSearch onClick={handleSearchClick} size={25} />
+          <IoMdSearch onClick={() => {
+              getTableData();
+          }} size={25} />
         </div>
-        <div className={styles.icons_box}>
-          <IoRefresh onClick={handleSearchClear} className=" " size={25} />
-        </div>
+        <div className={styles.icons_box}><IoRefresh onClick={handleSearchClear} className=" " size={25} /></div>
         <button
           className={`${styles.bulkdown_button}`}
           onClick={() => fetchDownloadData(storeId)}
         >
-          <FaDownload /> Bulk Download
-        </button>
+          <FaDownload />Bulk Download</button>
         <div className="[bg-[#F5F4F9]">
           <DatePicker
             selected={fromDate}
@@ -282,40 +258,34 @@ getTableData();
               setStoreDrop(!storeDrop);
             }}
           >
-            <p className="truncate">
-              {searchTerm === "" ? "Select Store" : searchTerm}
-            </p>
+            <p className="truncate">{searchTerm === "" ? "Select Store" : searchTerm}</p>
             <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
           {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
+            <div className="absolute   w-full bg-white shadow-md">
               <input
                 type="text"
-                value={searchTerm}
                 onChange={handleSearch}
                 className="w-full p-2 border-b border-gray-300"
                 placeholder="Search store..."
+                value={searchTerm}
               />
               <div
-                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
+                className={` overflow-y-scroll  max-h-[200px] ${styles.filter_drop}`}
               >
                 {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
+                  filteredStores.map((item5, index) => (
                     <div
                       key={index}
                       onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item.storeName);
+                        handleStoreChange(item5);
+                        setSearchTerm(item5.storeName);
                         setStoreDrop(false);
                       }}
                       className={`${styles.filter_option}`}
-                    >
-                      <p className="truncate">{item.storeName}</p>
-                    </div>
+                    ><p className="truncate  ">{item5.storeName}</p></div>
                   ))
-                ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
-                )}
+                ) : (<p className="p-2 text-gray-500">No stores found</p>)}
                 <div
                   className={`${styles.filter_option}`}
                   onClick={() => {

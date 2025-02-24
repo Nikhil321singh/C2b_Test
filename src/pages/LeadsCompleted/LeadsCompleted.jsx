@@ -12,9 +12,12 @@ import NavigateListing from "../../components/NavigateListing/NavigateListing";
 import styless from "../QuotesCreatedAdmin/QuotesCreatedAdmin.module.css";
 import { IoMdSearch } from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
-
+import ReactDOMServer from "react-dom/server";
+import html2pdf from "html2pdf.js";
+import PurchaseReceipt from "../../components/PurchaseReceipt";
 const pageLimit = 10;
 const ALLstore = "All Stores";
+const iniDate = "2023-01-01";
 
 const getStore = async () => {
   let storeNamesArray = [];
@@ -51,16 +54,21 @@ const downloadExcelLeadsompleted = (apiData) => {
     const questionData = {};
     let index = 1;
 
-    for (const group in item?.QNA[0]) {
-      item?.QNA[0][group].forEach((qna) => {
-        // Create a column for each question with its answer
-        questionData[`Q${index}. ${qna?.quetion}`] = qna?.key;
-        index++;
-      });
+    if (item?.QNA?.[0] && typeof item.QNA[0] === 'object') {
+      for (const group in item.QNA[0]) {
+        // Check if item.QNA[0][group] is an array before calling forEach
+        if (Array.isArray(item.QNA[0][group])) {
+          item.QNA[0][group].forEach((qna) => {
+            // Create a column for each question with its answer
+            questionData[`Q${index}. ${qna?.quetion}`] = qna?.key;
+            index++;
+          });
+        }
+      }
     }
 
     return {
-      "Date Created": new Date(item?.createdAt).toLocaleDateString("en-IN"),
+      "Date Created": new Date(item?.updatedAt).toLocaleDateString("en-IN"),
       "Store user Mobile No.": item.phoneNumber,
       "User Email": item.userId?.email,
       "Customer Mobile No.": item.phoneNumber,
@@ -91,7 +99,7 @@ const downloadExcelLeadsompleted = (apiData) => {
 };
 
 const LeadsCompleted = () => {
-  const [deviceType, setDeviceType] = useState("Mobile");
+  const [deviceType, setDeviceType] = useState("CTG1");
   const userToken = sessionStorage.getItem("authToken");
   const [loading, setLoading] = useState(false);
   const [sideMenu, setsideMenu] = useState(false);
@@ -101,7 +109,7 @@ const LeadsCompleted = () => {
   const [maxPages, setMaxPages] = useState(0);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [fromDateDup, setFromDateDup] = useState("2023-01-01");
+  const [fromDateDup, setFromDateDup] = useState(iniDate);
   const [toDateDup, setToDateDup] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -111,6 +119,7 @@ const LeadsCompleted = () => {
   const [storeName, setStoreName] = useState(ALLstore);
   const [selStoreId, setSelStoreId] = useState("");
   const [storeData, setStoreData] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [reset, setReset] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredStores, setFilteredStores] = useState(storeData);
@@ -120,13 +129,28 @@ const LeadsCompleted = () => {
   };
   useEffect(() => {
     saveStore();
+    getCategories();
   }, []);
-
+  const getCategories = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+        {
+          headers: { Authorization: userToken },
+        }
+      );
+      setCategories(data.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   function getSalesData() {
     setLoading(true);
     const endpoint = `${
       import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=${fromDateDup}&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=${search1}&deviceType=${deviceType}`;
+    }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=${
+    fromDateDup}&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=${
+    search1}&deviceType=${deviceType}`;
     axios
       .get(endpoint, {
         headers: { authorization: userToken },
@@ -148,37 +172,12 @@ const LeadsCompleted = () => {
     setStoreName(ALLstore);
     setSelStoreId("");
     setFromDate("");
-    setFromDateDup("2023-01-01");
+    setFromDateDup(iniDate);
     setToDate("");
     setToDateDup(new Date().toISOString().split("T")[0]);
     setReset(!reset);
   };
 
-   useEffect(() => {
-     if (
-       search === "" &&
-       search1 === "" &&
-       storeName == ALLstore &&
-       selStoreId === "" &&
-       fromDateDup === "2023-01-01"
-     ) {
-getSalesData();
-     }
-   }, [search, search1, storeName, selStoreId, fromDateDup]);
-
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-
-    if (value === "") {
-      setFilteredStores(storeData);
-    } else {
-      const filtered = storeData.filter((store) =>
-        store.storeName.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredStores(filtered);
-    }
-  };
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     console.log(value._id);
@@ -226,6 +225,32 @@ getSalesData();
     }
   };
 
+useEffect(() => {
+  if (
+    search === "" &&
+    search1 === "" &&
+    storeName === ALLstore &&
+    selStoreId === "" &&
+    fromDateDup === iniDate
+  ) {
+    getSalesData();
+  }
+}, [search, search1, storeName, selStoreId, fromDateDup]);
+
+const handleSearch = (e) => {
+  const value = e.target.value;
+  setSearchTerm(value);
+
+  if (value === "") {
+    setFilteredStores(storeData);
+  } else {
+    const filtered = storeData.filter((store) =>
+      store.storeName.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredStores(filtered);
+  }
+};
+
   return (
     <div>
       <SubLeadsCompleted
@@ -259,6 +284,7 @@ getSalesData();
         setSearchTerm={setSearchTerm}
         handleSearch={handleSearch}
         filteredStores={filteredStores}
+        categories={categories}
       />
     </div>
   );
@@ -318,13 +344,17 @@ const SubLeadsCompleted = ({
   setSearchTerm,
   handleSearch,
   filteredStores,
+  categories
 }) => {
-  const [deviceDrop, setDeviceDrop] = useState(false);
   return (
     <div className="overflow-y-hidden">
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={loading} size={15} />
+          <BeatLoader
+            color="var(--primary-color)"
+            loading={loading}
+            size={15}
+          />
         </div>
       )}
       <div className="navbar">
@@ -332,118 +362,24 @@ const SubLeadsCompleted = ({
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
       <NavigateListing />
-      <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
-        <button
-          className={`${styles.bulkdown_button}`}
-          onClick={() => fetchDownloadData(totalCount, deviceType, selStoreId)}
-        >
-          <FaDownload /> Bulk Download
-        </button>
-        <div className="[bg-[#F5F4F9]">
-          <DatePicker
-            selected={fromDate}
-            onChange={handleFromDateChange}
-            dateFormat="yyyy-MM-dd"
-            className={` mt-1 py-[6px] border px-[15px]  rounded-md`}
-            placeholderText="Select from date"
-          />
-        </div>
-        <div>
-          <DatePicker
-            selected={toDate}
-            dateFormat="yyyy-MM-dd"
-            onChange={handleToDateChange}
-            className="mt-1 py-[6px] px-[15px]  border rounded-md"
-            placeholderText="Select to date"
-          />
-        </div>
-        <div className="w-[250px] relative">
-          <div
-            className={`${styless.filter_button}`}
-            onClick={() => setStoreDrop(!storeDrop)}
-          >
-            <p className="truncate">
-              {searchTerm === "" ? "Select Store" : searchTerm}
-            </p>
-            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
-          </div>
-          {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
-                placeholder="Search store..."
-              />
-              <div
-                className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
-              >
-                {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item.storeName);
-                        setStoreDrop(false);
-                      }}
-                      className={`${styles.filter_option}`}
-                    >
-                      <p className="truncate">{item.storeName}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
-                )}
-                <div
-                  className={`${styles.filter_option}`}
-                  onClick={() => {
-                    handleStoreChange({ _id: "", storeName: ALLstore })
-                  setSearchTerm(ALLstore);
-                  }}
-                  
-                >
-                  <p className="truncate">{ALLstore}</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="w-[250px] relative">
-          <div
-            className={`${styless.filter_button}`}
-            onClick={() => setDeviceDrop(!deviceDrop)}
-          >
-            <p className="truncate">{deviceType}</p>
-            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
-          </div>
-          {deviceDrop && (
-            <div
-              className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
-            >
-              <div
-                className={`${styless.filter_option}`}
-                onClick={() => {
-                  setDeviceType("Mobile");
-                  setDeviceDrop(false);
-                }}
-              >
-                <p className="truncate">Mobile</p>
-              </div>
-              <div
-                className={`${styless.filter_option}`}
-                onClick={() => {
-                  setDeviceType("Watch");
-                  setDeviceDrop(false);
-                }}
-              >
-                <p className="truncate">Watch</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      <SubLeadsCompletedBtns
+        handleFromDateChange={handleFromDateChange}
+        fromDate={fromDate}
+        totalCount={totalCount}
+        deviceType={deviceType}
+        selStoreId={selStoreId}
+        toDate={toDate}
+        handleToDateChange={handleToDateChange}
+        setStoreDrop={setStoreDrop}
+        storeDrop={storeDrop}
+        searchTerm={searchTerm}
+        handleSearch={handleSearch}
+        filteredStores={filteredStores}
+        handleStoreChange={handleStoreChange}
+        setSearchTerm={setSearchTerm}
+        setDeviceType={setDeviceType}
+        categories={categories}
+        tableData={tableData}/>
       <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
         <div className={`${styles.search_bar_wrap}`}>
           <input
@@ -456,11 +392,7 @@ const SubLeadsCompleted = ({
           <IoMdSearch size={25} onClick={() => getSalesData()} />
         </div>
         <div className={styles.icons_box}>
-          <IoRefresh
-            onClick={() => handleSearchClear()}
-            className=""
-            size={25}
-          />
+          <IoRefresh onClick={() => handleSearchClear()} size={25} />
         </div>
         <div className={`${styles.search_bar_wrap}`}>
           <input
@@ -481,7 +413,7 @@ const SubLeadsCompleted = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#4900A8] text-white cursor-pointer"
+              : "bg-primary text-white cursor-pointer"
           }`}
         >
           Previous
@@ -492,7 +424,7 @@ const SubLeadsCompleted = ({
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === maxPages - 1
               ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-[#4900A8] text-white cursor-pointer"
+              : "bg-primary text-white cursor-pointer"
           }`}
         >
           Next
@@ -501,5 +433,157 @@ const SubLeadsCompleted = ({
     </div>
   );
 };
+const SubLeadsCompletedBtns = ({ handleFromDateChange,fromDate, totalCount, deviceType, selStoreId, toDate, handleToDateChange, setStoreDrop,
+  storeDrop, searchTerm, handleSearch, filteredStores, handleStoreChange, setSearchTerm, setDeviceType, categories, tableData}) => {
 
+  const handleBulkDownloadReceipts = () => {
+    if (!fromDate || !toDate) {
+      alert("Please select and search valid date range Leads.");
+      return;
+    }
+    tableData.forEach((item, index) => {
+      const dateString = item?.updatedAt;
+      const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+      const printElement = ReactDOMServer.renderToString(
+        <PurchaseReceipt
+          phoneNumber={item?.phoneNumber}
+          aadharNumber={item?.aadharNumber}
+          uniqueCode={item?.uniqueCode}
+          emailId={item?.emailId}
+          name={item?.name}
+          imeiNumber={item?.documentId?.IMEI}
+          phoneName={item?.modelId?.name}
+          type={item?.categoryInfo?.categoryName}
+          storeName={item?.store?.storeName}
+          region={item?.store?.region}
+          address={item?.store?.address}
+          storage={item?.storage}
+          RAM={item?.ram}
+          formattedDate={formattedDate}
+        />
+      );
+      html2pdf()
+        .from(printElement)
+        .save(`purchase_receipt_${index + 1}.pdf`);
+    });
+  };
+
+  return (
+    <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
+    <div className="flex gap-4">
+      <button
+        className={`${styles.bulkdown_button}`}
+        onClick={() =>
+          fetchDownloadData(totalCount, deviceType, selStoreId)
+        }
+      >
+        <FaDownload /> Bulk Download
+      </button>
+      <div className="mt-2 ml-4">
+        <button
+          className={`${styles.bulkdown_button}`}
+          onClick={handleBulkDownloadReceipts}
+        >
+          <FaDownload /> Download Receipts
+        </button>
+      </div>
+    </div>
+    <div className="[bg-[#F5F4F9]">
+      <DatePicker
+        selected={fromDate}
+        onChange={handleFromDateChange}
+        dateFormat="yyyy-MM-dd"
+        className={` mt-1 py-[6px] border px-[15px]  rounded-md`}
+        placeholderText="Select from date"
+      />
+    </div>
+    <div>
+      <DatePicker
+        selected={toDate}
+        dateFormat="yyyy-MM-dd"
+        onChange={handleToDateChange}
+        className="mt-1 py-[6px] px-[15px]  border rounded-md"
+        placeholderText="Select to date"
+      />
+    </div>
+    <div className="w-[250px] relative">
+      <div
+        className={`${styless.filter_button}`}
+        onClick={() => setStoreDrop(!storeDrop)}
+      >
+        <p className="truncate">
+          {searchTerm === "" ? "Select Store" : searchTerm}
+        </p>
+        <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
+      </div>
+      {storeDrop && (
+        <div className="absolute w-full bg-white shadow-md">
+          <input
+            placeholder="Search store..."
+            type="text"
+            value={searchTerm}
+            onChange={handleSearch}
+            className="w-full   p-2   border-b border-gray-300"
+          />
+          <div
+            className={`overflow-y-scroll   max-h-[200px]   ${styless.filter_drop}`}
+          >
+            {filteredStores.length > 0 ? (
+              filteredStores.map((item3, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    handleStoreChange(item3);
+                    setSearchTerm(item3.storeName);
+                    setStoreDrop(false);
+                  }}
+                  className={`  ${styles.filter_option}`}
+                >
+                  <p className=" truncate ">{item3.storeName}</p>
+                </div>
+              ))
+            ) : (
+              <p className="p-2 text-gray-500">No stores found</p>
+            )}
+            <div
+              className={`${styles.filter_option}`}
+              onClick={() => {
+                handleStoreChange({ _id: "", storeName: ALLstore });
+                setSearchTerm(ALLstore);
+              }}
+            >
+              <p className=" truncate ">{ALLstore}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+    <div className="w-[250px] h-[35px] relative">
+      <select
+        name=""
+        id=""
+        className="bg-primary text-white rounded-lg outline-none px-2 py-1 w-full h-full"
+        onChange={(e) => {
+          setDeviceType(e.target.value);
+        }}
+      >
+        {categories.map((cat) => (
+          <option
+            className="bg-white text-primary font-medium"
+            key={cat?._id}
+            value={cat?.categoryCode}
+          >
+            {cat?.categoryName}
+          </option>
+        ))}
+      </select>
+    </div>
+
+  </div>
+  );
+  };
 export default LeadsCompleted;

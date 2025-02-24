@@ -100,7 +100,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
     <div className="min-h-screen">
       {loading && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={loading} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={loading} size={15} />
         </div>
       )}
       {head === undefined && (
@@ -130,7 +130,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
           value={serachval}
           onChange={(e) => setSerachval(e.target.value)}
         />
-        <div className=" text-center bg-[#4900A8] px-2  py-1 rounded-lg">
+        <div className=" text-center bg-primary px-2  py-1 rounded-lg">
           <button className="text-white " onClick={handleSeachSubmit}>
             Search
           </button>
@@ -140,11 +140,13 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
       <div className="flex flex-col gap-4 mt-4">
         {data.map((item, index) => (
           <OrdersCard
+            allData={item}
+            key={index}
             itemData={item}
             title={orderType === "quoteData" ? "Quote Saved" : "Order Saved"}
             customerName={item.lead?.name}
-            customerMobile={item.lead?.phoneNumber}
             customerEmail={item.lead?.emailId}
+            customerMobile={item.lead?.phoneNumber}
             deviceName={item.lead?.model?.name}
             savedBy={item.user?.name}
             deviceRam={item.lead?.model?.config?.RAM}

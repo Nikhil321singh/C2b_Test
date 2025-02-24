@@ -4,7 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { setLeadOTPData, setResponseData } from "../../store/slices/responseSlice";
 import { useDispatch } from "react-redux";
 import watch from "../../assets/apple_watch.png";
+import { setOtpVerified } from "../../store/slices/otpSlice";
+import PurchaseReceipt from "../PurchaseReceipt";
+import ReactDOMServer from "react-dom/server";
+import html2pdf from "html2pdf.js";
+import { FaDownload } from "react-icons/fa6";
 
+const quoteSaved = "Quote Saved";
 export const DeleteModal = ({ onCancel, onConfirm }) => {
   return (
     <div className="fixed z-50 flex items-center justify-center w-full h-full mx-2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
@@ -14,13 +20,13 @@ export const DeleteModal = ({ onCancel, onConfirm }) => {
         <div className="flex justify-end">
           <button
             onClick={onConfirm}
-            className="bg-[#4900A8] text-white px-4 py-2 rounded mr-2"
+            className="bg-primary text-white px-4 py-2 rounded mr-2"
           >
             Yes
           </button>
           <button
             onClick={onCancel}
-            className="border border-[#4900A8] text-[#4900A8] px-4 py-2 rounded"
+            className="border border-primary text-primary px-4 py-2 rounded"
           >
             No
           </button>
@@ -30,7 +36,39 @@ export const DeleteModal = ({ onCancel, onConfirm }) => {
   );
 };
 
+function hanldlejsx_pdf(item) {
+  console.log("store is");
+  console.log(item)
+  const dateString = item.updatedAt;
+  const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  const printElement = ReactDOMServer.renderToString(
+    <PurchaseReceipt
+      phoneNumber={item.phoneNumber}
+      aadharNumber={item?.aadharNumber}
+      uniqueCode={item.uniqueCode}
+      emailId={item.emailId}
+      name={item.name}
+      imeiNumber={item.doc.IMEI}
+      phoneName={item.model.name}
+      type={item?.model?.type}
+      storeName={item.store.storeName}
+      region={item.store.region}
+      address={item.store.address}
+      storage={item.model.config?.storage}
+      RAM={item.model.config?.RAM}
+      formattedDate={formattedDate}
+      price={item.price}
+    />
+  );
+  html2pdf().from(printElement).save('purchase_receipt.pdf');
+}
+
 const OrdersCard = ({
+  allData,
   itemData,
   title,
   customerName,
@@ -49,7 +87,6 @@ const OrdersCard = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const deviceSelected = sessionStorage.getItem("DeviceType");
 
   const formatDateTime = (dateTimeString) => {
@@ -75,11 +112,10 @@ const OrdersCard = ({
     const createdDate = new Date(dateTime);
     const currentDate = new Date();
     const timeDiff = currentDate - createdDate;
-
     const oneDay = 24 * 60 * 60 * 1000; // 1 day in milliseconds
-    const threeDays = 3 * oneDay; // 3 days in milliseconds
+    const threeDays = 6 * oneDay; // 6 days in milliseconds
 
-    if (title === "Quote Saved") {
+    if (title === quoteSaved) {
       return timeDiff > oneDay;
     } else if (title === "Order Saved") {
       return timeDiff > threeDays;
@@ -87,15 +123,15 @@ const OrdersCard = ({
       return false;
     }
   };
-
   const handleInitiate = () => {
-    if (isExpired()) return;
-
-    if (title === "Quote Saved") {
+    if (isExpired()) {
+      return;
+    }
+    if (title === quoteSaved) {
       const detail = {
         models: itemData.lead?.model,
         phoneNumber: customerMobile,
-        status: "Quote Saved",
+        status: quoteSaved,
         customerName: customerName,
       };
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
@@ -132,6 +168,7 @@ const OrdersCard = ({
 
       dispatch(setResponseData(responseData));
       dispatch(setLeadOTPData(otpData));
+      dispatch(setOtpVerified(false));
       sessionStorage.setItem("otpData", JSON.stringify(otpData));
       sessionStorage.setItem("LeadId", itemData?.lead_id);
       sessionStorage.setItem("responsedatadata", JSON.stringify(responseData));
@@ -156,15 +193,20 @@ const OrdersCard = ({
     <div className="p-2 mx-2 bg-white rounded-lg relative">
       {isExpired() && (
         <div className="absolute inset-0 flex items-center justify-center bg-opacity-75 bg-white">
-          <div className="text-[#4900A8] text-2xl font-bold border-4 border-[#8080FF] px-4 py-2 rounded-md">
+          <div className="text-black text-2xl font-bold border-4 border-primary px-4 py-2 rounded-md">
             Expired
           </div>
         </div>
       )}
       <div className="flex items-center justify-between p-2 border-b-2 border-gray-300 border-dashed">
-        <div className="flex items-center py-1 px-2 text-[#4900A8]  bg-[#8080FF] rounded-xl">
+        <div className="flex items-center py-1 px-2 text-white bg-primary rounded-xl">
           <p className="text-sm font-medium">{title}</p>
         </div>
+        {
+          title === "Order Completed" &&
+        <div onClick={() => {hanldlejsx_pdf(allData)}} className="flex items-center h-full px-4 text-white bg-[#EC2752] rounded-xl">
+          <FaDownload size={15} />
+        </div>}
         <div className="">
           <p className="text-sm font-medium text-gray-400">
             {formatDateTime(dateTime)}
@@ -183,9 +225,9 @@ const OrdersCard = ({
         <div className="font-medium w-[78%]">
           <p className="text-black text-wrap">
             {deviceName}
-            {deviceSelected === "Mobile" && `(${deviceRam}/${deviceStorage})`}
+            {deviceSelected === "CTG1" && `(${deviceRam}/${deviceStorage})`}
           </p>
-          <p className="text-[#4900A8]">₹{price}</p>
+          <p className="text-primary">₹{price}</p>
         </div>
       </div>
 
@@ -224,7 +266,7 @@ const OrdersCard = ({
               <RiDeleteBin6Line size={20} />
             </button>
           </div>
-          <div className="w-[80%] text-center bg-[#4900A8] py-2 rounded-lg">
+          <div className="w-[80%] text-center bg-primary py-2 rounded-lg">
             <button onClick={handleInitiate} className="text-white ">
               Initiate Order
             </button>

@@ -7,13 +7,13 @@ import { BeatLoader } from "react-spinners";
 import axios from "axios";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
-import { FaAngleDown } from "react-icons/fa6";
-
 
 const sucTextColor = "text-green-500";
-const failTextColor = "text-[#4900A8]";
-const role = ["Admin Manager", "Technician", "Sale User"];
-
+const failTextColor = "text-primary";
+const defaultRoles = ["Super Admin", "Admin Manager", "Technician"];
+const role = import.meta.env.VITE_REACT_APP_ROLES
+  ? import.meta.env.VITE_REACT_APP_ROLES.split(",").map(item => item.trim())
+  : defaultRoles;
 const getStore = async () => {
   const token1 = sessionStorage.getItem("authToken");
   const config = {
@@ -40,29 +40,6 @@ const getStore = async () => {
   return storeNamesArray;
 };
 
-const getCompany = async () => {
-  const token1 = sessionStorage.getItem("authToken");
-  const config = {
-    method: "get",
-    url: `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/company/findAll?page=0&limit=9999`,
-    headers: { Authorization: token1 },
-  };
-  let storeNamesArray = [];
-  await axios
-    .request(config)
-    .then((response) => {
-      storeNamesArray = response.data.result.map((company) => ({
-        companyName: company.companyName,
-        _id: company._id,
-      }));
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  return storeNamesArray;
-};
 
 const initForm = {
   firstName: "",
@@ -85,7 +62,6 @@ const RegisterUser = () => {
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [storeData, setStoreData] = useState([]);
-  const [companyData, setCompanyData] = useState([]);
   const [formData, setFormData] = useState(initForm);
   const navigate = useNavigate();
 
@@ -98,8 +74,6 @@ const RegisterUser = () => {
 
   const saveStrCmp = async () => {
     const tempStr = await getStore();
-    const tempCmp = await getCompany();
-    setCompanyData(tempCmp);
     setStoreData(tempStr);
   };
   useEffect(() => {
@@ -161,7 +135,7 @@ const RegisterUser = () => {
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       {(sucBox || failBox) && (
@@ -192,7 +166,7 @@ const RegisterUser = () => {
                 setFailBox(false);
               }}
               className={
-                sucBox ? "bg-green-500 text-white" : "text-white bg-[#4900A8]"
+                sucBox ? "bg-green-500 text-white" : "text-white bg-primary"
               }
             >
               Okay
@@ -215,7 +189,7 @@ const RegisterUser = () => {
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <button
               onClick={() => navigate("/registeruserdetails")}
-              className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+              className="font-medium text-sm text-white p-3 rounded bg-primary"
             >
               View Details
             </button>
@@ -226,7 +200,6 @@ const RegisterUser = () => {
             handleChange={handleChange}
             setIsGrest={setIsGrest}
             storeData={storeData}
-            setFormData={setFormData}
           />
         </div>
       </div>
@@ -236,37 +209,9 @@ const RegisterUser = () => {
 
 export default RegisterUser;
 
-const UserForm = ({
-  formData,
-  submitHandler,
-  handleChange,
-  storeData,
-  setFormData,
-}) => {
-  const [showUserPassword, setShowUserPassword] = useState(false);
-  const [storeDrop, setStoreDrop] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredStores, setFilteredStores] = useState(storeData);
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
+const UserForm = ({ formData, submitHandler, handleChange, storeData }) => {
+    const [showUserPassword, setShowUserPassword] = useState(false);
 
-    if (value === "") {
-      setFilteredStores(storeData);
-    } else {
-      const filtered = storeData.filter((store) =>
-        store.storeName.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredStores(filtered);
-    }
-  };
-  const handleStoreChange = (value) => {
-    setStoreDrop(false);
-    setFormData({
-      ...formData,
-      storeId: value,
-    });
-  };
   return (
     <form
       className="ml-10 flex flex-col gap-4"
@@ -353,61 +298,24 @@ const UserForm = ({
           required
         />
       </label>
-      <div className="relative w-[70%]">
+      <label className="flex flex-col w-[70%] gap-2">
         <span className="font-medium text-xl">Store Name*</span>
-        <div
-          className={`${styles.filter_button} w-full bg-white border p-2 flex justify-between items-center cursor-pointer`}
-          onClick={() => setStoreDrop(!storeDrop)}
+        <select
+          name="storeId"
+          id="storeId"
+          value={formData.storeId}
+          className="outline-none text-base border-2 p-2 rounded-lg"
+          onChange={handleChange}
+          required
         >
-          <p className="truncate">
-            {searchTerm === "" ? "Select Store" : searchTerm}
-          </p>
-          <FaAngleDown
-            className={`${storeDrop ? "rotate-180" : ""} transition-transform`}
-            size={17}
-          />
-        </div>
-        {storeDrop && (
-          <div className="absolute w-full bg-white shadow-md">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleSearch}
-              className="w-full p-2 border-b border-gray-300"
-              placeholder="Search store..."
-            />
-            <div
-              className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full `}
-            >
-              <p
-                className="truncate bg-slate-100 p-1 border"
-                onClick={() => handleStoreChange("")}
-              >
-                None
-              </p>
-              {filteredStores.length > 0 ? (
-                filteredStores.map((item, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      handleStoreChange(item._id);
-                      setSearchTerm(item.storeName + ", " + item.region);
-                      setStoreDrop(false);
-                    }}
-                    className={`${styles.filter_option}`}
-                  >
-                    <p className="truncate bg-slate-100 p-1 border">
-                      {item.storeName},{item.region}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="p-2 text-gray-500">No stores found</p>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+          <option value=""> None </option>
+          {storeData.map((item) => (
+            <option key={item._id} value={item._id}>
+              {`${item.storeName}, ${item.region}`}
+            </option>
+          ))}
+        </select>
+      </label>
       <label className="flex flex-col w-[70%] gap-2">
         <span className="font-medium text-xl">Role*</span>
         <select
@@ -453,7 +361,7 @@ const UserForm = ({
       <div className="mt-8">
         <button
           type="submit"
-          className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+          className="font-medium text-sm text-white p-3 rounded bg-primary"
         >
           Submit Form
         </button>

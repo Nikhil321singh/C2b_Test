@@ -19,12 +19,12 @@
 }
 
 .button_unsel:hover {
-  background-color: #4900a8;
+  background-color: var(--primary-color);
   color: white;
 }
 
 .button_sel {
-  background-color: #4900a8;
+  background-color: var(--primary-color);
   color: white;
   border-radius: 0.55rem;
   padding: 5px 10px;

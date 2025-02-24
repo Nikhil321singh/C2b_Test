@@ -21,17 +21,19 @@ const options = {
   Physical: ["A1", "A2", "A3", "A0"],
 };
 
-const Mobile = [
-  "Functional_major",
-  "Core",
-  "Display",
-  "Functional_minor",
-  "Cosmetics",
-  "Warranty",
-];
-const Watch = ["Accessories", "Functional", "Physical", "Warranty"];
+  const questypes = [
+    "Functional_major",
+    "Core",
+    "Display",
+    "Functional_minor",
+    "Cosmetics",
+    "Warranty",
+    "Accessories",
+    "Functional",
+    "Physical",
+  ];
 const successColorClass = "text-green-500";
-const errorColorClass = "text-[#4900A8]";
+const errorColorClass = "text-primary";
 
 function sortQuestionnaires(data) {
   return data.sort((a, b) => {
@@ -55,7 +57,6 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
   const [selectedUser, setSelectedUser] = useState();
   const [selectedUserqs, setSelectedUserqs] = useState();
   const [mobiledata, setMobile] = useState([]);
-  const [watchdata, setWatch] = useState([]);
   const dispatch = useDispatch();
   const [group, setGroup] = useState("");
   const [question, setQuestion] = useState("");
@@ -99,10 +100,7 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
     async function handleQuestionnaires() {
       const data = await getQuestionnaires();
       const sortedData = sortQuestionnaires(data);
-      const dummyMobile = filterQuestionnairesByType(sortedData, Mobile);
-      const dummyWatch = filterQuestionnairesByType(sortedData, Watch);
-      setMobile(dummyMobile);
-      setWatch(dummyWatch);
+      setMobile(sortedData);
     }
     handleQuestionnaires();
   }, [updateTable]);
@@ -136,84 +134,80 @@ const AdminQuestionTable = ({ updateTable, steUpdatetable }) => {
       />
       <div className="m-2  w-[90%] overflow-x-auto md:m-5">
         <div className="min-w-max">
-          {category === "Mobile" && (
-            <table className="w-full border border-[#4900A8]">
-              <thead className="bg-[#4900A8] text-white">
-                <tr>
-                  <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
-                    Groups
-                  </th>
-                  <th className="text-left p-2 text-sm md:p-3 md:text-base w-[60%]">
-                    Parameter
-                  </th>
-                  <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
-                    Output
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {mobiledata.map((item, index) => (
-                  <tr
-                    className={index % 2 === 0 ? "bg-gray-200" : ""}
-                    key={index}
-                  >
-                    <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                      {item._id}
-                    </td>
+          <table className="w-full border border-primary">
+            <thead className="bg-primary text-white">
+              <tr>
+                <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
+                  Groups
+                </th>
+                <th className="text-left p-2 text-sm md:p-3 md:text-base w-[60%]">
+                  Parameter
+                </th>
+                <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
+                  Output
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {mobiledata.map((item, index) => (
+                <tr
+                  className={index % 2 === 0 ? "bg-gray-200" : ""}
+                  key={index}
+                >
+                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                    {item._id}
+                  </td>
 
-                    <td className="w-1/3 p-2 text-sm md:p-3 md:text-base">
-                      {item.data.map((value, index2) => (
-                        <React.Fragment key={index2}>
-                          <div className="di flex w-[full]" key={value?._id}>
-                            <span className="mr-1">{index2 + 1}</span>
-                            <p style={{ flexBasis: "70%" }}>-{value.quetion}</p>
-                            <MdEdit
-                              size={17}
-                              className="mr-[8px]"
-                              onClick={() => {
-                                handleEdit(value);
-                              }}
-                            />{" "}
-                            <MdDelete
-                              size={17}
-                              onClick={() => {
-                                deleteConfHandler(value?._id, value?.quetion);
-                              }}
-                            />
-                          </div>
-                          <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed "></div>
-                        </React.Fragment>
+                  <td className="w-1/3 p-2 text-sm md:p-3 md:text-base">
+                    {item.data.map((value, index2) => (
+                      <React.Fragment key={index2}>
+                        <div className="di flex w-[full]" key={value?._id}>
+                          <span className="mr-1">{index2 + 1}</span>
+                          <p style={{ flexBasis: "70%" }}>-{value.quetion}</p>
+                          <MdEdit
+                            size={17}
+                            className="mr-[8px]"
+                            onClick={() => {
+                              handleEdit(value);
+                            }}
+                          />{" "}
+                          <MdDelete
+                            size={17}
+                            onClick={() => {
+                              deleteConfHandler(value?._id, value?.quetion);
+                            }}
+                          />
+                        </div>
+                        <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed "></div>
+                      </React.Fragment>
+                    ))}
+                  </td>
+                  <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                    <select
+                      onChange={(e) => {
+                        dispatch(
+                          setSelectedOptions({
+                            id: item._id,
+                            value: e.target.value,
+                          })
+                        );
+                      }}
+                      className="bg-[#F5F4F9]"
+                    >
+                      <option >
+                        Select Code
+                      </option>
+                      {options[item._id]?.map((value, indexV) => (
+                        <option key={indexV} value={value}>
+                          {value}
+                        </option>
                       ))}
-                    </td>
-                    <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                      <select
-                        onChange={(e) => {
-                          dispatch(
-                            setSelectedOptions({
-                              id: item._id,
-                              value: e.target.value,
-                            })
-                          );
-                        }}
-                        className="bg-[#F5F4F9]"
-                      >
-                        {options[item._id]?.map((value, indexV) => (
-                          <option key={indexV} value={value}>
-                            {value}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          <WatchComp
-            watchdata={watchdata}
-            handleEdit={handleEdit}
-            deleteConfHandler={deleteConfHandler}
-          />
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </>
@@ -283,7 +277,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailBox(false);
               }}
-              className={"bg-[#4900A8] text-white"}
+              className={"bg-primary text-white"}
             >
               Okay
             </button>
@@ -301,7 +295,7 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => deleteHandler(selectedUser)}
-                className={"bg-[#4900A8] text-white"}
+                className={"bg-primary text-white"}
               >
                 Okay
               </button>
@@ -309,7 +303,7 @@ const ExtComps = ({
                 onClick={() => {
                   setConfBox(false);
                 }}
-                className="bg-white text-[#4900A8]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -378,7 +372,7 @@ const QSComp = ({
             <div className="relative flex flex-col gap-2 pb-2 mb-6 ml-10 mr-10 border-b-2">
               <IoClose
                 size={35}
-                className="absolute right-0 text-[#4900A8] transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
+                className="absolute right-0 text-primary transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
                 onClick={() => setQsmodel(false)}
               />
               <p className="text-4xl font-bold">Edit Question</p>
@@ -476,7 +470,7 @@ const QSComp = ({
 
               <div className="mt-8">
                 <button
-                  className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+                  className="font-medium text-sm text-white p-3 rounded bg-primary"
                   onClick={handleSubmitedit}
                 >
                   Update Details
@@ -495,9 +489,9 @@ const WatchComp = ({ watchdata, handleEdit, deleteConfHandler }) => {
   const category1 = sessionStorage.getItem("admincategory");
   return (
     <React.Fragment>
-      {category1 === "Watch" && (
-        <table className="w-full border border-[#4900A8]">
-          <thead className="bg-[#4900A8] text-white">
+      {category1 === "CTG2" && (
+        <table className="w-full border border-primary">
+          <thead className="bg-primary text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base w-[20%]">
                 Groups

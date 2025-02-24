@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { DataProvider } from './components/dataContext.jsx'
+document.title = import.meta.env.VITE_WEBSITE_TITLE || 'Unicorn';
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(

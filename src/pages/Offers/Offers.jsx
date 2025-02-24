@@ -145,7 +145,7 @@ const SubOffer = ({ formData, setFormData, handleOffer }) => {
         <div className="flex flex-wrap gap-2 ml-10 mb-10">
           <button
             onClick={() => navigate(navViewOfferr)}
-            className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+            className="font-medium text-sm text-white p-3 rounded bg-primary"
           >
             View Detail
           </button>
@@ -202,10 +202,10 @@ const SubOffer = ({ formData, setFormData, handleOffer }) => {
           <span className="font-medium text-xl">If Warranty</span>
           <div className="flex gap-2 -mt-2">
             <div
-              className={`text-[#4900A8] font-medium w-[100px] h-[40px] flex items-center justify-center gap-1 p-2 rounded-lg ${
+              className={`text-primary font-medium w-[100px] h-[40px] flex items-center justify-center gap-1 p-2 rounded-lg ${
                 formData.warranty === true
-                  ? "bg-[#4900A8] text-white"
-                  : "border-[#4900A8] border-2"
+                  ? "bg-primary text-white"
+                  : "border-primary border-2"
               }`}
               onClick={() =>
                 setFormData({
@@ -217,10 +217,10 @@ const SubOffer = ({ formData, setFormData, handleOffer }) => {
               True
             </div>
             <div
-              className={`text-[#4900A8]  font-medium w-[100px] h-[40px] flex items-center justify-center gap-1 p-2 rounded-lg ${
+              className={`text-primary  font-medium w-[100px] h-[40px] flex items-center justify-center gap-1 p-2 rounded-lg ${
                 formData.warranty === false
-                  ? "bg-[#4900A8] text-white"
-                  : "border-2 border-[#4900A8]"
+                  ? "bg-primary text-white"
+                  : "border-2 border-primary"
               }`}
               onClick={() =>
                 setFormData({
@@ -236,7 +236,7 @@ const SubOffer = ({ formData, setFormData, handleOffer }) => {
             <button
               type="submit"
               onClick={(e) => handleOffer(e)}
-              className="font-medium text-sm text-white px-8 py-3 rounded bg-[#4900A8]"
+              className="font-medium text-sm text-white px-8 py-3 rounded bg-primary"
             >
               Submit
             </button>

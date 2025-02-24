@@ -52,15 +52,15 @@
     color: #fff;
     width: 8.5em;
     height: 2.9em;
-    border: #4900a8 0.2em solid;
+    border: var(--primary-color) 0.2em solid;
     border-radius: 11px;
     text-align: right;
     transition: all 0.6s ease;
-    background-color: #4900a8;
+    background-color: var(--primary-color);
     margin-top: 10px;
 
     &:hover {
-      background-color: #ff0037;
+      background-color: var(--secondary-color);
       cursor: pointer;
     }
   }
@@ -89,7 +89,7 @@
     overflow: auto;
 
     width: 90vw;
-    // background-color: red;
+    // background-color: var(--secondary-color);
     border-radius: 8px;
     margin-top: 4px;
     margin-bottom: 102px;
@@ -157,12 +157,14 @@
                 display: flex;
                 justify-content: center;
                 cursor: pointer;
-                box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.158), 1px 1px 0px 0px rgba(0, 0, 0, 0.034);
+                box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.158),
+                  1px 1px 0px 0px rgba(0, 0, 0, 0.034);
                 input {
                   display: none;
                 }
                 transition: all ease 0.5s;
-              }:hover{
+              }
+              :hover {
                 scale: 1.03;
               }
             }
@@ -179,11 +181,11 @@
               color: #fff;
               width: 8.5em;
               height: 2.9em;
-              border: #4900a8 0.2em solid;
+              border: var(--primary-color) 0.2em solid;
               border-radius: 11px;
               text-align: right;
               transition: all 0.6s ease;
-              background-color: #4900a8;
+              background-color: var(--primary-color);
 
               &:hover {
                 background-color: #f5093c;
@@ -215,14 +217,14 @@
               color: #fff;
               width: 8.5em;
               height: 2.9em;
-              border: #4900a8 0.2em solid;
+              border: var(--primary-color) 0.2em solid;
               border-radius: 11px;
               text-align: right;
               transition: all 0.6s ease;
               background-color: #f898ad;
 
               &:hover {
-                background-color: #4900a8;
+                background-color: var(--primary-color);
                 cursor: pointer;
 
                 .svg {

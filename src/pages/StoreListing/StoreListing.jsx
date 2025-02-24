@@ -8,13 +8,12 @@ import { useNavigate } from "react-router-dom";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#4900A8]";
+const failTextColor = "text-primary";
 
 const initStoreForm = {
   storeName: "",
   region: "",
   email: "",
-  uniqueId: "",
   contactNumber: "",
   address: "",
 };
@@ -44,7 +43,6 @@ const StoreListing = () => {
     setIsTableLoaded(true);
     const data = {
       storeName: formData.storeName,
-      // uniqueId: formData.uniqueId,
       email: formData.email,
       contactNumber: formData.contactNumber,
       region: formData.region,
@@ -82,7 +80,7 @@ const StoreListing = () => {
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full bg-black bg-opacity-50 h-full">
-          <BeatLoader color={"#4900A8"} size={15} loading={isTableLoaded} />
+          <BeatLoader color="var(--primary-color)" size={15} loading={isTableLoaded} />
         </div>
       )}
       {(sucBox || failBox) && (
@@ -113,7 +111,7 @@ const StoreListing = () => {
                 setFailBox(false);
               }}
               className={
-                sucBox ? "bg-green-500 text-white" : "bg-[#4900A8] text-white"
+                sucBox ? "bg-green-500 text-white" : "bg-primary text-white"
               }
             >
               Okay
@@ -136,7 +134,7 @@ const StoreListing = () => {
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <button
               onClick={() => navigate("/storelistingtable")}
-              className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+              className="font-medium text-sm text-white p-3 rounded bg-primary"
             >
               View Detail
             </button>
@@ -167,18 +165,6 @@ const StoreListingForm = ({ submitHandler, formData, handleChange }) => {
           required={true}
         />
       </div>
-      {/* <div className="w-[70%] flex flex-col gap-2">
-        <span className="font-medium text-xl">Unique Id*</span>
-        <input
-          id="uniqueId"
-          name="uniqueId"
-          value={formData.uniqueId}
-          className="border-2 px-2 py-2 rounded-lg  outline-none "
-          onChange={handleChange}
-          type="text"
-          required={true}
-        />
-      </div> */}
       <div className="flex flex-col w-[70%] gap-2 ">
         <span className="text-xl font-medium">Email*</span>
         <input
@@ -232,7 +218,7 @@ const StoreListingForm = ({ submitHandler, formData, handleChange }) => {
       <div className="mt-8">
         <button
           type="submit"
-          className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+          className="font-medium text-sm text-white p-3 rounded bg-primary"
         >
           Submit Form
         </button>

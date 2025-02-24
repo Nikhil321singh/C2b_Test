@@ -94,6 +94,7 @@ const DeviceInformation = () => {
         phoneNumber: phoneNumber,
         modelId: id?.models?._id,
         storage: id?.models?.config?.storage,
+        aadharNumber: "1234567890",
         ram: id?.models?.config?.RAM,
         name: profile.name,
       };
@@ -141,7 +142,7 @@ const DeviceInformation = () => {
         </div>
       </div>
       <div className="w-[90%] md:w-[70%]  mx-auto">
-        <h1 className="text-[#4900A8] font-semibold text-lg my-4">
+        <h1 className="text-primary font-semibold text-lg my-4">
           Tell Us More About Your Device
         </h1>
         <div className="my-4">
@@ -155,9 +156,9 @@ const DeviceInformation = () => {
                   </div>
                   <div className="max-w-[500px] flex gap-4 ml-3">
                     <label
-                      className={`text-[#4900A8] font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                      className={`text-primary font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                         answers[index].answer === data.yes
-                          ? "bg-[#4900A8] text-white"
+                          ? "bg-primary text-white"
                           : ""
                       }`}
                     >
@@ -173,9 +174,9 @@ const DeviceInformation = () => {
                       Yes
                     </label>
                     <label
-                      className={`text-[#4900A8] font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+                      className={`text-primary font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
                         answers[index].answer === data.no
-                          ? "bg-[#4900A8] text-white"
+                          ? "bg-primary text-white"
                           : ""
                       }`}
                     >

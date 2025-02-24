@@ -37,7 +37,6 @@ const AdminHome = () => {
   const [updateTable, steUpdatetable] = useState(false);
 
   const handleNext = () => {
-    if (storedCategory === "Mobile" || storedCategory === "Watch") {
       const userToken = sessionStorage.getItem("authToken");
       axios
         .post(
@@ -64,9 +63,6 @@ const AdminHome = () => {
           toast.error("error occur");
           navigate(navAdminFnlGrd);
         });
-    } else {
-      navigate(navAdminFnlGrd);
-    }
   };
 
   function handleEdit() {
@@ -169,7 +165,6 @@ const AdminHome = () => {
           <CreateQuestion
             closeHandler={closeHandler}
             setGroup={setGroup}
-            options={options}
             question={question}
             setQuestion={setQuestion}
             setYes={setYes}
@@ -210,7 +205,7 @@ const AdminHome = () => {
         <div className="flex justify-center mb-2">
           <button
             onClick={handleNext}
-            className="text-center  mx-2 px-4 py-2 rounded-lg bg-[#4900A8] text-white cursor-pointer"
+            className="text-center  mx-2 px-4 py-2 rounded-lg bg-primary text-white cursor-pointer"
           >
             Next
           </button>
@@ -224,7 +219,6 @@ const AdminHome = () => {
 const CreateQuestion = ({
   closeHandler,
   setGroup,
-  options,
   question,
   setQuestion,
   setYes,
@@ -238,7 +232,7 @@ const CreateQuestion = ({
       <div className="relative flex flex-col gap-2 pb-2 mb-6 ml-10 mr-10 border-b-2">
         <IoClose
           size={35}
-          className="absolute right-0 text-[#4900A8] transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
+          className="absolute right-0 text-primary transition ease hover:rotate-[360deg] duration-500 cursor-pointer"
           onClick={closeHandler}
         />
         <p className="text-4xl font-bold">Add New Question</p>
@@ -336,7 +330,7 @@ const CreateQuestion = ({
 
         <div className="mt-8">
           <button
-            className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+            className="font-medium text-sm text-white p-3 rounded bg-primary"
             onClick={handleSubmit}
           >
             Create

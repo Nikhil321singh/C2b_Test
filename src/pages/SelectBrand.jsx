@@ -64,13 +64,16 @@ export default function SelectBrand() {
   }
 
   useEffect(() => {
+    const userToken = sessionStorage.getItem("authToken");
     const fetchData = async () => {
       try {
-        const apiUrl = `${
+        const response = await axios.get(`${
           import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/brands/getAllBrandsModels`;
-
-        const response = await axios.get(apiUrl);
+        }/api/brands/getAllBrandsModels`, {
+          headers: {
+            authorization: `${userToken}`,
+          },
+        });
         setData(response.data.data);
         console.log("mobile data", response.data.data);
       } catch (error) {

@@ -76,21 +76,21 @@ const ViewPickupTable = ({ refNo, setShowView, fromOutStand = false }) => {
         <p className="font-medium opacity-0">{"Ref No: " + refNo}</p>
         <IoClose
           size={25}
-          className="absolute right-3 text-[#4900A8] transition ease hover:rotate-[360deg] duration-500"
+          className="absolute right-3 text-primary transition ease hover:rotate-[360deg] duration-500"
           onClick={closeHandler}
         />
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <button className={`${styles.bulkdown_button}`} onClick={downloadExcel}>
         <FaDownload /> Bulk Download
       </button>
       <div className="overflow-x-auto m-1">
-        <table className="w-full border border-[#4900A8]">
-          <thead className="bg-[#4900A8] text-white">
+        <table className="w-full border border-primary">
+          <thead className="bg-primary text-white">
             <tr>
               <th className="p-2 min-w-[100px] text-sm md:p-3 md:text-base">
                 Date

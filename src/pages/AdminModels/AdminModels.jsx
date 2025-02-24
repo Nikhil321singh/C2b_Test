@@ -1,5 +1,5 @@
-import styles from "./AdminModels.module.css";
 import React, { useEffect, useState } from "react";
+import styles from "./AdminModels.module.css";
 import axios from "axios";
 import { BeatLoader } from "react-spinners";
 import {
@@ -19,6 +19,7 @@ import {
   setMobileID,
   setRam,
   setStorage,
+  resetAdminAnswer
 } from "../../store/slices/newAdminGrade";
 import DeleteConfirmationModal from "../../components/DeleteConfirmationModal";
 
@@ -72,14 +73,14 @@ const getRowClass = (selectmodel, selectstorage, selectram, val) => {
 };
 
 const getTextColorClass = (isSuccess) =>
-  isSuccess ? "text-green-500" : "text-[#4900A8]";
-const grestTheme = "bg-[#4900A8] text-white";
+  isSuccess ? "text-green-500" : "text-primary";
+const grestTheme = "bg-primary text-white";
 const errMsg = "";
 const selectedModel = "";
 
 const AdminModels = () => {
   const [admincategory, setAdminCategory] = useState(
-    sessionStorage.getItem("admincategory") === "Watch" ? "Watch" : "Mobile"
+    sessionStorage.getItem("admincategory") === "CTG2" ? "CTG2" : "CTG1"
   );
   const [data, setData] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -87,27 +88,24 @@ const AdminModels = () => {
   const [selectmodel, setSelectModel] = useState("");
   const [selectstorage, setSelectstorage] = useState("");
   const [selectram, setSelectram] = useState("");
-  const [category, setCategory] = useState("Mobile");
+  const [category, setCategory] = useState("CTG1");
+  const [categories, setCategories] = useState([]);
   const token = sessionStorage.getItem("authToken");
   const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
   const [confBox, setConfBox] = useState(false);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-
   useEffect(() => {
     sessionStorage.setItem("admincategory", category);
     getData();
     setAdminCategory(sessionStorage.getItem("admincategory"));
   }, [category]);
-
   useEffect(() => {
-    sessionStorage.setItem("admincategory", "Mobile");
+    dispatch(resetAdminAnswer());
+    sessionStorage.setItem("admincategory", "CTG1");
+    getCategories();
   }, []);
 
-  function handleNext() {
-    navigate("/adminhome");
-  }
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
@@ -188,12 +186,25 @@ const AdminModels = () => {
         setIsTableLoaded(false);
       });
   };
+  const getCategories = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+        {
+          headers: { Authorization: token },
+        }
+      );
+      setCategories(response.data.data);
+    } catch (err) {
+      console.log(err)
+    }
+  }
   const selectHandler = (modelId, modelStorage, ram, modelName) => {
     sessionStorage.setItem(
       "adminModelName",
       `${modelName} (${ram}/${modelStorage})`
     );
-    if (category === "Watch") {
+    if (category === "CTG2") {
       sessionStorage.setItem("adminModelName", modelName);
     }
     setSelectModel(modelId);
@@ -227,6 +238,7 @@ const AdminModels = () => {
         category={category}
         setConfBox={setConfBox}
         setCategory={setCategory}
+        categories={categories}
       />
       <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
         <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
@@ -261,7 +273,6 @@ const AdminModels = () => {
           selectHandler={selectHandler}
           deleteHandler={deleteHandler}
           category={category}
-          handleNext={handleNext}
         />
       </div>
     </div>
@@ -280,6 +291,7 @@ const ExtComps = ({
   setConfBox,
   category,
   setCategory,
+  categories,
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
   return (
@@ -292,16 +304,20 @@ const ExtComps = ({
       </div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader
+            color="var(--primary-color)"
+            loading={isTableLoaded}
+            size={15}
+          />
         </div>
       )}
-      {(sucBox || failBox) && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      {(failBox || sucBox ) && (
+        <div className="fixed z-50  top-0 left-0 flex items-center justify-center h-full w-full  bg-black bg-opacity-50">
           <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
             {sucBox ? (
               <IoIosCheckmarkCircle
-                className={`${getTextColorClass(sucBox)}`}
-                size={90}
+              size={90}
+              className={`${getTextColorClass(sucBox)}`}
               />
             ) : (
               <IoIosCloseCircle
@@ -309,16 +325,16 @@ const ExtComps = ({
                 size={90}
               />
             )}
-            <h6 className={`${getTextColorClass(sucBox)}`}>
+            <h6 className={`${getTextColorClass(sucBox)} `}>
               {sucBox ? "Success!" : "Error!"}
             </h6>
             <p className="text-slate-500">{errMsg}</p>
             <button
               onClick={() => {
-                setSucBox(false);
                 setFailBox(false);
+                setSucBox(false);
               }}
-              className={sucBox ? "bg-green-500 text-white" : grestTheme}
+              className={sucBox ? "text-white bg-green-500 " : grestTheme}
             >
               Okay
             </button>
@@ -326,16 +342,16 @@ const ExtComps = ({
         </div>
       )}
       {confBox && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
-            <h6 className={`${getTextColorClass(sucBox)}`}>Confirmation!</h6>
-            <p className="text-slate-500">
+        <div className="fixed top-0 left-0 z-50 flex  justify-center items-center w-full h-full bg-black bg-opacity-50">
+          <div className={`${styles.err_mod_box}  ${getTextColorClass(sucBox)}`}>
+            <h6 className={`${getTextColorClass(sucBox)} `}>Confirmation!</h6>
+            <p className="text-slate-500 ">
               {`Do you want to delete store - ${selectedModel} ?`} ?
             </p>
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-row  gap-2">
               <button
-                onClick={() => deleteHandler(selectedModel)}
                 className={grestTheme}
+                onClick={() => deleteHandler(selectedModel)}
               >
                 Okay
               </button>
@@ -344,7 +360,7 @@ const ExtComps = ({
                   setConfBox(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#4900A8]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -356,22 +372,19 @@ const ExtComps = ({
         <div className="flex gap-2">
           <p className="font-medium">Select Category</p>
           <select
-            className="bg-[#4900A8] text-white rounded-lg outline-none px-2 py-1"
+            className="bg-primary text-white rounded-lg outline-none px-2 py-1"
             onChange={(e) => setCategory(e.target.value)}
             value={category}
           >
-            <option
-              className="bg-white text-[#4900A8] font-medium"
-              value="Mobile"
-            >
-              Mobile
-            </option>
-            <option
-              className="bg-white text-[#4900A8] font-medium"
-              value="Watch"
-            >
-              Watch
-            </option>
+            {categories.map((cat) => (
+              <option
+                className="bg-white text-primary font-medium"
+                key={cat?._id}
+                value={cat?.categoryCode}
+              >
+                {cat?.categoryName}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -387,9 +400,8 @@ const AdminModelsTable = ({
   selectram,
   selectHandler,
   deleteHandler,
-  category,
-  handleNext,
 }) => {
+  const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const openDeleteModal = (item) => {
@@ -408,10 +420,12 @@ const AdminModelsTable = ({
     setIsDeleteModalOpen(false);
     setItemToDelete(null);
   };
-
+  function handleNext() {
+    navigate("/adminhome");
+  }
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#4900A8]">
+      <table className="w-full border border-primary">
         <thead className={grestTheme1}>
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
@@ -464,10 +478,10 @@ const AdminModelsTable = ({
                 {val?.modelName}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {category === "Mobile" ? val?.RAM : "-"}
+                {val?.RAM ? val?.RAM : "-"}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {category === "Mobile" ? val?.storage : "-"}
+                {val?.RAM ? val?.storage : "-"}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.price}
@@ -479,7 +493,7 @@ const AdminModelsTable = ({
       <div className="flex justify-center mb-2">
         <button
           onClick={handleNext}
-          className="text-center  mx-2 px-4 py-2 rounded-lg bg-[#4900A8] text-white cursor-pointer mt-3"
+          className="text-center  mx-2 px-4 py-2 rounded-lg bg-primary text-white cursor-pointer mt-3"
         >
           Next
         </button>

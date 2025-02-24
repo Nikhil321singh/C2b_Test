@@ -95,8 +95,8 @@ const DeviceDetails = () => {
         {/* how grest works */}
         <div>
           <div className="my-4">
-            <h1 className="text-[#4900A8] font-semibold text-2xl">
-              How GREST Works?
+            <h1 className="text-primary font-semibold text-2xl">
+              How {import.meta.env.VITE_WEBSITE_SHORT_NAME} Works?
             </h1>
           </div>
           <div className="flex justify-around gap-2 text-center">
@@ -107,7 +107,7 @@ const DeviceDetails = () => {
         </div>
         {/* FAQ */}
         <div className="mt-4">
-          <div className="text-[#4900A8] font-semibold text-2xl mb-2">
+          <div className="text-primary font-semibold text-2xl mb-2">
             FAQ's
           </div>
           <FAQ />

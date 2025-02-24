@@ -5,9 +5,9 @@ const DashboardTable = ({ tableData }) => {
   return (
     <div className="m-2 md:m-5 ">
       <div className="w-full ">
-        <table className="w-[100%] border border-[#4900A8]">
+        <table className="w-[100%] border border-primary">
           <thead>
-            <tr className="text-[#4900A8] align-top bg-white ">
+            <tr className="text-primary align-top bg-white ">
               <th className="p-2 text-sm md:p-3 md:text-base">total</th>
 
               <th className="p-2 text-sm md:p-3 md:text-base">-</th>
@@ -37,7 +37,7 @@ const DashboardTable = ({ tableData }) => {
                 {tablevalue?.totalPendingForPickupPrice}
               </th>
             </tr>
-            <tr className="bg-[#4900A8] text-white align-top">
+            <tr className="bg-primary text-white align-top">
               <th className="p-2 text-sm md:p-3 md:text-base">Purchase Date</th>
 
               <th className="p-2 text-sm md:p-3 md:text-base">Store Name</th>

@@ -42,14 +42,6 @@ const NavigateTable = () => {
       >
         Pending
       </button>
-      {/* <button
-        onClick={() => handleTable("outstanding")}
-        className={`${
-          selected === "outstanding" ? styles.button_sel : styles.button_unsel
-        }`}
-      >
-        Outstanding
-      </button> */}
       <button
         onClick={() => handleTable("pickedup")}
         className={`${

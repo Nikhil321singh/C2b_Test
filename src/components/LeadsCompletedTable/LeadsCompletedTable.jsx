@@ -28,7 +28,7 @@ const LeadsCompletedTable = ({ data }) => {
   };
 
   function hanldlejsx_pdf(index) {
-    console.log("store is", data[index]?.userId?.storeName);
+    console.log("store is", data[index]?.store?.storeName);
     const dateString = data[index]?.updatedAt;
     const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -68,7 +68,7 @@ const LeadsCompletedTable = ({ data }) => {
   };
 
   const getStorage = (val) => {
-    if (val?.modelId?.type === "Mobile") {
+    if (val?.modelId?.type === "CTG1") {
       return `${
         val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
       }`;
@@ -78,8 +78,8 @@ const LeadsCompletedTable = ({ data }) => {
   };
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#4900A8]">
-        <thead className="bg-[#4900A8] text-white">
+      <table className="w-full border border-primary">
+        <thead className="bg-primary text-white">
           <tr className="align-top">
             <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Username</th>
@@ -114,7 +114,7 @@ const LeadsCompletedTable = ({ data }) => {
                 {getUserName(val)}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {val?.modelId?.type}
+                {val?.categoryInfo?.categoryName}
               </td>
               <td className="p-2 min-w-[200px] text-sm text-center md:p-3 md:text-base">
                 {val?.modelId?.name}

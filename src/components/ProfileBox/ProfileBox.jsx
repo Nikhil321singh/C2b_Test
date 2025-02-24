@@ -1,8 +1,26 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import User_Logo from "../../assets/User_Logo.jpg";
 import { IoClose } from "react-icons/io5";
 import styles from "./ProfileBox.module.css";
 import { useNavigate } from "react-router";
+
+function setName(firstName, lastName) {
+  if (!firstName && !lastName) {
+      return "Sale User";
+  }
+
+  const fullName = lastName ? `${firstName} ${lastName}` : firstName;
+
+  if (fullName.length > 20) {
+      if (firstName.length > 20) {
+          return lastName ? `${firstName.charAt(0)}. ${lastName}` : `${firstName.charAt(0)}.`;
+      } else {
+          return lastName ? `${firstName} ${lastName.charAt(0)}.` : firstName;
+      }
+  } else {
+      return fullName;
+  }
+}
 
 const ProfileBox = () => {
   const navigate = useNavigate();
@@ -11,10 +29,12 @@ const ProfileBox = () => {
   const [userRole, setUserRole] = useState();
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLoggenIn, setIsLoggedIn] = useState(false);
+  const currentDomain = window.location.origin;
+
 
   useEffect(() => {
     const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    setUserName(LoggedInUser?.name);
+    setUserName(setName(LoggedInUser?.firstName, LoggedInUser?.lastName));
     setUserEmail(LoggedInUser?.email);
     setUserRole(LoggedInUser?.role);
     if (LoggedInUser?.name) {
@@ -39,6 +59,11 @@ const ProfileBox = () => {
   const handlePwdChange = () => {
     navigate("/changepassword");
   };
+  if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
+    return     <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
+          </div>
+  }
+
   return (
     <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
       <p className="mr-4 text-base  md:text-xl">{userName}</p>
@@ -63,10 +88,10 @@ const ProfileBox = () => {
               <IoClose
                 onClick={profileHandler}
                 size={30}
-                className="absolute right-0 text-[#4900A8]"
+                className="absolute right-0 text-primary"
               />
             </div>
-            <p className="font-medium underline text-[#4900A8]">{userEmail}</p>
+            <p className="font-medium underline text-primary">{userEmail}</p>
             <div className={`${styles.button_wrap}`}>
               <button onClick={handlePwdChange}>Change Password</button>
             </div>

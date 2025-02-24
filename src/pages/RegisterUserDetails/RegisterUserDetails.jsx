@@ -18,7 +18,7 @@ import RegisterUserEdit from "../../components/RegisterUserEdit/RegisterUserEdit
 import { useNavigate } from "react-router-dom";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#4900A8]";
+const failTextColor = "text-primary";
 
 const downloadExcel = (dataDown) => {
   const fileType =
@@ -32,7 +32,7 @@ const downloadExcel = (dataDown) => {
       "User Name": `${item?.firstName} ${item?.lastName}`,
       "User Email": item.email,
       "Phone Number": item.phoneNumber,
-      "Grest Member": item.grestMember,
+      [`${import.meta.env.VITE_WEBSITE_SHORT_NAME} Member`]: item.grestMember,
       "Company Name": item.companyName,
       Role: item.role,
       "Store Name": item.stores?.storeName,
@@ -199,60 +199,26 @@ const RegisterUserDetails = () => {
               onClick={() => {
                 setSucBox(false);
               }}
-              className={"bg-green-500 text-white"}
+              className={"text-white bg-green-500"}
             >
               Okay
             </button>
           </div>
         </div>
       )}
-      {failBox && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <IoIosCloseCircle className={failTextColor} size={90} />
-            <h6 className={failTextColor}>Error!</h6>
-            <p className="text-slate-500">{errMsg}</p>
-            <button
-              onClick={() => {
-                setFailBox(false);
-              }}
-              className={"bg-[#4900A8] text-white"}
-            >
-              Okay
-            </button>
-          </div>
-        </div>
-      )}
+      {failBox && <FailBox errMsg={errMsg} setFailBox={setFailBox} />}
       {confBox && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <div className={`${styles.err_mod_box} ${failTextColor}`}>
-            <h6 className={failTextColor}>Confirmation!</h6>
-            <p className="text-slate-500">
-              {`Do you want to delete user with email - ${selectedEmail} ?`}
-            </p>
-            <div className="flex flex-row gap-2">
-              <button
-                onClick={() => deleteHandler(selectedUser)}
-                className={"bg-[#4900A8] text-white"}
-              >
-                Okay
-              </button>
-              <button
-                onClick={() => {
-                  setConfBox(false);
-                  setIsTableLoaded(false);
-                }}
-                className="bg-white text-[#4900A8]"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfBox
+          selectedEmail={selectedEmail}
+          deleteHandler={deleteHandler}
+          selectedUser={selectedUser}
+          setIsTableLoaded={setIsTableLoaded}
+          setConfBox={setConfBox}
+        />
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <TableFilters
@@ -276,6 +242,61 @@ const RegisterUserDetails = () => {
 };
 
 export default RegisterUserDetails;
+
+const FailBox = ({ errMsg, setFailBox }) => {
+  return (
+    <div className="fixed top-0 left-0 z-50 justify-center flex items-center w-full h-full bg-black bg-opacity-50">
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <IoIosCloseCircle size={90} className={failTextColor} />
+        <h6 className={failTextColor}>Error!</h6>
+        <p className="text-slate-500">{errMsg}</p>
+        <button
+          onClick={() => {
+            setFailBox(false);
+          }}
+          className={"bg-primary text-white"}
+        >
+          Okay
+        </button>
+      </div>
+    </div>
+  );
+};
+const ConfBox = ({
+  selectedEmail,
+  deleteHandler,
+  selectedUser,
+  setIsTableLoaded,
+  setConfBox,
+}) => {
+  return (
+    <div className="fixed z-50 top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>Confirmation!</h6>
+        <p className="text-slate-500">
+          {`Do you want to delete user with email - ${selectedEmail} ?`}
+        </p>
+        <div className="flex flex-row gap-2">
+          <button
+            onClick={() => deleteHandler(selectedUser)}
+            className={"bg-primary text-white"}
+          >
+            Okay
+          </button>
+          <button
+            onClick={() => {
+              setConfBox(false);
+              setIsTableLoaded(false);
+            }}
+            className="bg-white text-primary"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const TableFilters = ({
   setSearchValue,
@@ -354,8 +375,8 @@ const TableFilters = ({
 const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#4900A8]">
-        <thead className="bg-[#4900A8] text-white">
+      <table className="w-full border border-primary">
+        <thead className="bg-primary text-white">
           <tr>
             <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Name</th>

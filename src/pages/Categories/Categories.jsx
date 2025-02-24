@@ -1,48 +1,66 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import AppFooter from "../../components/AppFooter";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import styles from "../SelectDevice/SelectDevice.module.css";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import mi from "../../assets/mi-logo.jpg";
-import smasung from "../../assets/samsung-logo.png";
-import vivo from "../../assets/Vivo-Logo.png";
-import Oppo from "../../assets/Oppo.png";
-import Motorola from "../../assets/Motorola.png";
-import Lenovo from "../../assets/Lenovo.png";
-import Nokia from "../../assets/Nokia.png";
-import Honor from "../../assets/Honor.png";
 import laptop from "../../assets/laptop-logo.png";
 import mobile from "../../assets/mobile-logo.png";
 import watch from "../../assets/watch_logo.png";
 import { ImCancelCircle } from "react-icons/im";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import poco from "../../assets/POCO.png";
-import real from "../../assets/real-logo.png";
-
-const brandImages = {
-  Apple: (logo) => <img className="w-[80px] mb-2" src={logo} alt="Apple"/>,
-  OnePlus: (logo) => <img className="w-[80px] mb-2" src={logo} alt="OnePlus" />,
-  POCO: (logo) => <img className="mx-auto" src={logo} alt="POCO" />,
-  Realme: (logo) => <img className="mx-auto" src={logo} alt="Realme" />,
-  Xiaomi: (logo) => <img className="mx-auto w-[50px]" src={logo} alt="Xiaomi" />,
-  Samsung: () => <img className="mx-auto" src={smasung} alt="Samsung" />,
-  Vivo: () => <img className="mx-auto" src={vivo} alt="Vivo" />,
-  OPPO: () => <img className="mx-auto" src={Oppo} alt="OPPO" />,
-};
 
 export const DeviceTypeFilter = ({
   setSelectedBtn,
   setDeviceType,
   selectedBtn,
 }) => {
-  const categories = [
-    { name: "Watches", image: watch, apiType: "Watch" },
-    { name: "Mobiles", image: mobile, apiType: "Mobile" },
-    { name: "Laptops", image: laptop, apiType: "Laptop" },
-    { name: "More", image: null },
-  ];
+
+  const [categories, setCategories] = useState([]);
+  const token = sessionStorage.getItem("authToken");
+  useEffect(() => {
+    getCategories();
+  }, []);
+    const staticCategories = [
+      { name: "Laptops", image: laptop, apiType: "CTG3" },
+      { name: "Mobiles", image: mobile, apiType: "CTG1" },
+      { name: "Watches", image: watch, apiType: "CTG2" },
+      { name: "More", image: null },
+    ];
+
+    const getCategories = async () => {
+
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+          {headers: { Authorization: token },}
+        );
+        const mergedCategories = data.data.map((apiCat) => {
+          const match = staticCategories.find(
+            (staticCat) => staticCat.apiType === apiCat.categoryName
+          );
+          return {
+            ...apiCat,
+            image: match?.image || null, // Use the image from static data if available
+            apiType: apiCat.categoryCode, // Ensure `apiType` is consistent
+          };
+        });
+
+        // Append static categories that are not present in API data
+        const additionalCategories = staticCategories.filter(
+          (staticCat) =>
+            !data.data.some(
+              (apiCat) => apiCat.categoryName === staticCat.apiType
+            )
+        );
+
+        // Update state with the merged categories
+        setCategories([...mergedCategories, ...additionalCategories]);
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
   const categoryContainerRef = useRef(null);
 
@@ -78,18 +96,18 @@ export const DeviceTypeFilter = ({
         {categories.map((category, index) => (
           <div
             onClick={() => {
-              setSelectedBtn(category.name);
+              setSelectedBtn(category.categoryCode);
               setDeviceType(category.apiType);
             }}
             key={index}
             className={
-              selectedBtn === category.name
+              selectedBtn === category.categoryCode
                 ? styles.button_checked
                 : styles.button_unchecked
             }
           >
             {category.image && <img src={category.image} alt={category.name} />}
-            <span>{category.name}</span>
+            <span>{category?.categoryName || category?.name}</span>
           </div>
         ))}
       </div>
@@ -104,11 +122,11 @@ export const DeviceTypeFilter = ({
 };
 
 function deviceSetter(DevType) {
-  if (DevType === "Mobile") {
+  if (DevType === "CTG1") {
     return "Mobiles";
-  } else if (DevType === "Laptop") {
+  } else if (DevType === "CTG3") {
     return "Laptops";
-  } else if (DevType === "Watch") {
+  } else if (DevType === "CTG2") {
     return "Watches";
   }
   return "More";
@@ -129,13 +147,6 @@ function Categories() {
   }, [deviceType]);
 
   const navigate = useNavigate();
-
-  const extraBrands = [
-    { name: "Motorola", logo: Motorola },
-    { name: "Lenovo", logo: Lenovo },
-    { name: "Nokia", logo: Nokia },
-    { name: "Honor", logo: Honor },
-  ];
 
   const handleBrandClick = (brandItem) => {
     console.log("morere", deviceType);
@@ -189,10 +200,10 @@ function Categories() {
               size={25}
               onClick={hanldeclose}
             />
-            <div className="text-4xl font-bold text-[#4900A8] p text-center">
+            <div className="text-4xl font-bold text-primary p text-center">
               Coming
             </div>
-            <div className="text-4xl font-bold text-[#4900A8] p text-center">
+            <div className="text-4xl font-bold text-primary p text-center">
               Soon !
             </div>
           </div>
@@ -233,7 +244,11 @@ function Categories() {
                 onClick={() => handleBrandClick(model)}
               >
                 <div className="imagecont h-[60px] w-[80px] flex items-center justify-center">
-                  <img className="w-[60px] mb-2" src={model?.logo} alt="Apple"/>
+                  <img
+                    className="w-[60px] mb-2"
+                    src={model?.logo}
+                    alt={model.name}
+                  />
                 </div>
                 <p className="text-[14px] font-medium">{model.name}</p>
               </div>

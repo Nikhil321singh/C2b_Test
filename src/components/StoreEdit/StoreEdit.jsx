@@ -81,7 +81,7 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
     <div className="min-h-screen  pb-8 bg-[#F5F4F9]">
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <div
@@ -95,7 +95,7 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
           <div className="mb-6 flex flex-col gap-2 border-b-2 mr-10 pb-2 ml-10">
             <IoClose
               size={35}
-              className="absolute right-[220px] text-[#4900A8] transition ease hover:rotate-[360deg] duration-500"
+              className="absolute right-[220px] text-primary transition ease hover:rotate-[360deg] duration-500"
               onClick={closeHandler}
             />
             <p className="text-4xl font-bold">Update Store Details</p>
@@ -179,11 +179,11 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
             <div className="mt-8 flex flex-row justify-start gap-4 items-center">
               <button
                 type="submit"
-                className="font-medium text-sm text-white p-3 rounded bg-[#4900A8]"
+                className="font-medium text-sm text-white p-3 rounded bg-primary"
               >
                 Update Details
               </button>
-              <p className="text-[#4900A8]">{response}</p>
+              <p className="text-primary">{response}</p>
             </div>
           </form>
         </div>

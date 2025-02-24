@@ -1,3 +1,4 @@
+import React from "react";
 const TechnicianWiseTable = ({ tableData }) => {
   function reverseDate(itemDate) {
     const dateArr = itemDate.split("-");
@@ -6,8 +7,8 @@ const TechnicianWiseTable = ({ tableData }) => {
   return (
     <div className="">
       <div className="m-2 w-full  md:m-5 ">
-        <table className="border border-[#4900A8] w-[130vh]">
-          <thead className="bg-[#4900A8] text-white">
+        <table className="border border-primary w-[130vh]">
+          <thead className="bg-primary text-white">
             <tr className="">
               <th className="p-2 min-w-[100px] text-sm md:p-3 md:text-base  ">
                 Date

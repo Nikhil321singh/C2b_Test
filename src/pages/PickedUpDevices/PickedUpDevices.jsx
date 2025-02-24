@@ -21,7 +21,7 @@ import { setStoreFilter } from "../../store/slices/userSlice";
 
 const userRoles = ["Pickup", "Payroll"];
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#4900A8]";
+const failTextColor = "text-primary";
 const checkOnPkd = "Check it On Picked Up";
 const PendingConf = "Pending Pickup Confirmation";
 const PickConf = "Pending Delivery At Warehouse"; //Technican Earlier - Pickup Confirmed
@@ -303,7 +303,7 @@ const ExtComps = ({
               onClick={() => {
                 setFailMode(false);
               }}
-              className={"bg-[#4900A8] text-white"}
+              className={"bg-primary text-white"}
             >
               Okay
             </button>
@@ -322,7 +322,7 @@ const ExtComps = ({
                 onClick={() =>
                   statusUpdHandler(tempId, "Pending Admin Approval")
                 }
-                className={"bg-[#4900A8] text-white"}
+                className={"bg-primary text-white"}
               >
                 Okay
               </button>
@@ -331,7 +331,7 @@ const ExtComps = ({
                   setConfMod(false);
                   setIsTableLoaded(false);
                 }}
-                className="bg-white text-[#4900A8]"
+                className="bg-white text-primary"
               >
                 Cancel
               </button>
@@ -341,7 +341,7 @@ const ExtComps = ({
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
     </React.Fragment>
@@ -366,18 +366,19 @@ const PickedUpFilter = ({
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredStores, setFilteredStores] = useState(storeData);
+   const [searchTerm, setSearchTerm] = useState("");
+   const [filteredStores, setFilteredStores] = useState(storeData);
   const dispatch = useDispatch();
   const handleSearchClear = () => {
-    setSearchValue("");
-    setSearchTerm("");
-    setDateValue("");
-    setRegion("chandigarh");
-    setStoreName("Switchkart");
+ setSearchValue("");
+ setSearchTerm("");
+ setDateValue("");
+ setRegion("");
+ setStoreName(import.meta.env.VITE_USER_STORE_NAME);
   };
+
   useEffect(() => {
-    if ( dateValue === "" && searchValue === "") {
+    if (dateValue === "" && searchValue === "") {
       getData();
     }
   }, [dateValue, searchValue]);
@@ -395,11 +396,12 @@ const PickedUpFilter = ({
       setFilteredStores(filtered);
     }
   };
+
   const handleRegionChange = (value) => {
     setRegionDrop(false);
     setStoreName("");
-    const filteredStores = allStore?.filter((store) => store.region === value);
-    const storeNamesArray = filteredStores.map((store) => store.storeName);
+    const filteredStoresTemp = allStore?.filter((store) => store.region === value);
+    const storeNamesArray = filteredStoresTemp.map((store) => store.storeName);
     dispatch(setStoreFilter({ selStore: "", selRegion: value }));
     setStoreData(storeNamesArray);
     setRegion(value);
@@ -407,10 +409,10 @@ const PickedUpFilter = ({
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStores = allStore?.filter(
+    const filteredStoresTemp2 = allStore?.filter(
       (store) => store.storeName === value
     );
-    const newRegion = filteredStores[0].region;
+    const newRegion = filteredStoresTemp2[0].region;
     setRegion(newRegion);
     dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
     setStoreName(value);
@@ -444,7 +446,7 @@ const PickedUpFilter = ({
         >
           <input
             id="datepicker"
-            style={{ color: "#4900A8" }}
+            style={{ color: "var(--primary-color)" }}
             type="date"
             value={dateValue}
             onChange={dateChangeHandler}
@@ -489,44 +491,44 @@ const PickedUpFilter = ({
             </div>
           )}
         </div>
-         <div className="relative w-[70%]">
+        <div className="relative w-[70%]">
           <div
             className={`${styles.filter_button} w-full`}
             onClick={() => setStoreDrop(!storeDrop)}
           >
-            <p className="truncate">
+            <p className="  truncate">
               {searchTerm === "" ? "Select Store" : searchTerm}
             </p>
             <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
           </div>
           {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
+            <div className="absolute w-full bg-white   shadow-md">
               <input
                 type="text"
-                value={searchTerm}
                 onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
+                value={searchTerm}
+                className="w-full p-2 border-b   border-gray-300"
                 placeholder="Search store..."
               />
               <div
-                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
+                className={`overflow-y-scroll   max-h-[200px] ${styles.filter_drop} w-full`}
               >
                 {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
+                  filteredStores.map((item2, index) => (
                     <div
                       key={index}
                       onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item);
+                        handleStoreChange(item2);
+                        setSearchTerm(item2);
                         setStoreDrop(false);
                       }}
                       className={`${styles.filter_option}`}
                     >
-                      <p className="truncate">{item}</p>
+                      <p className="truncate">{item2}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
+                  <p className="p-2   text-gray-500">No stores found</p>
                 )}
               </div>
             </div>
@@ -595,9 +597,7 @@ const PickedUpDevicesTable = ({
         }
         if (newStatus === ApprovDelivery) {
           setErrorMsg(`Successfully Updated Status to ${newStatus}`);
-          setErrorMsg1(
-            `Lot No. :- ${uniqueCode}`
-          );
+          setErrorMsg1(`Lot No. :- ${uniqueCode}`);
           setErrorMsg2("Check it On History");
         }
         console.log(response);
@@ -620,8 +620,8 @@ const PickedUpDevicesTable = ({
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
           </div>
         )}
-        <table className="w-full border border-[#4900A8]">
-          <thead className="bg-[#4900A8] text-white">
+        <table className="w-full border border-primary">
+          <thead className="bg-primary text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
@@ -649,58 +649,12 @@ const PickedUpDevicesTable = ({
                   )}
                   {(userRole === "Super Admin" ||
                     userRole === "Admin Manager") && (
-                    <div className="flex flex-col gap-1">
-                      <button
-                        className={`${styles.view_btn}`}
-                        onClick={() => viewHandler(val?._id)}
-                      >
-                        View
-                      </button>
-                      {val?.status === "Pending Payment Confirmation" && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={ () => 
-                              confHandler(val?._id, val?.uniqueCode)
-                            }
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Confirm Payment
-                          </button>
-                        </div>
-                      )}
-                      {val?.status === "Pending Admin Approval" && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() =>
-                              statusUpdateHandler(
-                                val?._id,
-                                PendingConf,
-                                val?.uniqueCode
-                              )
-                            }
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Accept
-                          </button>
-                        </div>
-                      )}
-                      {val?.status === PickDelivered && (
-                        <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() =>
-                              statusUpdateHandler(
-                                val?._id,
-                                ApprovDelivery,
-                                val?.uniqueCode
-                              )
-                            }
-                            className={`${styles.acpt_btn}`}
-                          >
-                            Approve Delivery
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    <UserAdminContent
+                      confHandler={confHandler}
+                      val={val}
+                      statusUpdateHandler={statusUpdateHandler}
+                      viewHandler={viewHandler}
+                    />
                   )}
                   {userRole === "Technician" && (
                     <div className="flex flex-col gap-1">
@@ -765,6 +719,58 @@ const PickedUpDevicesTable = ({
           </tbody>
         </table>
       </div>
+    </div>
+  );
+};
+
+const UserAdminContent = ({
+  confHandler,
+  val,
+  statusUpdateHandler,
+  viewHandler,
+}) => {
+  return (
+    <div className="flex flex-col gap-1">
+      <button
+        className={`${styles.view_btn}`}
+        onClick={() => viewHandler(val?._id)}
+      >
+        View
+      </button>
+      {val?.status === "Pending Payment Confirmation" && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => confHandler(val?._id, val?.uniqueCode)}
+            className={`${styles.acpt_btn}`}
+          >
+            Confirm Payment
+          </button>
+        </div>
+      )}
+      {val?.status === "Pending Admin Approval" && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() =>
+              statusUpdateHandler(val?._id, PendingConf, val?.uniqueCode)
+            }
+            className={`${styles.acpt_btn}`}
+          >
+            Accept
+          </button>
+        </div>
+      )}
+      {val?.status === PickDelivered && (
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() =>
+              statusUpdateHandler(val?._id, ApprovDelivery, val?.uniqueCode)
+            }
+            className={`${styles.acpt_btn}`}
+          >
+            Approve Delivery
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -22,7 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setStoreFilter } from "../../store/slices/userSlice";
 
 const succTextColor = "text-green-500";
-const failTextColor = "text-[#4900A8]";
+const failTextColor = "text-primary";
 const PayrollRej = "Payroll Approval Rejected";
 
 const downloadExcel = (dataDown) => {
@@ -296,7 +296,7 @@ const ExtComps = ({
             <h6 className={failTextColor}>Error!</h6>
             <p className="text-slate-500">{errorMsg}</p>
             <button
-              className={"text-white bg-[#4900A8] "}
+              className={"text-white bg-primary "}
               onClick={() => {
                 setFailMode(false);
               }}
@@ -316,12 +316,12 @@ const ExtComps = ({
             <div className="flex flex-row gap-2">
               <button
                 onClick={() => forwardReqHandler(tempId, "Request Forwarded")}
-                className={"text-white bg-[#4900A8]"}
+                className={"text-white bg-primary"}
               >
                 Okay
               </button>
               <button
-                className="bg-white text-[#4900A8]"
+                className="bg-white text-primary"
                 onClick={() => {
                   setConfMod(false);
                   setIsTableLoaded(false);
@@ -335,7 +335,7 @@ const ExtComps = ({
       )}
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} size={15} loading={isTableLoaded} />
+          <BeatLoader color="var(--primary-color)" size={15} loading={isTableLoaded} />
         </div>
       )}
     </React.Fragment>
@@ -424,7 +424,7 @@ const OutstandingFilter = ({
               id="datepicker"
               type="date"
               className=""
-              style={{ color: "#4900A8" }}
+              style={{ color: "var(--primary-color)" }}
               onChange={dateChangeHandler}
               value={dateValue}
             />
@@ -564,8 +564,8 @@ const OutstandingTable = ({
             />
           </div>
         )}
-        <table className="w-full border border-[#4900A8]">
-          <thead className="bg-[#4900A8] text-white">
+        <table className="w-full border border-primary">
+          <thead className="bg-primary text-white">
             <tr>
               <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
               <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
@@ -583,7 +583,9 @@ const OutstandingTable = ({
               <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {(userRole === "Super Admin" ||
-                    userRole === "Admin Manager") && (
+                    userRole === "Admin Manager" ||
+                    userRole === "Super_Admin_Unicorn" ||
+                    userRole === "Admin_Manager_Unicorn") && (
                     <div className="flex flex-col gap-1">
                       <button
                         className={`${styles.view_btn}`}

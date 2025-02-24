@@ -13,7 +13,7 @@ import {
 } from "react-icons/md";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { FaRegUser } from "react-icons/fa";
-
+const iconStyles = { margin: "0px 10px", color: "var(--primary-color)" };
 const AdminLogin = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
@@ -75,7 +75,7 @@ const AdminLogin = () => {
               <div className="input">
                 <MdOutlineLocationOn
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={iconStyles}
                 />
                 <input
                   type="text"
@@ -93,7 +93,7 @@ const AdminLogin = () => {
               <div className="input">
                 <MdOutlineStorefront
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={iconStyles}
                 />
                 <select
                   id="store"
@@ -124,7 +124,7 @@ const AdminLogin = () => {
               <div className="input">
                 <FaRegUser
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={iconStyles}
                 />
                 <select
                   id="user"
@@ -152,7 +152,7 @@ const AdminLogin = () => {
               <div className="input">
                 <MdOutlineMailLock
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={iconStyles}
                 />
                 <input
                   type="text"
@@ -171,7 +171,7 @@ const AdminLogin = () => {
               <div className="input">
                 <RiLockPasswordLine
                   size={25}
-                  style={{ margin: "0px 10px", color: "#4900A8" }}
+                  style={iconStyles}
                 />
                 <input
                   type="password"
@@ -193,8 +193,8 @@ const AdminLogin = () => {
             <Link to="/adminlogin" className="login_button_holder">
               <button
                 onClick={userLogin}
-                type="button"
                 className={`login_button ${isLoading && "opacity-[.9]"}`}
+                type="button"
                 disabled={isLoading}
               >
                 {isLoading && (

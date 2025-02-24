@@ -10,6 +10,7 @@ import { MdOutlineMailLock } from "react-icons/md";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
+const homeroute = "/SelectDeviceType";
 
 const Login = () => {
   const [userEmail, setUserEmail] = useState("");
@@ -23,6 +24,17 @@ const Login = () => {
   useEffect(() => {
     sessionStorage.clear();
     localStorage.clear();
+    const currentDomain = window.location.origin;
+    const bypassedDomain = import.meta.env.BYPASSED_DOMAIN;
+    console.log(currentDomain,"  " ,bypassedDomain);
+    if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
+          sessionStorage.setItem("authToken", "");
+          sessionStorage.setItem("profile", JSON.stringify({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
+          sessionStorage.setItem("DeviceType", "CTG1");
+          localStorage.removeItem("formData");
+          dispatch(setUserProfile({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
+          navigate(homeroute);
+    }
   }, []);
 
   const userLogin = () => {
@@ -43,7 +55,7 @@ const Login = () => {
           const { profile, authToken } = response.data;
           sessionStorage.setItem("authToken", authToken);
           sessionStorage.setItem("profile", JSON.stringify(profile));
-          sessionStorage.setItem("DeviceType", "Mobile");
+          sessionStorage.setItem("DeviceType", "CTG1");
           localStorage.removeItem("formData");
           dispatch(setUserProfile(profile));
           dispatch(
@@ -53,22 +65,28 @@ const Login = () => {
             })
           );
           console.log(profile.role);
-
+          const customTable = "/customertable";
           switch (profile.role) {
             case "Super Admin":
               navigate("/adminmodels");
               break;
             case "Admin Manager":
-              navigate("/customertable");
+              navigate(customTable);
+              break;
+            case "Super_Admin_Unicorn":
+              navigate(customTable);
+              break;
+            case "Admin_Manager_Unicorn":
+              navigate(customTable);
               break;
             case "Technician":
               navigate("/devicepickupdashboard");
               break;
             case "Sale User":
-              navigate("/SelectDeviceType");
+              navigate(homeroute);
               break;
             default:
-              navigate("/SelectDeviceType");
+              navigate(homeroute);
           }
         })
         .catch((err) => {
@@ -86,7 +104,7 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-white Container">
       <div className="flex flex-col items-center justify-center px-10 pb-4 secondContainer">
         <img className="w-48 pt-4 mt-2 mb-4" src={Grest_Logo} alt="app logo" />
-        <h1 className="font-sans text-[#4900A8] mt-2 text-3xl font-bold sm:text-4xl">
+        <h1 className="font-sans text-primary mt-2 text-3xl font-bold sm:text-4xl">
           Login
         </h1>
         {error && <p className="text-sm text-red-500 sm:text-base">{error}</p>}
@@ -99,7 +117,7 @@ const Login = () => {
             <div className="input">
               <MdOutlineMailLock
                 size={25}
-                style={{ margin: "0px 10px", color: "#4900A8" }}
+                style={{ margin: "0px 10px", color: "var(--primary-color)" }}
               />
               <input
                 type="text"
@@ -118,7 +136,7 @@ const Login = () => {
             <div className="relative input">
               <RiLockPasswordLine
                 size={25}
-                style={{ margin: "0px 10px", color: "#4900A8" }}
+                style={{ margin: "0px 10px", color: "var(--primary-color)" }}
               />
               <input
                 type={showUserPassword ? "text" : "password"}
@@ -140,7 +158,7 @@ const Login = () => {
           </div>
 
           <Link to="/PasswordRecovery">
-            <span className="text-right text-sm font-medium block text-[#4900A8] forgetpass">
+            <span className="text-right text-sm font-medium block text-primary forgetpass">
               Forgot Password?
             </span>
           </Link>

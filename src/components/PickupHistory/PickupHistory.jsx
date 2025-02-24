@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React,{ useEffect, useState, useRef } from "react";
 import NavigateTable from "../NavigateTable/NavigateTable";
 import styles from "./PickupHistory.module.css";
 import ViewPickupTable from "../ViewPickupTable/ViewPickupTable";
@@ -58,22 +58,17 @@ const PickupHistory = () => {
   const [storeDrop, setStoreDrop] = useState(false);
   const [allStore, setAllStore] = useState([]);
   const firsttime = useRef(true);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filteredStores, setFilteredStores] = useState(storeData);
-
+const [searchTerm, setSearchTerm] = useState("");
+const [filteredStores, setFilteredStores] = useState(storeData);
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
     };
-    axios
-      .request(config)
+    axios.request(config)
       .then((response) => {
-        console.log(response.data.data);
         setPickupData(response.data.data);
         setIsTableLoaded(false);
       })
@@ -87,20 +82,14 @@ const PickupHistory = () => {
     setIsTableLoaded(true);
     const conf = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=0&limit=9999`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
-    axios
-      .request(conf)
+    axios.request(conf)
       .then((res) => {
-        console.log(res.data.result);
         const allData = res.data.result;
         const storeNamesArray = res.data.result.map((store) => store.storeName);
-        const uniqueRegionsArray = [
-          ...new Set(res.data.result.map((store) => store.region)),
-        ];
+        const uniqueRegionsArray = [...new Set(res.data.result.map((store) => store.region))];
         setStoreData(storeNamesArray);
         setAllStore(allData);
         setIsTableLoaded(false);
@@ -111,7 +100,6 @@ const PickupHistory = () => {
         console.log(error);
       });
   };
-
   useEffect(() => {
     if (!!storeName && !!region) {
       getData();
@@ -129,7 +117,6 @@ const PickupHistory = () => {
     setStoreData(storeNamesArray);
     dispatch(setStoreFilter({ selStore: "", selRegion: value }));
   };
-
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     const filterStores = allStore.filter((store) => store.storeName === value);
@@ -138,30 +125,25 @@ const PickupHistory = () => {
     setRegion(newRegion);
     dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
   };
-
   const viewHandler = (refID) => {
     setViewRef(refID);
     setShowView(true);
   };
-
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-
     if (value === "") {
       setFilteredStores(storeData);
     } else {
-      const filtered = storeData.filter((store) =>
-        store.toLowerCase().includes(value.toLowerCase())
-      );
+      const filtered = storeData.filter((store) => store.toLowerCase().includes(value.toLowerCase()));
       setFilteredStores(filtered);
     }
   };
   return (
     <div>
       {isTableLoaded && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color={"#4900A8"} loading={isTableLoaded} size={15} />
+        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 text-primary">
+          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
@@ -181,84 +163,69 @@ const PickupHistory = () => {
       <button
         className={`${styles.bulkdown_button}`}
         onClick={() => downloadExcel(pickupData)}
-      >
-        <FaDownload /> Bulk Download
-      </button>
+      ><FaDownload /> Bulk Download</button>
       <div className="m-2 flex gap-2 w-100 items-center outline-none">
         <div className="w-[45%] relative">
-          <div
-            onClick={() => {
+          <div onClick={() => {
               setRegionDrop(!regionDrop);
             }}
             className={`${styles.filter_button}`}
           >
-            <p className="truncate ">
-              {region === "" ? "Select Region" : region}
-            </p>
-            <FaAngleDown
-              className={`${regionDrop && "rotate-180"}`}
-              size={17}
-            />
+            <p className="truncate ">{region === "" ? "Select Region" : region}</p>
+            <FaAngleDown className={`${regionDrop && "rotate-180"}`} size={17}/>
           </div>
-          {regionDrop && (
-            <div className={`${styles.filter_drop}`}>
+          {regionDrop && (<div className={`${styles.filter_drop}`}>
               {regionData.map((elem) => (
-                <div
-                  key={elem}
+                <div key={elem}
                   onClick={() => handleRegionChange(elem)}
                   className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{elem}</p>
-                </div>
+                ><p className="truncate">{elem}</p></div>
               ))}
-            </div>
-          )}
+            </div>)}
         </div>
-        <div className="relative w-[70%]">
+        <div className=" w-[70%] relative ">
           <div
-            className={`${styles.filter_button} w-full`}
             onClick={() => setStoreDrop(!storeDrop)}
+            className={` w-full ${styles.filter_button} `}
           >
-            <p className="truncate">
+            <p className="truncate ">
               {searchTerm === "" ? "Select Store" : searchTerm}
             </p>
             <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
           </div>
           {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
+            <div className="absolute w-full bg-white shadow-md  ">
               <input
                 type="text"
                 value={searchTerm}
                 onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
-                placeholder="Search store..."
+                className="w-full p-2 border-b border-gray-300 "
+                placeholder="Search store... "
               />
               <div
-                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
+                className={`overflow-y-scroll max-h-[200px]   ${styles.filter_drop} w-full `}
               >
                 {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
-                    <div
-                      key={index}
+                  filteredStores.map((item1, index) => (
+                    <div   key={index}
                       onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item);
+                        handleStoreChange(item1);
                         setStoreDrop(false);
+                        setSearchTerm(item1);
                       }}
                       className={`${styles.filter_option}`}
                     >
-                      <p className="truncate">{item}</p>
+                      <p className="truncate  ">{item1}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
+                  <p className="p-2   text-gray-500">No stores found</p>
                 )}
               </div>
-            </div>
-          )}
+            </div>)}
         </div>
       </div>
-      <div className="m-2 overflow-x-auto md:m-5">
+      <div className="m-2 overflow-x-auto   md:m-5">
         {showView && (
           <div className={styles.view_wrap}>
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
@@ -272,8 +239,8 @@ const PickupHistory = () => {
 
 const PickupTable = ({ pickupData, viewHandler }) => {
   return (
-    <table className="w-full border border-[#4900A8]">
-      <thead className="bg-[#4900A8] text-white">
+    <table className="w-full border border-primary">
+      <thead className="bg-primary text-white">
         <tr>
           <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
           <th className="p-2 text-sm md:p-3 md:text-base">Status</th>

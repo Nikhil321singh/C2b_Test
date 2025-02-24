@@ -26,7 +26,7 @@ const UserTable = ({ data }) => {
       return "-";
     }
 
-    if (val.lead.model.type === "Mobile") {
+    if (val.lead.model.type === "CTG1") {
       if (val.lead.ram) {
         return `${val.lead.ram}/${val.lead.storage}`;
       }
@@ -48,8 +48,8 @@ const UserTable = ({ data }) => {
 
   return (
     <div className="m-2 overflow-x-auto md:m-5">
-      <table className="w-full border border-[#4900A8]">
-        <thead className="bg-[#4900A8] text-white">
+      <table className="w-full border border-primary">
+        <thead className="bg-primary text-white">
           <tr className="align-top">
             <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
             <th className="p-2 text-sm md:p-3 md:text-base">Username</th>
@@ -84,7 +84,7 @@ const UserTable = ({ data }) => {
                 {getUserFullName(val?.user)}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {val?.lead?.model?.type}
+                {val?.categoryInfo?.categoryName}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base min-w-[200px]">
                 {val?.lead?.model?.name}

@@ -69,14 +69,14 @@
 
 .uncheck_box:hover {
   scale: 1.03;
-  background-color: #4900a8;
-  box-shadow: 1px 1px 2px 0px #4900a828, -1px -1px 2px 0px #4900a848;
+  background-color: var(--primary-color);
+  box-shadow: 1px 1px 2px 0px var(--primary-color)28, -1px -1px 2px 0px var(--primary-color)48;
   color: white;
 }
 
 .check_box {
-  background-color: #4900a8;
-  box-shadow: 1px 1px 2px 0px #4900a828, -1px -1px 2px 0px #4900a848;
+  background-color: var(--primary-color);
+  box-shadow: 1px 1px 2px 0px var(--primary-color)28, -1px -1px 2px 0px var(--primary-color)48;
   color: white;
 }
 
@@ -98,18 +98,18 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  background-color: #4900a8;
+  background-color: var(--primary-color);
   width: 100%;
   max-width: 500px;
   border-radius: 0.55rem;
   color: white;
   font-weight: 500;
   font-size: 1.1rem;
-  box-shadow: 1px 1px 2px 0px #4900a828, -1px -1px 2px 0px #4900a848;
+  box-shadow: 1px 1px 2px 0px var(--primary-color)28, -1px -1px 2px 0px var(--primary-color)48;
   transition: all 0.5s ease;
 }
 
 .button_wrap button:hover {
   scale: 1.02;
-  box-shadow: 0px 0px 0px 4px #4900a850, -0px -0px 0px 4px #4900a850;
+  box-shadow: 0px 0px 0px 4px var(--primary-color)50, -0px -0px 0px 4px var(--primary-color)50;
 }

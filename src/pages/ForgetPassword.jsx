@@ -9,6 +9,7 @@ import OtpInput from "otp-input-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { IoEye, IoEyeOffSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
+const iconStyles = { margin: "0px 10px", color: "var(--primary-color)" };
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
@@ -129,7 +130,7 @@ const ForgetPassword = () => {
                   <div className="input">
                     <MdOutlineMailLock
                       size={25}
-                      style={{ margin: "0px 10px", color: "#4900A8" }}
+                      style={iconStyles}
                     />
                     <input
                       id="email-address"
@@ -219,7 +220,7 @@ const OTPInput = ({ isLoading, handleOtpSubmit, otp, setOtp }) => {
               disabled={false}
               autoFocus
               inputStyles={{
-                border: "2px solid #4900A8",
+                border: "2px solid var(--primary-color)",
                 borderRadius: ".55rem",
                 outline: "none",
               }}
@@ -268,7 +269,7 @@ const PassConfirm = ({
         <div className="relative input">
           <RiLockPasswordLine
             size={25}
-            style={{ margin: "0px 10px", color: "#4900A8" }}
+            style={iconStyles}
           />
           <input
             minLength={6}
@@ -290,7 +291,7 @@ const PassConfirm = ({
         <div className="relative input">
           <RiLockPasswordLine
             size={25}
-            style={{ margin: "0px 10px", color: "#4900A8" }}
+            style={iconStyles}
           />
           <input
             minLength={6}

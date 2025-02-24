@@ -100,6 +100,10 @@ const SpecialOffers = () => {
   const leadId = sessionStorage.getItem("LeadId");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    dispatch(setOtpVerified(false));
+  }, []);
+
   const handleViewSummary = () => {
     const bonus = Number(phonePrice) - Number(Price);
     setExtraBonus(bonus);
@@ -154,7 +158,6 @@ const SpecialOffers = () => {
         sessionStorage.setItem("disableBtn", JSON.stringify(false));
         sessionStorage.setItem("myMessageKey", "");
       }, 30000);
-      dispatch(setOtpVerified(false));
     } else {
       console.log("clicked");
     }
@@ -242,7 +245,7 @@ const SubSpecialOffers = ({
   const navigate = useNavigate();
   const Device = sessionStorage.getItem("DeviceType");
   const DummyImg =
-    Device === "Mobile"
+    Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
@@ -289,14 +292,14 @@ const SubSpecialOffers = ({
           <p className="text-xl">₹{Number(phonePrice)}</p>
           <p
             onClick={handleViewSummary}
-            className="text-[#4900A8] cursor-pointer"
+            className="text-primary cursor-pointer"
           >
             View Summary
           </p>
         </div>
         <div
           onClick={handleSubmit}
-          className="bg-[#4900A8] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
+          className="bg-primary relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
         >
           {isLoading && (
             <CgSpinner

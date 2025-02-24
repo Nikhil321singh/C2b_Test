@@ -9,22 +9,6 @@ const ProductSold = () => {
   const [userName, setUserName] = useState();
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-    const [countdown, setCountdown] = useState(10); // 10 seconds countdown
-
-    useEffect(() => {
-      let timer;
-      if (countdown > 0) {
-        timer = setInterval(() => {
-          setCountdown((prevCount) => {
-            console.log("Countdown:", prevCount - 1); // Log the countdown
-            return prevCount - 1;
-          });
-        }, 1000);
-      } else if (countdown === 0) {
-        navigate("/selectdevicetype");
-      }
-      return () => clearInterval(timer);
-    }, [countdown, navigate]);
   useEffect(() => {
     const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
     setUserName(LoggedInUser?.name);
@@ -32,6 +16,22 @@ const ProductSold = () => {
     const ShowMessage = sessionStorage.getItem("messageReceived");
     setMessage(ShowMessage);
   }, []);
+  const [countdown, setCountdown] = useState(10); // 10 seconds countdown
+
+  useEffect(() => {
+    let timer;
+    if ( countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prevCount) => {
+          console.log("Countdown:", prevCount - 1); // Log the countdown
+          return prevCount - 1;
+        });
+      }, 1000);
+    } else if (countdown === 0) {
+      navigate("/selectdevicetype");
+    }
+    return () => clearInterval(timer);
+  }, [countdown, navigate]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -63,7 +63,7 @@ const ProductSold = () => {
         </div>
       </div>
       <div className="flex flex-col items-center justify-center gap-2 h-[70vh]">
-        <BsCartCheckFill size={84} color="#4900A8" />
+        <BsCartCheckFill size={84} color="var(--primary-color)" />
         <p className="font-medium text-2xl">
           {message.length > 0 ? message : ""}
         </p>
@@ -71,11 +71,9 @@ const ProductSold = () => {
       <div className="fixed bottom-0 w-full ">
         <div
           onClick={handleReturn}
-          className=" bg-[#4900A8] mb-20 text-center p-3 mx-2 text-lg rounded-lg cursor-pointer flex justify-between  text-white items-center"
+          className=" bg-primary mb-20 text-center p-3 mx-2 text-lg rounded-lg cursor-pointer flex justify-between  text-white items-center"
         >
-          <p className="font-medium  text-2xl flex-1 mx-4">
-            Return To Home ({countdown}s)
-          </p>
+          <p className="font-medium  text-2xl flex-1 mx-4">Return To Home ({countdown}s)</p>
         </div>
       </div>
     </div>

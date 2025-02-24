@@ -86,7 +86,7 @@ const SelectDevice = () => {
   const [searchModel, setSearchModel] = useState("");
   const [isTableLoaded, setIsTableLoaded] = useState(false);
   const DummyImg =
-    Device === "Mobile"
+    Device === "CTG1"
       ? "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg"
       : apple_watch;
   const { brandId } = useParams();
@@ -146,12 +146,13 @@ const SelectDevice = () => {
      })
    : [];
 
+
   return (
     <div className="flex flex-col min-h-screen pb-16 bg-white">
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         {isTableLoaded && (
           <div className="fixed top-0 left-0 z-100 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-            <BeatLoader color={"#4900AD"} loading={isTableLoaded} size={15} />
+            <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
           </div>
         )}
         <div className="flex items-center justify-between w-full pr-2">
@@ -165,11 +166,7 @@ const SelectDevice = () => {
         </div>
       </div>
       <div className="ml-5">
-        {Device === "Mobile" ? (
-          <p className="text-2xl font-bold">Select Mobile Phone</p>
-        ) : (
-          <p className="text-2xl font-bold">Select Smartwatches</p>
-        )}
+          <p className="text-2xl font-bold">Select Device</p>
       </div>
       {seriesList.length > 1 && (
         <SeriesFilter
@@ -196,7 +193,7 @@ const SelectDevice = () => {
           type="text"
         />
         <div
-          className="flex items-center justify-center bg-[#4900AD] h-[40px] w-[50px] cursor-pointer"
+          className="flex items-center justify-center bg-primary h-[40px] w-[50px] cursor-pointer"
           onClick={fetchModels}
         >
           <IoMdSearch size={25} className="inline text-white" />
@@ -206,9 +203,9 @@ const SelectDevice = () => {
         className={` ${styles.cardsContainer} m-4 shrink flex flex-wrap justify-center gap-2 md:gap-8`}
       >
         {modelInfo && modelInfo.length === 0 && (
-          <div className="mt-[50%] font-bold text-4xl">...comming soon...</div>
+          <div className="mt-[50%] font-bold text-4xl">No Product Found</div>
         )}
-        {sortedModels &&
+        {isArray && sortedModels.length > 0 &&
           sortedModels.map((model) => (
             <div
               key={model._id}

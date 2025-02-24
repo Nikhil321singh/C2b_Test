@@ -10,7 +10,7 @@ const DownloadSample = () => {
     <div>
       <button
         onClick={handleDownload}
-        className="p-1 sm:p-3 bg-white text-base sm:text-xl rounded-lg text-[#4900A8] font-semibold  focus:outline-none"
+        className="p-1 sm:p-3 bg-white text-base sm:text-xl rounded-lg text-primary font-semibold  focus:outline-none"
       >
         Download Sample File
       </button>

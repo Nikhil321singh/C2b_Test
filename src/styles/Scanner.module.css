@@ -27,13 +27,13 @@
 
 /* .scan_page_wrap button:hover {
   color: white;
-  background-color: #4900A8;
-  box-shadow: #4900A888 0px 1px 4px, #4900A87f 0px 2px 8px;
+  background-color: var(--primary-color);
+  box-shadow: var(--primary-color)88 0px 1px 4px, var(--primary-color)7f 0px 2px 8px;
   scale: 1.05;
 } */
 
 .torchOn {
-  background-color: #4900a8;
+  background-color: var(--primary-color);
   color: white;
 }
 

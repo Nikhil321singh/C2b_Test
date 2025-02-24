@@ -1,5 +1,5 @@
-import axios from "axios";
 import React from "react";
+import axios from "axios";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -60,7 +60,7 @@ function DownloadFilter({
     <>
       <button
         onClick={fetchData}
-        className="bg-[#4900A8] relative top-5 font-bold text-white rounded-md p-2 h-[40px] w-1/2 focus:outline-none"
+        className="bg-primary relative top-5 font-bold text-white rounded-md p-2 h-[40px] w-1/2 focus:outline-none"
       >
         Download
       </button>

@@ -42,8 +42,6 @@ const qnaSlice = createSlice({
       if (state.Accessories[index]) {
         state.Accessories[index].answer = newAnswer;
         state.Accessories[index].key = newKey;
-        console.log(state.Accessories[index].answer);
-        console.log(state.Accessories[index].key);
       }
     },
     updateWatchWarrantyObject: (state, action) => {
