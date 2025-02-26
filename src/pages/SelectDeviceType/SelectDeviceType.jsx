@@ -14,7 +14,6 @@ import vivo from "../../assets/Vivo-Logo.png";
 import onepluse from "../../assets/oneplus-logo.png";
 import mi from "../../assets/mi-logo.jpg";
 import smasung from "../../assets/samsung-logo.png";
-import laptop from "../../assets/laptop-logo.png";
 import mobile from "../../assets/mobile-logo.png";
 import watch from "../../assets/watch_logo.png";
 import appleWatch from "../../assets/apple_watch.png";
