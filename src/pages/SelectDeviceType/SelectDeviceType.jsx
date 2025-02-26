@@ -14,7 +14,6 @@ import vivo from "../../assets/Vivo-Logo.png";
 import onepluse from "../../assets/oneplus-logo.png";
 import mi from "../../assets/mi-logo.jpg";
 import smasung from "../../assets/samsung-logo.png";
-import laptop from "../../assets/laptop-logo.png";
 import mobile from "../../assets/mobile-logo.png";
 import watch from "../../assets/watch_logo.png";
 import appleWatch from "../../assets/apple_watch.png";
@@ -60,9 +59,6 @@ export const DeviceTypeFilter = ({
   const [categories, setCategories] = useState([]);
 
   const staticCategories = [
-    { name: "Mobiles", image: mobile, apiType: "CTG1" },
-    { name: "Laptops", image: laptop, apiType: "CTG3" },
-    { name: "Watches", image: watch, apiType: "CTG2" },
     { name: "More", image: null },
   ];
   useEffect(() => {
@@ -148,7 +144,7 @@ const getCategories = async () => {
               setDeviceType(category.apiType);
             }}
           >
-            {category.image && <img src={category.image} alt={category.name} />}
+            {category?.logo && <img src={category.logo} alt={category.categoryName} />}
             <span>{category?.categoryName || category?.name}</span>
           </div>
         ))}
