@@ -1,5 +1,5 @@
 import React from "react";
-import Grest_Logo from "../assets/Grest_pdf_Logo.png";
+import Grest_Logo from "../assets/Grest_Logo.jpg";
 
 const PurchaseReceipt = ({
   imeiNumber,
