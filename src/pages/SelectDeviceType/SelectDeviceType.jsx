@@ -60,9 +60,6 @@ export const DeviceTypeFilter = ({
   const [categories, setCategories] = useState([]);
 
   const staticCategories = [
-    { name: "Mobiles", image: mobile, apiType: "CTG1" },
-    { name: "Laptops", image: laptop, apiType: "CTG3" },
-    { name: "Watches", image: watch, apiType: "CTG2" },
     { name: "More", image: null },
   ];
   useEffect(() => {
@@ -148,7 +145,7 @@ const getCategories = async () => {
               setDeviceType(category.apiType);
             }}
           >
-            {category.image && <img src={category.image} alt={category.name} />}
+            {category?.logo && <img src={category.logo} alt={category.categoryName} />}
             <span>{category?.categoryName || category?.name}</span>
           </div>
         ))}
