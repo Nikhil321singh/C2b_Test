@@ -316,8 +316,9 @@ const FunctionalList = ({ title, data, quickData, exactQuoteValue }) => {
       ? quickData?.slice(0, 2)
       : data;
 
-  if (!items || items.length === 0) return null;
-
+  if (!items || items.length === 0) {
+    return null;
+  }
   return (
     <div className={`${styles.ques_box}`}>
       <p className={`${styles.ques_head} font-medium text-base`}>{title}</p>

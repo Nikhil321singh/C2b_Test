@@ -315,15 +315,14 @@ const ExtComps = ({
           Authorization: utoken,
         },
       });
-      const urlS3 = response.data.url;
-      const uploadResponse = await axios.put(urlS3, file, {
+      const uploadResponse = await axios.put(response.data.url, file, {
         headers: {
           "Content-Type": file.type || "application/octet-stream",
         },
       });
       if (uploadResponse.status === 200) {
-        const uploadedFileUrl = urlS3.split("?")[0];
-        const { data } = await axios.post(
+        const uploadedFileUrl = response.data.url.split("?")[0];
+        await axios.post(
           `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/uploadStores`,
           {fileUrl: uploadedFileUrl},
           {
@@ -340,14 +339,12 @@ const ExtComps = ({
         throw new Error("File upload to S3 failed");
       }
     } catch (error) {
-      console.log(error);
       setErrMsg("Failed to upload store data");
       setFailBox(true);
     } finally {
       setIsTableLoaded(false);
     }
   };
-
   return (
     <React.Fragment>
       {editBoxOpen && (
