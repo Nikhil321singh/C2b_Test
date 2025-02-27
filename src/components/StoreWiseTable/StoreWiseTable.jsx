@@ -100,7 +100,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                 </tr>
               ))}
               { tableData.length === 0 &&
-                <tr> 
+                <tr>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base"
                   colSpan={14}>
                     No Leads Found

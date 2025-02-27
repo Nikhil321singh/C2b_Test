@@ -299,16 +299,13 @@ const ExtComps = ({
   const handleBulkSubmit = async (event) => {
     event.preventDefault();
     setIsTableLoaded(true);
-  
     if (!file) {
       setErrMsg("No file selected");
       setFailBox(true);
       setIsTableLoaded(false);
       return;
     }
-  
     try {
-      // Request pre-signed URL for the file
       const response = await axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/get-presigned-url`, {
         params: {
           fileName: file.name,
@@ -318,22 +315,14 @@ const ExtComps = ({
           Authorization: utoken,
         },
       });
-  
       const urlS3 = response.data.url;
-  
-      // Upload file to S3
       const uploadResponse = await axios.put(urlS3, file, {
         headers: {
           "Content-Type": file.type || "application/octet-stream",
         },
       });
-  
       if (uploadResponse.status === 200) {
-        console.log(`${file.name} uploaded successfully!`);
-  
-        // Extract the base URL (without query params)
         const uploadedFileUrl = urlS3.split("?")[0];
-  
         const { data } = await axios.post(
           `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/uploadStores`,
           {fileUrl: uploadedFileUrl},
@@ -344,8 +333,6 @@ const ExtComps = ({
             },
           }
         );
-  
-        console.log(data);
         getData();
         setErrMsg("Successfully uploaded stores data");
         setSucBox(true);
@@ -359,7 +346,7 @@ const ExtComps = ({
     } finally {
       setIsTableLoaded(false);
     }
-  };  
+  };
 
   return (
     <React.Fragment>
