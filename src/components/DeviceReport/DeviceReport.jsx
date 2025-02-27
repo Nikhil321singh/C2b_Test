@@ -14,6 +14,7 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
   let data = useSelector((state) => state.qna);
   const watchdata = useSelector((state) => state.watchQNA);
   const quickData = useSelector((state) => state.qnaQuick);
+  console.log(quickData)
   if (isWatch) {
     data = watchdata;
   }
@@ -64,6 +65,69 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
             />
           </div>
           <CoreCosDis data={data} quickData={quickData} />
+          {(data?.Accessories.length > 0 ) && 
+
+          <div className={`${styles.ques_box}`}>
+            <p className={`${styles.ques_head} font-medium text-base`}>
+              Accessories
+            </p>
+            <div className={`${styles.ques_wrap}`}>
+              {data?.Accessories.map((item) => (
+                <div key={item.index} className="flex flex-row items-center w-full">
+                  <LuDot size={25} className="shrink-0 text-primary" />
+                  <div className="flex justify-between w-[85%] questionkey">
+                    <p className="text-sm font-medium opacity-60">{item.quetion}</p>
+                    <p className="ml-2 text-base font-medium uppercase">
+                      {item.key}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          }
+          {(data?.Functional.length > 0 ) && 
+
+          <div className={`${styles.ques_box}`}>
+            <p className={`${styles.ques_head} font-medium text-base`}>
+              Functional
+            </p>
+            <div className={`${styles.ques_wrap}`}>
+              {data?.Functional.map((item) => (
+                <div key={item.index} className="flex flex-row items-center w-full">
+                  <LuDot size={25} className="shrink-0 text-primary" />
+                  <div className="flex justify-between w-[85%] questionkey">
+                    <p className="text-sm font-medium opacity-60">{item.quetion}</p>
+                    <p className="ml-2 text-base font-medium uppercase">
+                      {item.key}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          }
+          {(data?.Physical) && 
+          <div className={`${styles.ques_box}`}>
+            <p className={`${styles.ques_head} font-medium text-base`}>Physical</p>
+            <div className={`${styles.ques_wrap}`}>
+              {data?.Physical?.map((item, ItemIndex) => (
+                <div key={ItemIndex} className="flex flex-row w-full items-center">
+                  <LuDot className="shrink-0 text-primary" size={25} />
+                  <div className="flex justify-between w-[85%] questionkey">
+                    <p className="text-sm  opacity-60 font-medium">
+                      {item.quetion}
+                    </p>
+                    <p className="ml-2 font-mediumfont-medium text-base  uppercase">
+                      {item.key}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          }
+          {(data?.Functional_major.length > 0 || quickData?.Functional_major.length > 0) && 
           <div className={`${styles.ques_box}`}>
             <p className={`${styles.ques_head} font-medium text-base`}>
               Functional Major
@@ -104,6 +168,9 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
                   ))}
             </div>
           </div>
+          }
+          {(data?.Functional_minor.length > 0 || quickData?.Functional_minor.length > 0) && 
+
           <div className={`${styles.ques_box}`}>
             <p className={`${styles.ques_head} font-medium text-base`}>
               Functional Minor
@@ -144,6 +211,7 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
                   ))}
             </div>
           </div>
+          }
           <div className={`${styles.ques_box}`}>
             <p className={`${styles.ques_head} font-medium text-base`}>
               Warranty
@@ -215,84 +283,7 @@ const WatchPart = ({ clickHandler, closeHandler, data, quoteSaved }) => {
           onClick={closeHandler}
         />
       </div>
-      <div className={`${styles.ques_box}`}>
-        <p className={`${styles.ques_head} font-medium text-base`}>
-          Accessories
-        </p>
-        <div className={`${styles.ques_wrap}`}>
-          {data?.Accessories.map((item) => (
-            <div key={item.index} className="flex flex-row items-center w-full">
-              <LuDot size={25} className="shrink-0 text-primary" />
-              <div className="flex justify-between w-[85%] questionkey">
-                <p className="text-sm font-medium opacity-60">{item.quetion}</p>
-                <p className="ml-2 text-base font-medium uppercase">
-                  {item.key}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className={`${styles.ques_box}`}>
-        <p className={`${styles.ques_head} font-medium text-base`}>
-          Functional
-        </p>
-        <div className={`${styles.ques_wrap}`}>
-          {data?.Functional.map((item) => (
-            <div key={item.index} className="flex flex-row items-center w-full">
-              <LuDot size={25} className="shrink-0 text-primary" />
-              <div className="flex justify-between w-[85%] questionkey">
-                <p className="text-sm font-medium opacity-60">{item.quetion}</p>
-                <p className="ml-2 text-base font-medium uppercase">
-                  {item.key}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className={`${styles.ques_box}`}>
-        <p className={`${styles.ques_head} font-medium text-base`}>Physical</p>
-        <div className={`${styles.ques_wrap}`}>
-          {data?.Physical.map((item, ItemIndex) => (
-            <div key={ItemIndex} className="flex flex-row w-full items-center">
-              <LuDot className="shrink-0 text-primary" size={25} />
-              <div className="flex justify-between w-[85%] questionkey">
-                <p className="text-sm  opacity-60 font-medium">
-                  {item.quetion}
-                </p>
-                <p className="ml-2 font-mediumfont-medium text-base  uppercase">
-                  {item.key}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className={`${styles.ques_box}`}>
-        <p className={`${styles.ques_head} text-base font-medium `}>Warranty</p>
-        <div className={`${styles.ques_wrap}`}>
-          {data?.Warranty.map(
-            (item) =>
-              item.key === "yes" && (
-                <div
-                  key={item.index}
-                  className="flex flex-row items-center w-full"
-                >
-                  <LuDot size={25} className="shrink-0 text-primary" />
-                  <div className="flex justify-between w-[85%] questionkey">
-                    <p className="text-sm font-medium opacity-60">
-                      {item.quetion}
-                    </p>
-                    <p className="ml-2 text-base font-medium uppercase">
-                      {item.key}
-                    </p>
-                  </div>
-                </div>
-              )
-          )}
-        </div>
-      </div>
+
     </div>
   );
 };
@@ -301,6 +292,7 @@ const CoreCosDis = ({ data, quickData }) => {
   const exactQuoteValue = sessionStorage.getItem("ExactQuote");
   return (
     <React.Fragment>
+      {(quickData?.Core.length > 0 || data?.Core.length > 0) && 
       <div className={`${styles.ques_box}`}>
         <p className={`${styles.ques_head} font-medium text-base`}>Core</p>
         <div className={`${styles.ques_wrap}`}>
@@ -339,6 +331,8 @@ const CoreCosDis = ({ data, quickData }) => {
               ))}
         </div>
       </div>
+      }
+      {(quickData?.Cosmetics.length > 0 || data?.Cosmetics.length > 0) && 
       <div className={`${styles.ques_box}`}>
         <p className={`${styles.ques_head} font-medium text-base`}>Cosmetics</p>
         <div className={`${styles.ques_wrap}`}>
@@ -377,6 +371,8 @@ const CoreCosDis = ({ data, quickData }) => {
               ))}
         </div>
       </div>
+      }
+  {(quickData?.Display.length > 0 || data?.Display.length > 0) && 
       <div className={`${styles.ques_box}`}>
         <p className={`${styles.ques_head} font-medium text-base`}>Display</p>
         <div className={`${styles.ques_wrap}`}>
@@ -415,6 +411,7 @@ const CoreCosDis = ({ data, quickData }) => {
               ))}
         </div>
       </div>
+    }
     </React.Fragment>
   );
 };

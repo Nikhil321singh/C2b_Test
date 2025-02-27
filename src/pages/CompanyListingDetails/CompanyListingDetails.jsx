@@ -438,8 +438,10 @@ const CompanyTable = ({
             </tr>
           </thead>
           <tbody>
-            {tableData !== undefined &&
-              tableData?.map((data, index) => (
+          {tableData !== undefined &&
+              [...tableData]
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .map((data, index) => (
                 <tr
                   key={index}
                   className={index % 2 === 0 ? "bg-gray-200" : ""}

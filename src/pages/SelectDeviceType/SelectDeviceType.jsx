@@ -343,11 +343,7 @@ export const BrandList = ({ deviceType }) => {
 
   const handleBrandClick = (brandItem) => {
     console.log("adasdasasfdafadf", deviceType);
-    if (deviceType === "Laptop" || deviceType === undefined) {
-      handleDeviceClick();
-    } else if (deviceType === "Watch" && brandItem.name !== "Apple") {
-      handleDeviceClick();
-    } else if (
+    if (deviceType === "CTG1" && (
       brandItem.name === "Apple" ||
       brandItem.name === "OnePlus" ||
       brandItem.name === "POCO" ||
@@ -365,11 +361,15 @@ export const BrandList = ({ deviceType }) => {
       brandItem.name === "Nokia" ||
       brandItem.name === "OPPO"||
       brandItem.name === "Lenovo"
-    ) {
+    )) {
       const detail = { brand: brandItem, models: {}, _id: brandItem._id };
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
       navigate(`/selectdevice/${detail.brand?._id}`);
-    } else {
+      } else if (deviceType === "CTG2" && brandItem.name === "Apple") {
+        const detail = { brand: brandItem, models: {}, _id: brandItem._id };
+        sessionStorage.setItem("dataModel", JSON.stringify(detail));
+        navigate(`/selectdevice/${detail.brand?._id}`);
+      } else {
       handleDeviceClick();
     }
   };
@@ -839,7 +839,13 @@ const MiddlePart = ({
   topModels,
 }) => {
   const Device1 = sessionStorage.getItem("DeviceType");
-  const [selectedBtn, setSelectedBtn] = useState(() => selBtn(Device1));
+  const [selectedBtn, setSelectedBtn] = useState(Device1 || "");
+
+  useEffect(() => {
+    if (Device1) {
+      setSelectedBtn(Device1);
+    }
+  }, [Device1]);
   const currentDomain = window.location.origin;
   return (
     <div className={styles.des_main_wrap}>

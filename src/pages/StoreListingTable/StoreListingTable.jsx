@@ -47,7 +47,7 @@ const downloadExcel = (dataDown, curPage) => {
 
 const sampleDownloadHandler = () => {
   const sampleFilePath = "sample-file-store.xlsx";
-  saveAs(sampleFilePath, "sample-file-store.xlsx");
+  saveAs(sampleFilePath, "storelisting-sample-file-store.xlsx");
 };
 
 const StoreListingTable = () => {
@@ -296,35 +296,70 @@ const ExtComps = ({
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
   };
-  const handleBulkSubmit = (event) => {
-    setIsTableLoaded(true);
+  const handleBulkSubmit = async (event) => {
     event.preventDefault();
-    const formData = new FormData();
-    formData.append("file", file);
-    axios
-      .post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/uploadStores`,
-        formData,
-        {
-          headers: {
-            Authorization: utoken,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
-      .then((res) => {
-        getData();
-        setErrMsg("Succesfully uploaded stores data");
-        setSucBox(true);
-        setIsTableLoaded(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setErrMsg("Failed to upload store data");
-        setFailBox(true);
-        setIsTableLoaded(false);
+    setIsTableLoaded(true);
+  
+    if (!file) {
+      setErrMsg("No file selected");
+      setFailBox(true);
+      setIsTableLoaded(false);
+      return;
+    }
+  
+    try {
+      // Request pre-signed URL for the file
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/get-presigned-url`, {
+        params: {
+          fileName: file.name,
+          fileType: file.type,
+        },
+        headers: {
+          Authorization: utoken,
+        },
       });
-  };
+  
+      const urlS3 = response.data.url;
+  
+      // Upload file to S3
+      const uploadResponse = await axios.put(urlS3, file, {
+        headers: {
+          "Content-Type": file.type || "application/octet-stream",
+        },
+      });
+  
+      if (uploadResponse.status === 200) {
+        console.log(`${file.name} uploaded successfully!`);
+  
+        // Extract the base URL (without query params)
+        const uploadedFileUrl = urlS3.split("?")[0];
+  
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/uploadStores`,
+          {fileUrl: uploadedFileUrl},
+          {
+            headers: {
+              Authorization: utoken,
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          }
+        );
+  
+        console.log(data);
+        getData();
+        setErrMsg("Successfully uploaded stores data");
+        setSucBox(true);
+      } else {
+        throw new Error("File upload to S3 failed");
+      }
+    } catch (error) {
+      console.log(error);
+      setErrMsg("Failed to upload store data");
+      setFailBox(true);
+    } finally {
+      setIsTableLoaded(false);
+    }
+  };  
 
   return (
     <React.Fragment>
