@@ -52,7 +52,7 @@ const downloadExcelGradePricingSheet = (apiData) => {
 
 const handleSampleDownload = () => {
   const sampleFilePath = "sample-file.xlsx";
-  saveAs(sampleFilePath, "sample-file.xlsx");
+  saveAs(sampleFilePath, "gradepricing-sample-file.xlsx");
 };
 
 const GradePricingSheet = () => {

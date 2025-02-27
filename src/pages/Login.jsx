@@ -131,30 +131,29 @@ const Login = () => {
               />
             </div>
           </div>
-          <div>
-            <label htmlFor="password">Password</label>
-            <div className="relative input">
-              <RiLockPasswordLine
-                size={25}
-                style={{ margin: "0px 10px", color: "var(--primary-color)" }}
-              />
-              <input
-                type={showUserPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                placeholder="Enter password"
-                required
-                value={userPassword}
-                onChange={(e) => setUserPassword(e.target.value)}
-                className="relative block w-[85%] px-2 py-1 rounded-none appearance-none rounded-b-md focus:outline-none focus:z-10 sm:text-sm"
-              />
-              <span
-                onClick={() => setShowUserPassword(!showUserPassword)}
-                className="absolute transform -translate-y-1/2 cursor-pointer right-2 top-6"
-              >
-                {!showUserPassword ? <IoEyeOffSharp /> : <IoEye />}
-              </span>
-            </div>
+          <div className="relative input">
+            <RiLockPasswordLine
+              size={25}
+              style={{ margin: "0px 10px", color: "var(--primary-color)" }}
+            />
+            <input
+              type={showUserPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              placeholder="Enter password"
+              required
+              value={userPassword}
+              onChange={(e) => setUserPassword(e.target.value)}
+              className="relative block w-[85%] px-2 py-1 rounded-none appearance-none rounded-b-md focus:outline-none focus:z-10 sm:text-sm"
+            />
+            {/* FIX: Add explicit styling to prevent overlap */}
+            <span
+              onClick={() => setShowUserPassword(!showUserPassword)}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer z-10"
+              style={{ padding: "5px" }} // Ensures clickable area
+            >
+              {showUserPassword ? <IoEye size={22} /> : <IoEyeOffSharp size={22} />}
+            </span>
           </div>
 
           <Link to="/PasswordRecovery">

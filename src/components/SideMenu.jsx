@@ -43,10 +43,6 @@ function SideMenu({ setsideMenu, sideMenu }) {
     setsideMenu(!sideMenu);
     navigate("/companylisting");
   };
-  const handleOffer = () => {
-    setsideMenu(!sideMenu);
-    navigate("/viewofferdetail");
-  };
   const handleTechnician = () => {
     setsideMenu(!sideMenu);
     navigate("/technicianwisereport");
@@ -79,7 +75,6 @@ function SideMenu({ setsideMenu, sideMenu }) {
           sideMenu={sideMenu}
           handleHome={handleHome}
           handleProfile={handleProfile}
-          handleOffer={handleOffer}
           handleGrade={handleGrade}
           handleRegister={handleRegister}
           handleStoreListing={handleStoreListing}
@@ -196,7 +191,6 @@ const SuperAdminProfile = ({
   sideMenu,
   handleHome,
   handleProfile,
-  handleOffer,
   handleGrade,
   handleRegister,
   handleStoreListing,
@@ -227,12 +221,6 @@ const SuperAdminProfile = ({
           onClick={handleProfile}
         >
           Profile
-        </li>
-        <li
-          className="text-[20px] font-[300] cursor-pointer  "
-          onClick={handleOffer}
-        >
-          Offers
         </li>
         <li
           className="text-[20px] font-[300] cursor-pointer "

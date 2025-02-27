@@ -343,29 +343,18 @@ export const BrandList = ({ deviceType }) => {
 
   const handleBrandClick = (brandItem) => {
     console.log("adasdasasfdafadf", deviceType);
-    if (deviceType === "Laptop" || deviceType === undefined) {
-      handleDeviceClick();
-    } else if (deviceType === "Watch" && brandItem.name !== "Apple") {
-      handleDeviceClick();
-    } else if (
-      brandItem.name === "Apple" ||
-      brandItem.name === "OnePlus" ||
-      brandItem.name === "POCO" ||
-      brandItem.name === "Realme" ||
-      brandItem.name === "Xiaomi" ||
-      brandItem.name === "Samsung" ||
-      brandItem.name === "Vivo" ||
-      brandItem.name === "iQOO" ||
-      brandItem.name === "Infinix" ||
-      brandItem.name === "Tecno" ||
-      brandItem.name === "Google" ||
-      brandItem.name === "Nothing" ||
-      brandItem.name === "Honor" ||
-      brandItem.name === "Motorola" ||
-      brandItem.name === "Nokia" ||
-      brandItem.name === "OPPO"||
-      brandItem.name === "Lenovo"
-    ) {
+
+    const allowedBrandsCTG1 = new Set([
+      "Apple", "OnePlus", "POCO", "Realme", "Xiaomi", "Samsung", "Vivo", "iQOO",
+      "Infinix", "Tecno", "Google", "Nothing", "Honor", "Motorola", "Nokia",
+      "OPPO", "Lenovo"
+    ]);
+
+    const shouldNavigate =
+      (deviceType === "CTG1" && allowedBrandsCTG1.has(brandItem.name)) ||
+      (deviceType === "CTG2" && brandItem.name === "Apple");
+
+    if (shouldNavigate) {
       const detail = { brand: brandItem, models: {}, _id: brandItem._id };
       sessionStorage.setItem("dataModel", JSON.stringify(detail));
       navigate(`/selectdevice/${detail.brand?._id}`);
@@ -839,7 +828,13 @@ const MiddlePart = ({
   topModels,
 }) => {
   const Device1 = sessionStorage.getItem("DeviceType");
-  const [selectedBtn, setSelectedBtn] = useState(() => selBtn(Device1));
+  const [selectedBtn, setSelectedBtn] = useState(Device1 || "");
+
+  useEffect(() => {
+    if (Device1) {
+      setSelectedBtn(Device1);
+    }
+  }, [Device1]);
   const currentDomain = window.location.origin;
   return (
     <div className={styles.des_main_wrap}>
