@@ -950,8 +950,15 @@ const AboveSix = ({
       ram: id?.models?.config?.RAM,
       name: id?.customerName ? id?.customerName : profile?.name,
     };
-    console.log(finalPayload);
-    sessionStorage.setItem("billData", JSON.stringify(finalPayload.QNA.Cosmetics[6]));
+    const billData = finalPayload.QNA.Accessories.find(item =>
+      item.quetion && item.quetion.toLowerCase().includes("bill")
+    );
+    if (billData) {
+      sessionStorage.setItem("billData", JSON.stringify(billData));
+    } else {
+      sessionStorage.setItem("billData", JSON.stringify(finalPayload.QNA.Cosmetics[6]));
+      console.log("No Accessories item with 'bill' found.");
+    }
     const response = await axios.post(
       `${import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/questionnaires/calculatePrice`,
