@@ -155,7 +155,7 @@ const StoreWiseReport = () => {
       .request(config)
       .then((response) => {
         const allStoresData = response.data.data;
-        const userNamesArray = allStoresData.map((user) => ({
+        const userNamesArray = allStoresData.filter(user => user.role === "Sale User").map((user) => ({
           userName: user?.name || user?.firstName,
           _id: user._id,
         }));
@@ -544,7 +544,7 @@ const MainFilterSub = ({
           className={`${styles.filter_button}`}
           onClick={() => setTechDrop(!techDrop)}
         >
-          <p className="truncate">{techName === "" ? "Select Technician" : techName}</p>
+          <p className="truncate">{techName === "" ? "Select Sale User" : techName}</p>
           <FaAngleDown size={17} className={`${techDrop && rotateCss}`} />
         </div>
         {techDrop && (
@@ -663,8 +663,11 @@ const MainFilterSub = ({
               )}
               <div
                 className={`${styles.filter_option}`}
-                onClick={handleSearchClear}
-              >
+                onClick={() => {
+                  handleSearchClear();
+                  setStoreDrop(false);
+                }}
+                >
                 <p className="truncate">{ALLstore}</p>
               </div>
             </div>

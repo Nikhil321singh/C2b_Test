@@ -746,7 +746,7 @@ const SixthPart = ({ NDstate, slice }) => {
             <div
               key={data._id}
               className={`${
-                slice[index]?.answer === data.yes ? whiteBg : pinkBg
+                slice[index]?.answer === data.yes ? pinkBg : whiteBg
               } flex flex-col justify-start items-center shadow-lg rounded-lg px-3`}
               onClick={() => {
                 if (slice[index]?.answer === data.yes) {
@@ -777,7 +777,7 @@ const SixthPart = ({ NDstate, slice }) => {
               <div className="w-full border-t-[1.5px] py-2">
                 <p
                   className={`${
-                    slice[index]?.answer === data.yes ? blackText : whiteText
+                    slice[index]?.answer === data.yes ? whiteText :  blackText
                   } text-xs font-medium text-center`}
                 >
                   {data.quetion}

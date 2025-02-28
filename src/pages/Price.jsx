@@ -8,10 +8,13 @@ import { CgSpinner } from "react-icons/cg";
 const pink = "bg-primary";
 const fileUploader = async (authToken, file, fileName, fileType) => {
   try {
-    const fileInfo = { fileName, fileType };
-    const resURL = await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`,
-      fileInfo,
-      { headers: { Authorization: authToken } }
+    const resURL = await axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`,
+      {
+        params: {
+          fileName: fileName,
+          fileType: fileType,
+        },
+        headers: { Authorization: authToken } }
     );
     if(resURL?.data?.url){
       const presignedUrl = resURL.data.url;
