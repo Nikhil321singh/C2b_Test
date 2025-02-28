@@ -9,7 +9,7 @@ const pink = "bg-primary";
 const fileUploader = async (authToken, file, fileName, fileType) => {
   try {
     const fileInfo = { fileName, fileType };
-    const resURL = await axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/get-presigned-url`,
+    const resURL = await axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`,
       fileInfo,
       { headers: { Authorization: authToken } }
     );

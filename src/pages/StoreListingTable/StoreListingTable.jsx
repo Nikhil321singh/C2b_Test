@@ -306,7 +306,7 @@ const ExtComps = ({
       return;
     }
     try {
-      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/get-presigned-url`, {
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`, {
         params: {
           fileName: file.name,
           fileType: file.type,
