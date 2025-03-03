@@ -78,7 +78,6 @@ const DevicePickupDashboard = () => {
   const [regionData, setRegionData] = useState([]);
   const [allStore, setAllStore] = useState([]);
   const firsttime = useRef(true);
-
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
@@ -104,7 +103,6 @@ const DevicePickupDashboard = () => {
         setIsTableLoaded(false);
       });
   };
-
   const getStore = () => {
     setIsTableLoaded(true);
     const config = {
@@ -133,7 +131,6 @@ const DevicePickupDashboard = () => {
         setIsTableLoaded(false);
       });
   };
-
   const getDataBySearch = () => {
     setIsTableLoaded(true);
     const config = {
@@ -163,7 +160,6 @@ const DevicePickupDashboard = () => {
         setIsTableLoaded(false);
       });
   };
-
   useEffect(() => {
     if (firsttime.current && !!storeName && !!region) {
       getData();
@@ -446,7 +442,6 @@ const DPFilter = ({
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredStores, setFilteredStores] = useState(storeData);
   const dispatch = useDispatch();
-
   const handleRegionChange = (value) => {
     setRegionDrop(false);
     setStoreName("");
@@ -456,7 +451,6 @@ const DPFilter = ({
     setRegion(value);
     dispatch(setStoreFilter({ selStore: "", selRegion: value }));
   };
-
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     const filteredStores2 = allStore?.filter((store) => store.storeName === value);
@@ -465,7 +459,6 @@ const DPFilter = ({
     setStoreName(value);
     dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
   };
-
   const handleSearchClear = () => {
     setSearchValue("");
     setSelectedStatus("");
@@ -496,14 +489,12 @@ const DPFilter = ({
   const handleFilterClick = () => {
     setShowFilterDropdown(!showFilterDropdown);
   };
-
   const dateChangeHandler = (event) => {
     const formattedDate = new Date(event.target.value).toLocaleDateString(
       "en-GB"
     );
     setDateValue(formattedDate);
   };
-
   return (
     <div className="px-2 flex flex-col gap-2">
       <div className="flex gap-2 items-center outline-none">
@@ -714,7 +705,6 @@ const PDTable = ({
   const token2 = sessionStorage.getItem("authToken");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showHoldModal, setShowHoldModal] = useState(false);
-
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {
       setErrorMsg("No device selected");
@@ -724,11 +714,9 @@ const PDTable = ({
     const newStatus = event.target.value;
     setSelectedStatus(newStatus);
     setIsTableLoaded(true);
-
     const LDIds = pendingTableData
       .filter((obj) => selectedIds.includes(obj._id))
       .map((obj) => obj._id.toString());
-
     let config;
     if (newStatus === PickupAvail) {
       config = {
@@ -765,7 +753,6 @@ const PDTable = ({
         },
       };
     }
-
     axios
       .request(config)
       .then((response) => {
@@ -789,7 +776,6 @@ const PDTable = ({
       });
     setSelectedStatus("");
   };
-
   const confHandler = () => {
     setIsTableLoaded(true);
     if (selectedIds.length === 0) {
@@ -800,7 +786,6 @@ const PDTable = ({
       setConfMod(true);
     }
   };
-
   return (
     <React.Fragment>
       <PendingDevicesTable
@@ -829,7 +814,6 @@ const PDTable = ({
           Request For Pickup
         </button>
       </div>
-
       {showCancelModal && (
         <CancelModal
           setShowCancelModal={setShowCancelModal}
@@ -847,7 +831,6 @@ const PDTable = ({
           setFailMode={setFailMode}
         />
       )}
-
       {showHoldModal && (
         <HoldModal
           setShowHoldModal={setShowHoldModal}
@@ -883,7 +866,6 @@ const CancelModal = ({
   setFailMode,
 }) => {
   const [cancelReason, setCancelReason] = useState("");
-
   const handleCancelSubmit = () => {
     setIsTableLoaded(true);
     const config = {
@@ -920,7 +902,6 @@ const CancelModal = ({
     setShowCancelModal(false);
     setCancelReason("");
   };
-
   return (
     <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
       <div className={`${styles.err_mod_box} ${failTextColor}`}>
@@ -965,7 +946,6 @@ const HoldModal = ({
   setFailMode,
 }) => {
   const [holdReason, setHoldReason] = useState("");
-
   const handleHoldSubmit = () => {
     setIsTableLoaded(true);
     const config = {
