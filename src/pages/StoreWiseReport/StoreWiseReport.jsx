@@ -16,6 +16,8 @@ const isSelled = "true";
 const rotateCss = "rotate-180";
 const pageLimit = 10;
 const startDateFillter = "2023-01-01";
+const currentDomain = window.location.origin;
+const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
 
 const downloadExcelStoreWise = (apiData) => {
   const fileType =
@@ -525,8 +527,6 @@ const MainFilterSub = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStores, setFilteredStores] = useState(storeData);
-  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
-
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);

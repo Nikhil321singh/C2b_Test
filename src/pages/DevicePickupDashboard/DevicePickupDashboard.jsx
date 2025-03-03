@@ -45,7 +45,6 @@ const downloadExcel = (pendDataDown) => {
       Location: item.location,
     };
   });
-
   const ws = XLSX.utils.json_to_sheet(formattedData);
   const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
   const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
@@ -174,7 +173,6 @@ const DevicePickupDashboard = () => {
       getDataBySearch();
     }
   }, [statusValue, dateValue, storeName, region]);
-
   return (
     <div className="min-h-screen bg-white pb-8">
       <ExtComps
@@ -301,7 +299,6 @@ const ExtComps = ({
     const LDIds = pendingTableData
       ?.filter((obj) => selectedIds.includes(obj._id))
       .map((obj) => obj._id.toString());
-
     const config = {
       method: "post",
       maxBodyLength: Infinity,
@@ -336,7 +333,6 @@ const ExtComps = ({
         setIsTableLoaded(false);
       });
   };
-
   return (
     <React.Fragment>
       {isTableLoaded && (
