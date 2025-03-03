@@ -3,7 +3,12 @@ import NavigateTable from "../../components/NavigateTable/NavigateTable";
 import axios from "axios";
 import styles from "./OutStandingDevices.module.css";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import ViewPickupTable from "../../components/ViewPickupTable/ViewPickupTable";
 import { BeatLoader } from "react-spinners";
 import {

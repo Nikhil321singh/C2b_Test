@@ -4,7 +4,12 @@ import { CiSearch, CiBarcode } from "react-icons/ci";
 import { IoClose } from "react-icons/io5";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import AppFooter from "../../components/AppFooter";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { useLocation, useNavigate } from "react-router";
 import styles from "./SelectDeviceType.module.css";
 import apple from "../../assets/apple-logo.png";
@@ -829,13 +834,14 @@ const MiddlePart = ({
 }) => {
   const Device1 = sessionStorage.getItem("DeviceType");
   const [selectedBtn, setSelectedBtn] = useState(Device1 || "");
+  const currentDomain = window.location.origin;
+  const WEBSITE_SHORT_NAME = currentDomain === buyback ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
 
   useEffect(() => {
     if (Device1) {
       setSelectedBtn(Device1);
     }
   }, [Device1]);
-  const currentDomain = window.location.origin;
   return (
     <div className={styles.des_main_wrap}>
       <div className={styles.des_lr_wrap}>
@@ -954,7 +960,7 @@ const MiddlePart = ({
       <p
         className={`${styles.topSell_head} text-lg font-bold mt-2 text-primary`}
       >
-        How {import.meta.env.VITE_WEBSITE_SHORT_NAME} Works?
+        How {WEBSITE_SHORT_NAME} Works?
       </p>
       <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
         <div className="flex flex-col min-w-[30%]  items-center  ">

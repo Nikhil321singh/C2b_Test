@@ -7,7 +7,12 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { FaAngleDown, FaDownload } from "react-icons/fa6";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import AdminNavbar from "../Admin_Navbar";
 import SideMenu from "../SideMenu";
 import ProfileBox from "../ProfileBox/ProfileBox";

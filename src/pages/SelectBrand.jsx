@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDataContext } from "../components/dataContext";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 
 export default function SelectBrand() {

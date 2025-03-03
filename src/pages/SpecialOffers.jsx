@@ -3,7 +3,12 @@ import DevicePriceCards from "../components/DevicePriceCards";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useQuestionContext } from "../components/QuestionContext";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { setOtpVerified } from "../store/slices/otpSlice";
 import { useDispatch, useSelector } from "react-redux";
 import User_Logo from "../assets/User_Logo.jpg";

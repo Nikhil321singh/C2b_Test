@@ -6,9 +6,16 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import CircleCard from "../components/CircleCard";
 import ContinueButton from "../components/ContinueButton";
 import DeviceCard from "../components/DeviceCard";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 const DeviceDetails = () => {
+  const currentDomain = window.location.origin;
+  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
+
   const [dataModel, setDataModel] = useState({});
   const navigate = useNavigate();
   const grestWork = [
@@ -96,7 +103,7 @@ const DeviceDetails = () => {
         <div>
           <div className="my-4">
             <h1 className="text-primary font-semibold text-2xl">
-              How {import.meta.env.VITE_WEBSITE_SHORT_NAME} Works?
+              How {WEBSITE_SHORT_NAME} Works?
             </h1>
           </div>
           <div className="flex justify-around gap-2 text-center">

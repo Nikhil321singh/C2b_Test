@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { useDispatch } from "react-redux";
 import { setUserProfile, setStoreFilter } from "../store/slices/userSlice";
 import "../styles/login.scss";
@@ -13,6 +18,9 @@ import { toast } from "react-hot-toast";
 const homeroute = "/SelectDeviceType";
 
 const Login = () => {
+  const currentDomain = window.location.origin;
+  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
+
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [error, setError] = useState(null);
@@ -29,10 +37,10 @@ const Login = () => {
     console.log(currentDomain,"  " ,bypassedDomain);
     if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
           sessionStorage.setItem("authToken", "");
-          sessionStorage.setItem("profile", JSON.stringify({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
+          sessionStorage.setItem("profile", JSON.stringify({ firstName: WEBSITE_SHORT_NAME }));
           sessionStorage.setItem("DeviceType", "CTG1");
           localStorage.removeItem("formData");
-          dispatch(setUserProfile({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
+          dispatch(setUserProfile({ firstName: WEBSITE_SHORT_NAME}));
           navigate(homeroute);
     }
   }, []);

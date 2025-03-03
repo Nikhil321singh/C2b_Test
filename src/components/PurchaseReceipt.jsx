@@ -1,6 +1,10 @@
 import React from "react";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 const PurchaseReceipt = ({
   imeiNumber,
   uniqueCode,
@@ -18,6 +22,9 @@ const PurchaseReceipt = ({
   address,
   price,
 }) => {
+  const currentDomain = window.location.origin;
+  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
+  const COMPANY_EMAIL = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_COMPANY_BUYBACK_EMAIL : import.meta.env.VITE_COMPANY_EMAIL;
   const maskPhoneNumber = (phNumber) => {
     const visibleLength = Math.ceil(phNumber?.length * 0.25);
     const maskedSection = phNumber?.slice(
@@ -57,7 +64,7 @@ const PurchaseReceipt = ({
           <span className="text-primary"> Contact:</span>{" "}
           {import.meta.env.VITE_COMPANY_CONTACT} ,
           <span className="text-primary"> E-mail:</span>{" "}
-          {import.meta.env.VITE_COMPANY_EMAIL}
+          {COMPANY_EMAIL}
         </p>
       </div>
       <div className="text-center">
@@ -142,7 +149,7 @@ const PurchaseReceipt = ({
           <span className="font-bold underline">{name}</span> Herein after
           referred to as "Seller" who has come in Retail store of{" "}
           <span className="font-bold underline">{storeName}</span> to sell
-          his/her old Gadget, to the {import.meta.env.VITE_WEBSITE_SHORT_NAME} Network herein after referred to as
+          his/her old Gadget, to the {WEBSITE_SHORT_NAME} Network herein after referred to as
           "Purchaser" which expression shall mean and include its
           representative, executors, nominee, partners, affiliates and assigns
           on day of <span className="font-bold">{formattedDate}</span>

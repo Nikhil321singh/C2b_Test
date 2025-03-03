@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import ViewPickupTable from "../../components/ViewPickupTable/ViewPickupTable";
 import { useNavigate } from "react-router-dom";
 import { BeatLoader } from "react-spinners";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import User_Logo from "../../assets/User_Logo.jpg";
 import axios from "axios";
 

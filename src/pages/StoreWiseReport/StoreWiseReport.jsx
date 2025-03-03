@@ -32,7 +32,7 @@ const downloadExcelStoreWise = (apiData) => {
       Price: item?.actualPrice,
       "Price Offered To Customer": item?.price,
       "Unique ID": item?.uniqueCode,
-      [`${import.meta.env.VITE_WEBSITE_SHORT_NAME} Received`]:
+      [`${import.meta.env.VITE_WEBSITE_TITLE} Received`]:
         item?.grestReceived || "NA",
       "Receiving Date": item?.grestRecDate || "NA",
       "New Prices As Per New Range": "NA",
@@ -525,6 +525,9 @@ const MainFilterSub = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStores, setFilteredStores] = useState(storeData);
+  const currentDomain = window.location.origin;
+  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
+
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -577,7 +580,7 @@ const MainFilterSub = ({
           }}
         >
           <p className="truncate">
-            {grestRec === "" ? `${import.meta.env.VITE_WEBSITE_SHORT_NAME} Received ?` : `${import.meta.env.VITE_WEBSITE_SHORT_NAME} Rec. ` + grestRec}
+            {grestRec === "" ? `${WEBSITE_SHORT_NAME} Received ?` : `${WEBSITE_SHORT_NAME} Rec. ` + grestRec}
           </p>
           <FaAngleDown size={17} className={`${grestDrop && rotateCss}`} />
         </div>

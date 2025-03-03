@@ -1,6 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useReducer, useState } from "react";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { IoIosArrowBack } from "react-icons/io";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { useQuestionContext } from "../../components/QuestionContext";
