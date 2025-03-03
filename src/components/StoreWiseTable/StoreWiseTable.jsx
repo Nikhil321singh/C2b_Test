@@ -1,6 +1,9 @@
 import React from "react";
 
 const StoreWiseTable = ({ currentPage, tableData }) => {
+  const currentDomain = window.location.origin;
+  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
+
   return (
     <div>
       <div className="m-2 overflow-x-scroll  md:m-5 ">
@@ -20,7 +23,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
               <th className="p-2 text-sm  ">Price Offered to Customer</th>
               <th className="p-2 text-sm  ">Unique ID</th>
               <th className="p-2 text-sm  ">
-                {import.meta.env.VITE_WEBSITE_SHORT_NAME} Received
+                {WEBSITE_SHORT_NAME} Received
               </th>
               <th className="p-2 text-sm  ">Receiving Date</th>
               <th className="p-2 text-sm  ">New Prices As Per New Range</th>

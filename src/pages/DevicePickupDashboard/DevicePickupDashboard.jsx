@@ -1,54 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import NavigateTable from "../../components/NavigateTable/NavigateTable";
 import PendingDevicesTable from "../../components/PendingDevicesTable/PendingDevicesTable";
 import axios from "axios";
 import { BeatLoader } from "react-spinners";
-import {IoIosCheckmarkCircle, IoIosCloseCircle, IoMdSearch} from "react-icons/io";
-import { IoRefresh } from "react-icons/io5";
-import { BsCalendarDate } from "react-icons/bs";
+import {IoIosCheckmarkCircle, IoIosCloseCircle} from "react-icons/io";
 import styles from "./DevicePickupDashboard.module.css";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import { FaAngleDown, FaDownload } from "react-icons/fa6";
 import SideMenu from "../../components/SideMenu";
 import AdminNavbar from "../../components/Admin_Navbar";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
-import { useDispatch, useSelector } from "react-redux";
-import { setStoreFilter } from "../../store/slices/userSlice";
+import {  useSelector } from "react-redux";
+import DPFilter from "./DPFilter";
 const buttonStyles = "bg-primary text-white";
 const updateStatusError = "Failed to update status";
 const succTextColor = "text-green-500";
 const failTextColor = "text-primary";
 const PickupAvail = "Available For Pickup";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-const id = LoggedInUser?._id || LoggedInUser?.id;
-const RotateCss = "rotate-180";
-
-const downloadExcel = (pendDataDown) => {
-  const fileType =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = ".xlsx";
-  const formattedData = pendDataDown.map((item) => {
-    return {
-      "Lead Id": item._id,
-      Date: new Date(item.createdAt).toLocaleDateString("en-GB"),
-      "Device Name": item.modelName,
-      "IMEI No": item.modelId,
-      "Model Id": item.modelId,
-      Storage: item.storage,
-      Price: item.price,
-      Status: item.status,
-      Location: item.location,
-    };
-  });
-
-  const ws = XLSX.utils.json_to_sheet(formattedData);
-  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  const dataFile = new Blob([excelBuffer], { type: fileType });
-  saveAs(dataFile, "Pending_Devices_Data" + fileExtension);
-};
 
 const DevicePickupDashboard = () => {
   const token = sessionStorage.getItem("authToken");
@@ -76,7 +48,6 @@ const DevicePickupDashboard = () => {
   const [regionData, setRegionData] = useState([]);
   const [allStore, setAllStore] = useState([]);
   const firsttime = useRef(true);
-
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
@@ -102,7 +73,6 @@ const DevicePickupDashboard = () => {
         setIsTableLoaded(false);
       });
   };
-
   const getStore = () => {
     setIsTableLoaded(true);
     const config = {
@@ -131,7 +101,6 @@ const DevicePickupDashboard = () => {
         setIsTableLoaded(false);
       });
   };
-
   const getDataBySearch = () => {
     setIsTableLoaded(true);
     const config = {
@@ -161,7 +130,6 @@ const DevicePickupDashboard = () => {
         setIsTableLoaded(false);
       });
   };
-
   useEffect(() => {
     if (firsttime.current && !!storeName && !!region) {
       getData();
@@ -171,7 +139,6 @@ const DevicePickupDashboard = () => {
       getDataBySearch();
     }
   }, [statusValue, dateValue, storeName, region]);
-
   return (
     <div className="min-h-screen bg-white pb-8">
       <ExtComps
@@ -298,7 +265,6 @@ const ExtComps = ({
     const LDIds = pendingTableData
       ?.filter((obj) => selectedIds.includes(obj._id))
       .map((obj) => obj._id.toString());
-
     const config = {
       method: "post",
       maxBodyLength: Infinity,
@@ -333,7 +299,6 @@ const ExtComps = ({
         setIsTableLoaded(false);
       });
   };
-
   return (
     <React.Fragment>
       {isTableLoaded && (
@@ -407,7 +372,7 @@ const ExtComps = ({
         {LoggedInUser?.role === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-40" src={Grest_Logo} alt="app logo" />
+            <img className="w-40" src={GREST_LOGO} alt="app logo" />
           </div>
         ) : (
           <div className="navbar">
@@ -417,279 +382,6 @@ const ExtComps = ({
         )}
       </div>
     </React.Fragment>
-  );
-};
-
-const DPFilter = ({
-  setSearchValue,
-  searchValue,
-  getDataBySearch,
-  dateValue,
-  statusValue,
-  selectedStatus,
-  setStatusValue,
-  setDateValue,
-  setRegion,
-  region,
-  regionData,
-  storeName,
-  setStoreName,
-  allStore,
-  setStoreData,
-  storeData,
-  pendingTableData,
-  setSelectedStatus,
-  getData,
-}) => {
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const [regionDrop, setRegionDrop] = useState(false);
-  const [storeDrop, setStoreDrop] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filteredStores, setFilteredStores] = useState(storeData);
-  const dispatch = useDispatch();
-
-  const handleRegionChange = (value) => {
-    setRegionDrop(false);
-    setStoreName("");
-    const filteredStores1 = allStore.filter((store) => store.region === value);
-    const storeNamesArray = filteredStores1.map((store) => store.storeName);
-    setStoreData(storeNamesArray);
-    setRegion(value);
-    dispatch(setStoreFilter({ selStore: "", selRegion: value }));
-  };
-
-  const handleStoreChange = (value) => {
-    setStoreDrop(false);
-    const filteredStores2 = allStore?.filter((store) => store.storeName === value);
-    const newRegion = filteredStores2[0].region;
-    setRegion(newRegion);
-    setStoreName(value);
-    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
-  };
-
-  const handleSearchClear = () => {
-    setSearchValue("");
-    setSelectedStatus("");
-    setDateValue("");
-    setRegion("chandigarh");
-    setStoreName(import.meta.env.VITE_USER_STORE_NAME);
-    setSearchTerm("");
-  };
-  useEffect(() => {
-    if (selectedStatus === "" && dateValue === "" && searchValue === "") {
-      getData();
-    }
-  }, [dateValue, selectedStatus, searchValue]);
-
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-
-    if (value === "") {
-      setFilteredStores(storeData);
-    } else {
-      const filtered = storeData.filter((store) =>
-        store.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredStores(filtered);
-    }
-  };
-  const handleFilterClick = () => {
-    setShowFilterDropdown(!showFilterDropdown);
-  };
-
-  const dateChangeHandler = (event) => {
-    const formattedDate = new Date(event.target.value).toLocaleDateString(
-      "en-GB"
-    );
-    setDateValue(formattedDate);
-  };
-
-  return (
-    <div className="px-2 flex flex-col gap-2">
-      <div className="flex gap-2 items-center outline-none">
-        <div className={`${styles.search_bar_wrap}`}>
-          <input
-            onChange={(e) => setSearchValue(e.target.value)}
-            className="text-sm"
-            type="text"
-            placeholder="Search"
-            value={searchValue}
-          />
-          <IoMdSearch onClick={() => getDataBySearch()} size={34} />
-        </div>
-        <div className={styles.icons_box}>
-          <IoRefresh onClick={handleSearchClear} className="" size={25} />
-        </div>
-        <div
-          className={`flex flex-row justify-center items-center ${styles.date_picker_wrap}`}
-        >
-          <input
-            type="date"
-            id="datepicker"
-            style={{ color: "var(--primary-color)" }}
-            className=""
-            value={dateValue}
-            onChange={dateChangeHandler}
-          />
-          <div
-            className={styles.date_box}
-            onClick={() => document.getElementById("datepicker").showPicker()}
-          >
-            <p>{dateValue ? dateValue : "DD/MM/YYYY"}</p>
-            <BsCalendarDate size={25} />
-          </div>
-        </div>
-      </div>
-      <DPFilterSub
-        handleFilterClick={handleFilterClick}
-        statusValue={statusValue}
-        showFilterDropdown={showFilterDropdown}
-        setStatusValue={setStatusValue}
-        pendingTableData={pendingTableData}
-      />
-      <div className="flex gap-2 w-100 items-center outline-none">
-        <div className="relative w-[45%]">
-          <div
-            className={`w-[100%] ${styles.filter_button}`}
-            onClick={() => {
-              setRegionDrop(!regionDrop);
-            }}
-          >
-            <p className="truncate">
-              {region === "" ? "Select Region" : region}
-            </p>
-            <FaAngleDown size={17} className={`${regionDrop && RotateCss}`} />
-          </div>
-          {regionDrop && (
-            <div className={`w-[100%] ${styles.filter_drop}`}>
-              {regionData.map((item) => (
-                <div
-                  key={item}
-                  onClick={() => handleRegionChange(item)}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{item}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="relative w-[70%]">
-          <div
-            className={`${styles.filter_button} w-full`}
-            onClick={() => setStoreDrop(!storeDrop)}
-          >
-            <p className="truncate">
-              {searchTerm === "" ? "Select Store" : searchTerm}
-            </p>
-            <FaAngleDown size={17} className={`${storeDrop && RotateCss}`} />
-          </div>
-          {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
-                placeholder="Search store..."
-              />
-              <div
-                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
-              >
-                {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item);
-                        setStoreDrop(false);
-                      }}
-                      className={`${styles.filter_option}`}
-                    >
-                      <p className="truncate">{item}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const DPFilterSub = ({
-  handleFilterClick,
-  statusValue,
-  showFilterDropdown,
-  setStatusValue,
-  pendingTableData,
-}) => {
-  return (
-    <div className="flex gap-2 items-center outline-none">
-      <div className="relative">
-        <div className={`${styles.filter_button}`} onClick={handleFilterClick}>
-          <p className="truncate">
-            {statusValue === "" ? "Select Status" : statusValue}
-          </p>
-          <FaAngleDown
-            size={17}
-            className={`${showFilterDropdown && RotateCss}`}
-          />
-        </div>
-        {showFilterDropdown && (
-          <div className={`${styles.filter_drop}`}>
-            <div
-              onClick={() => {
-                setStatusValue(PickupAvail);
-                handleFilterClick();
-              }}
-              className={`${styles.filter_option}`}
-            >
-              <p>Available for Pickup</p>
-            </div>
-            <div
-              onClick={() => {
-                setStatusValue("On Hold");
-                handleFilterClick();
-              }}
-              className={`${styles.filter_option}`}
-            >
-              <p>On Hold</p>
-            </div>
-            <div
-              onClick={() => {
-                setStatusValue("Cancelled");
-                handleFilterClick();
-              }}
-              className={`${styles.filter_option}`}
-            >
-              <p>Cancelled</p>
-            </div>
-            <div
-              onClick={() => {
-                setStatusValue("");
-                handleFilterClick();
-              }}
-              className={`${styles.filter_option}`}
-            >
-              <p>Show All</p>
-            </div>
-          </div>
-        )}
-      </div>
-      <button
-        className={`${styles.bulkdown_button}`}
-        onClick={() => downloadExcel(pendingTableData)}
-      >
-        <FaDownload /> Bulk Download
-      </button>
-    </div>
   );
 };
 
@@ -715,7 +407,6 @@ const PDTable = ({
   const token2 = sessionStorage.getItem("authToken");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showHoldModal, setShowHoldModal] = useState(false);
-
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {
       setErrorMsg("No device selected");
@@ -725,11 +416,9 @@ const PDTable = ({
     const newStatus = event.target.value;
     setSelectedStatus(newStatus);
     setIsTableLoaded(true);
-
     const LDIds = pendingTableData
       .filter((obj) => selectedIds.includes(obj._id))
       .map((obj) => obj._id.toString());
-
     let config;
     if (newStatus === PickupAvail) {
       config = {
@@ -766,7 +455,6 @@ const PDTable = ({
         },
       };
     }
-
     axios
       .request(config)
       .then((response) => {
@@ -790,7 +478,6 @@ const PDTable = ({
       });
     setSelectedStatus("");
   };
-
   const confHandler = () => {
     setIsTableLoaded(true);
     if (selectedIds.length === 0) {
@@ -801,7 +488,6 @@ const PDTable = ({
       setConfMod(true);
     }
   };
-
   return (
     <React.Fragment>
       <PendingDevicesTable
@@ -830,7 +516,6 @@ const PDTable = ({
           Request For Pickup
         </button>
       </div>
-
       {showCancelModal && (
         <CancelModal
           setShowCancelModal={setShowCancelModal}
@@ -848,7 +533,6 @@ const PDTable = ({
           setFailMode={setFailMode}
         />
       )}
-
       {showHoldModal && (
         <HoldModal
           setShowHoldModal={setShowHoldModal}
@@ -884,7 +568,6 @@ const CancelModal = ({
   setFailMode,
 }) => {
   const [cancelReason, setCancelReason] = useState("");
-
   const handleCancelSubmit = () => {
     setIsTableLoaded(true);
     const config = {
@@ -921,7 +604,6 @@ const CancelModal = ({
     setShowCancelModal(false);
     setCancelReason("");
   };
-
   return (
     <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
       <div className={`${styles.err_mod_box} ${failTextColor}`}>
@@ -966,7 +648,6 @@ const HoldModal = ({
   setFailMode,
 }) => {
   const [holdReason, setHoldReason] = useState("");
-
   const handleHoldSubmit = () => {
     setIsTableLoaded(true);
     const config = {

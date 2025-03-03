@@ -5,7 +5,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ImArrowLeft } from "react-icons/im";
 import store from "../../store/store";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { useSelector } from "react-redux";
 import banner from "../../assets/banner.jpg";
 import { GoDotFill } from "react-icons/go";
@@ -395,7 +400,7 @@ const MainQContainer = ({
           <img
             onClick={() => navigate("/selectdevicetype")}
             className="w-40"
-            src={Grest_Logo}
+            src={GREST_LOGO}
             alt="app logo"
           />
         </div>

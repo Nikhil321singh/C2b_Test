@@ -3,7 +3,12 @@ import NavigateTable from "../../components/NavigateTable/NavigateTable";
 import axios from "axios";
 import styles from "./PickedUpDevices.module.css";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import ViewPickupTable from "../../components/ViewPickupTable/ViewPickupTable";
 import {
   IoIosCheckmarkCircle,
@@ -263,7 +268,7 @@ const ExtComps = ({
         {userRole === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-40" src={Grest_Logo} alt="app logo" />
+            <img className="w-40" src={GREST_LOGO} alt="app logo" />
           </div>
         ) : (
           <div className="navbar">

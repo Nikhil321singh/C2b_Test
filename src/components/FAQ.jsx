@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 const FAQ = () => {
+  const currentDomain = window.location.origin;
+  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
   const faqData = [
     {
       question: "How did you calculate my device price?",
@@ -8,8 +10,8 @@ const FAQ = () => {
         "Your price is calculated by determining the condition and working of your phone",
     },
     {
-      question: `Is it safe to sell my phone on ${import.meta.env.VITE_WEBSITE_SHORT_NAME}?`,
-      answer: `Yes, it is 100% safe to sell your phone on ${import.meta.env.VITE_WEBSITE_SHORT_NAME}`,
+      question: `Is it safe to sell my phone on ${WEBSITE_SHORT_NAME}?`,
+      answer: `Yes, it is 100% safe to sell your phone on ${WEBSITE_SHORT_NAME}`,
     },
   ];
 

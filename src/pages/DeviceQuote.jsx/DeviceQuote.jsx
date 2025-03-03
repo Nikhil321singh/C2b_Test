@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import styles from "./DeviceQuote.module.css";
 import QuoteModal from "../../components/QuoteModal/QuoteModal";
 import ContOTP from "../../components/ContOTP/ContOTP";
@@ -27,7 +32,6 @@ const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) => {
 };
 
 const DeviceQuote = () => {
-  const currentDomain = window.location.origin;
   const dispatch = useDispatch();
   const Device = sessionStorage.getItem("DeviceType");
   const DummyImg = Device === "CTG1"
@@ -104,7 +108,7 @@ const DeviceQuote = () => {
           <img
             onClick={() => navigate(deviceTypePage)}
             className="w-40"
-            src={Grest_Logo}
+            src={GREST_LOGO}
             alt="app logo"
           />
         </div>

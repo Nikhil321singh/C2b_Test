@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import "../styles/ForgetPassword.scss";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineMailLock } from "react-icons/md";
@@ -105,7 +110,7 @@ const ForgetPassword = () => {
     <div className="outer">
       <div className="flex flex-col items-center justify-center box">
         <div className="imgBox">
-          <img className="w-48" src={Grest_Logo} />
+          <img className="w-48" src={GREST_LOGO} />
           <h1 className="mb-2 text-2xl font-semibold sm:text-3xl">
             Password Recovery
           </h1>

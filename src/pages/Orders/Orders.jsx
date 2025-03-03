@@ -1,7 +1,12 @@
 import AppFooter from "../../components/AppFooter";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { useNavigate, useParams } from "react-router";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import styles from "../SelectDevice/SelectDevice.module.css";
 import { useEffect, useState } from "react";
 import OrdersCreated from "../OrdersCreated/OrdersCreated";
@@ -51,7 +56,7 @@ function Orders() {
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-40"
-              src={Grest_Logo}
+              src={GREST_LOGO}
               alt="app logo"
             />
           </div>
