@@ -357,7 +357,7 @@ export const BrandList = ({ deviceType }) => {
 
     const shouldNavigate =
       (deviceType === "CTG1" && allowedBrandsCTG1.has(brandItem.name)) ||
-      (deviceType === "CTG2" && brandItem.name === "Apple");
+      ((deviceType === "CTG2" || deviceType === "CTG5") && brandItem.name === "Apple");
 
     if (shouldNavigate) {
       const detail = { brand: brandItem, models: {}, _id: brandItem._id };
