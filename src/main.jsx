@@ -10,7 +10,7 @@ const currentDomain = window.location.origin;
 const WEBSITE_TITLE = import.meta.env.VITE_WEBSITE_TITLE || "Unicorn";
 const BUYBACK_TITLE = import.meta.env.VITE_WEBSITE_GREST_TITLE || "Grest";
 const DEFAULT_FAVICON = "/Grest_Logo.jpg";
-const BUYBACK_FAVICON = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+const BUYBACK_FAVICON = "/Buyback_Logo.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
 
