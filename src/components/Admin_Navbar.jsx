@@ -5,7 +5,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 
 function AdminNavbar({ setsideMenu, sideMenu }) {
   return (
@@ -44,7 +44,7 @@ function AdminNavbar({ setsideMenu, sideMenu }) {
             <span>admin</span>
           </div>
 
-          <img className="w-40" src={Grest_Logo} alt="" />
+          <img className="w-40" src={GREST_LOGO} alt="" />
         </div>
       </div>
     </>

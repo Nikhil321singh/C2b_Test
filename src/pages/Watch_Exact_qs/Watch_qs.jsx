@@ -22,7 +22,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import question1 from "../../assets/question1.png";
 import question2 from "../../assets/question2.png";
 import question3 from "../../assets/question3.png";
@@ -265,7 +265,7 @@ const WatchHeader = ({ WTCstate, dispatch }) => {
           <img
             onClick={() => navigate("/selectdevicetype")}
             className="w-40"
-            src={Grest_Logo}
+            src={GREST_LOGO}
             alt="app logo"
           />
         </div>

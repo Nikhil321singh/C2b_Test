@@ -6,7 +6,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { useDispatch } from "react-redux";
 import { setUserProfile, setStoreFilter } from "../store/slices/userSlice";
 import "../styles/login.scss";
@@ -18,7 +18,6 @@ import { toast } from "react-hot-toast";
 const homeroute = "/SelectDeviceType";
 
 const Login = () => {
-  const currentDomain = window.location.origin;
   const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
 
   const [userEmail, setUserEmail] = useState("");
@@ -32,7 +31,6 @@ const Login = () => {
   useEffect(() => {
     sessionStorage.clear();
     localStorage.clear();
-    const currentDomain = window.location.origin;
     const bypassedDomain = import.meta.env.BYPASSED_DOMAIN;
     console.log(currentDomain,"  " ,bypassedDomain);
     if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
@@ -111,7 +109,7 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white Container">
       <div className="flex flex-col items-center justify-center px-10 pb-4 secondContainer">
-        <img className="w-48 pt-4 mt-2 mb-4" src={Grest_Logo} alt="app logo" />
+        <img className="w-48 pt-4 mt-2 mb-4" src={GREST_LOGO} alt="app logo" />
         <h1 className="font-sans text-primary mt-2 text-3xl font-bold sm:text-4xl">
           Login
         </h1>

@@ -5,7 +5,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "../SelectDeviceType/SelectDeviceType.module.css";
@@ -87,7 +87,7 @@ const OrdersCompleted = ({ daysfilters, head }) => {
             <img
               className="w-40"
               onClick={() => navigate("/selectdevicetype")}
-              src={Grest_Logo}
+              src={GREST_LOGO}
               alt="app logo"
             />
           </div>

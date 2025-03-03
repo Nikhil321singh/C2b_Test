@@ -525,7 +525,6 @@ const MainFilterSub = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStores, setFilteredStores] = useState(storeData);
-  const currentDomain = window.location.origin;
   const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
 
   const handleSearch = (e) => {

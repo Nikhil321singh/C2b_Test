@@ -13,7 +13,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import axios from "axios";
 import { auth } from "../../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
@@ -110,7 +110,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     function onOTPVerify() {
       setLoading(true);
           const leadId = sessionStorage.getItem("LeadId");
-          const currentDomain = window.location.origin;
       window.confirmationResult
         .confirm(otp)
         .then(async (res) => {
@@ -237,7 +236,7 @@ export const MainOtpUI = ({
         <img
           onClick={() => navigate("/selectdevicetype")}
           className="w-40"
-          src={Grest_Logo}
+          src={GREST_LOGO}
           alt="app logo"
         />
       </div>

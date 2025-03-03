@@ -8,7 +8,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import ViewPickupTable from "../../components/ViewPickupTable/ViewPickupTable";
 import { BeatLoader } from "react-spinners";
 import {
@@ -268,7 +268,7 @@ const ExtComps = ({
         {userRole === "Technician" ? (
           <div className="w-full flex items-center justify-between">
             <ProfileBox />
-            <img src={Grest_Logo} className="w-40" alt="app logo" />
+            <img src={GREST_LOGO} className="w-40" alt="app logo" />
           </div>
         ) : (
           <div className="navbar">

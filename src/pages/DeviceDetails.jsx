@@ -11,9 +11,8 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 const DeviceDetails = () => {
-  const currentDomain = window.location.origin;
   const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
 
   const [dataModel, setDataModel] = useState({});
@@ -61,7 +60,7 @@ const DeviceDetails = () => {
           <img
             onClick={handleLogoClick}
             className="w-36 sm:w-40"
-            src={Grest_Logo}
+            src={GREST_LOGO}
             alt="app logo"
           />
         </div>

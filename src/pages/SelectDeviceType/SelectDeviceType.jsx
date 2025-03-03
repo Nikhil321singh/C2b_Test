@@ -9,7 +9,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { useLocation, useNavigate } from "react-router";
 import styles from "./SelectDeviceType.module.css";
 import apple from "../../assets/apple-logo.png";
@@ -737,7 +737,7 @@ const SearchBox = ({
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-          <img className="w-40" src={Grest_Logo} alt="app logo" />
+          <img className="w-40" src={GREST_LOGO} alt="app logo" />
         </div>
       </div>
       {isSearchBoxOpen && (
@@ -834,7 +834,6 @@ const MiddlePart = ({
 }) => {
   const Device1 = sessionStorage.getItem("DeviceType");
   const [selectedBtn, setSelectedBtn] = useState(Device1 || "");
-  const currentDomain = window.location.origin;
   const WEBSITE_SHORT_NAME = currentDomain === buyback ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
 
   useEffect(() => {

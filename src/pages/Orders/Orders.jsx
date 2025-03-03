@@ -6,7 +6,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import styles from "../SelectDevice/SelectDevice.module.css";
 import { useEffect, useState } from "react";
 import OrdersCreated from "../OrdersCreated/OrdersCreated";
@@ -56,7 +56,7 @@ function Orders() {
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-40"
-              src={Grest_Logo}
+              src={GREST_LOGO}
               alt="app logo"
             />
           </div>

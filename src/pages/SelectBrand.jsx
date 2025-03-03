@@ -7,7 +7,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 
 export default function SelectBrand() {
@@ -96,7 +96,7 @@ export default function SelectBrand() {
           <span className="w-4/5 text-xl md:text-3xl ml-4">
             Select Brand/Model
           </span>
-          <img className="w-36 sm:w-40" src={Grest_Logo} alt="" />
+          <img className="w-36 sm:w-40" src={GREST_LOGO} alt="" />
         </div>
       </div>
 

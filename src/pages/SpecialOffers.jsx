@@ -8,7 +8,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { setOtpVerified } from "../store/slices/otpSlice";
 import { useDispatch, useSelector } from "react-redux";
 import User_Logo from "../assets/User_Logo.jpg";
@@ -32,7 +32,7 @@ export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
         onClick={hanldePermanenet}
       >
         <div className="rounded-full bg-white flex items-center justify-center border-2 h-[70px] w-[70px]">
-          <img className="w-[75%]" src={Grest_Logo} alt="" />
+          <img className="w-[75%]" src={GREST_LOGO} alt="" />
         </div>
         <div className="">
           <p className="font-bold  w-[80px] text-xl relative ]">{code}</p>
@@ -68,7 +68,7 @@ export const DynamicCouponCard = ({
         onClick={hanldePermanenet}
       >
         <div className="rounded-full bg-white flex items-center justify-center border-2 h-[70px] w-[70px]">
-          <img className="w-[75%]" src={Grest_Logo} alt="" />
+          <img className="w-[75%]" src={GREST_LOGO} alt="" />
         </div>
         <div className="">
           <p className="font-bold  w-[80px] text-xl relative ]">{`GRU${discount}`}</p>
@@ -274,7 +274,7 @@ const SubSpecialOffers = ({
           <img
             onClick={() => navigate("/selectdevicetype")}
             className="w-40"
-            src={Grest_Logo}
+            src={GREST_LOGO}
             alt="app logo"
           />
         </div>

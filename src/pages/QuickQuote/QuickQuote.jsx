@@ -5,7 +5,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { IoIosArrowBack } from "react-icons/io";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { useQuestionContext } from "../../components/QuestionContext";
@@ -184,7 +184,7 @@ const QuickQuote = () => {
             className="w-40"
             onClick={() => navigate("/selectdevicetype")}
             alt="app logo"
-            src={Grest_Logo}
+            src={GREST_LOGO}
           />
         </div>
       </div>

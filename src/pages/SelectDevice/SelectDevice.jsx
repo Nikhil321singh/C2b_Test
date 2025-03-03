@@ -6,7 +6,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import styles from "./SelectDevice.module.css";
 import AppFooter from "../../components/AppFooter";
 import apple_watch from "../../assets/apple_watch.png";
@@ -165,7 +165,7 @@ const SelectDevice = () => {
           <img
             onClick={() => navigate("/selectdevicetype")}
             className="w-40"
-            src={Grest_Logo}
+            src={GREST_LOGO}
             alt="app logo"
           />
         </div>

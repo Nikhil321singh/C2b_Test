@@ -4,7 +4,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { useNavigate } from "react-router-dom";
 import { BsCartCheckFill } from "react-icons/bs";
 const navtoSelDevTP = "/selectdevicetype";
@@ -46,7 +46,7 @@ const ThankYou = () => {
           <img
             onClick={() => navigate(navtoSelDevTP)}
             className="w-40"
-            src={Grest_Logo}
+            src={GREST_LOGO}
             alt="app logo"
           />
         </div>

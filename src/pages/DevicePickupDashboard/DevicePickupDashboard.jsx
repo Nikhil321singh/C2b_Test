@@ -2,9 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 const currentDomain = window.location.origin;
 const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
-
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import NavigateTable from "../../components/NavigateTable/NavigateTable";
 import PendingDevicesTable from "../../components/PendingDevicesTable/PendingDevicesTable";
 import axios from "axios";
@@ -29,7 +28,6 @@ const PickupAvail = "Available For Pickup";
 const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 const id = LoggedInUser?._id || LoggedInUser?.id;
 const RotateCss = "rotate-180";
-
 const downloadExcel = (pendDataDown) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -412,7 +410,7 @@ const ExtComps = ({
         {LoggedInUser?.role === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-40" src={Grest_Logo} alt="app logo" />
+            <img className="w-40" src={GREST_LOGO} alt="app logo" />
           </div>
         ) : (
           <div className="navbar">

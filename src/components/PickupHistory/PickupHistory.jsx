@@ -12,7 +12,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import AdminNavbar from "../Admin_Navbar";
 import SideMenu from "../SideMenu";
 import ProfileBox from "../ProfileBox/ProfileBox";
@@ -155,7 +155,7 @@ const [filteredStores, setFilteredStores] = useState(storeData);
         {userRole === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
-            <img className="w-40" src={Grest_Logo} alt="app logo" />
+            <img className="w-40" src={GREST_LOGO} alt="app logo" />
           </div>
         ) : (
           <div className="navbar">

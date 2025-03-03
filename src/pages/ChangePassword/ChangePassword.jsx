@@ -7,7 +7,7 @@ const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const Grest_Logo = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { MdOutlineMailLock } from "react-icons/md";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -157,7 +157,7 @@ const passwordValidation = () => {
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-40"
-              src={Grest_Logo}
+              src={GREST_LOGO}
               alt="app logo"
             />
           </div>
@@ -208,7 +208,7 @@ const PasswordChange = ({
     <div className="flex flex-col items-center justify-center w-full h-full mt-16">
       <div className="flex flex-col items-center justify-center box">
         <div className="imgBox">
-          <img className="w-48 pt-4 mt-2 mb-3" src={Grest_Logo} />
+          <img className="w-48 pt-4 mt-2 mb-3" src={GREST_LOGO} />
           <h1 className="font-sans text-primary my-2 text-3xl font-bold sm:text-4xl">
             Change Password
           </h1>
