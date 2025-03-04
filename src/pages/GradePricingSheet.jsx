@@ -51,7 +51,7 @@ const downloadExcelGradePricingSheet = (apiData) => {
 };
 
 const handleSampleDownload = () => {
-  const sampleFilePath = "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/sample-file%20%287%29.xlsx";
+  const sampleFilePath = "https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gradepricing-sample-file.xlsx";
   window.open(sampleFilePath, "_blank");
 };
 
