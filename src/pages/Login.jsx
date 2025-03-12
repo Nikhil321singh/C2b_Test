@@ -22,8 +22,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    sessionStorage.clear();
-    localStorage.clear();
     const currentDomain = window.location.origin;
     const bypassedDomain = import.meta.env.BYPASSED_DOMAIN;
     console.log(currentDomain,"  " ,bypassedDomain);
@@ -45,6 +43,8 @@ const Login = () => {
     } else {
       setIsLoading(true);
       setError(null);
+      sessionStorage.clear();
+      localStorage.clear();
       axios
         .post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/users/login`, {
           email: userEmail,

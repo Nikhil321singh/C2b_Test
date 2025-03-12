@@ -11,6 +11,7 @@ import apple_watch from "../../assets/apple_watch.png";
 import { setResponseData } from "../../store/slices/responseSlice";
 import { toast } from "react-hot-toast";
 const buyback = import.meta.env.VITE_BUYBACK_URL;
+const switchKart = import.meta.env.VITE_SWITCHKART_URL;
 
 const deviceTypePage = "/selectdevicetype";
 
@@ -143,7 +144,7 @@ const DeviceQuote = () => {
             currentDomain !== buyback && (
               <div className="flex flex-row items-center justify-between px-2 my-2">
                 <div className="w-[40%] font-medium text-gray-700">
-                  Bonus Amount :
+                {currentDomain === switchKart && ("SwitchKart")} Bonus Amount :
                 </div>
                 <div className="rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-primary flex flex-col items-center justify-center">
                   <input
