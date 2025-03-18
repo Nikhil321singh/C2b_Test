@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { CiSearch, CiBarcode } from "react-icons/ci";
 import { IoClose } from "react-icons/io5";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { IoArrowBack } from "react-icons/io5";
 import AppFooter from "../../components/AppFooter";
 import Grest_Logo from "../../assets/Grest_Logo.jpg";
 import { useLocation, useNavigate } from "react-router";
@@ -730,9 +731,17 @@ const SearchBox = ({
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full pr-2">
+        <div className="flex items-center justify-between w-full px-4">
           <ProfileBox />
-          <img className="w-40" src={Grest_Logo} alt="app logo" />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full flex items-center justify-center"
+            >
+              <IoArrowBack size={24} />
+            </button>
+            <img className="w-[150px] max-w-[150px] object-contain" src={Grest_Logo} alt="app logo" />
+          </div>
         </div>
       </div>
       {isSearchBoxOpen && (

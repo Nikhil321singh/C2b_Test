@@ -21,6 +21,7 @@ import styless from "./QuickQuote.module.css";
 import { CgSpinner } from "react-icons/cg";
 import useUserProfile from "../../utils/useUserProfile";
 import { setResponseData } from "../../store/slices/responseSlice";
+import { IoArrowBack } from "react-icons/io5";
 
 const PinkBgWhText = "bg-primary text-white";
 
@@ -173,14 +174,22 @@ const QuickQuote = () => {
   return (
     <div className="mainQContainer">
       <div className="flex items-center w-screen py-4 h-16 border-b-2  bg-white HEADER header">
-        <div className="w-full flex items-center justify-between pr-2">
+        <div className="w-full flex items-center justify-between px-4">
           <ProfileBox />
-          <img
-            className="w-40"
-            onClick={() => navigate("/selectdevicetype")}
-            alt="app logo"
-            src={Grest_Logo}
-          />
+          <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center justify-center text-white ml-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+              >
+              <IoArrowBack size={24} />
+            </button>
+            <img
+              onClick={() => navigate("/selectdevicetype")}
+              className="w-[150px] max-w-[150px] object-contain cursor-pointer"
+              src={Grest_Logo}
+              alt="app logo"
+              />
+          </div>
         </div>
       </div>
       <div className={`${styless.quick_page_nav}`}>

@@ -10,6 +10,7 @@ import User_Logo from "../assets/User_Logo.jpg";
 import SummaryModal from "../components/SummaryModal";
 import { CgSpinner } from "react-icons/cg";
 import apple_watch from "../assets/apple_watch.png";
+import { IoArrowBack } from "react-icons/io5";
 
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
@@ -256,24 +257,30 @@ const SubSpecialOffers = ({
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
   return (
     <div>
-      <div
-        className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}
-      >
-        <div className="flex items-center justify-between w-full ">
-          <div className="flex flex-row-reverse items-center gap-2 ml-4">
-            <p className="mr-4 text-base md:text-xl">{LoggedInUser?.name}</p>
+    <div className="flex items-center border-b-2 w-full max-w-screen-lg mx-auto h-16 py-4 bg-white HEADER px-4">
+      <div className="flex items-center justify-between w-full gap-2">
+        <div className="flex flex-row-reverse items-center gap-x-4">
+          <p className="text-base md:text-xl">{LoggedInUser?.name}</p>
+          <img className="w-[30px] shrink-0" src={User_Logo} alt="User" />
+        </div>
 
-            <img className="w-[30px]" src={User_Logo} alt="" />
-          </div>
+        <div className="flex items-center gap-x-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+          >
+            <IoArrowBack size={24} />
+          </button>
 
           <img
-            onClick={() => navigate("/selectdevicetype")}
-            className="w-40"
+            onClick={() => navigate('/selectdevicetype')}
+            className="w-[120px] max-w-[120px] object-contain cursor-pointer shrink-0"
             src={Grest_Logo}
-            alt="app logo"
+            alt="App Logo"
           />
         </div>
       </div>
+    </div>
       <div className="w-[90%] md:w-[70%] mx-auto mt-4  ">
         <p className="mb-2 text-lg font-medium">
           The best price for your phone is:
