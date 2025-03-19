@@ -23,7 +23,7 @@ const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) => {
       : Number(Price) + Number(bonus);
   } else {
     return savedBonus
-      ? Number(Price) - Number(savedBonus)
+      ? Number(Price)
       : Number(Price);
   }
 };
@@ -267,7 +267,7 @@ const SubDeviceQuote = ({
         <p>
           ₹
           {savedBonus
-            ? Number(Price) + Number(bonus) - Number(savedBonus)
+            ? Number(Price) + Number(bonus)
             : Number(Price) + Number(bonus)}
         </p>
       </div>
