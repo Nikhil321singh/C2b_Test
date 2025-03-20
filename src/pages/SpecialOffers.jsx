@@ -10,7 +10,6 @@ import User_Logo from "../assets/User_Logo.jpg";
 import SummaryModal from "../components/SummaryModal";
 import { CgSpinner } from "react-icons/cg";
 import apple_watch from "../assets/apple_watch.png";
-import { IoArrowBack } from "react-icons/io5";
 
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
@@ -259,19 +258,17 @@ const SubSpecialOffers = ({
     <div>
     <div className="flex items-center border-b-2 w-full max-w-screen-lg mx-auto h-16 py-4 bg-white HEADER px-4">
       <div className="flex items-center justify-between w-full gap-2">
-        <div className="flex flex-row-reverse items-center gap-x-4">
-          <p className="text-base md:text-xl">{LoggedInUser?.name}</p>
-          <img className="w-[30px] shrink-0" src={User_Logo} alt="User" />
-        </div>
-
-        <div className="flex items-center gap-x-2">
+          <div className="flex flex-row-reverse items-center gap-2 ml-4">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-          >
-            <IoArrowBack size={24} />
+            className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+            Back
           </button>
-
+            <p className=" text-base md:text-xl">{userName}</p>
+            <img className="w-[30px]" src={User_Logo} alt="" />
+          </div>
+          <div className="flex items-center justify-between gap-2">
           <img
             onClick={() => navigate('/selectdevicetype')}
             className="w-[120px] max-w-[120px] object-contain cursor-pointer shrink-0"

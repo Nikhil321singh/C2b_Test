@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import User_Logo from "../../assets/User_Logo.jpg";
-import { IoClose } from "react-icons/io5";
+import { IoArrowBack, IoClose } from "react-icons/io5";
 import styles from "./ProfileBox.module.css";
 import { useNavigate } from "react-router";
 
@@ -66,7 +66,13 @@ const ProfileBox = () => {
 
   return (
     <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
-      <p className="mr-4 text-base  md:text-xl">{userName}</p>
+      <button
+        onClick={() => navigate(-1)}
+        className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+        >
+        Back
+      </button>
+      <p className=" text-base  md:text-xl">{userName}</p>
       <img
         onClick={profileHandler}
         className="w-[30px]"

@@ -7,7 +7,7 @@ import AppFooter from "../../components/AppFooter";
 import apple_watch from "../../assets/apple_watch.png";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io";
-import { IoArrowBack } from "react-icons/io5";
+
 import { BeatLoader } from "react-spinners";
 const data = JSON.parse(sessionStorage.getItem("dataModel"));
 
@@ -159,12 +159,6 @@ const SelectDevice = () => {
         <div className="flex items-center justify-between w-full px-4">
           <ProfileBox />
           <div className="flex items-center justify-between gap-2">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center justify-center text-white ml-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-              >
-              <IoArrowBack size={24} />
-            </button>
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-[150px] max-w-[150px] object-contain cursor-pointer"
