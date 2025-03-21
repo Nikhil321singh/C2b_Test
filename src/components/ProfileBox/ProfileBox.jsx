@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import User_Logo from "../../assets/User_Logo.jpg";
 import { IoArrowBack, IoClose } from "react-icons/io5";
 import styles from "./ProfileBox.module.css";
-import { useNavigate } from "react-router";
 
 function setName(firstName, lastName) {
   if (!firstName && !lastName) {
@@ -24,6 +24,7 @@ function setName(firstName, lastName) {
 
 const ProfileBox = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [userName, setUserName] = useState();
   const [userEmail, setUserEmail] = useState();
   const [userRole, setUserRole] = useState();
@@ -65,13 +66,15 @@ const ProfileBox = () => {
   }
 
   return (
-    <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
-      <button
-        onClick={() => navigate(-1)}
-        className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+    <div className="select-none flex ml-4 z-40 gap-2 flex-row-reverse items-center">
+      {!["/selectdevicetype", "/selectdevicetype/"].includes(location.pathname.toLowerCase().replace(/\/$/, "")) && (
+        <button
+          onClick={() => navigate(-1)}
+          className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
         >
-        Back
-      </button>
+          Back
+        </button>
+      )}
       <p className=" text-base  md:text-xl">{userName}</p>
       <img
         onClick={profileHandler}
