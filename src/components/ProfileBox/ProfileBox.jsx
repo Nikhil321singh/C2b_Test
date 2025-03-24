@@ -75,7 +75,7 @@ const ProfileBox = () => {
       {/* {!["/selectdevicetype", "/selectdevicetype/"].includes(location.pathname.toLowerCase().replace(/\/$/, "")) && (
         <button
           onClick={() => navigate(-1)}
-          className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+          className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
         >
           <IoArrowBack
             size={24}

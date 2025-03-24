@@ -131,7 +131,7 @@ const Price = () => {
           <div className="flex flex-row-reverse items-center gap-2 ml-4">
           <button
             onClick={() => navigate(-1)}
-            className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
             >
           <IoArrowBack
             size={24}
