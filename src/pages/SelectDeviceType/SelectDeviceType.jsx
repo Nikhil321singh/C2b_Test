@@ -5,7 +5,12 @@ import { IoClose } from "react-icons/io5";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 import AppFooter from "../../components/AppFooter";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { useLocation, useNavigate } from "react-router";
 import styles from "./SelectDeviceType.module.css";
 import apple from "../../assets/apple-logo.png";
@@ -353,7 +358,7 @@ export const BrandList = ({ deviceType }) => {
 
     const shouldNavigate =
       (deviceType === "CTG1" && allowedBrandsCTG1.has(brandItem.name)) ||
-      (deviceType === "CTG2" && brandItem.name === "Apple");
+      ((deviceType === "CTG2" || deviceType === "CTG5") && brandItem.name === "Apple");
 
     if (shouldNavigate) {
       const detail = { brand: brandItem, models: {}, _id: brandItem._id };
@@ -731,11 +736,9 @@ const SearchBox = ({
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full px-4">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-          <div className="flex items-center gap-2">
-            <img className="w-[150px] max-w-[150px] object-contain" src={Grest_Logo} alt="app logo" />
-          </div>
+          <img className="w-40" src={GREST_LOGO} alt="app logo" />
         </div>
       </div>
       {isSearchBoxOpen && (
@@ -832,13 +835,13 @@ const MiddlePart = ({
 }) => {
   const Device1 = sessionStorage.getItem("DeviceType");
   const [selectedBtn, setSelectedBtn] = useState(Device1 || "");
+  const WEBSITE_SHORT_NAME = currentDomain === buyback ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
 
   useEffect(() => {
     if (Device1) {
       setSelectedBtn(Device1);
     }
   }, [Device1]);
-  const currentDomain = window.location.origin;
   return (
     <div className={styles.des_main_wrap}>
       <div className={styles.des_lr_wrap}>
@@ -957,7 +960,7 @@ const MiddlePart = ({
       <p
         className={`${styles.topSell_head} text-lg font-bold mt-2 text-primary`}
       >
-        How {import.meta.env.VITE_WEBSITE_SHORT_NAME} Works?
+        How {WEBSITE_SHORT_NAME} Works?
       </p>
       <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
         <div className="flex flex-col min-w-[30%]  items-center  ">

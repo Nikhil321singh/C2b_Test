@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Grest_Logo from "../../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import FAQ from "../../components/FAQ";
 import styles from "./SelectModel.module.css";
 import { useNavigate } from "react-router";
@@ -7,7 +12,6 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import store from "../../store/store";
 import { useQuestionContext } from "../../components/QuestionContext";
 import apple_watch from "../../assets/apple_watch.png";
-
 
 const SelectModel = () => {
   const phoneImg = JSON.parse(sessionStorage.getItem("dataModel"));
@@ -79,22 +83,19 @@ const SelectModel = () => {
       console.log("watch");
     }
   };
-  const currentDomain = window.location.origin;
   const buyback = import.meta.env.VITE_BUYBACK_URL;
 
   return (
     <div className={`bg-white min-h-screen`}>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full px-4">
+        <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-          <div className="flex items-center justify-between gap-2">
-            <img
-              onClick={() => navigate("/selectdevicetype")}
-              className="w-[150px] max-w-[150px] object-contain cursor-pointer"
-              src={Grest_Logo}
-              alt="app logo"
-              />
-          </div>
+          <img
+            onClick={() => navigate("/selectdevicetype")}
+            className="w-40"
+            src={GREST_LOGO}
+            alt="app logo"
+          />
         </div>
       </div>
 

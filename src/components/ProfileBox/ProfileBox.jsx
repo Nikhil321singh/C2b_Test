@@ -32,9 +32,9 @@ const ProfileBox = () => {
   const [isLoggenIn, setIsLoggedIn] = useState(false);
   const currentDomain = window.location.origin;
 
-
   useEffect(() => {
     const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+    setUserName(setName(LoggedInUser?.firstName, LoggedInUser?.lastName));
     setUserName(setName(LoggedInUser?.firstName, LoggedInUser?.lastName));
     setUserEmail(LoggedInUser?.email);
     setUserRole(LoggedInUser?.role);
@@ -60,6 +60,11 @@ const ProfileBox = () => {
   const handlePwdChange = () => {
     navigate("/changepassword");
   };
+  if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
+    return     <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
+          </div>
+  }
+
   if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
     return     <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
           </div>
@@ -100,6 +105,7 @@ const ProfileBox = () => {
                 className="absolute right-0 text-primary"
               />
             </div>
+            <p className="font-medium underline text-primary">{userEmail}</p>
             <p className="font-medium underline text-primary">{userEmail}</p>
             <div className={`${styles.button_wrap}`}>
               <button onClick={handlePwdChange}>Change Password</button>

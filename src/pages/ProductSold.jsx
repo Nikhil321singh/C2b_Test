@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import User_Logo from "../assets/User_Logo.jpg";
 import { useNavigate } from "react-router-dom";
 import { BsCartCheckFill } from "react-icons/bs";
@@ -57,12 +62,13 @@ const ProductSold = () => {
           <img
             onClick={() => navigate(navtoSelDevTP)}
             className="w-40"
-            src={Grest_Logo}
+            src={GREST_LOGO}
             alt="app logo"
           />
         </div>
       </div>
       <div className="flex flex-col items-center justify-center gap-2 h-[70vh]">
+        <BsCartCheckFill size={84} color="var(--primary-color)" />
         <BsCartCheckFill size={84} color="var(--primary-color)" />
         <p className="font-medium text-2xl">
           {message.length > 0 ? message : ""}
@@ -73,6 +79,7 @@ const ProductSold = () => {
           onClick={handleReturn}
           className=" bg-primary mb-20 text-center p-3 mx-2 text-lg rounded-lg cursor-pointer flex justify-between  text-white items-center"
         >
+          <p className="font-medium  text-2xl flex-1 mx-4">Return To Home ({countdown}s)</p>
           <p className="font-medium  text-2xl flex-1 mx-4">Return To Home ({countdown}s)</p>
         </div>
       </div>

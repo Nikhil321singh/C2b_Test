@@ -32,7 +32,7 @@ const downloadExcel = (dataDown) => {
       "User Name": `${item?.firstName} ${item?.lastName}`,
       "User Email": item.email,
       "Phone Number": item.phoneNumber,
-      [`${import.meta.env.VITE_WEBSITE_SHORT_NAME} Member`]: item.grestMember,
+      [`${import.meta.env.VITE_WEBSITE_TITLE} Member`]: item.grestMember,
       "Company Name": item.companyName,
       Role: item.role,
       "Store Name": item.stores?.storeName,

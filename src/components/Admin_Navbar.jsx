@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { IoMdPerson } from "react-icons/io";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
 import { useNavigate } from "react-router-dom";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 
 function AdminNavbar({ setsideMenu, sideMenu }) {
   const [showLogout, setShowLogout] = useState(false);
@@ -52,19 +57,7 @@ function AdminNavbar({ setsideMenu, sideMenu }) {
             <span>admin</span>
           </div>
 
-          {/* Logout Popup */}
-          {showLogout && (
-            <div className="absolute top-12 right-30 bg-white border shadow-md px-4 py-2 rounded-md">
-              <button
-                onClick={handleLogout}
-                className="text-red-500 hover:text-red-700"
-              >
-                Logout
-              </button>
-            </div>
-          )}
-
-          <img className="w-40" src={Grest_Logo} alt="" />
+          <img className="w-28" src={GREST_LOGO} alt="" />
         </div>
       </div>
     </>

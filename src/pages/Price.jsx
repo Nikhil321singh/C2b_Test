@@ -1,6 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
@@ -132,14 +137,12 @@ const Price = () => {
             <p className=" text-base md:text-xl">{userName}</p>
             <img className="w-[30px]" src={User_Logo} alt="" />
           </div>
-          <div className="flex items-center justify-between gap-2">
-            <img
-              onClick={() => navigate("/selectdevicetype")}
-              className="w-[150px] max-w-[150px] object-contain cursor-pointer"
-              src={Grest_Logo}
-              alt="app logo"
-              />
-          </div>
+          <img
+            onClick={() => navigate("/selectdevicetype")}
+            className="w-40"
+            src={GREST_LOGO}
+            alt="app logo"
+          />
         </div>
       </div>
       <div className="w-[90%] md:w-[90%] mx-auto h-[auto] mb-[93px]">
