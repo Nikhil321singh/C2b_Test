@@ -26,6 +26,7 @@ import styless from "./QuickQuote.module.css";
 import { CgSpinner } from "react-icons/cg";
 import useUserProfile from "../../utils/useUserProfile";
 import { setResponseData } from "../../store/slices/responseSlice";
+import { IoArrowBack } from "react-icons/io5";
 
 const PinkBgWhText = "bg-primary text-white";
 
@@ -187,6 +188,14 @@ const QuickQuote = () => {
               src={GREST_LOGO}
               alt="app logo"
               />
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+            </button>
           </div>
         </div>
       </div>

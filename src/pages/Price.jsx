@@ -10,6 +10,7 @@ import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
+import { IoArrowBack } from "react-icons/io5";
 const pink = "bg-primary";
 const fileUploader = async (authToken, file, fileName, fileType) => {
   try {
@@ -132,7 +133,9 @@ const Price = () => {
             onClick={() => navigate(-1)}
             className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
             >
-            Back
+          <IoArrowBack
+            size={24}
+          />
           </button>
             <p className=" text-base md:text-xl">{userName}</p>
             <img className="w-[30px]" src={User_Logo} alt="" />

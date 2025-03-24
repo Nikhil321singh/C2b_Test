@@ -19,6 +19,7 @@ import ReactDOMServer from "react-dom/server";
 import html2pdf from "html2pdf.js";
 import PurchaseReceipt from "../components/PurchaseReceipt";
 import toast from "react-hot-toast";
+import { IoArrowBack } from "react-icons/io5";
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
     <div
@@ -337,7 +338,9 @@ const SubSpecialOffers = ({
             onClick={() => navigate(-1)}
             className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
             >
-            Back
+              <IoArrowBack
+                size={24}
+              />
           </button>
             <p className=" text-base md:text-xl">{LoggedInUser?.name}</p>
             <img className="w-[30px]" src={User_Logo} alt="" />

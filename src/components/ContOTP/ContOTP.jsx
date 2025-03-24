@@ -17,6 +17,7 @@ const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import axios from "axios";
 import { auth } from "../../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { IoArrowBack } from "react-icons/io5";
 const initOtp = {
   name: "",
   email: "",
@@ -233,12 +234,22 @@ export const MainOtpUI = ({
     <div className={`${styles.contopt_page}`} style={{ zIndex: 9999 }}>
       <div className="absolute top-4 md:top-0 bg-white flex items-center justify-between w-full pr-2 py-2 rounded-md">
         <ProfileBox />
-        <img
-          onClick={() => navigate("/selectdevicetype")}
-          className="w-40"
-          src={GREST_LOGO}
-          alt="app logo"
-        />
+          <div className="flex items-center justify-between gap-2">
+            <img
+              onClick={() => navigate("/selectdevicetype")}
+              className="w-[150px] max-w-[150px] object-contain cursor-pointer"
+              src={GREST_LOGO}
+              alt="app logo"
+              />
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+            </button>
+          </div>
       </div>
       <div className={` ${styles.optbox_wrap}`}>
         <div className={`${styles.optimg_wrap}`}>

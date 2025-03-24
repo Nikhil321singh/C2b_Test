@@ -167,6 +167,7 @@ import { CgSpinner } from "react-icons/cg";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack } from "react-icons/io";
 import styless from "../QuickQuote/QuickQuote.module.css";
+import { IoArrowBack } from "react-icons/io5";
 
 const initialState = {
   Core: [],
@@ -397,12 +398,22 @@ const MainQContainer = ({
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
         <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-          <img
-            onClick={() => navigate("/selectdevicetype")}
-            className="w-40"
-            src={GREST_LOGO}
-            alt="app logo"
-          />
+          <div className="flex items-center justify-between gap-2">
+            <img
+              onClick={() => navigate("/selectdevicetype")}
+              className="w-[150px] max-w-[150px] object-contain cursor-pointer"
+              src={GREST_LOGO}
+              alt="app logo"
+              />
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+            </button>
+          </div>
         </div>
       </div>
       <div className={`${styless.quick_page_nav}`}>

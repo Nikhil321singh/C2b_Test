@@ -15,6 +15,7 @@ import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import apple_watch from "../../assets/apple_watch.png";
 import { setResponseData } from "../../store/slices/responseSlice";
 import { toast } from "react-hot-toast";
+import { IoArrowBack } from "react-icons/io5";
 
 const buyback = import.meta.env.VITE_BUYBACK_URL;
 const switchKart = import.meta.env.VITE_SWITCHKART_URL;
@@ -110,11 +111,19 @@ const DeviceQuote = () => {
           <ProfileBox />
           <div className="flex items-center justify-between gap-2">
             <img
-            onClick={() => navigate(deviceTypePage)}
+              onClick={() => navigate(deviceTypePage)}
               className="w-[150px] max-w-[150px] object-contain cursor-pointer"
               src={GREST_LOGO}
               alt="app logo"
               />
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+            </button>
           </div>
         </div>
       </div>

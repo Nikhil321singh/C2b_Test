@@ -72,14 +72,16 @@ const ProfileBox = () => {
 
   return (
     <div className="select-none flex ml-4 z-40 gap-2 flex-row-reverse items-center">
-      {!["/selectdevicetype", "/selectdevicetype/"].includes(location.pathname.toLowerCase().replace(/\/$/, "")) && (
+      {/* {!["/selectdevicetype", "/selectdevicetype/"].includes(location.pathname.toLowerCase().replace(/\/$/, "")) && (
         <button
           onClick={() => navigate(-1)}
           className="text-xs flex items-center justify-center text-white mr-4 bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
         >
-          Back
+          <IoArrowBack
+            size={24}
+          />
         </button>
-      )}
+      )} */}
       <p className=" text-base  md:text-xl">{userName}</p>
       <img
         onClick={profileHandler}
