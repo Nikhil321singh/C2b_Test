@@ -54,8 +54,18 @@ const LeadsCompletedTable = ({ data }) => {
         formattedDate={formattedDate}
       />
     );
-    html2pdf().from(printElement).save("purchase_receipt.pdf");
-  }
+    html2pdf()
+    .set({
+      margin: 10,
+      filename: "purchase_receipt.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, logging: false },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: ["css", "legacy"] }, // Ensure page breaks work
+    })
+    .from(printElement)
+    .save();
+    }
 
   const getUserName = (val) => {
     if (val?.userId?.firstName) {

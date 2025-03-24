@@ -46,11 +46,14 @@ const PurchaseReceipt = ({
     <div className="p-4 px-12 bg-white border-2 text-sm">
       <style>
         {`
-          @media print {
+       @media print {
   .page-break {
-    page-break-before: always;
+    break-before: page; /* More reliable for html2pdf */
+    display: block;
+    width: 100%;
   }
 }
+
         `}
       </style>
 
@@ -167,7 +170,7 @@ const PurchaseReceipt = ({
         <p className="mt-4">
           <span> Scheme Title: Buyback</span>
         </p>
-        <p className="font-bold mt-16">Seller Name and Sign</p>
+        <p className="font-bold mt-16 mb-2">Seller Name and Sign</p>
       </div>
 
       {/* Page break before TERMS & CONDITIONS */}
@@ -182,23 +185,23 @@ const PurchaseReceipt = ({
         <div className="w-full">
           <ol className="list-decimal pl-5 text-left leading-normal">
             <li>
-              The Customer/Seller confirms that they are the rightful owner of the Gadget/Device and assume full 
+              The Customer/Seller confirms that they are the rightful owner of the Gadget/Device and assume full
               responsibility for any liabilities related to its ownership.
             </li>
             <li>
-              The Customer/Seller affirms that all personal data has been completely removed from the device, 
+              The Customer/Seller affirms that all personal data has been completely removed from the device,
               and the Company shall not be held responsible for any data-related issues.
             </li>
             <li>
-              The Customer/Seller agrees to indemnify and hold the Company harmless against any third-party 
+              The Customer/Seller agrees to indemnify and hold the Company harmless against any third-party
               claims arising from the ownership, data, condition of the device, or any criminal matters related to the device.
             </li>
             <li>
-              Payment will be processed as per the agreed terms. Any discrepancies must be reported within 2 hours of the transaction. 
+              Payment will be processed as per the agreed terms. Any discrepancies must be reported within 2 hours of the transaction,
               Return and refund requests, if applicable, must comply with the Company’s return policy.
             </li>
             <li>
-              Any disputes or disagreements between the Customer/Seller and Purchaser shall be exclusively resolved under the 
+              Any disputes or disagreements between the Customer/Seller and Purchaser shall be exclusively resolved under the
               jurisdiction of the courts located in {import.meta.env.VITE_COURT_ADDRESS} only.
             </li>
           </ol>

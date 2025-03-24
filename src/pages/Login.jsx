@@ -42,6 +42,10 @@ const Login = () => {
     } else {
       const storedProfile = JSON.parse(localStorage.getItem("profile"));
       const storedToken = localStorage.getItem("authToken");
+      sessionStorage.setItem("authToken", storedToken);
+      sessionStorage.setItem("profile", JSON.stringify(storedProfile));
+      sessionStorage.setItem("DeviceType", "CTG1");
+      localStorage.removeItem("formData");
       if (storedProfile && storedToken) {
         dispatch(setUserProfile(storedProfile));
         dispatch(
