@@ -56,7 +56,16 @@ function AdminNavbar({ setsideMenu, sideMenu }) {
             <IoMdPerson size={30} />
             <span>admin</span>
           </div>
-
+          {showLogout && (
+            <div className="absolute top-12 right-30 bg-white border shadow-md px-4 py-2 rounded-md">
+              <button
+                onClick={handleLogout}
+                className="text-red-500 hover:text-red-700"
+              >
+                Logout
+              </button>
+            </div>
+          )}
           <img className="w-28" src={GREST_LOGO} alt="" />
         </div>
       </div>

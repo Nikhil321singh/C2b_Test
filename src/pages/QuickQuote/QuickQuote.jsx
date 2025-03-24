@@ -184,7 +184,7 @@ const QuickQuote = () => {
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-[150px] max-w-[150px] object-contain cursor-pointer"
-              src={Grest_Logo}
+              src={GREST_LOGO}
               alt="app logo"
               />
           </div>

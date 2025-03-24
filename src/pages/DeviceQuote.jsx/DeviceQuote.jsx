@@ -112,7 +112,7 @@ const DeviceQuote = () => {
             <img
             onClick={() => navigate(deviceTypePage)}
               className="w-[150px] max-w-[150px] object-contain cursor-pointer"
-              src={Grest_Logo}
+              src={GREST_LOGO}
               alt="app logo"
               />
           </div>
