@@ -32,72 +32,92 @@ const Login = () => {
           localStorage.removeItem("formData");
           dispatch(setUserProfile({ firstName: import.meta.env.VITE_WEBSITE_SHORT_NAME }));
           navigate(homeroute);
+    } else {
+      const storedProfile = JSON.parse(localStorage.getItem("profile"));
+      const storedToken = localStorage.getItem("authToken");
+      if (storedProfile && storedToken) {
+        dispatch(setUserProfile(storedProfile));
+        dispatch(
+          setStoreFilter({
+            selStore: storedProfile.storeName,
+            selRegion: storedProfile.region,
+          })
+        );
+        redirectUser(storedProfile.role);
+      }
     }
   }, []);
+
+  const redirectUser = (role) => {
+    const customTable = "/customertable";
+    switch (role) {
+      case "Super Admin":
+        navigate("/adminmodels");
+        break;
+      case "Admin Manager":
+      case "Super_Admin_Unicorn":
+      case "Admin_Manager_Unicorn":
+        navigate(customTable);
+        break;
+      case "Technician":
+        navigate("/devicepickupdashboard");
+        break;
+      case "Sale User":
+      default:
+        navigate(homeroute);
+    }
+  };
 
   const userLogin = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!emailRegex.test(userEmail)) {
       toast.error("Please enter a valid email address");
-    } else {
-      setIsLoading(true);
-      setError(null);
-      sessionStorage.clear();
-      localStorage.clear();
-      axios
-        .post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/users/login`, {
-          email: userEmail,
-          password: userPassword,
-        })
-        .then((response) => {
-          toast.success("login successfully");
-          const { profile, authToken } = response.data;
-          sessionStorage.setItem("authToken", authToken);
-          sessionStorage.setItem("profile", JSON.stringify(profile));
-          sessionStorage.setItem("DeviceType", "CTG1");
-          localStorage.removeItem("formData");
-          dispatch(setUserProfile(profile));
-          dispatch(
-            setStoreFilter({
-              selStore: profile?.storeName,
-              selRegion: profile?.region,
-            })
-          );
-          console.log(profile.role);
-          const customTable = "/customertable";
-          switch (profile.role) {
-            case "Super Admin":
-              navigate("/adminmodels");
-              break;
-            case "Admin Manager":
-              navigate(customTable);
-              break;
-            case "Super_Admin_Unicorn":
-              navigate(customTable);
-              break;
-            case "Admin_Manager_Unicorn":
-              navigate(customTable);
-              break;
-            case "Technician":
-              navigate("/devicepickupdashboard");
-              break;
-            case "Sale User":
-              navigate(homeroute);
-              break;
-            default:
-              navigate(homeroute);
-          }
-        })
-        .catch((err) => {
-          toast.error("Please enter correct login credentials");
-          setIsLoading(false);
-          setError(
-            err.response?.data?.error ||
-              "Please enter correct login credentials"
-          );
-        });
+      return;
     }
+
+    setIsLoading(true);
+    setError(null);
+    sessionStorage.clear();
+    localStorage.clear();
+
+    axios
+      .post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/users/login`, {
+        email: userEmail,
+        password: userPassword,
+      })
+      .then((response) => {
+        toast.success("Login successfully");
+        const { profile, authToken } = response.data;
+
+        // Store in both sessionStorage and localStorage
+        sessionStorage.setItem("authToken", authToken);
+        sessionStorage.setItem("profile", JSON.stringify(profile));
+        sessionStorage.setItem("DeviceType", "CTG1");
+
+        localStorage.setItem("authToken", authToken);
+        localStorage.setItem("profile", JSON.stringify(profile));
+        localStorage.setItem("DeviceType", "CTG1");
+
+        localStorage.removeItem("formData");
+
+        dispatch(setUserProfile(profile));
+        dispatch(
+          setStoreFilter({
+            selStore: profile?.storeName,
+            selRegion: profile?.region,
+          })
+        );
+
+        redirectUser(profile.role);
+      })
+      .catch((err) => {
+        toast.error("Please enter correct login credentials");
+        setIsLoading(false);
+        setError(
+          err.response?.data?.error || "Please enter correct login credentials"
+        );
+      });
   };
 
   return (

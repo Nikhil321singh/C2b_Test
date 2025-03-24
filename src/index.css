@@ -8,3 +8,9 @@
   --tertiary-color: rgba(233, 68, 118, 0.495);
   --quaternary-color: #8080ff;
 }
+
+@media print {
+  .page-break {
+    page-break-before: always;
+  }
+}
