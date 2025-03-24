@@ -1,6 +1,10 @@
 import React from "react";
-import Grest_Logo from "../assets/Grest_Logo.jpg";
+const currentDomain = window.location.origin;
+const DEFAULT_LOGO = "/Grest_Logo.jpg";
+const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 const PurchaseReceipt = ({
   imeiNumber,
   uniqueCode,
@@ -51,7 +55,7 @@ const PurchaseReceipt = ({
       </style>
 
       <div className="flex items-center justify-center bg-white p-[1vh] mx-[2vh] my-[1vh]">
-        <img src={Grest_Logo} alt="App logo" className="w-80 h-24" />
+        <img src={GREST_LOGO} alt="App logo" className="w-80 h-24" />
       </div>
       <div className="flex flex-col items-center justify-between mb-2">
         <p className="text-sm text-[#1b0d6c]">
