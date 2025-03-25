@@ -3,7 +3,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { CiSearch, CiBarcode } from "react-icons/ci";
 import { IoClose } from "react-icons/io5";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-
 import AppFooter from "../../components/AppFooter";
 const currentDomain = window.location.origin;
 const DEFAULT_LOGO = "/Grest_Logo.jpg";

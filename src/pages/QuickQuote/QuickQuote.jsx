@@ -180,23 +180,23 @@ const QuickQuote = () => {
     <div className="mainQContainer">
       <div className="flex items-center w-screen py-4 h-16 border-b-2  bg-white HEADER header">
         <div className="w-full flex items-center justify-between px-4">
-          <ProfileBox />
           <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs ml-2 flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+            </button>
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
               src={GREST_LOGO}
               alt="app logo"
               />
-            <button
-              onClick={() => navigate(-1)}
-              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-            >
-              <IoArrowBack
-                size={24}
-              />
-            </button>
           </div>
+          <ProfileBox />
         </div>
       </div>
       <div className={`${styless.quick_page_nav}`}>

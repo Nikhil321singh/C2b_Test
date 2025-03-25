@@ -233,23 +233,23 @@ export const MainOtpUI = ({
   return (
     <div className={`${styles.contopt_page}`} style={{ zIndex: 9999 }}>
       <div className="absolute top-4 md:top-0 bg-white flex items-center justify-between w-full pr-2 py-2 rounded-md">
-        <ProfileBox />
           <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs ml-2 flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+            </button>
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
               src={GREST_LOGO}
               alt="app logo"
               />
-            <button
-              onClick={() => navigate(-1)}
-              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-            >
-              <IoArrowBack
-                size={24}
-              />
-            </button>
           </div>
+        <ProfileBox />
       </div>
       <div className={` ${styles.optbox_wrap}`}>
         <div className={`${styles.optimg_wrap}`}>

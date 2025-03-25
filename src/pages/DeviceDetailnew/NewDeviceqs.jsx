@@ -184,26 +184,6 @@ const blackText = "text-black";
 const pinkBg = "bg-primary";
 const whiteBg = "bg-white";
 
-const handleSkip = (visible, updateAns) => {
-  switch (visible) {
-    case 1:
-      updateAns("Core");
-      break;
-    case 2:
-      updateAns("Cosmetics");
-      break;
-    case 3:
-      updateAns("Display");
-      break;
-    case 4:
-      updateAns("Functional_major");
-      break;
-    case 5:
-      updateAns("Functional_minor");
-      break;
-  }
-};
-
 const NewDeviceqs = () => {
   const userToken = sessionStorage.getItem("authToken");
   const DeviceType = sessionStorage.getItem("DeviceType");
@@ -397,23 +377,23 @@ const MainQContainer = ({
     <div className="mainQContainer">
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
         <div className="flex items-center justify-between w-full pr-2">
-          <ProfileBox />
           <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs ml-2 flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+            </button>
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
               src={GREST_LOGO}
               alt="app logo"
               />
-            <button
-              onClick={() => navigate(-1)}
-              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-            >
-              <IoArrowBack
-                size={24}
-              />
-            </button>
           </div>
+          <ProfileBox />
         </div>
       </div>
       <div className={`${styless.quick_page_nav}`}>

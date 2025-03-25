@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import User_Logo from "../../assets/User_Logo.jpg";
-import { IoArrowBack, IoClose } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 import styles from "./ProfileBox.module.css";
 
 function setName(firstName, lastName) {
@@ -24,7 +24,6 @@ function setName(firstName, lastName) {
 
 const ProfileBox = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [userName, setUserName] = useState();
   const [userEmail, setUserEmail] = useState();
   const [userRole, setUserRole] = useState();
@@ -32,9 +31,9 @@ const ProfileBox = () => {
   const [isLoggenIn, setIsLoggedIn] = useState(false);
   const currentDomain = window.location.origin;
 
+
   useEffect(() => {
     const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-    setUserName(setName(LoggedInUser?.firstName, LoggedInUser?.lastName));
     setUserName(setName(LoggedInUser?.firstName, LoggedInUser?.lastName));
     setUserEmail(LoggedInUser?.email);
     setUserRole(LoggedInUser?.role);
@@ -72,16 +71,6 @@ const ProfileBox = () => {
 
   return (
     <div className="select-none flex ml-4 z-40 gap-2 flex-row-reverse items-center">
-      {/* {!["/selectdevicetype", "/selectdevicetype/"].includes(location.pathname.toLowerCase().replace(/\/$/, "")) && (
-        <button
-          onClick={() => navigate(-1)}
-          className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-        >
-          <IoArrowBack
-            size={24}
-          />
-        </button>
-      )} */}
       <p className=" text-base  md:text-xl">{userName}</p>
       <img
         onClick={profileHandler}
@@ -107,7 +96,6 @@ const ProfileBox = () => {
                 className="absolute right-0 text-primary"
               />
             </div>
-            <p className="font-medium underline text-primary">{userEmail}</p>
             <p className="font-medium underline text-primary">{userEmail}</p>
             <div className={`${styles.button_wrap}`}>
               <button onClick={handlePwdChange}>Change Password</button>

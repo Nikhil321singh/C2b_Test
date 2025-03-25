@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-
 const currentDomain = window.location.origin;
 const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo

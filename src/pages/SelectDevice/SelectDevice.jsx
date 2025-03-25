@@ -162,23 +162,23 @@ const SelectDevice = () => {
           </div>
         )}
         <div className="flex items-center justify-between w-full px-4">
-          <ProfileBox />
           <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs ml-2 flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+            </button>
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
               src={GREST_LOGO}
               alt="app logo"
               />
-            <button
-              onClick={() => navigate(-1)}
-              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-            >
-              <IoArrowBack
-                size={24}
-              />
-            </button>
           </div>
+          <ProfileBox />
         </div>
       </div>
       <div className="ml-5">
