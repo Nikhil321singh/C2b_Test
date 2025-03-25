@@ -88,6 +88,55 @@ export const DynamicCouponCard = ({
   );
 };
 
+function hanldlejsx_pdf(leadData, setReceipt) {
+  console.log("store is", leadData?.store?.storeName);
+  console.log("store is", leadData?.emailId);
+
+  const dateString = leadData?.updatedAt;
+  const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  const printElement = ReactDOMServer.renderToString(
+    <PurchaseReceipt
+      phoneNumber={leadData?.phoneNumber}
+      aadharNumber={leadData?.aadharNumber}
+      uniqueCode={leadData?.uniqueCode}
+      emailId={leadData?.emailId}
+      name={leadData?.name}
+      price={leadData?.price}
+      imeiNumber={leadData?.documentId?.IMEI}
+      phoneName={leadData?.modelId?.name}
+      type={leadData?.modelId?.type}
+      storeName={leadData?.store?.storeName}
+      region={leadData?.store?.region}
+      address={leadData?.store?.address}
+      storage={leadData?.storage}
+      RAM={leadData?.ram}
+      formattedDate={formattedDate}
+    />
+  );
+
+  html2pdf()
+    .set({
+      margin: 10,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, logging: false },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: ["css", "legacy"] }, // Ensure page breaks work
+    })
+    .from(printElement)
+    .outputPdf("blob") // Get Blob output
+    .then((blob) => {
+      const file = new File([blob], "Purchase_Receipt.pdf", { type: "application/pdf" });
+      console.log("Generated PDF File:", file);
+      setReceipt(file); // Store in state
+    })
+    .catch((err) => console.error("PDF Generation Error:", err));
+}
+
 const SpecialOffers = () => {
   const storedDisableBtn = sessionStorage.getItem("disableBtn");
   const initialDisableBtn = storedDisableBtn
@@ -122,7 +171,7 @@ const SpecialOffers = () => {
             headers: { Authorization: userToken },
           }
         );
-        hanldlejsx_pdf(data.data);
+        hanldlejsx_pdf(data.data, setReceipt);
       } catch (err) {
         console.log(err);
       }
@@ -187,54 +236,7 @@ const SpecialOffers = () => {
       console.log("clicked");
     }
   };
-  function hanldlejsx_pdf(leadData) {
-    console.log("store is", leadData?.store?.storeName);
-    console.log("store is", leadData?.emailId);
 
-    const dateString = leadData?.updatedAt;
-    const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-
-    const printElement = ReactDOMServer.renderToString(
-      <PurchaseReceipt
-        phoneNumber={leadData?.phoneNumber}
-        aadharNumber={leadData?.aadharNumber}
-        uniqueCode={leadData?.uniqueCode}
-        emailId={leadData?.emailId}
-        name={leadData?.name}
-        price={leadData?.price}
-        imeiNumber={leadData?.documentId?.IMEI}
-        phoneName={leadData?.modelId?.name}
-        type={leadData?.modelId?.type}
-        storeName={leadData?.store?.storeName}
-        region={leadData?.store?.region}
-        address={leadData?.store?.address}
-        storage={leadData?.storage}
-        RAM={leadData?.ram}
-        formattedDate={formattedDate}
-      />
-    );
-
-    html2pdf()
-      .set({
-        margin: 10,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, logging: false },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: { mode: ["css", "legacy"] }, // Ensure page breaks work
-      })
-      .from(printElement)
-      .outputPdf("blob") // Get Blob output
-      .then((blob) => {
-        const file = new File([blob], "Purchase_Receipt.pdf", { type: "application/pdf" });
-        console.log("Generated PDF File:", file);
-        setReceipt(file); // Store in state
-      })
-      .catch((err) => console.error("PDF Generation Error:", err));
-  }
 
   const handleSubmit = () => {
     if (!receipt) {

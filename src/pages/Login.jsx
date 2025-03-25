@@ -29,7 +29,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const currentDomain = window.location.origin;
     const bypassedDomain = import.meta.env.BYPASSED_DOMAIN;
     console.log(currentDomain,"  " ,bypassedDomain);
     if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {

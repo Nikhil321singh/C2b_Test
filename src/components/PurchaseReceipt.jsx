@@ -2,9 +2,9 @@ import React from "react";
 const currentDomain = window.location.origin;
 const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
-
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
 const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
+
 const PurchaseReceipt = ({
   imeiNumber,
   uniqueCode,
@@ -46,19 +46,14 @@ const PurchaseReceipt = ({
 
   return (
     <div className="p-4 px-12 bg-white border-2 text-sm">
-      <style>
-        {`
+      <style>{`
        @media print {
   .page-break {
     break-before: page; /* More reliable for html2pdf */
     display: block;
     width: 100%;
   }
-}
-
-        `}
-      </style>
-
+}`}</style>
       <div className="flex items-center justify-center bg-white p-[1vh] mx-[2vh] my-[1vh]">
         <img src={GREST_LOGO} alt="App logo" className="w-80 h-24" />
       </div>
@@ -143,7 +138,6 @@ const PurchaseReceipt = ({
           <p className="mt-4">{type === "Laptop" ? imeiNumber : ""}</p>
         </div>
       </div>
-
       <hr className="border-black mt-10 border-1" />
       <div className="flex flex-col items-center border-b-2 border-dashed border-black py-4 ">
         <p className="text-xl font-bold mt-4 mb-2">Via Retail Store Partner:</p>
@@ -167,23 +161,17 @@ const PurchaseReceipt = ({
           on day of <span className="font-bold">{formattedDate}</span>
         </p>
       </div>
-
       <div>
         <p className="mt-4">
           <span> Scheme Title: Buyback</span>
         </p>
         <p className="font-bold mt-16 mb-2">Seller Name and Sign</p>
       </div>
-
-      {/* Page break before TERMS & CONDITIONS */}
       <div className="page-break">
-
-
       <div className="terms-conditions">
         <div className="text-center mt-2 border-t-2 border-dashed border-black ">
           <p className="text-xl font-bold my-4 mx-auto">TERMS & CONDITIONS</p>
         </div>
-
         <div className="w-full">
           <ol className="list-decimal pl-5 text-left leading-normal">
             <li>
@@ -208,7 +196,6 @@ const PurchaseReceipt = ({
             </li>
           </ol>
         </div>
-
         <div className="w-full text-right mt-8">
           <p className="font-bold">SIGNATURES</p>
           <p className="font-bold mt-16">(SELLER)</p>

@@ -28,14 +28,11 @@ const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) => {
       ? Number(Price) + Number(bonus) - Number(savedBonus)
       : Number(Price) + Number(bonus);
   } else {
-    return savedBonus
-      ? Number(Price)
-      : Number(Price);
+    return Number(Price);
   }
 };
 
 const DeviceQuote = () => {
-  const currentDomain = window.location.origin;
   const dispatch = useDispatch();
   const Device = sessionStorage.getItem("DeviceType");
   const DummyImg = Device === "CTG1"
@@ -274,9 +271,7 @@ const SubDeviceQuote = ({
       <div className="flex flex-col w-1/2 text-xl font-medium">
         <p>
           ₹
-          {savedBonus
-            ? Number(Price) + Number(bonus)
-            : Number(Price) + Number(bonus)}
+          {Number(Price) + Number(bonus)}
         </p>
       </div>
       {quoteSaved === false && exactQuoteValue === "true" && (

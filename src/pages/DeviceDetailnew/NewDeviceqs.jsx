@@ -184,26 +184,6 @@ const blackText = "text-black";
 const pinkBg = "bg-primary";
 const whiteBg = "bg-white";
 
-const handleSkip = (visible, updateAns) => {
-  switch (visible) {
-    case 1:
-      updateAns("Core");
-      break;
-    case 2:
-      updateAns("Cosmetics");
-      break;
-    case 3:
-      updateAns("Display");
-      break;
-    case 4:
-      updateAns("Functional_major");
-      break;
-    case 5:
-      updateAns("Functional_minor");
-      break;
-  }
-};
-
 const NewDeviceqs = () => {
   const userToken = sessionStorage.getItem("authToken");
   const DeviceType = sessionStorage.getItem("DeviceType");
