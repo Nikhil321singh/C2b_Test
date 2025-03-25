@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import User_Logo from "../../assets/User_Logo.jpg";
 import { IoClose } from "react-icons/io5";
 import styles from "./ProfileBox.module.css";
-import { useNavigate } from "react-router";
 
 function setName(firstName, lastName) {
   if (!firstName && !lastName) {
@@ -64,9 +64,14 @@ const ProfileBox = () => {
           </div>
   }
 
+  if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
+    return     <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
+          </div>
+  }
+
   return (
-    <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
-      <p className="mr-4 text-base  md:text-xl">{userName}</p>
+    <div className="select-none flex ml-4 z-40 gap-2 flex-row-reverse items-center">
+      <p className=" text-base  md:text-xl">{userName}</p>
       <img
         onClick={profileHandler}
         className="w-[30px]"

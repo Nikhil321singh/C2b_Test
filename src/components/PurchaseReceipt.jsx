@@ -46,6 +46,19 @@ const PurchaseReceipt = ({
 
   return (
     <div className="p-4 px-12 bg-white border-2 text-sm">
+      <style>
+        {`
+       @media print {
+  .page-break {
+    break-before: page; /* More reliable for html2pdf */
+    display: block;
+    width: 100%;
+  }
+}
+
+        `}
+      </style>
+
       <div className="flex items-center justify-center bg-white p-[1vh] mx-[2vh] my-[1vh]">
         <img src={GREST_LOGO} alt="App logo" className="w-80 h-24" />
       </div>
@@ -159,9 +172,49 @@ const PurchaseReceipt = ({
         <p className="mt-4">
           <span> Scheme Title: Buyback</span>
         </p>
-        <p className="font-bold mt-16">Seller Name and Sign</p>
+        <p className="font-bold mt-16 mb-2">Seller Name and Sign</p>
       </div>
-    </div>
+
+      {/* Page break before TERMS & CONDITIONS */}
+      <div className="page-break">
+
+
+      <div className="terms-conditions">
+        <div className="text-center mt-2 border-t-2 border-dashed border-black ">
+          <p className="text-xl font-bold my-4 mx-auto">TERMS & CONDITIONS</p>
+        </div>
+
+        <div className="w-full">
+          <ol className="list-decimal pl-5 text-left leading-normal">
+            <li>
+              The Customer/Seller confirms that they are the rightful owner of the Gadget/Device and assume full
+              responsibility for any liabilities related to its ownership.
+            </li>
+            <li>
+              The Customer/Seller affirms that all personal data has been completely removed from the device,
+              and the Company shall not be held responsible for any data-related issues.
+            </li>
+            <li>
+              The Customer/Seller agrees to indemnify and hold the Company harmless against any third-party
+              claims arising from the ownership, data, condition of the device, or any criminal matters related to the device.
+            </li>
+            <li>
+              Payment will be processed as per the agreed terms. Any discrepancies must be reported within 2 hours of the transaction,
+              Return and refund requests, if applicable, must comply with the Company’s return policy.
+            </li>
+            <li>
+              Any disputes or disagreements between the Customer/Seller and Purchaser shall be exclusively resolved under the
+              jurisdiction of the courts located in {import.meta.env.VITE_COURT_ADDRESS} only.
+            </li>
+          </ol>
+        </div>
+
+        <div className="w-full text-right mt-8">
+          <p className="font-bold">SIGNATURES</p>
+          <p className="font-bold mt-16">(SELLER)</p>
+        </div>
+      </div>
+    </div></div>
   );
 };
 

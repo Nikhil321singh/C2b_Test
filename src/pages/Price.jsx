@@ -10,6 +10,7 @@ import axios from "axios";
 import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
+import { IoArrowBack } from "react-icons/io5";
 const pink = "bg-primary";
 const fileUploader = async (authToken, file, fileName, fileType) => {
   try {
@@ -126,9 +127,17 @@ const Price = () => {
   return (
     <div className="h-[100vh] max-h-[200vh] overflow-y-auto bg-white ">
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
-        <div className="flex items-center justify-between w-full ">
+        <div className="flex items-center justify-between w-full pr-4">
           <div className="flex flex-row-reverse items-center gap-2 ml-4">
-            <p className="mr-4 text-base md:text-xl">{userName}</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+          <IoArrowBack
+            size={24}
+          />
+          </button>
+            <p className=" text-base md:text-xl">{userName}</p>
             <img className="w-[30px]" src={User_Logo} alt="" />
           </div>
           <img

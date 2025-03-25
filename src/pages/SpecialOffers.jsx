@@ -15,7 +15,11 @@ import User_Logo from "../assets/User_Logo.jpg";
 import SummaryModal from "../components/SummaryModal";
 import { CgSpinner } from "react-icons/cg";
 import apple_watch from "../assets/apple_watch.png";
-
+import ReactDOMServer from "react-dom/server";
+import html2pdf from "html2pdf.js";
+import PurchaseReceipt from "../components/PurchaseReceipt";
+import toast from "react-hot-toast";
+import { IoArrowBack } from "react-icons/io5";
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
     <div
@@ -100,6 +104,7 @@ const SpecialOffers = () => {
   const [extraBonus, setExtraBonus] = useState(0);
   const [disableBtn, setDisableBtn] = useState(initialDisableBtn);
   const [phonePrice, setPhonePrice] = useState(Price + responseData.bonus);
+  const [receipt, setReceipt] = useState(null);
   const dispatch = useDispatch(false);
   const { setAnswers } = useQuestionContext();
   const leadId = sessionStorage.getItem("LeadId");
@@ -108,7 +113,22 @@ const SpecialOffers = () => {
   useEffect(() => {
     dispatch(setOtpVerified(false));
   }, []);
-
+  useEffect(() => {
+    const getLeadData = async () => {
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findLeadById?id=${leadId}`,
+          {
+            headers: { Authorization: userToken },
+          }
+        );
+        hanldlejsx_pdf(data.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getLeadData()
+    }, []);
   const handleViewSummary = () => {
     const bonus = Number(phonePrice) - Number(Price);
     setExtraBonus(bonus);
@@ -167,17 +187,71 @@ const SpecialOffers = () => {
       console.log("clicked");
     }
   };
+  function hanldlejsx_pdf(leadData) {
+    console.log("store is", leadData?.store?.storeName);
+    console.log("store is", leadData?.emailId);
+
+    const dateString = leadData?.updatedAt;
+    const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
+    const printElement = ReactDOMServer.renderToString(
+      <PurchaseReceipt
+        phoneNumber={leadData?.phoneNumber}
+        aadharNumber={leadData?.aadharNumber}
+        uniqueCode={leadData?.uniqueCode}
+        emailId={leadData?.emailId}
+        name={leadData?.name}
+        price={leadData?.price}
+        imeiNumber={leadData?.documentId?.IMEI}
+        phoneName={leadData?.modelId?.name}
+        type={leadData?.modelId?.type}
+        storeName={leadData?.store?.storeName}
+        region={leadData?.store?.region}
+        address={leadData?.store?.address}
+        storage={leadData?.storage}
+        RAM={leadData?.ram}
+        formattedDate={formattedDate}
+      />
+    );
+
+    html2pdf()
+      .set({
+        margin: 10,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, logging: false },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"] }, // Ensure page breaks work
+      })
+      .from(printElement)
+      .outputPdf("blob") // Get Blob output
+      .then((blob) => {
+        const file = new File([blob], "Purchase_Receipt.pdf", { type: "application/pdf" });
+        console.log("Generated PDF File:", file);
+        setReceipt(file); // Store in state
+      })
+      .catch((err) => console.error("PDF Generation Error:", err));
+  }
+
   const handleSubmit = () => {
+    if (!receipt) {
+      toast.error("Please wait purchase receipt is being created");
+      return;
+    }
     setIsLoading(true);
     const userIdToken = sessionStorage.getItem("authToken");
     const LeadId = sessionStorage.getItem("LeadId");
+    const formData = new FormData();
+    formData.append("id", LeadId);
+    formData.append("bonusPrice", responseData.bonus);
+    formData.append("file", receipt);
     axios
-      .post(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/item-purchased`,
-        { id: LeadId, bonusPrice: responseData.bonus },
-        { headers: { Authorization: userIdToken } }
+      .post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/item-purchased`,
+        formData,
+        { headers: { Authorization: userIdToken, "Content-Type": "multipart/form-data" } }
       )
       .then((response) => {
         setAnswers([]);
@@ -225,6 +299,7 @@ const SpecialOffers = () => {
         discountData={discountData}
         handleViewSummary={handleViewSummary}
         handleSubmit={handleSubmit}
+        receipt={receipt}
         isLoading={isLoading}
         showModal={showModal}
         handleCloseModal={handleCloseModal}
@@ -241,6 +316,7 @@ const SubSpecialOffers = ({
   isSelected,
   discountData,
   handleViewSummary,
+  receipt,
   handleSubmit,
   isLoading,
   showModal,
@@ -261,24 +337,30 @@ const SubSpecialOffers = ({
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
   return (
     <div>
-      <div
-        className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}
-      >
-        <div className="flex items-center justify-between w-full ">
+    <div className="flex items-center border-b-2 w-full max-w-screen-lg mx-auto h-16 py-4 bg-white HEADER px-4">
+      <div className="flex items-center justify-between w-full gap-2">
           <div className="flex flex-row-reverse items-center gap-2 ml-4">
-            <p className="mr-4 text-base md:text-xl">{LoggedInUser?.name}</p>
-
+          <button
+            onClick={() => navigate(-1)}
+            className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+          </button>
+            <p className=" text-base md:text-xl">{LoggedInUser?.name}</p>
             <img className="w-[30px]" src={User_Logo} alt="" />
           </div>
-
+          <div className="flex items-center justify-between gap-2">
           <img
-            onClick={() => navigate("/selectdevicetype")}
-            className="w-40"
+            onClick={() => navigate('/selectdevicetype')}
+            className="w-[120px] max-w-[120px] object-contain cursor-pointer shrink-0"
             src={GREST_LOGO}
-            alt="app logo"
+            alt="App Logo"
           />
         </div>
       </div>
+    </div>
       <div className="w-[90%] md:w-[70%] mx-auto mt-4  ">
         <p className="mb-2 text-lg font-medium">
           The best price for your phone is:
@@ -303,13 +385,15 @@ const SubSpecialOffers = ({
           </p>
         </div>
         <div
-          onClick={handleSubmit}
-          className="bg-primary relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
+          onClick={receipt ? handleSubmit : null} // Prevent click if receipt is missing
+          className={`bg-primary relative text-center py-1 px-2 rounded-lg flex justify-between text-white items-center 
+            ${!receipt ? "cursor-not-allowed opacity-50 pointer-events-none" : "cursor-pointer"}
+          `}
         >
           {isLoading && (
             <CgSpinner
               size={20}
-              className="absolute left-[30%] top-[8px]  mt-1 animate-spin"
+              className="absolute left-[30%] top-[8px] mt-1 animate-spin"
             />
           )}
           <p className="w-full p-1 text-xl font-medium">Sell Now</p>

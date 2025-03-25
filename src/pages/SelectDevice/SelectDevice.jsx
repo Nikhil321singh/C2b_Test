@@ -13,6 +13,7 @@ import apple_watch from "../../assets/apple_watch.png";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io";
 import { BeatLoader } from "react-spinners";
+import { IoArrowBack } from "react-icons/io5";
 const data = JSON.parse(sessionStorage.getItem("dataModel"));
 
 const DeviceType = sessionStorage.getItem("DeviceType");
@@ -160,14 +161,24 @@ const SelectDevice = () => {
             <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
           </div>
         )}
-        <div className="flex items-center justify-between w-full pr-2">
+        <div className="flex items-center justify-between w-full px-4">
           <ProfileBox />
-          <img
-            onClick={() => navigate("/selectdevicetype")}
-            className="w-40"
-            src={GREST_LOGO}
-            alt="app logo"
-          />
+          <div className="flex items-center justify-between gap-2">
+            <img
+              onClick={() => navigate("/selectdevicetype")}
+              className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
+              src={GREST_LOGO}
+              alt="app logo"
+              />
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack
+                size={24}
+              />
+            </button>
+          </div>
         </div>
       </div>
       <div className="ml-5">

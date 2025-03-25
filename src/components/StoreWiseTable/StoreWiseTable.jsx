@@ -34,7 +34,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
           </thead>
           <tbody>
             {tableData !== undefined &&
-              tableData.map((data, index) => (
+              tableData?.map((data, index) => (
                 <tr
                   key={index}
                   className={index % 2 === 0 ? "bg-gray-200" : ""}
@@ -102,7 +102,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                   </td>
                 </tr>
               ))}
-              { tableData.length === 0 &&
+              { tableData?.length === 0 &&
                 <tr>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base"
                   colSpan={14}>
