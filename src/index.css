@@ -8,3 +8,9 @@
   --tertiary-color: #d7203d;
   --quaternary-color: #ff3864;
 }
+
+@media print {
+  .page-break {
+    page-break-before: always;
+  }
+}
