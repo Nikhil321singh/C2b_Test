@@ -36,7 +36,6 @@ const fileUploader = async (authToken, file, fileName, fileType) => {
   }
 };
 const Price = () => {
-  const userName = "";
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem("responsedatadata"));
   const savedOtpData = JSON.parse(localStorage.getItem("otpData"));
   const token = sessionStorage.getItem("authToken");
@@ -126,28 +125,7 @@ const Price = () => {
   };
   return (
     <div className="h-[100vh] max-h-[200vh] overflow-y-auto bg-white ">
-      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
-        <div className="flex items-center justify-between w-full pr-4">
-          <div className="flex flex-row-reverse items-center gap-2 ml-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-            >
-          <IoArrowBack
-            size={24}
-          />
-          </button>
-            <p className=" text-base md:text-xl">{userName}</p>
-            <img className="w-[30px]" src={User_Logo} alt="" />
-          </div>
-          <img
-            onClick={() => navigate("/selectdevicetype")}
-            className="w-40"
-            src={GREST_LOGO}
-            alt="app logo"
-          />
-        </div>
-      </div>
+      <PriceHeader navigate={navigate} />
       <div className="w-[90%] md:w-[90%] mx-auto h-[auto] mb-[93px]">
         <div className="mt-3 text-center relative">
           <h1 className="text-2xl font-semibold">Upload Documents</h1>
@@ -734,6 +712,34 @@ const MobileMoldModel = ({ setShowHoldModal }) => {
     </div>
   );
 };
+
+const PriceHeader = (navigate) => {
+  const userName = "";
+  return (
+    <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
+    <div className="flex items-center justify-between w-full pr-4">
+      <div className="flex flex-row-reverse items-center gap-2 ml-4">
+      <button
+        onClick={() => navigate(-1)}
+        className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+        >
+      <IoArrowBack
+        size={24}
+      />
+      </button>
+        <p className=" text-base md:text-xl">{userName}</p>
+        <img className="w-[30px]" src={User_Logo} alt="" />
+      </div>
+      <img
+        onClick={() => navigate("/selectdevicetype")}
+        className="w-40"
+        src={GREST_LOGO}
+        alt="app logo"
+      />
+    </div>
+  </div>
+  )
+}
 const WatchMoldModel = ({ setShowHoldModal }) => {
   return (
     <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">

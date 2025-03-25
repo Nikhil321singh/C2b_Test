@@ -737,7 +737,7 @@ const SearchBox = ({
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         <div className="flex items-center justify-between w-full pr-2">
           <ProfileBox />
-          <img className="w-40" src={GREST_LOGO} alt="app logo" />
+          <img className="w-24" src={GREST_LOGO} alt="app logo" />
         </div>
       </div>
       {isSearchBoxOpen && (

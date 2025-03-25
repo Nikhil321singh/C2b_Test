@@ -82,7 +82,6 @@ const DeviceQuote = () => {
   const showDeviceReportHandler = () => {
     setShowDeviceReport(!showDeviceReport);
   };
-  const navigate = useNavigate();
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -101,29 +100,7 @@ const DeviceQuote = () => {
           quoteSaved={quoteSaved}
         />
       )}
-      <div
-        className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}
-      >
-        <div className="flex items-center justify-between w-full px-4">
-          <ProfileBox />
-          <div className="flex items-center justify-between gap-2">
-            <img
-              onClick={() => navigate(deviceTypePage)}
-              className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
-              src={GREST_LOGO}
-              alt="app logo"
-              />
-            <button
-              onClick={() => navigate(-1)}
-              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-            >
-              <IoArrowBack
-                size={24}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
+      <DeviceQuoteHeader />
       <div className="max-w-[900px]  md:mx-auto">
         <p className="mx-2 my-4 text-xl font-medium">Device Quote Details</p>
         <div className={` ${styles.QuoteCardShadow} rounded-md p-2 mx-2`}>
@@ -305,3 +282,31 @@ const SubDeviceQuote = ({
     </div>
   );
 };
+
+const DeviceQuoteHeader = () => {
+  const navigate = useNavigate();
+  return (
+      <div
+      className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}
+    >
+      <div className="flex items-center justify-between w-full px-4">
+        <ProfileBox />
+        <div className="flex items-center justify-between gap-2">
+          <img
+            onClick={() => navigate(deviceTypePage)}
+            className="w-[100px] max-w-[100px] object-contain cursor-pointer ml-2"
+            src={GREST_LOGO}
+            alt="app logo"
+            />
+          <button
+            onClick={() => navigate(-1)}
+            className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+          >
+            <IoArrowBack
+              size={24}
+            />
+          </button>
+        </div>
+      </div>
+    </div>
+  )}

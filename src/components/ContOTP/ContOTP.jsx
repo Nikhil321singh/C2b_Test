@@ -237,7 +237,7 @@ export const MainOtpUI = ({
           <div className="flex items-center justify-between gap-2">
             <img
               onClick={() => navigate("/selectdevicetype")}
-              className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
+              className="w-[100px] max-w-[100px] object-contain cursor-pointer ml-2"
               src={GREST_LOGO}
               alt="app logo"
               />
