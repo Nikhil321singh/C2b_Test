@@ -90,23 +90,23 @@ const SelectModel = () => {
     <div className={`bg-white min-h-screen`}>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
         <div className="flex items-center justify-between w-full pr-2">
-          <ProfileBox />
           <div className="flex items-center justify-between gap-2">
-            <img
-              onClick={() => navigate("/selectdevicetype")}
-              className="w-[100px] max-w-[100px] object-contain cursor-pointer ml-2"
-              src={GREST_LOGO}
-              alt="app logo"
-              />
             <button
               onClick={() => navigate(-1)}
-              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+              className="text-xs ml-2 flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
             >
               <IoArrowBack
                 size={24}
               />
             </button>
+            <img
+              onClick={() => navigate("/selectdevicetype")}
+              className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
+              src={GREST_LOGO}
+              alt="app logo"
+              />
           </div>
+          <ProfileBox />
         </div>
       </div>
 

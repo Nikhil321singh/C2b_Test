@@ -718,24 +718,24 @@ const PriceHeader = (navigate) => {
   return (
     <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
     <div className="flex items-center justify-between w-full pr-4">
-      <div className="flex flex-row-reverse items-center gap-2 ml-4">
+      <div className="flex items-center gap-2 ml-4">
       <button
         onClick={() => navigate(-1)}
-        className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+        className="text-xs ml-2 flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
         >
       <IoArrowBack
         size={24}
       />
       </button>
-        <p className=" text-base md:text-xl">{userName}</p>
-        <img className="w-[30px]" src={User_Logo} alt="" />
-      </div>
       <img
         onClick={() => navigate("/selectdevicetype")}
         className="w-40"
         src={GREST_LOGO}
         alt="app logo"
       />
+      </div>
+        <p className=" text-base md:text-xl">{userName}</p>
+        <img className="w-[30px]" src={User_Logo} alt="" />
     </div>
   </div>
   )
