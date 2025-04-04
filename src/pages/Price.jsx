@@ -224,7 +224,6 @@ export default Price;
 
 const ImeiField = ({ imeinumber, setImeiNumber, prod }) => {
   const [error, setError] = useState(true);
-  const Device = sessionStorage.getItem("DeviceType");
   const validateImeiNumber = (value) => {
     if (value.length !== 15) {
       setError("IMEI number must be exactly 15 digits.");
