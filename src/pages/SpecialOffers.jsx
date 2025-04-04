@@ -239,21 +239,16 @@ const SpecialOffers = () => {
 
 
   const handleSubmit = () => {
-    if (!receipt) {
-      toast.error("Please wait purchase receipt is being created");
-      return;
-    }
     setIsLoading(true);
     const userIdToken = sessionStorage.getItem("authToken");
     const LeadId = sessionStorage.getItem("LeadId");
-    const formData = new FormData();
-    formData.append("id", LeadId);
-    formData.append("bonusPrice", responseData.bonus);
-    formData.append("file", receipt);
     axios
-      .post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/item-purchased`,
-        formData,
-        { headers: { Authorization: userIdToken, "Content-Type": "multipart/form-data" } }
+      .post(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/questionnaires/item-purchased`,
+        { id: LeadId, bonusPrice: responseData.bonus },
+        { headers: { Authorization: userIdToken } }
       )
       .then((response) => {
         setAnswers([]);
@@ -385,15 +380,13 @@ const SubSpecialOffers = ({
           </p>
         </div>
         <div
-          onClick={receipt ? handleSubmit : null} // Prevent click if receipt is missing
-          className={`bg-primary relative text-center py-1 px-2 rounded-lg flex justify-between text-white items-center 
-            ${!receipt ? "cursor-not-allowed opacity-50 pointer-events-none" : "cursor-pointer"}
-          `}
+          onClick={handleSubmit}
+          className="bg-primary relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between  text-white items-center"
         >
           {isLoading && (
             <CgSpinner
               size={20}
-              className="absolute left-[30%] top-[8px] mt-1 animate-spin"
+              className="absolute left-[30%] top-[8px]  mt-1 animate-spin"
             />
           )}
           <p className="w-full p-1 text-xl font-medium">Sell Now</p>

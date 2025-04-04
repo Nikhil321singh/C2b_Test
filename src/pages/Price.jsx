@@ -226,19 +226,12 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod }) => {
   const [error, setError] = useState(true);
   const Device = sessionStorage.getItem("DeviceType");
   const validateImeiNumber = (value) => {
-    if (Device === "CTG1") {
-      if (value.length !== 15) {
-        setError("IMEI number must be exactly 15 digits.");
-        return false;
-      } else if (!/^\d{15}$/.test(value)) {
-        setError("IMEI number must only contain digits.");
-        return false;
-      }
-    } else if (Device !== "CTG1") {
-      if (value.length < 6) {
-        setError("IMEI number must be between 6 to 15 digits.");
-        return false;
-      }
+    if (value.length !== 15) {
+      setError("IMEI number must be exactly 15 digits.");
+      return false;
+    } else if (!/^\d{15}$/.test(value)) {
+      setError("IMEI number must only contain digits.");
+      return false;
     }
     setError("");
     return true;

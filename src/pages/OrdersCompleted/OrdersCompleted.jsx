@@ -46,8 +46,9 @@ const OrdersCompleted = ({ daysfilters, head }) => {
         console.log("ras", res.data?.Leads);
         const modifiedDataArray = res.data?.Leads.map((data) => {
           const storageValue = data.storage;
+          const ramValue = data.ram;
           const filteredConfig = data.model?.config.filter(
-            (configItem) => configItem.storage === storageValue
+            (configItem) => configItem.storage === storageValue && configItem.RAM === ramValue
           );
 
           return {
