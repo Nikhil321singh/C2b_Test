@@ -298,7 +298,7 @@ const fetchDownloadData = (totalCount, deviceType, Str) => {
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}&deviceType=${deviceType}&startDate=2020-01-01&toDate=${
         new Date().toISOString().split("T")[0]
-      }store=${Str}`,
+      }&store=${Str}`,
       {
         headers: {
           authorization: `${userToken1}`,
