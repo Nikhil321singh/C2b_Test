@@ -20,7 +20,6 @@ import onepluse from "../../assets/oneplus-logo.png";
 import mi from "../../assets/mi-logo.jpg";
 import smasung from "../../assets/samsung-logo.png";
 import mobile from "../../assets/mobile-logo.png";
-import watch from "../../assets/apple_watch.png";
 import appleWatch from "../../assets/apple_watch.png";
 import searchImage from "../../assets/mobileSearch.png";
 import Scanner from "../../components/Scanner";
@@ -167,7 +166,7 @@ const getCategories = async () => {
 export const DeviceTypeFilter2 = () => {
   const categories = [
     { name: "iPhone", image: mobile, apiType: "CTG1", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" },
-    { name: "Watch", image: watch, apiType: "CTG2", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" }
+    { name: "Watch", image: appleWatch, apiType: "CTG2", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" }
   ];
   const navigate = useNavigate();
   return (
