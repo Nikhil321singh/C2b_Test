@@ -333,7 +333,7 @@ const NewDeviceqs = () => {
   return (
     <>
       <div className={`popup ${showPopup ? "show" : ""}`}>
-        <img src={banner} alt="banner" />
+        <img className="object-contain" src={banner} alt="banner" />
         <div className="text">
           Help us calculate your device value correctly by answering to the
           following questions
