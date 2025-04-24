@@ -25,7 +25,7 @@ const AppFooter = ({ days }) => {
       <div
         onClick={() => navigate("/selectdevicetype")}
         className={`flex flex-col items-center ${
-          isActive("selectdevicetype") ? "text-primary font-semibold" : ""
+          isActive("selectdevicetype") ? "font-semibold text-primary" : ""
         }`}
       >
         <MdOutlineHome size={24} />
