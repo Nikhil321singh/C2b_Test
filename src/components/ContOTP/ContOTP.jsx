@@ -39,12 +39,17 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [errMsg, setErrMsg] = useState("");
     const [firstTime, setFirstIme] = useState(true);
 
-  const handleChange = (e) => {
-    setOtpData({
-      ...otpData,
-      [e.target.name]: e.target.value,
-    });
-  };
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      let newValue = value;
+      if (name === "name") {
+        newValue = value.replace(/[^a-zA-Z\s]/g, ""); // allow only letters and spaces
+      }
+      setOtpData({
+        ...otpData,
+        [name]: newValue,
+      });
+    };
   const handleNumberEdit = () => {
     setLoading(false);
     setOtpBoxOpen(!otpBoxOpen);
@@ -62,12 +67,12 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     function onSignup(event) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (otpData.name.length < 3) {
-        setErrMsg("Name: (Size Must Be >= 3)");
+        setErrMsg("Please enter a name with at least 3 characters.");
         return;
       }
 
       if (otpData.email.length < 5) {
-        setErrMsg("Email: (Size Must Be >= 5)");
+        setErrMsg("Please enter a valid email address (minimum 5 characters).");
         return;
       } else if (!emailRegex.test(otpData.email)) {
         setErrMsg("Invalid Email Format");
@@ -148,6 +153,11 @@ const ContOTP = ({ setContinueOTPOpen }) => {
         .catch((err) => {
           console.log(err);
           setLoading(false);
+          if (err?.message?.includes("INVALID_CODE") || err?.code === "auth/invalid-verification-code") {
+            toast.error("The OTP you entered is incorrect. Please try again.");
+          } else {
+            toast.error("Something went wrong. Please try again later.");
+          }
         });
     }
 

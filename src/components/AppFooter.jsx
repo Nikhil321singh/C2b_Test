@@ -4,24 +4,15 @@ import { CiSearch } from "react-icons/ci";
 import { IoBagAddOutline } from "react-icons/io5";
 import { BiCategory } from "react-icons/bi";
 import styles from "../styles/AppFooter.module.css";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 const AppFooter = ({ days }) => {
   const show = true;
   const navigate = useNavigate();
+  const location = useLocation();
   const currentDomain = window.location.origin;
-  const handleHome = () => {
-    navigate("/selectdevicetype");
-  };
-  const handleCategories = () => {
-    navigate("/BrandList");
-  };
-  const handleOrders = () => {
-    navigate(`/Orders/${days}`);
-  };
-  const handleSearch = () => {
-    navigate(`/selectdevicetype`, { state: { openSearch: true } });
-  };
+
+  const isActive = (keyword) => location.pathname.includes(keyword);
 
   return (
     <div
@@ -31,22 +22,46 @@ const AppFooter = ({ days }) => {
         styles.footer_wrap
       }`}
     >
-      <div onClick={handleHome} className="flex flex-col items-center">
+      <div
+        onClick={() => navigate("/selectdevicetype")}
+        className={`flex flex-col items-center ${
+          isActive("selectdevicetype") ? "font-semibold text-primary" : ""
+        }`}
+      >
         <MdOutlineHome size={24} />
         <button className="text-sm">Home</button>
       </div>
-      {currentDomain === import.meta.env.VITE_BUYBACK_URL && <div onClick={handleSearch} className="flex flex-col items-center">
-        <CiSearch size={24} />
-        <button className="text-sm">Search Products</button>
-      </div>}
-      {currentDomain !== import.meta.env.VITE_BUYBACK_URL && <div onClick={handleCategories} className="flex flex-col items-center">
-        <BiCategory size={24} />
-        <button className="text-sm">Categories</button>
-      </div>}
-      {currentDomain !== import.meta.env.VITE_BUYBACK_URL && <div onClick={handleOrders} className="flex flex-col items-center">
-        <IoBagAddOutline size={24} />
-        <button className="text-sm">Orders</button>
-      </div>}
+
+      {currentDomain === import.meta.env.VITE_BUYBACK_URL && (
+        <div onClick={() => navigate("/selectdevicetype", { state: { openSearch: true } })} className="flex flex-col items-center">
+          <CiSearch size={24} />
+          <button className="text-sm">Search Products</button>
+        </div>
+      )}
+
+      {currentDomain !== import.meta.env.VITE_BUYBACK_URL && (
+        <div
+          onClick={() => navigate("/BrandList")}
+          className={`flex flex-col items-center ${
+            isActive("BrandList") ? "text-primary font-semibold" : ""
+          }`}
+        >
+          <BiCategory size={24} />
+          <button className="text-sm">Categories</button>
+        </div>
+      )}
+
+      {currentDomain !== import.meta.env.VITE_BUYBACK_URL && (
+        <div
+          onClick={() => navigate(`/Orders/${days}`)}
+          className={`flex flex-col items-center ${
+            isActive("Orders") ? "text-primary font-semibold" : ""
+          }`}
+        >
+          <IoBagAddOutline size={24} />
+          <button className="text-sm">Orders</button>
+        </div>
+      )}
     </div>
   );
 };

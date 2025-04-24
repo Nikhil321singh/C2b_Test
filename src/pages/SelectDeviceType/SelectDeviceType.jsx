@@ -20,7 +20,6 @@ import onepluse from "../../assets/oneplus-logo.png";
 import mi from "../../assets/mi-logo.jpg";
 import smasung from "../../assets/samsung-logo.png";
 import mobile from "../../assets/mobile-logo.png";
-import watch from "../../assets/watch_logo.png";
 import appleWatch from "../../assets/apple_watch.png";
 import searchImage from "../../assets/mobileSearch.png";
 import Scanner from "../../components/Scanner";
@@ -167,7 +166,7 @@ const getCategories = async () => {
 export const DeviceTypeFilter2 = () => {
   const categories = [
     { name: "iPhone", image: mobile, apiType: "CTG1", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" },
-    { name: "Watch", image: watch, apiType: "CTG2", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" }
+    { name: "Watch", image: appleWatch, apiType: "CTG2", link: "/selectdevice/653cbbeae2eb1f468a1dd7ea" }
   ];
   const navigate = useNavigate();
   return (
@@ -185,7 +184,7 @@ export const DeviceTypeFilter2 = () => {
               navigate(category.link);
             }}
           >
-            {category.image && <img className="w-[50%]" src={category.image} alt={category.name} />}
+            {category.image && <img className="w-[400px] h-[150px] object-contain" src={category.image} alt={category.name} />}
             <div className="w-full text-center font-semibold text-base text-primary">{category.name}</div>
           </div>
         ))}
@@ -468,7 +467,7 @@ const searchPhoneAPI = async (Sdata, deviceType) => {
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/user/Dashboard/search/phones`,
-      { name: Sdata, deviceType: deviceType },
+      { name: Sdata},
       { headers: { authorization: `${userToken}` } }
     )
     .then((res) => {

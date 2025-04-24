@@ -442,7 +442,10 @@ const OTPCompSub = ({
           type="text"
           placeholder="Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            const alphabetOnly = e.target.value.replace(/[^a-zA-Z\s]/g, ""); // allows letters and spaces
+            setName(alphabetOnly);
+          }}
         />
         <input
           className="p-2 border-2 outline-none"
