@@ -7,9 +7,9 @@ import { DataProvider } from "./components/dataContext.jsx";
 const currentDomain = window.location.origin;
 
 // Read environment variables
-const WEBSITE_TITLE = import.meta.env.VITE_WEBSITE_TITLE || "Unicorn";
+const WEBSITE_TITLE = import.meta.env.VITE_WEBSITE_TITLE || "Grest";
 const BUYBACK_TITLE = import.meta.env.VITE_WEBSITE_GREST_TITLE || "Grest";
-const DEFAULT_FAVICON = "/Grest_Logo.jpg";
+const DEFAULT_FAVICON = "/Grest_Short.jpg";
 const BUYBACK_FAVICON = "/Buyback_Logo.jpg"; // Use your actual buyback logo
 
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
