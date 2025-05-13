@@ -11,6 +11,7 @@ import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 import { IoArrowBack } from "react-icons/io5";
+import toast from "react-hot-toast";
 const pink = "bg-primary";
 const fileUploader = async (authToken, file, fileName, fileType) => {
   try {
@@ -83,6 +84,16 @@ const Price = () => {
   };
   const uploadAllImages = async () => {
     setIsLoading(true);
+    if(imeinumber.length !== 15){
+      toast.error("IMEI number must be exactly 15 digits.");
+      setIsLoading(false);
+      return;
+    }
+    if(aadharNumber.length !== 12){
+      toast.error("Aadhar number must be exactly 12 digits.");
+      setIsLoading(false);
+      return;
+    }
     if (!imeinumber || !aadharNumber || !phoneFront || !phoneBack || !phoneLeft ||
       !phoneRight || !phoneTop || !phoneBottom || (isBillRequired && !phoneBill)
     ) {

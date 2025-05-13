@@ -18,6 +18,7 @@ import axios from "axios";
 import { auth } from "../../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { IoArrowBack } from "react-icons/io5";
+import toast from "react-hot-toast";
 const initOtp = {
   name: "",
   email: "",
@@ -379,6 +380,11 @@ const OTPComp = ({
   setPh,
   setOtpData,
 }) => {
+    useEffect(() => {
+    return () => {
+      setOtp("");
+    };
+    }, []);
   return (
     <React.Fragment>
       {otpBoxOpen ? (
