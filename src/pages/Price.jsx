@@ -84,11 +84,6 @@ const Price = () => {
   };
   const uploadAllImages = async () => {
     setIsLoading(true);
-    if(imeinumber.length !== 15){
-      toast.error("IMEI number must be exactly 15 digits.");
-      setIsLoading(false);
-      return;
-    }
     if(aadharNumber.length !== 12){
       toast.error("Aadhar number must be exactly 12 digits.");
       setIsLoading(false);
