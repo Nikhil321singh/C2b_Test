@@ -67,7 +67,7 @@ const Login = () => {
             );
             redirectUser(storedProfile.role);
           })
-          .catch((error) => {
+          .catch(() => {
             // Token is invalid, clear session and localStorage, and do not redirect
             sessionStorage.clear();
             localStorage.clear();
