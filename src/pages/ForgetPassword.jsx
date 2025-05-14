@@ -12,7 +12,7 @@ import { MdOutlineMailLock } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import OtpInput from "otp-input-react";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { IoEye, IoEyeOffSharp } from "react-icons/io5";
+import { IoArrowBack, IoEye, IoEyeOffSharp } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 const iconStyles = { margin: "0px 10px", color: "var(--primary-color)" };
 
@@ -111,9 +111,17 @@ const ForgetPassword = () => {
       <div className="flex flex-col items-center justify-center box">
         <div className="imgBox">
           <img className="w-48" src={GREST_LOGO} />
-          <h1 className="mb-2 text-2xl font-semibold sm:text-3xl">
-            Password Recovery
-          </h1>
+          <div className="flex gap-2 items-center justify-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack size={20} />
+            </button>
+            <h1 className="mb-2 text-2xl font-semibold sm:text-3xl">
+              Password Recovery
+            </h1>
+          </div>
           <div className="underline"></div>
         </div>
         <div className="innerbox">

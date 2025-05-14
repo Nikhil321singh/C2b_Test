@@ -289,24 +289,22 @@ const DeviceQuoteHeader = () => {
       <div
       className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}
     >
-      <div className="flex items-center justify-between w-full px-4">
-        <div className="flex items-center justify-between gap-2">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-xs ml-2 flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-          >
-            <IoArrowBack
-              size={24}
-            />
-          </button>
-          <img
-            onClick={() => navigate(deviceTypePage)}
-            className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
-            src={GREST_LOGO}
-            alt="app logo"
-            />
+        <div className="flex items-center justify-between w-full max-w-screen overflow-hidden px-4 py-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack size={20} />
+            </button>
+            <img
+              onClick={() => navigate(deviceTypePage)}
+              className="w-[120px] sm:w-[130px] md:w-[150px] object-contain cursor-pointer"
+              src={GREST_LOGO}
+              alt="app logo"
+              />
+          </div>
+          <ProfileBox />
         </div>
-        <ProfileBox />
-      </div>
     </div>
   )}

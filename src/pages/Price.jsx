@@ -11,6 +11,7 @@ import User_Logo from "../assets/User_Logo.jpg";
 import { FaCamera, FaInfoCircle } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 import { IoArrowBack } from "react-icons/io5";
+import { GiHamburgerMenu } from "react-icons/gi";
 const pink = "bg-primary";
 const fileUploader = async (authToken, file, fileName, fileType) => {
   try {
