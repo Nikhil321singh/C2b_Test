@@ -30,30 +30,49 @@ const Login = () => {
 
   useEffect(() => {
     const bypassedDomain = import.meta.env.BYPASSED_DOMAIN;
-    console.log(currentDomain,"  " ,bypassedDomain);
+    console.log(currentDomain, "  ", bypassedDomain);
+
+    // If the current domain is the buyback domain, reset the session and navigate
     if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
-          sessionStorage.setItem("authToken", "");
-          sessionStorage.setItem("profile", JSON.stringify({ firstName: WEBSITE_SHORT_NAME }));
-          sessionStorage.setItem("DeviceType", "CTG1");
-          localStorage.removeItem("formData");
-          dispatch(setUserProfile({ firstName: WEBSITE_SHORT_NAME }));
-          navigate(homeroute);
+      sessionStorage.setItem("authToken", "");
+      sessionStorage.setItem("profile", JSON.stringify({ firstName: WEBSITE_SHORT_NAME }));
+      sessionStorage.setItem("DeviceType", "CTG1");
+      localStorage.removeItem("formData");
+      dispatch(setUserProfile({ firstName: WEBSITE_SHORT_NAME }));
+      navigate(homeroute);
     } else {
+      // Get stored profile and token
       const storedProfile = JSON.parse(localStorage.getItem("profile"));
       const storedToken = localStorage.getItem("authToken");
       sessionStorage.setItem("authToken", storedToken);
       sessionStorage.setItem("profile", JSON.stringify(storedProfile));
       sessionStorage.setItem("DeviceType", "CTG1");
       localStorage.removeItem("formData");
+
+      // If there is a stored profile and token, verify token
       if (storedProfile && storedToken) {
-        dispatch(setUserProfile(storedProfile));
-        dispatch(
-          setStoreFilter({
-            selStore: storedProfile.storeName,
-            selRegion: storedProfile.region,
+        // Validate token with a GET request to the server
+        axios
+          .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`, {
+            headers: { Authorization: storedToken },
           })
-        );
-        redirectUser(storedProfile.role);
+          .then((response) => {
+            // Token is valid, continue with redirection
+            dispatch(setUserProfile(storedProfile));
+            dispatch(
+              setStoreFilter({
+                selStore: storedProfile.storeName,
+                selRegion: storedProfile.region,
+              })
+            );
+            redirectUser(storedProfile.role);
+          })
+          .catch(() => {
+            // Token is invalid, clear session and localStorage, and do not redirect
+            sessionStorage.clear();
+            localStorage.clear();
+            toast.error("Session expired. Please log in again.");
+          });
       }
     }
   }, []);

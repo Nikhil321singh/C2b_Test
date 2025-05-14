@@ -18,6 +18,7 @@ import axios from "axios";
 import { auth } from "../../firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { IoArrowBack } from "react-icons/io5";
+import toast from "react-hot-toast";
 const initOtp = {
   name: "",
   email: "",
@@ -37,7 +38,8 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
   const [errMsg, setErrMsg] = useState("");
-    const [firstTime, setFirstIme] = useState(true);
+    const [firstTime, setFirstTime] = useState(true);
+    const token = sessionStorage.getItem("authToken");
 
     const handleChange = (e) => {
       const { name, value } = e.target;
@@ -64,134 +66,122 @@ const ContOTP = ({ setContinueOTPOpen }) => {
       });
     }
 
-    function onSignup(event) {
+    const onSignup = async () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (otpData.name.length < 3) {
         setErrMsg("Please enter a name with at least 3 characters.");
         return;
       }
-
-      if (otpData.email.length < 5) {
-        setErrMsg("Please enter a valid email address (minimum 5 characters).");
-        return;
-      } else if (!emailRegex.test(otpData.email)) {
+      if (!emailRegex.test(otpData.email)) {
         setErrMsg("Invalid Email Format");
         return;
       }
-
       if (otpData.phone.length !== 10) {
         setErrMsg("Mobile: (Must have 10 Digits)");
         return;
       }
+
       setErrMsg("");
       setLoading(true);
-      if (firstTime) {
-        onCaptchVerify();
-        setFirstIme(false);
+      setFirstTime(false);
+
+      try {
+        await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/sendOtp`, {
+          mobileNumber: otpData.phone,
+        },{
+          headers: { Authorization: token },
+        });
+
+        setOtpBoxOpen(true);
+        setDisableResend(true);
+      } catch (err) {
+        console.error(err);
+        setErrMsg("Failed to send OTP");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const appVerifier = window.recaptchaVerifier;
-      const formatPh = "+91" + ph;
-      console.log(formatPh);
-
-      signInWithPhoneNumber(auth, formatPh, appVerifier)
-        .then((confirmationResult) => {
-          window.confirmationResult = confirmationResult;
-          setLoading(false);
-          setOtpBoxOpen(true);
-          setDisableResend(true);
-          console.log("OTP sent successfully!");
-        })
-        .catch((error) => {
-          console.log(error);
-          setLoading(false);
-        });
-
-      setOtpData({
-        ...otpData,
-        phone: ph,
-      });
-    }
-
-    function onOTPVerify() {
+    const onOTPVerify = async () => {
       setLoading(true);
-          const leadId = sessionStorage.getItem("LeadId");
-      window.confirmationResult
-        .confirm(otp)
-        .then(async (res) => {
-          console.log("ho gya");
-             if (
-               currentDomain === buyBackUrl
-             ) {
-               const response = await axios.post(
-                 `${
-                   import.meta.env.VITE_REACT_APP_ENDPOINT
-                 }/api/questionnaires/customerDetail`,
-                 {
-                   name: otpData.name,
-                   emailId: otpData.email,
-                   phoneNumber: otpData.phone,
-                   leadId,
-                 }
-               );
-               console.log(response);
-               if (response?.status === 200) {
-                 navigate("/thankyou");
-               } else {
-                 setErrMsg("Failed to Save Details");
-               }
-               setLoading(false);
-             } else if (
-               currentDomain !== buyBackUrl
-             ) {
-               dispatch(setOtpVerified(true));
-               navigate("/inputnumber");
-             } else {
-               setLoading(false);
-             }
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-          if (err?.message?.includes("INVALID_CODE") || err?.code === "auth/invalid-verification-code") {
-            toast.error("The OTP you entered is incorrect. Please try again.");
-          } else {
-            toast.error("Something went wrong. Please try again later.");
-          }
-        });
-    }
+      const leadId = sessionStorage.getItem("LeadId");
 
-    const resendOTP = () => {
+      try {
+        const res = await axios.post(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/verifyOtp`,
+          {
+            mobileNumber: otpData.phone,
+            otp,
+          },{
+            headers: { Authorization: token },
+          }
+        );
+
+        if (res?.data?.success && currentDomain === buyBackUrl) {
+          const response = await axios.post(
+            `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/customerDetail`,
+            {
+              name: otpData.name,
+              emailId: otpData.email,
+              phoneNumber: otpData.phone,
+              leadId,
+            },{
+              headers: { Authorization: token },
+            }
+          );
+
+          if (response?.status === 200) {
+            navigate("/thankyou");
+          } else {
+            setErrMsg("Failed to Save Details");
+          }
+        } else {
+          dispatch(setOtpVerified(true));
+          navigate("/inputnumber");
+        }
+      } catch (err) {
+        console.error(err);
+        const isInvalidOtp =
+          err.response?.status === 400 &&
+          err.response?.data?.error === "Invalid OTP";
+        if (isInvalidOtp) {
+          toast.error("Invalid OTP. Please try again.");
+        } else {
+          toast.error("Invalid or expired OTP");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const resendOTP = async () => {
       setDisableResend(true);
 
-      const appVerifier = window.recaptchaVerifier;
-      const formatPh = "+91" + ph;
-
-      signInWithPhoneNumber(auth, formatPh, appVerifier)
-        .then((confirmationResult) => {
-          window.confirmationResult = confirmationResult;
-          console.log("OTP resent successfully!");
-        })
-        .catch((error) => {
-          console.log(error);
+      try {
+        await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/resendOtp`, {
+          mobileNumber: otpData.phone,
+        },{
+          headers: { Authorization: token },
         });
+      } catch (err) {
+        console.error(err);
+        setErrMsg("Failed to resend OTP");
+      }
     };
 
-  useEffect(() => {
-    let intrvl;
-    if (disableResend && timer > 0) {
-      intrvl = setInterval(() => {
-        setTimer(timer - 1);
-      }, 1000);
-    } else if (timer === 0) {
-      setDisableResend(false);
-    } else if (!disableResend) {
-      setTimer(30);
-    }
-    return () => {
-      clearInterval(intrvl);
-    };
-  }, [disableResend, timer]);
+    useEffect(() => {
+      let intrvl;
+      if (disableResend && timer > 0) {
+        intrvl = setInterval(() => setTimer((prev) => prev - 1), 1000);
+      } else if (timer === 0) {
+        setDisableResend(false);
+      } else if (!disableResend) {
+        setTimer(30);
+      }
+
+      return () => clearInterval(intrvl);
+    }, [disableResend, timer]);
+
 
   useEffect(() => {
     localStorage.setItem("otpData", JSON.stringify(otpData));
@@ -254,7 +244,7 @@ export const MainOtpUI = ({
             </button>
             <img
               onClick={() => navigate("/selectdevicetype")}
-              className="w-[150px] max-w-[150px] object-contain cursor-pointer ml-2"
+              className="w-[120px] max-w-[150px] object-contain cursor-pointer ml-2"
               src={GREST_LOGO}
               alt="app logo"
               />
@@ -379,6 +369,11 @@ const OTPComp = ({
   setPh,
   setOtpData,
 }) => {
+  useEffect(() => {
+    return () => {
+      setOtp("");
+    };
+  }, []);
   return (
     <React.Fragment>
       {otpBoxOpen ? (

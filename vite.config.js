@@ -8,6 +8,6 @@ export default defineConfig({
     port: 4200,  // Set the port to 4000
   },
   build: {
-    outDir: 'build', // specify the output directory
+    outDir: 'dist', // specify the output directory
   },
 })

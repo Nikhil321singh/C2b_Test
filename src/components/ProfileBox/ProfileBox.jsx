@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import User_Logo from "../../assets/User_Logo.jpg";
 import { IoClose } from "react-icons/io5";
 import styles from "./ProfileBox.module.css";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 function setName(firstName, lastName) {
   if (!firstName && !lastName) {
@@ -71,9 +72,9 @@ const ProfileBox = () => {
 
   return (
     <div className="select-none flex ml-4 z-40 gap-2 flex-row-reverse items-center">
+      <GiHamburgerMenu size={24} className="w-[60px]" onClick={profileHandler}/>
       <p className=" text-base  md:text-xl">{userName}</p>
       <img
-        onClick={profileHandler}
         className="w-[30px]"
         src={User_Logo}
         alt=""

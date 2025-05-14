@@ -49,8 +49,6 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
       address: formData.address,
     };
 
-    console.log(data);
-
     const config = {
       method: "put",
       maxBodyLength: Infinity,
@@ -59,127 +57,81 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
         Authorization: token,
         "Content-Type": "application/json",
       },
-      data: data,
+      data,
     };
 
     axios
       .request(config)
       .then((response1) => {
-        console.log(response1);
         setIsTableLoaded(false);
         setResponse(response1.data.msg);
         setEditSuccess(true);
       })
       .catch((error) => {
-        console.log(error);
         setIsTableLoaded(false);
         setResponse("Failed to update data");
       });
   };
 
   return (
-    <div className="min-h-screen  pb-8 bg-[#F5F4F9]">
+    <div className="min-h-screen pb-8 bg-[#F5F4F9]">
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
+
       <div
         style={{
           boxShadow:
             "rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px",
         }}
-        className="items-center bg-white max-w-[900px] flex py-8 mx-auto mt-4 justify-center flex-col"
+        className="bg-white w-full max-w-[900px] mx-auto mt-4 py-8 flex flex-col items-center px-4 md:px-10 relative"
       >
-        <div className="flex flex-col w-[900px]">
-          <div className="mb-6 flex flex-col gap-2 border-b-2 mr-10 pb-2 ml-10">
-            <IoClose
-              size={35}
-              className="absolute right-[220px] text-primary transition ease hover:rotate-[360deg] duration-500"
-              onClick={closeHandler}
-            />
-            <p className="text-4xl font-bold">Update Store Details</p>
-            <p className="text-lg">All fields marked with * are required</p>
+        {/* Close Icon */}
+        <IoClose
+          size={30}
+          className="absolute top-4 right-4 text-primary transition hover:rotate-[360deg] duration-500 cursor-pointer"
+          onClick={closeHandler}
+        />
+
+        <div className="flex flex-col w-full">
+          {/* Heading */}
+          <div className="mb-6 border-b-2 pb-2">
+            <p className="text-3xl md:text-4xl font-bold">Update Store Details</p>
+            <p className="text-base md:text-lg">All fields marked with * are required</p>
           </div>
-          <form className="ml-10 flex flex-col gap-4" onSubmit={submitHandler}>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Store Name*</span>
-              <input
-                id="storeName"
-                name="storeName"
-                value={formData.storeName}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Unique Id*</span>
-              <input
-                id="uniqueId"
-                name="uniqueId"
-                value={formData.uniqueId}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none "
-                type="text"
-                required={true}
-              />
-            </div>
 
-            <div className="flex flex-col w-[70%] gap-2 ">
-              <span className="font-medium text-xl">Email*</span>
-              <input
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="email"
-                required={true}
-              />
-            </div>
+          {/* Form */}
+          <form className="flex flex-col gap-4" onSubmit={submitHandler}>
+            {[
+              { label: "Store Name", name: "storeName", type: "text" },
+              { label: "Unique Id", name: "uniqueId", type: "text" },
+              { label: "Email", name: "email", type: "email" },
+              { label: "Contact Number", name: "contactNumber", type: "number" },
+              { label: "Region", name: "region", type: "text" },
+              { label: "Adddress", name: "address", type: "text" },
+            ].map(({ label, name, type }) => (
+              <div key={name} className="flex flex-col gap-2 w-full md:w-[70%]">
+                <label className="font-medium text-base md:text-xl">
+                  {label}*
+                </label>
+                <input
+                  id={name}
+                  name={name}
+                  type={type}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  required
+                  className="border-2 px-3 py-2 rounded-lg outline-none"
+                />
+              </div>
+            ))}
 
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Contact Number*</span>
-              <input
-                id="contactNumber"
-                name="contactNumber"
-                value={formData.contactNumber}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="number"
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Region*</span>
-              <input
-                id="region"
-                name="region"
-                value={formData.region}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="text"
-                required={true}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Adddress*</span>
-              <input
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="text"
-                required={true}
-              />
-            </div>
-            <div className="mt-8 flex flex-row justify-start gap-4 items-center">
+            <div className="mt-8 flex flex-row flex-wrap items-center gap-4">
               <button
                 type="submit"
-                className="font-medium text-sm text-white p-3 rounded bg-primary"
+                className="font-medium text-sm text-white px-4 py-2 rounded bg-primary"
               >
                 Update Details
               </button>

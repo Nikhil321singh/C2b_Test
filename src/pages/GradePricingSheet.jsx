@@ -11,7 +11,7 @@ import { IoMdSearch } from "react-icons/io";
 import { FaDownload, FaUpload } from "react-icons/fa6";
 import { IoRefresh } from "react-icons/io5";
 import { saveAs } from "file-saver";
-import { ToastContainer, toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const pageLimit = 10;
 
