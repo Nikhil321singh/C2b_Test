@@ -178,7 +178,6 @@ const StoreListingTable = () => {
       />
 <div className="m-4 w-full flex flex-col gap-4 items-center">
   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-6 gap-2 w-full items-center justify-center mr-10">
-    
     <button
       className={`${styles.bulkdown_button} w-full`}
       onClick={() => navigate("/storelisting")}

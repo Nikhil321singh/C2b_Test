@@ -15,8 +15,6 @@ const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
 const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import axios from "axios";
-import { auth } from "../../firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { IoArrowBack } from "react-icons/io5";
 import toast from "react-hot-toast";
 const initOtp = {
@@ -38,7 +36,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
   const [disableResend, setDisableResend] = useState(false);
   const [otpData, setOtpData] = useState(initOtp);
   const [errMsg, setErrMsg] = useState("");
-    const [firstTime, setFirstTime] = useState(true);
     const token = sessionStorage.getItem("authToken");
 
     const handleChange = (e) => {
@@ -57,15 +54,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
     setOtpBoxOpen(!otpBoxOpen);
   };
 
-    function onCaptchVerify() {
-      console.log(auth);
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
-        size: "invisible",
-        callback: (response) => {
-        },
-      });
-    }
-
     const onSignup = async () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (otpData.name.length < 3) {
@@ -83,7 +71,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
 
       setErrMsg("");
       setLoading(true);
-      setFirstTime(false);
 
       try {
         await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/sendOtp`, {
