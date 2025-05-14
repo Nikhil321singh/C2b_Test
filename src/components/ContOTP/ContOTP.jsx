@@ -369,11 +369,11 @@ const OTPComp = ({
   setPh,
   setOtpData,
 }) => {
-  useEffect(() => {
+    useEffect(() => {
     return () => {
       setOtp("");
     };
-  }, []);
+    }, []);
   return (
     <React.Fragment>
       {otpBoxOpen ? (

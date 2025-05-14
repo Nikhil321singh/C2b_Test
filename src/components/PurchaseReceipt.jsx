@@ -168,33 +168,33 @@ const PurchaseReceipt = ({
         <p className="font-bold mt-16 mb-2">Seller Name and Sign</p>
       </div>
       <div className="page-break">
-      <div className="terms-conditions">
-        <div className="text-center mt-2 border-t-2 border-dashed border-black ">
+      <div className="terms-conditions mt-32">
+        <div className="text-center mt-2">
           <p className="text-xl font-bold my-4 mx-auto">TERMS & CONDITIONS</p>
         </div>
         <div className="w-full">
-          <ol className="list-decimal pl-5 text-left leading-normal">
-            <li>
-              The Customer/Seller confirms that they are the rightful owner of the Gadget/Device and assume full
+        <div className="pl-5 text-left leading-normal">
+          <div className="mb-2">
+              1. The Customer/Seller confirms that they are the rightful owner of the Gadget/Device and assume full
               responsibility for any liabilities related to its ownership.
-            </li>
-            <li>
-              The Customer/Seller affirms that all personal data has been completely removed from the device,
+            </div>
+              <div className="mb-2">
+              2. The Customer/Seller affirms that all personal data has been completely removed from the device,
               and the Company shall not be held responsible for any data-related issues.
-            </li>
-            <li>
-              The Customer/Seller agrees to indemnify and hold the Company harmless against any third-party
+            </div>
+              <div className="mb-2">
+              3. The Customer/Seller agrees to indemnify and hold the Company harmless against any third-party
               claims arising from the ownership, data, condition of the device, or any criminal matters related to the device.
-            </li>
-            <li>
-              Payment will be processed as per the agreed terms. Any discrepancies must be reported within 2 hours of the transaction,
+            </div>
+              <div className="mb-2">
+              4. Payment will be processed as per the agreed terms. Any discrepancies must be reported within 2 hours of the transaction,
               Return and refund requests, if applicable, must comply with the Company’s return policy.
-            </li>
-            <li>
-              Any disputes or disagreements between the Customer/Seller and Purchaser shall be exclusively resolved under the
+            </div>
+              <div className="mb-2">
+              5. Any disputes or disagreements between the Customer/Seller and Purchaser shall be exclusively resolved under the
               jurisdiction of the courts located in {import.meta.env.VITE_COURT_ADDRESS} only.
-            </li>
-          </ol>
+            </div>
+          </div>
         </div>
         <div className="w-full text-right mt-8">
           <p className="font-bold">SIGNATURES</p>
