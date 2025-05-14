@@ -3,16 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --primary-color: #4900a8;
+  --primary-color: #ec2752;
   --secondary-color: red;
-  --tertiary-color: rgba(233, 68, 118, 0.495);
-  --quaternary-color: #8080ff;
-}
-
-@media print {
-  .page-break {
-    page-break-before: always;
-  }
+  --tertiary-color: #d7203d;
+  --quaternary-color: #ff3864;
 }
 
 @media print {
