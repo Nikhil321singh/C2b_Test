@@ -232,7 +232,7 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod }) => {
   const [error, setError] = useState(true);
   const validateImeiNumber = (value) => {
     if (value.length !== 15) {
-      setError("IMEI number must be exactly 15 digits.");
+      setError("IMEI number must less than or equal to 15 digits.");
       return false;
     } else if (!/^\d{15}$/.test(value)) {
       setError("IMEI number must only contain digits.");

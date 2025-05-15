@@ -351,7 +351,7 @@ export const BrandList = ({ deviceType }) => {
     const allowedBrandsCTG1 = new Set([
       "Apple", "OnePlus", "POCO", "Realme", "Xiaomi", "Samsung", "Vivo", "iQOO",
       "Infinix", "Tecno", "Google", "Nothing", "Honor", "Motorola", "Nokia",
-      "OPPO", "Lenovo"
+      "OPPO", "Lenovo", "Huawei"
     ]);
 
     const shouldNavigate =
@@ -734,9 +734,9 @@ const SearchBox = ({
   return (
     <React.Fragment>
       <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-        <div className="flex items-center justify-between w-full pr-2">
-          <ProfileBox />
+        <div className="flex items-center justify-between w-full px-2">
           <img className="w-40" src={GREST_LOGO} alt="app logo" />
+          <ProfileBox />
         </div>
       </div>
       {isSearchBoxOpen && (

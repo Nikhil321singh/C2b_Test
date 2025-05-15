@@ -222,15 +222,14 @@ function Categories() {
         }
       >
         <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-          <div className="flex items-center justify-between w-full ">
-            <ProfileBox />
-
+          <div className="flex items-center justify-between w-full pl-2">
             <img
               onClick={() => navigate("/selectdevicetype")}
               className="w-40"
               src={GREST_LOGO}
               alt="app logo"
             />
+            <ProfileBox />
           </div>
         </div>
         <DeviceTypeFilter

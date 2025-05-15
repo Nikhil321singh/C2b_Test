@@ -9,6 +9,7 @@ import PurchaseReceipt from "../PurchaseReceipt";
 import ReactDOMServer from "react-dom/server";
 import html2pdf from "html2pdf.js";
 import { FaDownload } from "react-icons/fa6";
+import { Capacitor } from "@capacitor/core";
 
 const quoteSaved = "Quote Saved";
 export const DeleteModal = ({ onCancel, onConfirm }) => {
@@ -212,11 +213,11 @@ const OrdersCard = ({
         <div className="flex items-center py-1 px-2 text-white bg-primary rounded-xl">
           <p className="text-sm font-medium">{title}</p>
         </div>
-        {
-          title === "Order Completed" &&
-        <div onClick={() => {hanldlejsx_pdf(allData)}} className="flex items-center h-full px-4 text-white bg-[#EC2752] rounded-xl">
-          <FaDownload size={15} />
-        </div>}
+        {title === "Order Completed" && Capacitor.getPlatform() === 'web' && (
+            <div onClick={() => hanldlejsx_pdf(allData)} className="flex items-center h-full px-4 text-white bg-[#EC2752] rounded-xl">
+              <FaDownload size={15} />
+            </div>
+          )}
         <div className="">
           <p className="text-sm font-medium text-gray-400">
             {formatDateTime(dateTime)}

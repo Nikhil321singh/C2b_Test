@@ -124,15 +124,15 @@ const StoreListing = () => {
           boxShadow:
             "rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px",
         }}
-        className="items-center bg-white max-w-[900px] flex py-8 mx-auto mt-4 justify-center flex-col"
+        className="items-center bg-white w-full max-w-[900px] flex py-8 mx-auto mt-4 justify-center flex-col px-4 md:px-8"
       >
-        <div className="flex flex-col  w-[900px]">
-          <div className="mb-6 flex flex-col gap-2 border-b-2 mr-10 pb-2 ml-10">
-            <p className="text-4xl font-bold">Store Listing</p>
+  <div className="flex flex-col w-full">
+  <div className="mb-6 flex flex-col gap-2 border-b-2 pb-2 px-4 md:px-10">
+  <p className="text-4xl font-bold">Store Listing</p>
             <p className="text-lg">All fields marked with * are required</p>
           </div>
-          <div className="flex flex-wrap gap-2 ml-10 mb-10">
-            <button
+          <div className="flex flex-wrap gap-2 px-4 md:px-10 mb-10">
+          <button
               onClick={() => navigate("/storelistingtable")}
               className="font-medium text-sm text-white p-3 rounded bg-primary"
             >
@@ -152,9 +152,9 @@ const StoreListing = () => {
 
 const StoreListingForm = ({ submitHandler, formData, handleChange }) => {
   return (
-    <form onSubmit={submitHandler} className="flex flex-col gap-4 ml-10">
-      <div className="flex flex-col gap-2 w-[70%]">
-        <span className="text-xl font-medium">Store Name*</span>
+<form onSubmit={submitHandler} className="flex flex-col gap-4 px-4 md:px-10">
+<div className="flex flex-col gap-2 w-full md:w-[70%]">
+<span className="text-xl font-medium">Store Name*</span>
         <input
           id="storeName"
           value={formData.storeName}

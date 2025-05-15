@@ -176,51 +176,69 @@ const StoreListingTable = () => {
         getData={getData}
         getDataBySearch={getDataBySearch}
       />
-      <div className="m-2 flex flex-col gap-2 items-center w-[100%]">
-        <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={() => {
-              navigate("/storelisting");
-            }}
-          >
-            <IoMdAdd /> Add Store
-          </button>
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={sampleDownloadHandler}
-          >
-            <FaDownload /> Upload Sample
-          </button>
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={() => {
-              setUploadBox(true);
-            }}
-          >
-            <FaUpload /> Bulk upload
-          </button>
-          <div className={`${styles.search_bar_wrap}`}>
-            <input
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="text-sm"
-              type="text"
-              placeholder="Search Store Name/Email/Id/Region"
-              value={searchValue}
-            />
-            <IoMdSearch onClick={() => getDataBySearch()} size={25} />
-          </div>
-          <div className={styles.icons_box}>
-            <IoRefresh onClick={handleSearchClear} className="" size={25} />
-          </div>
-          <button
-            className={`${styles.bulkdown_button}`}
-            onClick={() => downloadExcel(data, curPage)}
-          >
-            <FaDownload /> Bulk Download
-          </button>
-        </div>
+<div className="m-4 w-full flex flex-col gap-4 items-center">
+  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-6 gap-2 w-full items-center justify-center mr-10">
+    <button
+      className={`${styles.bulkdown_button} w-full`}
+      onClick={() => navigate("/storelisting")}
+    >
+      <IoMdAdd /> Add Store
+    </button>
+
+    <button
+      className={`${styles.bulkdown_button} w-full`}
+      onClick={sampleDownloadHandler}
+    >
+      <FaDownload /> Upload Sample
+    </button>
+
+    <button
+      className={`${styles.bulkdown_button} w-full`}
+      onClick={() => setUploadBox(true)}
+    >
+      <FaUpload /> Bulk Upload
+    </button>
+
+    {/* Search bar and Refresh - combined in one row for sm and below */}
+    <div className="flex w-full items-center gap-2">
+      <div className={`${styles.search_bar_wrap} flex items-center w-full`}>
+        <input
+          onChange={(e) => setSearchValue(e.target.value)}
+          className="text-sm w-full"
+          type="text"
+          placeholder="Search Store Name/Email/Id/Region"
+          value={searchValue}
+        />
+        <IoMdSearch
+          onClick={getDataBySearch}
+          size={25}
+          className="ml-2 cursor-pointer"
+        />
       </div>
+      {/* Only show this refresh icon here for small screens */}
+      <div className="block md:hidden mr-3">
+        <IoRefresh
+          onClick={handleSearchClear}
+          size={25}
+          className="cursor-pointer"
+        />
+      </div>
+    </div>
+
+    {/* Refresh button for larger screens only */}
+    <div className={`${styles.icons_box} hidden md:flex items-center w-full`}>
+      <IoRefresh onClick={handleSearchClear} size={25} className="cursor-pointer" />
+    </div>
+
+    <button
+      className={`${styles.bulkdown_button} w-full`}
+      onClick={() => downloadExcel(data, curPage)}
+    >
+      <FaDownload /> Bulk Download
+    </button>
+  </div>
+</div>
+
       <StoreTable
         data={data}
         searchValue={searchValue}
