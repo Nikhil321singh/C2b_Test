@@ -20,6 +20,37 @@ import html2pdf from "html2pdf.js";
 import PurchaseReceipt from "../components/PurchaseReceipt";
 import toast from "react-hot-toast";
 import { IoArrowBack } from "react-icons/io5";
+
+const fileUploader = async (authToken, file, fileName, fileType) => {
+  try {
+    const resURL = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`,
+      {
+        params: { fileName, fileType },
+        headers: { Authorization: authToken },
+      }
+    );
+    console.log(resURL)
+
+    if (resURL?.data?.url) {
+      const presignedUrl = resURL.data.url;
+      const fullUrl = resURL.data.url;
+      const publicFileUrl = fullUrl.split('?')[0];
+      await axios.put(presignedUrl, file, {
+        headers: { 'Content-Type': fileType },
+      });
+
+      console.log("File uploaded successfully.");
+      return publicFileUrl; // ✅ Return this
+    } else {
+      throw new Error("Failed to get a valid presigned URL");
+    }
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw error;
+  }
+};
+
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
     <div
@@ -228,7 +259,7 @@ const SpecialOffers = () => {
   const navigateHome = () => {
     if (disableBtn) {
       setTimeout(() => {
-        navigate("/selectPhone");
+        navigate("/selectDeviceType");
         sessionStorage.setItem("disableBtn", JSON.stringify(false));
         sessionStorage.setItem("myMessageKey", "");
       }, 30000);
@@ -238,36 +269,45 @@ const SpecialOffers = () => {
   };
 
 
-  const handleSubmit = () => {
-    if (!receipt) {
-      toast.error("Please wait purchase receipt is being created");
-      return;
-    }
-    setIsLoading(true);
-    const userIdToken = sessionStorage.getItem("authToken");
-    const LeadId = sessionStorage.getItem("LeadId");
-    const formData = new FormData();
-    formData.append("id", LeadId);
-    formData.append("bonusPrice", responseData.bonus);
-    formData.append("file", receipt);
-    axios
-      .post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/item-purchased`,
-        formData,
-        { headers: { Authorization: userIdToken, "Content-Type": "multipart/form-data" } }
-      )
-      .then((response) => {
-        setAnswers([]);
-        sessionStorage.setItem("messageReceived", response.data.message);
-        sessionStorage.setItem("disableBtn", JSON.stringify(true));
-        setDisableBtn(true);
-        navigate("/productsold");
-        navigateHome();
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsLoading(false);
-      });
-  };
+const handleSubmit = async () => {
+  if (!receipt) {
+    toast.error("Please wait, purchase receipt is being created");
+    return;
+  }
+
+  setIsLoading(true);
+  const userIdToken = sessionStorage.getItem("authToken");
+  const LeadId = sessionStorage.getItem("LeadId");
+
+  try {
+    const invoiceUrl = await fileUploader(userIdToken, receipt, LeadId, receipt.type); // ✅ await
+
+    await axios.post(
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/item-purchased`,
+      {id:LeadId,
+        bonusPrice: responseData.bonus,
+        invoiceUrl: invoiceUrl
+      },
+      {
+        headers: {
+          Authorization: userIdToken,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    setAnswers([]);
+    sessionStorage.setItem("messageReceived", "Item Sold Successfully");
+    sessionStorage.setItem("disableBtn", JSON.stringify(true));
+    setDisableBtn(true);
+    navigate("/productsold");
+    navigateHome();
+
+  } catch (err) {
+    console.log(err);
+    setIsLoading(false);
+  }
+};
 
   const hanldePermanenet = (code) => {
     if (isSelected === code) {
