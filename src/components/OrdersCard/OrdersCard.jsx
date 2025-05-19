@@ -49,16 +49,16 @@ async function handlejsx_pdf(item) {
       month: "short",
       year: "numeric",
     });
-  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
-  const COMPANY_EMAIL = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_COMPANY_BUYBACK_EMAIL : import.meta.env.VITE_COMPANY_EMAIL;
+    const COMPANY_EMAIL = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_COMPANY_BUYBACK_EMAIL : import.meta.env.VITE_COMPANY_EMAIL;
+    const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
   const maskPhoneNumber = (phNumber) => {
     const visibleLength = Math.ceil(phNumber?.length * 0.25);
+    const visibleSection = phNumber?.slice(
+      phNumber?.length - visibleLength
+    );
     const maskedSection = phNumber?.slice(
       0,
       phNumber.length - visibleLength
-    );
-    const visibleSection = phNumber?.slice(
-      phNumber?.length - visibleLength
     );
     return `${maskedSection.replace(/./g, "x")}${visibleSection}`;
   };
@@ -66,21 +66,25 @@ async function handlejsx_pdf(item) {
   const maskEmail = (email) => {
     const [namee, domain] = email.split("@");
     const visibleLength = Math.ceil(namee?.length * 0.25);
-    const maskedName = namee?.slice(0, namee?.length - visibleLength);
     const visibleName = namee?.slice(namee?.length - visibleLength);
+    const maskedName = namee?.slice(0, namee?.length - visibleLength);
     return `${maskedName.replace(/./g, "x")}${visibleName}@${domain}`;
   };
 
     const payload = {
+      companyContact:import.meta.env.VITE_COMPANY_CONTACT,
       maskedPhoneNumber: maskPhoneNumber(item?.phoneNumber),
       logoUrl:import.meta.env.VITE_LOGO_ENDPOINT,
       aadharNumber: item?.aadharNumber,
       uniqueCode: item.uniqueCode,
       maskedEmail: maskEmail(item?.emailId),
+      companyName:import.meta.env.VITE_COMPANY_NAME,
+      websiteShortName:WEBSITE_SHORT_NAME,
       name: item.name,
       imeiNumber: item.doc.IMEI,
       phoneName: item.model.name,
       type: item?.model?.type,
+      companyAddress:import.meta.env.VITE_COMPANY_ADDRESS,
       storeName: item.store.storeName,
       region: item.store.region,
       address: item.store.address,
@@ -88,11 +92,7 @@ async function handlejsx_pdf(item) {
       RAM: item.model.config?.RAM,
       formattedDate: formattedDate,
       price: item.price,
-      websiteShortName:WEBSITE_SHORT_NAME,
-      companyName:import.meta.env.VITE_COMPANY_NAME,
       companyGstin:import.meta.env.VITE_COMPANY_GSTIN,
-      companyAddress:import.meta.env.VITE_COMPANY_ADDRESS,
-      companyContact:import.meta.env.VITE_COMPANY_CONTACT,
       companyEmail:COMPANY_EMAIL,
       courtJurisdiction:import.meta.env.VITE_COURT_ADDRESS,
     };

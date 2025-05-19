@@ -99,8 +99,15 @@ console.log("store is", leadData?.store?.storeName);
     month: "short",
     year: "numeric",
   });
-  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
   const COMPANY_EMAIL = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_COMPANY_BUYBACK_EMAIL : import.meta.env.VITE_COMPANY_EMAIL;
+  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
+    const maskEmail = (email) => {
+    const [namee, domain] = email.split("@");
+    const visibleLength = Math.ceil(namee?.length * 0.25);
+    const maskedName = namee?.slice(0, namee?.length - visibleLength);
+    const visibleName = namee?.slice(namee?.length - visibleLength);
+    return `${maskedName.replace(/./g, "x")}${visibleName}@${domain}`;
+  };
   const maskPhoneNumber = (phNumber) => {
     const visibleLength = Math.ceil(phNumber?.length * 0.25);
     const maskedSection = phNumber?.slice(
@@ -113,37 +120,31 @@ console.log("store is", leadData?.store?.storeName);
     return `${maskedSection.replace(/./g, "x")}${visibleSection}`;
   };
 
-  const maskEmail = (email) => {
-    const [namee, domain] = email.split("@");
-    const visibleLength = Math.ceil(namee?.length * 0.25);
-    const maskedName = namee?.slice(0, namee?.length - visibleLength);
-    const visibleName = namee?.slice(namee?.length - visibleLength);
-    return `${maskedName.replace(/./g, "x")}${visibleName}@${domain}`;
-  };
+
       const payload = {
       maskedPhoneNumber: maskPhoneNumber(leadData?.phoneNumber),
       aadharNumber: leadData?.aadharNumber,
       uniqueCode: leadData.uniqueCode,
       maskedEmail: maskEmail(leadData?.emailId),
       name: leadData.name,
+      courtJurisdiction:import.meta.env.VITE_COURT_ADDRESS,
       imeiNumber: leadData.documentId.IMEI,
+      companyGstin:import.meta.env.VITE_COMPANY_GSTIN,
       phoneName: leadData.modelId.name,
       type: leadData?.modelId?.type,
       storeName: leadData.store.storeName,
+      companyContact:import.meta.env.VITE_COMPANY_CONTACT,
       region: leadData.store.region,
+      companyEmail:COMPANY_EMAIL,
       address: leadData.store.address,
+      companyName:import.meta.env.VITE_COMPANY_NAME,
       storage: leadData?.storage,
+      websiteShortName:WEBSITE_SHORT_NAME,
       RAM: leadData?.ram,
       formattedDate: formattedDate,
-      price: leadData.price,
-      websiteShortName:WEBSITE_SHORT_NAME,
       logoUrl:import.meta.env.VITE_LOGO_ENDPOINT,
-      companyName:import.meta.env.VITE_COMPANY_NAME,
-      companyGstin:import.meta.env.VITE_COMPANY_GSTIN,
+      price: leadData.price,
       companyAddress:import.meta.env.VITE_COMPANY_ADDRESS,
-      companyContact:import.meta.env.VITE_COMPANY_CONTACT,
-      companyEmail:COMPANY_EMAIL,
-      courtJurisdiction:import.meta.env.VITE_COURT_ADDRESS,
     };
 
   const { data } = await axios.post( import.meta.env.VITE_REACT_APP_ENDPOINT + "/api/receipt/generate", payload, {
