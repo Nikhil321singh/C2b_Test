@@ -96,11 +96,13 @@ async function handlejsx_pdf(item) {
       companyEmail:COMPANY_EMAIL,
       courtJurisdiction:import.meta.env.VITE_COURT_ADDRESS,
     };
+    const userToken = sessionStorage.getItem("authToken");
 
     // 🔁 Make API call to backend to generate and upload PDF
     const { data } = await axios.post( import.meta.env.VITE_REACT_APP_ENDPOINT + "/api/receipt/generate", payload, {
       headers: {
         "Content-Type": "application/json",
+        Authorization: userToken
       },
     });
     // 📥 Trigger download
