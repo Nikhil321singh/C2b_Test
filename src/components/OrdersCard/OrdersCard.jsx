@@ -5,12 +5,12 @@ import { setLeadOTPData, setResponseData } from "../../store/slices/responseSlic
 import { useDispatch } from "react-redux";
 import watch from "../../assets/apple_watch.png";
 import { setOtpVerified } from "../../store/slices/otpSlice";
-import PurchaseReceipt from "../PurchaseReceipt";
-import ReactDOMServer from "react-dom/server";
-import html2pdf from "html2pdf.js";
+import { FaExclamationTriangle } from "react-icons/fa";
 import { FaDownload } from "react-icons/fa6";
-import { Capacitor } from "@capacitor/core";
 
+const currentDomain = window.location.origin;
+import axios from "axios";
+import toast from "react-hot-toast";
 const quoteSaved = "Quote Saved";
 export const DeleteModal = ({ onCancel, onConfirm }) => {
   return (
@@ -37,45 +37,88 @@ export const DeleteModal = ({ onCancel, onConfirm }) => {
   );
 };
 
-function hanldlejsx_pdf(item) {
-  console.log("store is");
-  console.log(item)
-  const dateString = item.updatedAt;
-  const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-  const printElement = ReactDOMServer.renderToString(
-    <PurchaseReceipt
-      phoneNumber={item.phoneNumber}
-      aadharNumber={item?.aadharNumber}
-      uniqueCode={item.uniqueCode}
-      emailId={item.emailId}
-      name={item.name}
-      imeiNumber={item.doc.IMEI}
-      phoneName={item.model.name}
-      type={item?.model?.type}
-      storeName={item.store.storeName}
-      region={item.store.region}
-      address={item.store.address}
-      storage={item.model.config?.storage}
-      RAM={item.model.config?.RAM}
-      formattedDate={formattedDate}
-      price={item.price}
-    />
-  );
-    html2pdf()
-    .set({
-      margin: 10,
-      filename: "purchase_receipt.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, logging: false },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["css", "legacy"] }, // Ensure page breaks work
-    })
-    .from(printElement)
-    .save();
+async function handlejsx_pdf(item) {
+  try {
+    console.log("store is", item);
+    toast.success("Please wait, Receipt will be downloaded shortly!", {
+      icon: <FaExclamationTriangle color="gold" />, // gold/yellow color
+    });
+    const dateString = item.updatedAt;
+    const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+    const COMPANY_EMAIL = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_COMPANY_BUYBACK_EMAIL : import.meta.env.VITE_COMPANY_EMAIL;
+    const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
+  const maskPhoneNumber = (phNumber) => {
+    const visibleLength = Math.ceil(phNumber?.length * 0.25);
+    const visibleSection = phNumber?.slice(
+      phNumber?.length - visibleLength
+    );
+    const maskedSection = phNumber?.slice(
+      0,
+      phNumber.length - visibleLength
+    );
+    return `${maskedSection.replace(/./g, "x")}${visibleSection}`;
+  };
+
+  const maskEmail = (email) => {
+    const [namee, domain] = email.split("@");
+    const visibleLength = Math.ceil(namee?.length * 0.25);
+    const visibleName = namee?.slice(namee?.length - visibleLength);
+    const maskedName = namee?.slice(0, namee?.length - visibleLength);
+    return `${maskedName.replace(/./g, "x")}${visibleName}@${domain}`;
+  };
+
+    const payload = {
+      companyContact:import.meta.env.VITE_COMPANY_CONTACT,
+      maskedPhoneNumber: maskPhoneNumber(item?.phoneNumber),
+      logoUrl:import.meta.env.VITE_LOGO_ENDPOINT,
+      aadharNumber: item?.aadharNumber,
+      uniqueCode: item.uniqueCode,
+      maskedEmail: maskEmail(item?.emailId),
+      companyName:import.meta.env.VITE_COMPANY_NAME,
+      websiteShortName:WEBSITE_SHORT_NAME,
+      name: item.name,
+      imeiNumber: item.doc.IMEI,
+      phoneName: item.model.name,
+      type: item?.model?.type,
+      companyAddress:import.meta.env.VITE_COMPANY_ADDRESS,
+      storeName: item.store.storeName,
+      region: item.store.region,
+      address: item.store.address,
+      storage: item.model.config?.storage,
+      RAM: item.model.config?.RAM,
+      formattedDate: formattedDate,
+      price: item.price,
+      companyGstin:import.meta.env.VITE_COMPANY_GSTIN,
+      companyEmail:COMPANY_EMAIL,
+      courtJurisdiction:import.meta.env.VITE_COURT_ADDRESS,
+    };
+
+    // 🔁 Make API call to backend to generate and upload PDF
+    const { data } = await axios.post( import.meta.env.VITE_REACT_APP_ENDPOINT + "/api/receipt/generate", payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    // 📥 Trigger download
+// 📥 Trigger download using Blob for better compatibility
+    const response = await fetch(data.url);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = "purchase_receipt.pdf"; // Suggested filename
+    document.body.appendChild(link);
+    link.click(); // Trigger the download
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl); // Cleanup
+  } catch (error) {
+    console.error("Error generating or downloading PDF:", error);
+  }
 }
 
 const OrdersCard = ({
@@ -213,8 +256,8 @@ const OrdersCard = ({
         <div className="flex items-center py-1 px-2 text-white bg-primary rounded-xl">
           <p className="text-sm font-medium">{title}</p>
         </div>
-        {title === "Order Completed" && Capacitor.getPlatform() === 'web' && (
-            <div onClick={() => hanldlejsx_pdf(allData)} className="flex items-center h-full px-4 text-white bg-[#EC2752] rounded-xl">
+        {title === "Order Completed" && (
+            <div onClick={() => handlejsx_pdf(allData)} className="flex items-center h-full px-4 text-white bg-[#EC2752] rounded-xl cursor-pointer">
               <FaDownload size={15} />
             </div>
           )}

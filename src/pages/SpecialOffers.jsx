@@ -15,11 +15,9 @@ import User_Logo from "../assets/User_Logo.jpg";
 import SummaryModal from "../components/SummaryModal";
 import { CgSpinner } from "react-icons/cg";
 import apple_watch from "../assets/apple_watch.png";
-import ReactDOMServer from "react-dom/server";
-import html2pdf from "html2pdf.js";
-import PurchaseReceipt from "../components/PurchaseReceipt";
 import toast from "react-hot-toast";
 import { IoArrowBack } from "react-icons/io5";
+import { FaExclamationTriangle } from "react-icons/fa";
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
     <div
@@ -88,53 +86,86 @@ export const DynamicCouponCard = ({
   );
 };
 
-function hanldlejsx_pdf(leadData, setReceipt) {
-  console.log("store is", leadData?.store?.storeName);
+async function hanldlejsx_pdf(leadData, setReceipt) {
+    try {
+console.log("store is", leadData?.store?.storeName);
   console.log("store is", leadData?.emailId);
-
+    toast.success("Please wait, Creating Receipt to be sent!", {
+      icon: <FaExclamationTriangle color="gold" />, // gold/yellow color
+    });
   const dateString = leadData?.updatedAt;
   const formattedDate = new Date(dateString).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+  const COMPANY_EMAIL = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_COMPANY_BUYBACK_EMAIL : import.meta.env.VITE_COMPANY_EMAIL;
+  const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
+    const maskEmail = (email) => {
+    const [namee, domain] = email.split("@");
+    const visibleLength = Math.ceil(namee?.length * 0.25);
+    const maskedName = namee?.slice(0, namee?.length - visibleLength);
+    const visibleName = namee?.slice(namee?.length - visibleLength);
+    return `${maskedName.replace(/./g, "x")}${visibleName}@${domain}`;
+  };
+  const maskPhoneNumber = (phNumber) => {
+    const visibleLength = Math.ceil(phNumber?.length * 0.25);
+    const maskedSection = phNumber?.slice(
+      0,
+      phNumber.length - visibleLength
+    );
+    const visibleSection = phNumber?.slice(
+      phNumber?.length - visibleLength
+    );
+    return `${maskedSection.replace(/./g, "x")}${visibleSection}`;
+  };
 
-  const printElement = ReactDOMServer.renderToString(
-    <PurchaseReceipt
-      phoneNumber={leadData?.phoneNumber}
-      aadharNumber={leadData?.aadharNumber}
-      uniqueCode={leadData?.uniqueCode}
-      emailId={leadData?.emailId}
-      name={leadData?.name}
-      price={leadData?.price}
-      imeiNumber={leadData?.documentId?.IMEI}
-      phoneName={leadData?.modelId?.name}
-      type={leadData?.modelId?.type}
-      storeName={leadData?.store?.storeName}
-      region={leadData?.store?.region}
-      address={leadData?.store?.address}
-      storage={leadData?.storage}
-      RAM={leadData?.ram}
-      formattedDate={formattedDate}
-    />
-  );
 
-  html2pdf()
-    .set({
-      margin: 10,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, logging: false },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["css", "legacy"] }, // Ensure page breaks work
-    })
-    .from(printElement)
-    .outputPdf("blob") // Get Blob output
-    .then((blob) => {
-      const file = new File([blob], "Purchase_Receipt.pdf", { type: "application/pdf" });
-      console.log("Generated PDF File:", file);
-      setReceipt(file); // Store in state
-    })
-    .catch((err) => console.error("PDF Generation Error:", err));
+      const payload = {
+      maskedPhoneNumber: maskPhoneNumber(leadData?.phoneNumber),
+      aadharNumber: leadData?.aadharNumber,
+      uniqueCode: leadData.uniqueCode,
+      maskedEmail: maskEmail(leadData?.emailId),
+      name: leadData.name,
+      courtJurisdiction:import.meta.env.VITE_COURT_ADDRESS,
+      imeiNumber: leadData.documentId.IMEI,
+      companyGstin:import.meta.env.VITE_COMPANY_GSTIN,
+      phoneName: leadData.modelId.name,
+      type: leadData?.modelId?.type,
+      storeName: leadData.store.storeName,
+      companyContact:import.meta.env.VITE_COMPANY_CONTACT,
+      region: leadData.store.region,
+      companyEmail:COMPANY_EMAIL,
+      address: leadData.store.address,
+      companyName:import.meta.env.VITE_COMPANY_NAME,
+      storage: leadData?.storage,
+      websiteShortName:WEBSITE_SHORT_NAME,
+      RAM: leadData?.ram,
+      formattedDate: formattedDate,
+      logoUrl:import.meta.env.VITE_LOGO_ENDPOINT,
+      price: leadData.price,
+      companyAddress:import.meta.env.VITE_COMPANY_ADDRESS,
+    };
+
+  const { data } = await axios.post( import.meta.env.VITE_REACT_APP_ENDPOINT + "/api/receipt/generate", payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    // 📥 Trigger download
+// 📥 Trigger download using Blob for better compatibility
+    const response = await fetch(data.url);
+    const blob = await response.blob();
+
+    // Create a File object
+    const file = new File([blob], "purchase_receipt.pdf", { type: "application/pdf" });
+
+    // Set the file using the provided setter
+    setReceipt(file);
+
+    } catch (error) {
+        console.error("Error generating or downloading PDF:", error);
+  }
 }
 
 const SpecialOffers = () => {
