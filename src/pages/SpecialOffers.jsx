@@ -120,7 +120,7 @@ console.log("store is", leadData?.store?.storeName);
     return `${maskedSection.replace(/./g, "x")}${visibleSection}`;
   };
 
-
+      const userToken = sessionStorage.getItem("authToken");
       const payload = {
       maskedPhoneNumber: maskPhoneNumber(leadData?.phoneNumber),
       aadharNumber: leadData?.aadharNumber,
@@ -150,6 +150,7 @@ console.log("store is", leadData?.store?.storeName);
   const { data } = await axios.post( import.meta.env.VITE_REACT_APP_ENDPOINT + "/api/receipt/generate", payload, {
       headers: {
         "Content-Type": "application/json",
+        authorization: userToken
       },
     });
     // 📥 Trigger download
