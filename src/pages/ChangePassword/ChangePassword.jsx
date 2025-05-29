@@ -11,7 +11,6 @@ const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { MdOutlineMailLock } from "react-icons/md";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoArrowBack, IoEye, IoEyeOffSharp } from "react-icons/io5";
 const iconStyles = { margin: "0px 10px", color: "var(--primary-color)" };
 

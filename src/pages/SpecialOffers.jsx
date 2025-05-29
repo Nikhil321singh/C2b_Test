@@ -18,7 +18,6 @@ import apple_watch from "../assets/apple_watch.png";
 import ReactDOMServer from "react-dom/server";
 import html2pdf from "html2pdf.js";
 import PurchaseReceipt from "../components/PurchaseReceipt";
-import toast from "react-hot-toast";
 import { IoArrowBack } from "react-icons/io5";
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (

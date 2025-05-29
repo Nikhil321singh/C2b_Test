@@ -158,19 +158,15 @@ const DeviceQuote = () => {
                         maxLength={6}
                         onKeyDown={(e) => {
                           if (
-                            e.key === "-" ||
-                            e.key === "+" ||
-                            e.key === "e" ||
-                            e.key === "." ||
-                            e.key === "E"
+                            e.key === "-" || e.key === "+" || e.key === "e" ||
+                            e.key === "." || e.key === "E"
                           ) {
                             e.preventDefault();
                           }
                         }}
                         onChange={(e) => {
                           if (
-                            Number(e.target.value) >= 0 &&
-                            Number(e.target.value) < 100001
+                            Number(e.target.value) >= 0 && Number(e.target.value) < 100001
                           ) {
                             setBonus(e.target.value);
                           }

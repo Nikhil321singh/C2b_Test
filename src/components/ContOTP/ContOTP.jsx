@@ -7,7 +7,6 @@ import { useDispatch } from "react-redux";
 import { setOtpVerified } from "../../store/slices/otpSlice";
 import LoadingSpinner from "../LoadingSpinner";
 import { MdEdit } from "react-icons/md";
-import ProfileBox from "../ProfileBox/ProfileBox";
 import { IoArrowBack } from "react-icons/io5";
 import toast from "react-hot-toast";
 const currentDomain = window.location.origin;
