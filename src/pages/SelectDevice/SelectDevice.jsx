@@ -155,7 +155,7 @@ const SelectDevice = () => {
 
   return (
     <div className="flex flex-col min-h-screen pb-16 bg-white">
-      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
+      <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER ">
         {isTableLoaded && (
           <div className="fixed top-0 left-0 z-100 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
             <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />

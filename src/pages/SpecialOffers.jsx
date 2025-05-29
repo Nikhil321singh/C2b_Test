@@ -339,7 +339,7 @@ const SubSpecialOffers = ({
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
   return (
     <div>
-    <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
+    <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER header">
       <div className="flex items-center justify-between w-full pr-4">
         <div className="flex items-center gap-2 ml-4">
         <button

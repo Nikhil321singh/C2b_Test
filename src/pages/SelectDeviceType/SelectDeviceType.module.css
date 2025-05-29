@@ -2,14 +2,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .des_main_wrap {
   display: flex;
   flex-direction: column;
   margin: 10px 50px;
-}
+  width:98%;
+  }
 
 .des_lr_wrap {
   display: flex;
@@ -288,17 +289,18 @@
   .home_page_wrap {
     display: flex;
     flex-direction: column;
-    min-width: 100vw;
   }
 
   .des_main_wrap {
     display: flex;
     flex-direction: column;
+    width:99%;
   }
 
   .des_left_wrap {
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: space-between;
     /* align-items: center; */
     gap: 10px;
@@ -323,14 +325,14 @@
   .search_box_wrap {
     display: flex;
     justify-content: center;
-    width: 100vw;
+    width: 95vw;
     padding: 0 10px;
   }
 
   .select_button_wrap {
     display: flex;
     justify-content: center;
-    width: 100vw;
+    width: 95vw;
     padding: 0 10px;
   }
   .select_button_box {
@@ -362,7 +364,7 @@
   }
 
   .info_wrap {
-    width: 100vw;
+    width: 97vw;
     justify-content: center;
     padding: 0 10px;
   }
@@ -386,10 +388,12 @@
   .topSell_wrap {
     display: flex;
     justify-content: center;
-    width: 100vw;
+    width: 95vw;
     padding: 0 10px;
   }
-
+  .date_filter{
+    width: 95vw;
+  }
   .topSell_box {
     width: 100%;
     padding: 7px 0;
@@ -421,4 +425,30 @@
     margin: 20px 0px 20px 0px;
     gap: 20px;
   }
+}
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .home_page_wrap {
+    flex-direction: column;
+  }
+
+  .des_main_wrap {
+    flex-direction: column;
+  }
+
+  .des_lr_wrap {
+    flex-direction: column;
+  }
+
+  .des_left_wrap {
+    width: 100%;
+    gap: 15px;
+    padding: 0;
+  }
+  .date_filter{
+    padding-left: 24px;
+  }
+  .des_right_wrap {
+    display:none;
+  }
+
 }

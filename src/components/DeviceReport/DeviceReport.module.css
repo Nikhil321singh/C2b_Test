@@ -1,7 +1,7 @@
 .devrep_page{
     position: absolute;
     width: 100vw;
-    min-height: 100vh;
+    min-height: 100dvh;
     background-color: white;
     display: flex;
     flex-direction: column;

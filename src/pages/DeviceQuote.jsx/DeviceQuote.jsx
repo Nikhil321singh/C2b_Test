@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 const currentDomain = window.location.origin;
 const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
@@ -85,135 +85,153 @@ const DeviceQuote = () => {
   const toggleModal = () => {
     setShowModal(!showModal);
   };
+  const hasShownError = useRef(false);
   useEffect(() => {
-    if (quoteSaved === false && exactQuoteValue === "true" && currentDomain !== buyback) {
+    if (
+      !hasShownError.current &&
+      quoteSaved === false &&
+      exactQuoteValue === "true" &&
+      currentDomain !== buyback
+    ) {
       toast.error("Bonus Must Be Less Than ₹2000.");
+      hasShownError.current = true;
     }
-  }, [quoteSaved, exactQuoteValue]);
+  }, [quoteSaved, exactQuoteValue, currentDomain]);
 
   return (
-    <div className={`bg-white min-h-screen ${styles.page_wrap}`}>
-      {continueOTPOpen && <ContOTP setContinueOTPOpen={setContinueOTPOpen} />}
+    <div
+      className={`bg-white min-h-screen ${styles.page_wrap}`}
+      style={{
+        paddingTop: continueOTPOpen ? 0 : 'calc(4rem + env(safe-area-inset-top))',
+        minHeight: '100vh'
+      }}
+    >
+      {continueOTPOpen ? (
+        <ContOTP setContinueOTPOpen={setContinueOTPOpen} />
+      ) : (
+        <>
+          <DeviceQuoteHeader isContOTPOpen={continueOTPOpen} />
+          <div className="max-w-[900px] mx-auto px-4 flex flex-col items-center">
+            <p className="my-4 text-xl font-medium">Device Quote Details</p>
+            <div className={`${styles.QuoteCardShadow} rounded-md p-4 w-full max-w-[600px]`}>
+              <div className="flex items-center gap-4">
+                <div>
+                  <img
+                    className="w-[50px]"
+                    src={phoneFrontPhoto ? phoneFrontPhoto : DummyImg}
+                    alt=""
+                  />
+                </div>
+                <div className="flex flex-col gap-[2px]">
+                  <p className="font-medium text-gray-700">
+                    {`${deviceModalInfo.models?.name}${
+                      deviceModalInfo.models?.type === "CTG1"
+                        ? `(${deviceModalInfo.models?.config?.RAM}/${deviceModalInfo.models?.config?.storage})`
+                        : ""
+                    }`}
+                  </p>
+                  <p className="text-primary font-semibold">₹{displayPrice.toLocaleString("en-IN")}</p>
+                </div>
+              </div>
+              <QuoteModal
+                show={showModal}
+                handleClose={toggleModal}
+                setQuoteSaved={setQuoteSaved}
+                quoteId={quoteId}
+                bonusPrice={bonus}
+              />
+              {quoteSaved === false &&
+                exactQuoteValue === "true" &&
+                currentDomain !== buyback && (
+                  <div className="flex flex-row items-center justify-between px-2 my-2">
+                    <div className="w-[40%] font-medium text-gray-700">
+                      {currentDomain === switchKart && ("SwitchKart")} Bonus Amount :
+                    </div>
+                    <div className="rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-primary flex flex-col items-center justify-center">
+                      <input
+                        className="bg-transparent outline-none my-auto text-center font-medium text-primary"
+                        name="bonus"
+                        id="bonus"
+                        type="number"
+                        placeholder="Enter Bonus Amount"
+                        value={bonus}
+                        maxLength={6}
+                        onKeyDown={(e) => {
+                          if (
+                            e.key === "-" ||
+                            e.key === "+" ||
+                            e.key === "e" ||
+                            e.key === "." ||
+                            e.key === "E"
+                          ) {
+                            e.preventDefault();
+                          }
+                        }}
+                        onChange={(e) => {
+                          if (
+                            Number(e.target.value) >= 0 &&
+                            Number(e.target.value) < 100001
+                          ) {
+                            setBonus(e.target.value);
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed"></div>
+              <div className="flex items-center justify-between">
+                <p
+                  className="text-gray-700 text-[17px] underline font-medium"
+                  onClick={showDeviceReportHandler}
+                >
+                  Device Report
+                </p>
+                {quoteSaved === false && (
+                  <button
+                    className="text-primary border-2 border-primary text-sm font-medium p-2 rounded-md"
+                    onClick={toggleModal}
+                  >
+                    Save Quote
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2">
+            {quoteSaved === false && exactQuoteValue === "true" && (
+              <div className="flex gap-1">
+                <input
+                  type="checkbox"
+                  checked={termsChecked}
+                  onChange={() => setTermsChecked(!termsChecked)}
+                />
+                <p className="font-medium">
+                  I agree to the
+                  <span className="text-primary cursor-pointer">
+                    Terms & Conditions
+                  </span>
+                </p>
+              </div>
+            )}
+            <SubDeviceQuote
+              savedBonus={savedBonus}
+              Price={Price}
+              bonus={bonus}
+              quoteSaved={quoteSaved}
+              exactQuoteValue={exactQuoteValue}
+              termsChecked={termsChecked}
+              continueOTPHandler={continueOTPHandler}
+            />
+          </div>
+        </>
+      )}
       {showDeviceReport && (
         <DeviceReport
           setShowDeviceReport={setShowDeviceReport}
           quoteSaved={quoteSaved}
         />
       )}
-      <DeviceQuoteHeader />
-      <div className="max-w-[900px]  md:mx-auto">
-        <p className="mx-2 my-4 text-xl font-medium">Device Quote Details</p>
-        <div className={` ${styles.QuoteCardShadow} rounded-md p-2 mx-2`}>
-          <div className="flex items-center gap-4">
-            <div>
-              <img
-                className="w-[50px]"
-                src={phoneFrontPhoto ? phoneFrontPhoto : DummyImg}
-                alt=""
-              />
-            </div>
-            <div className="flex flex-col gap-[2px]">
-              <p className="font-medium text-gray-700">
-                {`${deviceModalInfo.models?.name}${
-                  deviceModalInfo.models?.type === "CTG1"
-                    ? `(${deviceModalInfo.models?.config?.RAM}/${deviceModalInfo.models?.config?.storage})`
-                    : ""
-                }`}
-              </p>
-              <p className="text-primary font-semibold">₹{displayPrice.toLocaleString("en-IN")}</p>
-            </div>
-          </div>
-          <QuoteModal
-            show={showModal}
-            handleClose={toggleModal}
-            setQuoteSaved={setQuoteSaved}
-            quoteId={quoteId}
-            bonusPrice={bonus}
-          ></QuoteModal>
-          {quoteSaved === false &&
-            exactQuoteValue === "true" &&
-            currentDomain !== buyback && (
-              <div className="flex flex-row items-center justify-between px-2 my-2">
-                <div className="w-[40%] font-medium text-gray-700">
-                {currentDomain === switchKart && ("SwitchKart")} Bonus Amount :
-                </div>
-                <div className="rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-primary flex flex-col items-center justify-center">
-                  <input
-                    className="bg-transparent outline-none my-auto text-center font-medium text-primary"
-                    name="bonus"
-                    id="bonus"
-                    type="number"
-                    placeholder="Enter Bonus Amount"
-                    value={bonus}
-                    maxLength={6}
-                    onKeyDown={(e) => {
-                      if (
-                        e.key === "-" ||
-                        e.key === "+" ||
-                        e.key === "e" ||
-                        e.key === "." ||
-                        e.key === "E"
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                    onChange={(e) => {
-                      if (
-                        Number(e.target.value) >= 0 &&
-                        Number(e.target.value) < 100001
-                      ) {
-                        setBonus(e.target.value);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-          <div className="mx-1 my-4 border-b-2 border-gray-400 border-dashed "></div>
-          <div className="flex items-center justify-between">
-            <p
-              className="text-gray-700 text-[17px] underline font-medium"
-              onClick={showDeviceReportHandler}
-            >
-              Device Report
-            </p>
-            {quoteSaved === false && (
-              <button
-                className="text-primary border-2 border-primary text-sm font-medium p-2 rounded-md "
-                onClick={toggleModal}
-              >
-                Save Quote
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2">
-        {quoteSaved === false && exactQuoteValue === "true" && (
-          <div className="flex gap-1">
-            <input
-              type="checkbox"
-              checked={termsChecked}
-              onChange={() => setTermsChecked(!termsChecked)}
-            />
-            <p className="font-medium">
-              I agree to the
-              <span className="text-primary cursor-pointer">
-                Terms & Conditions
-              </span>
-            </p>
-          </div>
-        )}
-        <SubDeviceQuote
-          savedBonus={savedBonus}
-          Price={Price}
-          bonus={bonus}
-          quoteSaved={quoteSaved}
-          exactQuoteValue={exactQuoteValue}
-          termsChecked={termsChecked}
-          continueOTPHandler={continueOTPHandler}
-        />
-      </div>
     </div>
   );
 };
@@ -283,28 +301,34 @@ const SubDeviceQuote = ({
   );
 };
 
-const DeviceQuoteHeader = () => {
+const DeviceQuoteHeader = ({ isContOTPOpen }) => {
   const navigate = useNavigate();
   return (
       <div
-      className={` flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER `}
+      className={`flex items-center justify-center border-b-2 w-screen bg-white fixed top-0 left-0 z-50`}
+      style={{
+        paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)',
+        height: 'calc(4rem + env(safe-area-inset-top))'
+      }}
     >
-        <div className="flex items-center justify-between w-full max-w-screen overflow-hidden px-4 py-2">
-          <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center justify-between w-full max-w-[900px] px-4">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}
               className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
             >
               <IoArrowBack size={20} />
             </button>
-            <img
-              onClick={() => navigate(deviceTypePage)}
-              className="w-[120px] sm:w-[130px] md:w-[150px] object-contain cursor-pointer"
-              src={GREST_LOGO}
-              alt="app logo"
+            {!isContOTPOpen && (
+              <img
+                onClick={() => navigate(deviceTypePage)}
+                className="w-[120px] sm:w-[130px] md:w-[150px] object-contain cursor-pointer"
+                src={GREST_LOGO}
+                alt="app logo"
               />
+            )}
           </div>
-          <ProfileBox />
+          {!isContOTPOpen && <ProfileBox />}
         </div>
     </div>
   )}

@@ -109,7 +109,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
         </div>
       )}
       {head === undefined && (
-        <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
+        <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER ">
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />
             <img

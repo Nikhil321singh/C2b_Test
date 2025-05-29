@@ -18,7 +18,7 @@ const AppFooter = ({ days }) => {
     <div
       className={`${
         show ? "bottom-0" : "-bottom-[60px]"
-      } bg-white flex border-2 py-2 justify-around w-full footer fixed ${
+      } bg-white flex border-2 py-2 justify-around w-[99%] footer fixed ${
         styles.footer_wrap
       }`}
     >

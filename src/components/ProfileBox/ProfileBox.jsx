@@ -71,7 +71,7 @@ const ProfileBox = () => {
   }
 
   return (
-    <div className="select-none flex ml-4 z-40 gap-2 flex-row-reverse items-center">
+    <div className="select-none flex ml-4 gap-2 flex-row-reverse items-center" style={{ zIndex: 9999 }}>
       <GiHamburgerMenu size={24} className="w-[60px]" onClick={profileHandler}/>
       <p className=" text-base  md:text-xl">{userName}</p>
       <img

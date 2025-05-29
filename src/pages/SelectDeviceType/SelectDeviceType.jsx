@@ -733,7 +733,7 @@ const SearchBox = ({
     : [];
   return (
     <React.Fragment>
-      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
+      <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER ">
         <div className="flex items-center justify-between w-full px-2">
           <img className="w-40" src={GREST_LOGO} alt="app logo" />
           <ProfileBox />
@@ -846,7 +846,7 @@ const MiddlePart = ({
         <div className={styles.des_left_wrap}>
           <div className={styles.search_box_wrap} onClick={searchBoxSwitch}>
             <div
-              className={`flex items-center p-2 mb-1 w-[100%] ${styles.search_box}`}
+              className={`flex items-center p-2 mb-1 ${styles.search_box}`}
             >
               <div className="flex items-center">
                 <CiSearch size={20} className="inline ml-1" />
@@ -868,7 +868,7 @@ const MiddlePart = ({
             setDeviceType={setDeviceType}
           />}
           {currentDomain !== buyback && <BrandList deviceType={deviceType} />}
-          {currentDomain !== buyback && <div className="ml-3">
+          {currentDomain !== buyback && <div className={`ml-3 ${styles.date_filter}`}>
             <select
               name=""
               id=""
@@ -960,7 +960,7 @@ const MiddlePart = ({
       >
         How {WEBSITE_SHORT_NAME} Works?
       </p>
-      <div className="flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2">
+      <div className={`flex gap-2 mt-4 mb-[px] pb-[80px] justify-between mx-2 ${styles.info_wrap}`}>
         <div className="flex flex-col min-w-[30%]  items-center  ">
           <img className={`w-[50px] mb-2`} src={how1} />
           <p className="-mb-1 text-base font-bold">Add</p>
