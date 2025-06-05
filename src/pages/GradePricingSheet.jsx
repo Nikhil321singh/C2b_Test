@@ -259,7 +259,6 @@ const GradePricingSheetSub = ({
 }) => {
   return (
     <div>
-      <ToastContainer />
       <div className="navbar">
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
