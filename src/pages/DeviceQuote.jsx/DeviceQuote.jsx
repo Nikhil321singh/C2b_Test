@@ -307,7 +307,7 @@ const DeviceQuoteHeader = ({ isContOTPOpen }) => {
         height: 'calc(4rem + env(safe-area-inset-top))'
       }}
     >
-        <div className="flex items-center justify-between w-full max-w-[900px] px-4">
+        <div className="flex items-center justify-between w-full max-w-screen px-4">
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}
