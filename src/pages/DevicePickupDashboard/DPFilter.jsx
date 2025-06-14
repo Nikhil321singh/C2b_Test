@@ -93,6 +93,11 @@ const DPFilter = ({
     }
   }, [dateValue, selectedStatus, searchValue]);
 
+  useEffect(() => {
+    if (storeDrop && searchTerm.trim() === "") {
+      setFilteredStores(storeData);
+    }
+  }, [storeDrop, searchTerm]);
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);

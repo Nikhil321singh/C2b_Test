@@ -54,8 +54,10 @@ const convertBlobToBase64 = (blob) => new Promise((resolve, reject) => {
   reader.readAsDataURL(blob);
 });
 
-async function handleJsxPdf(item) {
-  if (window._isSharing) return;
+async function hanldlejsx_pdf(item) {
+  if (window._isSharing)
+    {return;
+    }
   window._isSharing = true;
 
   try {
@@ -175,7 +177,9 @@ async function tryShare({ url }) {
       console.log('Share completed:', result.activityType);
     }
   } catch (error) {
-    if (error.message !== shareCanceled) throw error;
+    if (error.message !== shareCanceled){
+      throw error;
+    }
   }
 }
 
