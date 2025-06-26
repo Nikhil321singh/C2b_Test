@@ -11,8 +11,7 @@ const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import { MdOutlineMailLock } from "react-icons/md";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import ProfileBox from "../../components/ProfileBox/ProfileBox";
-import { IoEye, IoEyeOffSharp } from "react-icons/io5";
+import { IoArrowBack, IoEye, IoEyeOffSharp } from "react-icons/io5";
 const iconStyles = { margin: "0px 10px", color: "var(--primary-color)" };
 
 const ChangePassword = () => {
@@ -151,17 +150,6 @@ const passwordValidation = () => {
   return (
     <>
       <div className="outer">
-        <div className="absolute top-0 flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
-          <div className="flex items-center justify-between w-full ">
-            <ProfileBox />
-            <img
-              onClick={() => navigate("/selectdevicetype")}
-              className="w-40"
-              src={GREST_LOGO}
-              alt="app logo"
-            />
-          </div>
-        </div>
         <PasswordChange
           isValid={isValid}
           userEmail={userEmail}
@@ -204,14 +192,24 @@ const PasswordChange = ({
   handleEmailChange,
   handleSubmit,
 }) => {
+    const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center justify-center w-full h-full mt-16">
       <div className="flex flex-col items-center justify-center box">
         <div className="imgBox">
           <img className="w-48 pt-4 mt-2 mb-3" src={GREST_LOGO} />
-          <h1 className="font-sans text-primary my-2 text-3xl font-bold sm:text-4xl">
-            Change Password
-          </h1>
+          <div className="flex gap-2 items-center justify-center">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+            >
+              <IoArrowBack size={20} />
+            </button>
+
+            <h1 className="font-sans text-primary my-2 text-3xl font-bold sm:text-4xl">
+              Change Password
+            </h1>
+          </div>
           <p
             className={`${
               isValid ? "text-primary" : "text-red-600"

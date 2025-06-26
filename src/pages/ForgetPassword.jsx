@@ -224,7 +224,7 @@ const OTPInput = ({ isLoading, handleOtpSubmit, otp, setOtp }) => {
       <form className="flex flex-col w-full gap-6" onSubmit={handleOtpSubmit}>
         <input type="hidden" name="remember" value="true" />
         <div className="">
-          <div className="flex flex-col items-center ml-3">
+          <div className="flex flex-col items-center ml-5">
             <OtpInput
               value={otp}
               onChange={setOtp}

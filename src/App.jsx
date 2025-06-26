@@ -199,7 +199,14 @@ function App() {
                 <Route path="/Orders/:daysfilter" element={<Orders />}></Route>
               </Routes>
             </Router>
-            <Toaster />
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                style: {
+                  marginTop: '60px', // adjust as needed
+                },
+              }}
+            />
           </Provider>
         </QuestionProvider>
       </AnswerProvider>

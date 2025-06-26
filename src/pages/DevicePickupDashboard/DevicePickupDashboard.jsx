@@ -368,7 +368,7 @@ const ExtComps = ({
           </div>
         </div>
       )}
-      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
+      <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER header">
         {LoggedInUser?.role === "Technician" ? (
           <div className="flex items-center justify-between w-full ">
             <ProfileBox />

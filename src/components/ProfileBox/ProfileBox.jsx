@@ -65,11 +65,6 @@ const ProfileBox = () => {
           </div>
   }
 
-  if (currentDomain === import.meta.env.VITE_BUYBACK_URL) {
-    return     <div className="select-none flex ml-4 z-40 gap-2  flex-row-reverse items-center">
-          </div>
-  }
-
   return (
     <div className="select-none flex ml-4 z-40 gap-2 flex-row-reverse items-center">
       <GiHamburgerMenu size={24} className="w-[60px]" onClick={profileHandler}/>

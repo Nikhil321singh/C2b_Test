@@ -164,7 +164,6 @@ import {
 import { setResponseData } from "../../store/slices/responseSlice";
 import useUserProfile from "../../utils/useUserProfile";
 import { CgSpinner } from "react-icons/cg";
-import ProfileBox from "../../components/ProfileBox/ProfileBox";
 import { IoIosArrowBack } from "react-icons/io";
 import styless from "../QuickQuote/QuickQuote.module.css";
 import { IoArrowBack } from "react-icons/io5";
@@ -375,7 +374,7 @@ const MainQContainer = ({
 
   return (
     <div className="mainQContainer">
-      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
+      <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER header">
         <div className="flex items-center justify-between w-full max-w-screen overflow-hidden px-4 py-2">
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
@@ -391,7 +390,6 @@ const MainQContainer = ({
               alt="app logo"
               />
           </div>
-          <ProfileBox />
         </div>
       </div>
       <div className={`${styless.quick_page_nav}`}>

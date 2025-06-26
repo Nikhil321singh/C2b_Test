@@ -3,8 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setOtpVerified } from "../store/slices/otpSlice";
 import { setLeadOTPData } from "../store/slices/responseSlice";
 import { MainOtpUI } from "../components/ContOTP/ContOTP";
-import { auth } from "../firebase";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function OTPpage() {
   const initVal = useSelector((state) => state.responseData);
@@ -16,12 +17,14 @@ function OTPpage() {
   const [loading, setLoading] = useState(false);
   const [disableResend, setDisableResend] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const token = sessionStorage.getItem("authToken");
+  const navigate = useNavigate();
+
   const [otpData, setOtpData] = useState({
     name: initVal.name,
     email: initVal.email,
     phone: initVal.phone,
   });
-    const [firstTime, setFirstIme] = useState(true);
   const handleNumberEdit = () => {
     setLoading(false);
     setOtpBoxOpen(!otpBoxOpen);
@@ -38,96 +41,107 @@ function OTPpage() {
     localStorage.setItem("otpData", JSON.stringify(otpData));
   }, [otpData]);
 
-    function onCaptchVerify() {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha", {
-        size: "invisible",
-        callback: (response) => {
-          //abc
-        },
-      });
-    }
-
-    function onSignup(event) {
+    const onSignup = async () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-       if (otpData.phone.length !== 10) {
-         setErrMsg("Mobile: (Must have 10 Digits)");
-         return;
-       }
-
-      if (otpData.email.length < 5) {
-        setErrMsg("Email: (Size Must Be >= 5)");
+      if (otpData.name.length < 3) {
+        setErrMsg("Please enter a name with at least 3 characters.");
         return;
-      } else if (!emailRegex.test(otpData.email)) {
+      }
+      if (!emailRegex.test(otpData.email)) {
         setErrMsg("Invalid Email Format");
         return;
       }
-
-      if (otpData.name.length < 3) {
-        setErrMsg("Name: (Size Must Be >= 3)");
+      if (otpData.phone.length !== 10) {
+        setErrMsg("Mobile: (Must have 10 Digits)");
         return;
       }
 
-      setLoading(true);
       setErrMsg("");
-      if (firstTime) {
-        onCaptchVerify();
-        setFirstIme(false);
-      }
+      setLoading(true);
 
-      const formatPh = "+91" + ph;
-      const appVerifier = window.recaptchaVerifier;
-      console.log(formatPh);
-      localStorage.setItem("otpData", JSON.stringify(otpData));
-      signInWithPhoneNumber(auth, formatPh, appVerifier)
-        .then((confirmationResult) => {
-          window.confirmationResult = confirmationResult;
-          setLoading(false);
-          setOtpBoxOpen(true);
-          setDisableResend(true);
-          console.log("OTP sent successfully!");
-        })
-        .catch((error) => {
-          console.log(error);
-          setLoading(false);
+      try {
+        await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/sendOtp`, {
+          mobileNumber: otpData.phone,
+        },{
+          headers: { Authorization: token },
         });
 
-      setOtpData({
-        ...otpData,
-        phone: ph,
-      });
-    }
+        setOtpBoxOpen(true);
+        setDisableResend(true);
+      } catch (err) {
+        console.error(err);
+        setErrMsg("Failed to send OTP");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    function onOTPVerify() {
+    const onOTPVerify = async () => {
       setLoading(true);
-      window.confirmationResult
-        .confirm(otp)
-        .then(async (res) => {
-          localStorage.setItem("otpData", JSON.stringify(otpData));
+      const leadId = sessionStorage.getItem("LeadId");
+
+      try {
+        const res = await axios.post(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/verifyOtp`,
+          {
+            mobileNumber: otpData.phone,
+            otp,
+          },{
+            headers: { Authorization: token },
+          }
+        );
+
+        if (res?.data?.success && currentDomain === buyBackUrl) {
+          const response = await axios.post(
+            `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/customerDetail`,
+            {
+              name: otpData.name,
+              emailId: otpData.email,
+              phoneNumber: otpData.phone,
+              leadId,
+            },{
+              headers: { Authorization: token },
+            }
+          );
+
+          if (response?.status === 200) {
+            navigate("/thankyou");
+          } else {
+            setErrMsg("Failed to Save Details");
+          }
+        } else {
           dispatch(setOtpVerified(true));
           dispatch(setLeadOTPData(otpData));
-          console.log("ho gya");
-        })
-        .catch((err) => {
-          setLoading(false);
-          console.log(err);
-        });
-    }
+          navigate("/inputnumber");
+        }
+      } catch (err) {
+        console.error(err);
+        const isInvalidOtp =
+          err.response?.status === 400 &&
+          err.response?.data?.error === "Invalid OTP";
+        if (isInvalidOtp) {
+          toast.error("Invalid OTP. Please try again.");
+        } else {
+          toast.error("Invalid or expired OTP");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    const resendOTP = () => {
+    const resendOTP = async () => {
       setDisableResend(true);
 
-      const formatPh = "+91" + ph;
-      const appVerifier = window.recaptchaVerifier;
-
-      signInWithPhoneNumber(auth, formatPh, appVerifier)
-        .then((confirmationResult) => {
-          window.confirmationResult = confirmationResult;
-          console.log("OTP resent successfully!");
-        })
-        .catch((error) => {
-          console.log(error);
-          console.log(error + "");
+      try {
+        await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/resendOtp`, {
+          mobileNumber: otpData.phone,
+        },{
+          headers: { Authorization: token },
         });
+      } catch (err) {
+        console.error(err);
+        setErrMsg("Failed to resend OTP");
+      }
     };
 
   useEffect(() => {

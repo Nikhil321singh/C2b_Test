@@ -18,7 +18,6 @@ import apple_watch from "../assets/apple_watch.png";
 import ReactDOMServer from "react-dom/server";
 import html2pdf from "html2pdf.js";
 import PurchaseReceipt from "../components/PurchaseReceipt";
-import toast from "react-hot-toast";
 import { IoArrowBack } from "react-icons/io5";
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
@@ -153,7 +152,6 @@ const SpecialOffers = () => {
   const [extraBonus, setExtraBonus] = useState(0);
   const [disableBtn, setDisableBtn] = useState(initialDisableBtn);
   const [phonePrice, setPhonePrice] = useState(Price + responseData.bonus);
-  const [receipt, setReceipt] = useState(null);
   const dispatch = useDispatch(false);
   const { setAnswers } = useQuestionContext();
   const leadId = sessionStorage.getItem("LeadId");
@@ -162,22 +160,6 @@ const SpecialOffers = () => {
   useEffect(() => {
     dispatch(setOtpVerified(false));
   }, []);
-  useEffect(() => {
-    const getLeadData = async () => {
-      try {
-        const { data } = await axios.get(
-          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findLeadById?id=${leadId}`,
-          {
-            headers: { Authorization: userToken },
-          }
-        );
-        hanldlejsx_pdf(data.data, setReceipt);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getLeadData()
-    }, []);
   const handleViewSummary = () => {
     const bonus = Number(phonePrice) - Number(Price);
     setExtraBonus(bonus);
@@ -239,21 +221,17 @@ const SpecialOffers = () => {
 
 
   const handleSubmit = () => {
-    if (!receipt) {
-      toast.error("Please wait purchase receipt is being created");
-      return;
-    }
+
     setIsLoading(true);
     const userIdToken = sessionStorage.getItem("authToken");
     const LeadId = sessionStorage.getItem("LeadId");
     const formData = new FormData();
     formData.append("id", LeadId);
     formData.append("bonusPrice", responseData.bonus);
-    formData.append("file", receipt);
     axios
       .post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/item-purchased`,
         formData,
-        { headers: { Authorization: userIdToken, "Content-Type": "multipart/form-data" } }
+        { headers: { Authorization: userIdToken } }
       )
       .then((response) => {
         setAnswers([]);
@@ -301,7 +279,6 @@ const SpecialOffers = () => {
         discountData={discountData}
         handleViewSummary={handleViewSummary}
         handleSubmit={handleSubmit}
-        receipt={receipt}
         isLoading={isLoading}
         showModal={showModal}
         handleCloseModal={handleCloseModal}
@@ -318,7 +295,6 @@ const SubSpecialOffers = ({
   isSelected,
   discountData,
   handleViewSummary,
-  receipt,
   handleSubmit,
   isLoading,
   showModal,
@@ -339,7 +315,7 @@ const SubSpecialOffers = ({
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
   return (
     <div>
-    <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
+    <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER header">
       <div className="flex items-center justify-between w-full pr-4">
         <div className="flex items-center gap-2 ml-4">
         <button
@@ -385,10 +361,8 @@ const SubSpecialOffers = ({
           </p>
         </div>
         <div
-          onClick={receipt ? handleSubmit : null} // Prevent click if receipt is missing
-          className={`bg-primary relative text-center py-1 px-2 rounded-lg flex justify-between text-white items-center 
-            ${!receipt ? "cursor-not-allowed opacity-50 pointer-events-none" : "cursor-pointer"}
-          `}
+          onClick={handleSubmit}
+          className={`bg-primary relative text-center py-1 px-2 rounded-lg flex justify-between text-white items-center cursor-pointer`}
         >
           {isLoading && (
             <CgSpinner

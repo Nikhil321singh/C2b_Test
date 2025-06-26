@@ -7,7 +7,8 @@ import { useDispatch } from "react-redux";
 import { setOtpVerified } from "../../store/slices/otpSlice";
 import LoadingSpinner from "../LoadingSpinner";
 import { MdEdit } from "react-icons/md";
-import ProfileBox from "../ProfileBox/ProfileBox";
+import { IoArrowBack } from "react-icons/io5";
+import toast from "react-hot-toast";
 const currentDomain = window.location.origin;
 const DEFAULT_LOGO = "/Grest_Logo.jpg";
 const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
@@ -15,8 +16,6 @@ const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
 const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import axios from "axios";
-import { IoArrowBack } from "react-icons/io5";
-import toast from "react-hot-toast";
 const initOtp = {
   name: "",
   email: "",
@@ -56,21 +55,21 @@ const ContOTP = ({ setContinueOTPOpen }) => {
 
     const onSignup = async () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (otpData.name.length < 3) {
-        setErrMsg("Please enter a name with at least 3 characters.");
+      if (otpData.phone.length !== 10) {
+        setErrMsg("Mobile: (Must have 10 Digits)");
         return;
       }
       if (!emailRegex.test(otpData.email)) {
         setErrMsg("Invalid Email Format");
         return;
       }
-      if (otpData.phone.length !== 10) {
-        setErrMsg("Mobile: (Must have 10 Digits)");
+      if (otpData.name.length < 3) {
+        setErrMsg("Please enter a name with at least 3 characters.");
         return;
       }
 
-      setErrMsg("");
       setLoading(true);
+      setErrMsg("");
 
       try {
         await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/sendOtp`, {
@@ -79,26 +78,26 @@ const ContOTP = ({ setContinueOTPOpen }) => {
           headers: { Authorization: token },
         });
 
-        setOtpBoxOpen(true);
         setDisableResend(true);
+        setOtpBoxOpen(true);
       } catch (err) {
-        console.error(err);
         setErrMsg("Failed to send OTP");
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
     const onOTPVerify = async () => {
-      setLoading(true);
       const leadId = sessionStorage.getItem("LeadId");
+      setLoading(true);
 
       try {
         const res = await axios.post(
           `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/verifyOtp`,
           {
-            mobileNumber: otpData.phone,
             otp,
+            mobileNumber: otpData.phone,
           },{
             headers: { Authorization: token },
           }
@@ -108,19 +107,19 @@ const ContOTP = ({ setContinueOTPOpen }) => {
           const response = await axios.post(
             `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/customerDetail`,
             {
-              name: otpData.name,
               emailId: otpData.email,
-              phoneNumber: otpData.phone,
+              name: otpData.name,
               leadId,
+              phoneNumber: otpData.phone,
             },{
               headers: { Authorization: token },
             }
           );
 
-          if (response?.status === 200) {
-            navigate("/thankyou");
-          } else {
+          if (response?.status !== 200) {
             setErrMsg("Failed to Save Details");
+          } else {
+            navigate("/thankyou");
           }
         } else {
           dispatch(setOtpVerified(true));
@@ -131,10 +130,10 @@ const ContOTP = ({ setContinueOTPOpen }) => {
         const isInvalidOtp =
           err.response?.status === 400 &&
           err.response?.data?.error === "Invalid OTP";
-        if (isInvalidOtp) {
-          toast.error("Invalid OTP. Please try again.");
-        } else {
+        if (!isInvalidOtp) {
           toast.error("Invalid or expired OTP");
+        } else {
+          toast.error("Invalid OTP. Please try again.");
         }
       } finally {
         setLoading(false);
@@ -143,7 +142,6 @@ const ContOTP = ({ setContinueOTPOpen }) => {
 
     const resendOTP = async () => {
       setDisableResend(true);
-
       try {
         await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/sms/resendOtp`, {
           mobileNumber: otpData.phone,
@@ -151,8 +149,8 @@ const ContOTP = ({ setContinueOTPOpen }) => {
           headers: { Authorization: token },
         });
       } catch (err) {
-        console.error(err);
         setErrMsg("Failed to resend OTP");
+        console.error(err);
       }
     };
 
@@ -169,6 +167,13 @@ const ContOTP = ({ setContinueOTPOpen }) => {
       return () => clearInterval(intrvl);
     }, [disableResend, timer]);
 
+    // Add useEffect to handle body scroll
+    useEffect(() => {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'auto';
+      };
+    }, []);
 
   useEffect(() => {
     localStorage.setItem("otpData", JSON.stringify(otpData));
@@ -219,31 +224,19 @@ export const MainOtpUI = ({
   const navigate = useNavigate();
   return (
     <div className={`${styles.contopt_page}`} style={{ zIndex: 9999 }}>
-      <div className="absolute top-4 md:top-0 bg-white flex items-center justify-between w-full pr-2 py-2 rounded-md">
-          <div className="flex items-center justify-between gap-2">
-            <button
-              onClick={() => navigate(-1)}
-              className="text-xs ml-2 flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
-            >
-              <IoArrowBack
-                size={24}
-              />
-            </button>
-            <img
-              onClick={() => navigate("/selectdevicetype")}
-              className="w-[120px] max-w-[150px] object-contain cursor-pointer ml-2"
-              src={GREST_LOGO}
-              alt="app logo"
-              />
-          </div>
-        <ProfileBox />
-      </div>
-      <div className={` ${styles.optbox_wrap}`}>
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-0 left-4 text-xs flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full"
+        style={{ marginTop: 'calc(env(safe-area-inset-top) + 0.5rem)' }}
+      >
+        <IoArrowBack size={20} />
+      </button>
+      <div className={`${styles.optbox_wrap}`}>
         <div className={`${styles.optimg_wrap}`}>
-          <img  src={optImg} />
+          <img src={optImg} />
         </div>
-        <div className={`${styles.opt_heading} `}>
-          <p className={`font-bold text-2xl`}>OTP Verificaiton</p>
+        <div className={`${styles.opt_heading}`}>
+          <p className={`font-bold text-2xl`}>{otpBoxOpen ? 'OTP Verification' : 'Enter Details'}</p>
           {otpBoxOpen ? (
             <div className={`flex ${styles.Editresponsive}`}>
               <span className="flex flex-col items-center justify-center text-sm font-medium opacity-60">
@@ -268,7 +261,7 @@ export const MainOtpUI = ({
             >
               {errMsg
                 ? errMsg
-                : "We will send you a one-time Password to this number."}
+                : "Please enter your details to continue."}
             </span>
           )}
         </div>
@@ -285,12 +278,12 @@ export const MainOtpUI = ({
         />
         {otpBoxOpen && (
           <div className={styles.resend_otp_wrap}>
-            <div className="flex flex-row gap-2  w-[300px] justify-center  text-sm font-medium">
-              <span className="opacity-60 min-w-[132px] ">
+            <div className="flex flex-row gap-2 w-[300px] justify-center text-sm font-medium">
+              <span className="opacity-60 min-w-[132px]">
                 Didn't Receive OTP?
               </span>
               <button
-                className=" text-left  min-w-[100px]"
+                className="text-left min-w-[100px]"
                 onClick={resendOTP}
                 disabled={disableResend}
               >
@@ -405,7 +398,7 @@ const OTPComp = ({
             />
           </div>
           <div className="w-[100%] flex flex-row">
-            <div className="flex   border-primary rounded-lg border-2  w-[85%] flex-row justify-start">
+            <div className="flex border-primary rounded-lg border-2 w-[85%] flex-row justify-start">
               <span className="px-3 py-1 text-gray-600 bg-gray-200 rounded-lg">
                 +91
               </span>

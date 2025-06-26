@@ -221,7 +221,7 @@ function Categories() {
             : `flex flex-col pb-16 min-h-[100vh]`
         }
       >
-        <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
+        <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER ">
           <div className="flex items-center justify-between w-full pl-2">
             <img
               onClick={() => navigate("/selectdevicetype")}

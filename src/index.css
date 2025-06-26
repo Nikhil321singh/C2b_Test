@@ -8,7 +8,14 @@
   --tertiary-color: #d7203d;
   --quaternary-color: #ff3864;
 }
+body {
+  padding-top: env(safe-area-inset-top);
+  /* padding-bottom: env(safe-area-inset-bottom); */
+}
 
+html,body{
+  max-height: 100dvh;
+}
 @media print {
   .page-break {
     page-break-before: always;

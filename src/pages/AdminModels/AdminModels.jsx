@@ -296,7 +296,7 @@ const ExtComps = ({
   const [sideMenu, setsideMenu] = useState(false);
   return (
     <React.Fragment>
-      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER ">
+      <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER ">
         <div className="navbar">
           <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
           <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />

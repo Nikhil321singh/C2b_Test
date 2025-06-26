@@ -39,7 +39,7 @@ const ViewPickup = () => {
           <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
         </div>
       )}
-      <div className="flex items-center w-screen h-16 py-4 bg-white border-b-2 HEADER header">
+      <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER header">
         <div className="flex items-center justify-between w-full ">
           <div className="flex flex-row-reverse items-center gap-2 ml-4">
             <p className="mr-4 text-base md:text-xl">{userName}</p>
