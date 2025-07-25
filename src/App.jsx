@@ -54,6 +54,7 @@ import LeadsCompleted from "./pages/LeadsCompleted/LeadsCompleted";
 import Categories from "./pages/Categories/Categories";
 import Watchqs from "./pages/Watch_Exact_qs/Watch_qs";
 import Orders from "./pages/Orders/Orders";
+import BulkUploadHistory from "./pages/BulkUploadHistory";
 import ThankYou from "./pages/ThankYou";
 
 function App() {
@@ -197,6 +198,7 @@ function App() {
                 <Route path="/BrandList" element={<Categories />}></Route>
                 <Route path="/watchQs" element={<Watchqs />}></Route>
                 <Route path="/Orders/:daysfilter" element={<Orders />}></Route>
+                <Route path="/bulkuploadhistory" element={<BulkUploadHistory />}></Route>
               </Routes>
             </Router>
             <Toaster

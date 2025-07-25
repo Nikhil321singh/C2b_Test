@@ -61,6 +61,11 @@ function SideMenu({ setsideMenu, sideMenu }) {
     navigate("/devicepickupdashboard");
   };
 
+  const handleBulkUploadHistory = () => {
+    setsideMenu(!sideMenu);
+    navigate("/bulkuploadhistory");
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
@@ -70,7 +75,7 @@ function SideMenu({ setsideMenu, sideMenu }) {
   return (
     <>
       {/* //new for change  */}
-      {(profile.role === "Super Admin"  || profile.role === "Super_Admin_Unicorn") && (
+      {(profile.role === "Super Admin" || profile.role === "Super_Admin_Unicorn") && (
         <SuperAdminProfile
           sideMenu={sideMenu}
           handleHome={handleHome}
@@ -84,10 +89,11 @@ function SideMenu({ setsideMenu, sideMenu }) {
           handlpickup={handlpickup}
           handleTechnician={handleTechnician}
           adminDashboard={adminDashboard}
+          handleBulkUploadHistory={handleBulkUploadHistory}
           handleLogout={handleLogout}
         />
       )}
-      {(profile.role === "Admin Manager"  || profile.role === "Admin_Manager_Unicorn") && (
+      {(profile.role === "Admin Manager" || profile.role === "Admin_Manager_Unicorn") && (
         <div
           className={
             "menu fixed justify-center left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center transition-all duration-950 ease-in " +
@@ -201,6 +207,7 @@ const SuperAdminProfile = ({
   handleTechnician,
   adminDashboard,
   handleLogout,
+  handleBulkUploadHistory,
 }) => {
   return (
     <div
@@ -233,6 +240,13 @@ const SuperAdminProfile = ({
           onClick={handleRegister}
         >
           Register User
+        </li>
+
+        <li
+          className="text-[20px] font-[300] cursor-pointer "
+          onClick={handleBulkUploadHistory}
+        >
+          Bulk Upload History
         </li>
 
         <li
