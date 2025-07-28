@@ -957,6 +957,7 @@ const AboveSix = ({
       finalPayload,
       { headers: { Authorization: userToken2 } }
     );
+    await logQuickQuoteAttempt(response.data.data, id);
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
@@ -967,6 +968,41 @@ const AboveSix = ({
     setIsLoading(false);
     navigate("/devicequote");
   };
+
+
+  const logQuickQuoteAttempt = async (quoteResult, deviceModel) => {
+  const token = sessionStorage.getItem("authToken");
+
+  if (!token || !quoteResult?.id || !deviceModel?.models?._id) {
+  console.error("Cannot log quote: Missing critical data.");
+    return;
+  }
+  const logPayload = {
+    quoteType: "Get Exact Value",
+    quoteAmount: quoteResult.price,
+    grade: quoteResult.grade,
+    deviceDetails: {
+      modelId: deviceModel?.models?._id,      
+      name: deviceModel?.models?.name,
+      brandId: deviceModel?.models?.brandId,  
+      categoryName:deviceModel?.models?.categoryInfo?.categoryName,
+      ram: deviceModel?.models?.config?.RAM,
+      rom: deviceModel?.models?.config?.storage,     
+      series:deviceModel?.models?.series,
+      
+    },
+  };
+  try {
+    await axios.post(
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/quoteTracking/log-quote-attempt`,
+      logPayload,
+      { headers: { Authorization: token } }
+    );
+  } catch (error) {
+    console.error("Error logging Quick Quote attempt:", error);
+  }
+};
+
 
   return (
     <React.Fragment>

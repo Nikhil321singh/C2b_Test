@@ -66,6 +66,11 @@ function SideMenu({ setsideMenu, sideMenu }) {
     navigate("/bulkuploadhistory");
   };
 
+   const handleQuoteTracking = () => {
+    setsideMenu(!sideMenu);
+    navigate("/quotetrackingdashboard");
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     sessionStorage.clear();
@@ -90,6 +95,7 @@ function SideMenu({ setsideMenu, sideMenu }) {
           handleTechnician={handleTechnician}
           adminDashboard={adminDashboard}
           handleBulkUploadHistory={handleBulkUploadHistory}
+          handleQuoteTracking={handleQuoteTracking}
           handleLogout={handleLogout}
         />
       )}
@@ -136,6 +142,12 @@ function SideMenu({ setsideMenu, sideMenu }) {
               onClick={handleStoreReport}
             >
               Store Report
+            </li>
+            <li
+              className="text-[20px] font-[300] cursor-pointer"
+              onClick={handleQuoteTracking}
+            >
+              Quote Tracking
             </li>
             <li
               className="text-[20px] font-[300] cursor-pointer "
@@ -208,6 +220,7 @@ const SuperAdminProfile = ({
   adminDashboard,
   handleLogout,
   handleBulkUploadHistory,
+  handleQuoteTracking, 
 }) => {
   return (
     <div
@@ -260,6 +273,12 @@ const SuperAdminProfile = ({
           onClick={handleStoreReport}
         >
           Store Report
+        </li>
+         <li
+          className="text-[20px] font-[300] cursor-pointer"
+          onClick={handleQuoteTracking}
+        >
+          Quote Tracking
         </li>
         <li
           className="text-[20px] font-[300] cursor-pointer "

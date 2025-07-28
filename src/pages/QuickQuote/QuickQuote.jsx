@@ -75,9 +75,8 @@ const QuickQuote = () => {
     const userToken = sessionStorage.getItem("authToken");
     const fetchData = async () => {
       try {
-        const apiUrl = `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/findAll?page=0&limit=31`;
+        const apiUrl = `${import.meta.env.VITE_REACT_APP_ENDPOINT
+          }/api/questionnaires/findAll?page=0&limit=31`;
 
         const response = await axios.get(apiUrl, {
           headers: {
@@ -155,8 +154,7 @@ const QuickQuote = () => {
       name: profile?.name,
     };
     const response = await axios.post(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/questionnaires/calculatePrice`,
       finalPayload,
       {
@@ -165,6 +163,7 @@ const QuickQuote = () => {
         },
       }
     );
+    await logQuickQuoteAttempt(response.data.data, id);
     sessionStorage.setItem("LeadId", response.data.data.id);
     sessionStorage.setItem(
       "responsedatadata",
@@ -176,10 +175,53 @@ const QuickQuote = () => {
     navigate("/devicequote");
   };
 
+  const logQuickQuoteAttempt = async (quoteResult, deviceModel, qna) => {
+    const token = sessionStorage.getItem("authToken");
+    if (!token || !quoteResult?.id || !deviceModel?.models?._id) {
+      console.error("❌ Cannot log quote: Missing critical data.");
+      return;
+    }
+    const logPayload = {
+      quoteType: "QuickQuote",
+      quoteAmount: quoteResult.price,
+      grade: quoteResult.grade,
+      deviceDetails: {
+        modelId: deviceModel?.models?._id,
+        name: deviceModel?.models?.name,
+        brandId: deviceModel?.models?.brandId,
+        categoryName: deviceModel?.models?.categoryInfo?.categoryName,
+        ram: deviceModel?.models?.config?.RAM,
+        rom: deviceModel?.models?.config?.storage,
+        series: deviceModel?.models?.series,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/quoteTracking/log-quote-attempt`,
+        logPayload,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+    } catch (error) {
+      if (error.response) {
+        console.error("Status:", error.response.status);
+        console.error("Message:", error.response.data?.message);
+        console.error("Details:", error.response.data);
+      } else {
+        console.error("Error:", error.message);
+      }
+    }
+  };
+
+
+
   return (
     <div className="mainQContainer">
       <div className="flex items-center w-screen py-4 h-16 border-b-2  bg-white HEADER header">
-      <div className="flex items-center justify-between w-full max-w-screen overflow-hidden px-4 py-2">
+        <div className="flex items-center justify-between w-full max-w-screen overflow-hidden px-4 py-2">
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => navigate(-1)}
@@ -192,7 +234,7 @@ const QuickQuote = () => {
               className="w-[120px] sm:w-[130px] md:w-[150px] object-contain cursor-pointer"
               src={GREST_LOGO}
               alt="app logo"
-              />
+            />
           </div>
           <ProfileBox />
         </div>
@@ -317,9 +359,8 @@ const QuestionList = ({
                 className="max-w-[500px] flex gap-4 ml-3 lableconatiner flex-col"
               >
                 <label
-                  className={`text-primary font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
-                    Warranty[index].answer === data.yes ? PinkBgWhText : ""
-                  }`}
+                  className={`text-primary font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${Warranty[index].answer === data.yes ? PinkBgWhText : ""
+                    }`}
                 >
                   <input
                     type="radio"
@@ -359,9 +400,8 @@ const QuestionsElement = ({ State, Task, dispatch, currentIndex, taskFun }) => {
             </div>
             <div className="max-w-[500px] flex gap-4 ml-3 lableconatiner">
               <label
-                className={`text-primary font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                  Task[index].answer === data.yes ? PinkBgWhText : ""
-                }`}
+                className={`text-primary font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${Task[index].answer === data.yes ? PinkBgWhText : ""
+                  }`}
               >
                 <input
                   name={data._id}
@@ -381,9 +421,8 @@ const QuestionsElement = ({ State, Task, dispatch, currentIndex, taskFun }) => {
                 Yes
               </label>
               <label
-                className={`text-primary font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                  Task[index].answer === data.no ? PinkBgWhText : ""
-                }`}
+                className={`text-primary font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${Task[index].answer === data.no ? PinkBgWhText : ""
+                  }`}
               >
                 <input
                   name={data._id}
