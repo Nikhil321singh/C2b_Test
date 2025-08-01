@@ -367,23 +367,23 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
                       </tr>
                     </thead>
                     <tbody className='bg-white'>
-                      {previewData.map((row, rowIndex) => (
-                        <tr
-                          key={rowIndex}
-                          className={
-                            rowIndex % 2 === 0 ? 'bg-gray-100' : 'bg-white'
-                          }
-                        >
-                          {row.map((cell, cellIndex) => (
-                            <td
-                              key={cellIndex}
-                              className='p-2 md:p-3 text-gray-700 truncate max-w-xs'
-                            >
-                              {cell}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
+                      {previewData.map((row, rowIndex) => {
+                        const rowClass =
+                          rowIndex % 2 === 0 ? 'bg-gray-100' : 'bg-white'
+
+                        return (
+                          <tr key={rowIndex} className={rowClass}>
+                            {row.map((cell, cellIndex) => (
+                              <td
+                                key={cellIndex}
+                                className='p-2 md:p-3 text-gray-700 truncate max-w-xs'
+                              >
+                                {cell}
+                              </td>
+                            ))}
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
