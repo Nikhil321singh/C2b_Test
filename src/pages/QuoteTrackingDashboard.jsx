@@ -8,6 +8,7 @@ import AdminNavbar from '../components/Admin_Navbar'
 import SideMenu from '../components/SideMenu'
 import QuoteTrackingTable from '../components/QuoteTrackingTable'
 import ActivityLogModal from '../components/QuickActivityLogModal'
+
 import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
 import {
@@ -17,38 +18,18 @@ import {
   FaExclamationTriangle,
 } from 'react-icons/fa'
 
-// Custom debounce hook
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value)
-
   useEffect(() => {
     const handler = setTimeout(() => {
+      ;``
       setDebouncedValue(value)
     }, delay)
-
     return () => {
       clearTimeout(handler)
     }
   }, [value, delay])
-
   return debouncedValue
-}
-
-// Helper function to handle API errors
-const handleApiError = (
-  error,
-  defaultMessage = 'An unexpected error occurred.'
-) => {
-  console.error('API Error:', error)
-  return error.response?.status === 404
-    ? 'Download failed: No data available.'
-    : defaultMessage
-}
-
-// Helper function to show toast messages
-const showToast = (type, message, toastId = null) => {
-  const options = toastId ? { id: toastId } : {}
-  return toast[type](message, options)
 }
 
 const QuoteTrackingDashboard = () => {
@@ -79,7 +60,6 @@ const QuoteTrackingDashboard = () => {
   const fetchTrackingData = useCallback(async () => {
     setLoading(true)
     const token = sessionStorage.getItem('authToken')
-
     try {
       const params = {
         page: pagination.currentPage,
@@ -129,8 +109,7 @@ const QuoteTrackingDashboard = () => {
     }
 
     setIsDownloading(true)
-    const toastId = showToast(
-      'loading',
+    const toastId = toast.loading(
       <div className='flex items-center gap-2'>
         <BeatLoader color='#3B82F6' size={8} />
         <span>Generating your report...</span>
@@ -145,57 +124,50 @@ const QuoteTrackingDashboard = () => {
         }/api/quoteTracking/dashboard/download`,
         {
           headers: { Authorization: token },
-          params: {
-            dateRange: filters.dateRange,
-            search: debouncedSearch,
-          },
+          params: { dateRange: filters.dateRange, search: debouncedSearch },
           responseType: 'blob',
         }
       )
 
       const blob = new Blob([response.data], { type: 'text/csv' })
-      const fileName = `quote_tracking_report_${
-        new Date().toISOString().split('T')[0]
-      }.csv`
-      saveAs(blob, fileName)
+      saveAs(
+        blob,
+        `quote_tracking_report_${new Date().toISOString().split('T')[0]}.csv`
+      )
 
-      showToast(
-        'success',
+      toast.success(
         <div className='flex items-center gap-2'>
           <FaCheckCircle className='text-green-500' />
           <b>Report downloaded successfully!</b>
         </div>,
-        toastId
+        { id: toastId }
       )
     } catch (error) {
-      const errorMessage = handleApiError(error)
-      showToast(
-        'error',
+      console.error('Failed to download report:', error)
+
+      const errorMessage = (
         <div className='flex items-center gap-2'>
           <FaExclamationTriangle className='text-red-500' />
-          <b>{errorMessage}</b>
-        </div>,
-        toastId
+          <b>
+            {error.response?.status === 404
+              ? 'Download failed: No data available.'
+              : 'An unexpected error occurred.'}
+          </b>
+        </div>
       )
+
+      toast.error(errorMessage, { id: toastId })
     } finally {
       setIsDownloading(false)
     }
   }
 
   const openActivityLog = (user) => {
-    setModalState({
-      isOpen: true,
-      userId: user.userId,
-      userName: user.userId,
-    })
+    setModalState({ isOpen: true, userId: user.userId, userName: user.userId })
   }
 
   const closeActivityLog = () => {
-    setModalState({
-      isOpen: false,
-      userId: null,
-      userName: '',
-    })
+    setModalState({ isOpen: false, userId: null, userName: '' })
   }
 
   return (
@@ -228,7 +200,6 @@ const QuoteTrackingDashboard = () => {
             value={filters.search}
           />
         </div>
-
         <div className='relative w-full md:w-auto'>
           <select
             value={filters.dateRange}
@@ -243,19 +214,24 @@ const QuoteTrackingDashboard = () => {
           </select>
           <FaAngleDown className='absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none' />
         </div>
-
         <button
           onClick={handleRefresh}
           title='Refresh Filters'
-          className='p-2.5 text-sm font-medium text-white bg-primary rounded-lg border border-gray-300 transition-transform duration-150 ease-in-out active:scale-95'
+          className='p-2.5 text-sm font-medium text-white bg-primary rounded-lg border border-gray-300 
+             transition-transform duration-150 ease-in-out active:scale-95'
         >
           <IoRefresh size={20} />
         </button>
-
         <button
           onClick={handleDownload}
           disabled={isDownloading || tableData.length === 0}
-          className='flex items-center justify-center gap-2 px-4 py-2.5 w-48 text-sm font-semibold text-white bg-primary rounded-lg shadow-md transition-all duration-200 ease-in-out active:scale-95 disabled:bg-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed disabled:shadow-none'
+          className={`
+                        flex items-center justify-center gap-2 px-4 py-2.5 w-48 text-sm font-semibold text-white 
+                         bg-primary rounded-lg shadow-md
+                        transition-all duration-200 ease-in-out
+                        active:scale-95
+                        disabled:bg-gray-400 disabled:text-gray-500 disabled:cursor-not-allowed disabled:shadow-none
+                    `}
         >
           {isDownloading ? (
             <>

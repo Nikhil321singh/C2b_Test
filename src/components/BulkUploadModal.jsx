@@ -1,13 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
-import { BeatLoader } from 'react-spinners'
 import * as XLSX from 'xlsx'
 import Papa from 'papaparse'
-import {
-  IoDownloadOutline,
-  IoDocumentTextOutline,
-  IoCloudUploadOutline,
-} from 'react-icons/io5'
+import UploadSummary from './UploadSummary'
+import FileUploadForm from './FileUploadForm'
+import UploadSpinner from './UploadSpinner'
+
+const buildCSVAndDownload = (headers, rows, filename) => {
+  const escapeCsvCell = (cell) => {
+    const strCell = String(cell ?? '')
+    return /,|"|\n/.test(strCell) ? `"${strCell.replace(/"/g, '""')}"` : strCell
+  }
+
+  const csvContent =
+    'data:text/csv;charset=utf-8,' +
+    [headers, ...rows].map((row) => row.map(escapeCsvCell).join(',')).join('\n')
+
+  const link = document.createElement('a')
+  link.href = encodeURI(csvContent)
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 
 const BulkUploadModal = ({ isOpen, onClose }) => {
   const [file, setFile] = useState(null)
@@ -134,30 +149,6 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
     }
   }
 
-  const downloadCSV = (data, filename) => {
-    const escapeCsvCell = (cell) => {
-      const strCell = String(cell ?? '')
-      if (
-        strCell.includes(',') ||
-        strCell.includes('"') ||
-        strCell.includes('\n')
-      ) {
-        return `"${strCell.replace(/"/g, '""')}"`
-      }
-      return strCell
-    }
-    const csvContent =
-      'data:text/csv;charset=utf-8,' +
-      data.map((row) => row.map(escapeCsvCell).join(',')).join('\n')
-    const encodedUri = encodeURI(csvContent)
-    const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
-    link.setAttribute('download', filename)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-
   const handleDownloadSample = () => {
     const headers = [
       'First Name',
@@ -170,8 +161,7 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
       'City',
       'Address',
     ]
-    const sampleData = [
-      headers,
+    const rows = [
       [
         'John',
         'Doe',
@@ -195,7 +185,7 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
         '123 MG Road',
       ],
     ]
-    downloadCSV(sampleData, 'sample_user_upload.csv')
+    buildCSVAndDownload(headers, rows, 'sample_user_upload.csv')
   }
 
   const handleDownloadFailed = () => {
@@ -212,8 +202,11 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
         'Address',
         'Error Message',
       ]
-      const dataToDownload = [headers, ...uploadResult.failedRecords]
-      downloadCSV(dataToDownload, 'failed_user_records.csv')
+      buildCSVAndDownload(
+        headers,
+        uploadResult.failedRecords,
+        'failed_user_records.csv'
+      )
     }
   }
 
@@ -238,168 +231,25 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
         </h2>
 
         {isUploading ? (
-          <div className='flex flex-col items-center justify-center h-64'>
-            <BeatLoader
-              color='var(--primary-color)'
-              loading={isUploading}
-              size={20}
-            />
-            <p className='mt-4 text-lg text-gray-600'>
-              Processing your file, please wait...
-            </p>
-          </div>
+          <UploadSpinner />
         ) : uploadResult ? (
-          <div>
-            <h3 className='text-xl font-semibold text-gray-700 mb-4'>
-              Upload Summary
-            </h3>
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 text-center mb-6'>
-              <div className='p-4 bg-gray-100 rounded-lg'>
-                <p className='text-3xl font-bold text-gray-800'>
-                  {uploadResult.total}
-                </p>
-                <p className='text-sm font-medium text-gray-500'>
-                  Total Records
-                </p>
-              </div>
-              <div className='p-4 bg-green-100 rounded-lg'>
-                <p className='text-3xl font-bold text-green-600'>
-                  {uploadResult.succeeded}
-                </p>
-                <p className='text-sm font-medium text-green-500'>Succeeded</p>
-              </div>
-              <div className='p-4 bg-red-100 rounded-lg'>
-                <p className='text-3xl font-bold text-red-600'>
-                  {uploadResult.failed}
-                </p>
-                <p className='text-sm font-medium text-red-500'>Failed</p>
-              </div>
-            </div>
-            {uploadResult.failed > 0 && (
-              <div className='flex flex-col items-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
-                <p className='text-gray-700 mb-3 text-center'>
-                  Some records could not be Register. Download the file to see
-                  the failed records with valid errors , correct them, and
-                  re-upload.
-                </p>
-                <button
-                  onClick={handleDownloadFailed}
-                  className='flex items-center gap-2 font-medium text-sm text-white px-4 py-2 rounded bg-primary hover:bg-opacity-90 transition-colors'
-                >
-                  <IoDownloadOutline size={18} />
-                  Download Failed Records
-                </button>
-              </div>
-            )}
-            <div className='mt-8 flex flex-col sm:flex-row justify-end gap-3'>
-              <button
-                onClick={resetState}
-                className='font-medium text-sm text-gray-700 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition-colors'
-              >
-                Upload Another File
-              </button>
-              <button
-                onClick={onClose}
-                className='font-medium text-sm text-white px-4 py-2 rounded bg-primary hover:bg-opacity-90'
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          <UploadSummary
+            uploadResult={uploadResult}
+            onReset={resetState}
+            onClose={onClose}
+            onDownloadFailed={handleDownloadFailed}
+          />
         ) : (
-          <div>
-            <div className='mb-6 p-4 border border-dashed rounded-lg bg-gray-50'>
-              <p className='text-sm text-gray-600 mb-2'>
-                Download the sample template to ensure your data is in the
-                correct format. Mandatory fields are:{' '}
-                <span className='font-semibold'>
-                  First Name, Last Name, Email, Password, Mobile Number, Store
-                  Name, Role, City,Address
-                </span>
-                .
-              </p>
-              <button
-                onClick={handleDownloadSample}
-                className='flex items-center gap-2 text-sm font-semibold text-primary hover:underline'
-              >
-                <IoDocumentTextOutline size={16} />
-                Download Sample CSV
-              </button>
-            </div>
-            <div className='flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg bg-white hover:border-primary transition-colors'>
-              <IoCloudUploadOutline className='text-gray-400' size={50} />
-              <label
-                htmlFor='file-upload'
-                className='mt-2 cursor-pointer font-medium text-primary hover:text-primary-dark'
-              >
-                <span>Select a .csv or .xlsx file</span>
-                <input
-                  id='file-upload'
-                  name='file-upload'
-                  type='file'
-                  className='sr-only'
-                  onChange={handleFileChange}
-                  accept='.csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
-                />
-              </label>
-              {file && (
-                <p className='mt-2 text-sm text-gray-500'>{file.name}</p>
-              )}
-            </div>
-            {error && (
-              <p className='mt-4 text-sm text-red-600 text-center'>{error}</p>
-            )}
-
-            {previewData.length > 0 && (
-              <div className='mt-6'>
-                <h4 className='font-semibold text-gray-700 mb-2'>
-                  File Preview (Top 5 rows)
-                </h4>
-                <div className='overflow-y-auto border border-primary rounded-lg max-h-40'>
-                  <table className='w-full text-sm text-left'>
-                    <thead className='bg-primary text-white sticky top-0'>
-                      <tr>
-                        {previewHeaders.map((header, index) => (
-                          <th key={index} className='p-2 md:p-3 font-medium'>
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className='bg-white'>
-                      {previewData.map((row, rowIndex) => {
-                        const rowClass =
-                          rowIndex % 2 === 0 ? 'bg-gray-100' : 'bg-white'
-
-                        return (
-                          <tr key={rowIndex} className={rowClass}>
-                            {row.map((cell, cellIndex) => (
-                              <td
-                                key={cellIndex}
-                                className='p-2 md:p-3 text-gray-700 truncate max-w-xs'
-                              >
-                                {cell}
-                              </td>
-                            ))}
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-            <div className='mt-8 flex justify-end'>
-              <button
-                onClick={handleUpload}
-                disabled={!file || isUploading}
-                className='flex items-center gap-2 font-medium text-sm text-white px-6 py-2.5 rounded bg-primary disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors'
-              >
-                <IoCloudUploadOutline size={18} />
-                Upload File
-              </button>
-            </div>
-          </div>
+          <FileUploadForm
+            file={file}
+            error={error}
+            previewData={previewData}
+            previewHeaders={previewHeaders}
+            handleFileChange={handleFileChange}
+            handleUpload={handleUpload}
+            handleDownloadSample={handleDownloadSample}
+            isUploading={isUploading}
+          />
         )}
       </div>
     </div>

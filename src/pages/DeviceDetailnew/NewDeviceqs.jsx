@@ -5,11 +5,16 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { ImArrowLeft } from 'react-icons/im'
 import store from '../../store/store'
+const currentDomain = window.location.origin
+const DEFAULT_LOGO = '/Grest_Logo.jpg'
+const BUYBACK_LOGO = '/Grest_Logo_2.jpg' // Use your actual buyback logo
+
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO
 import { useSelector } from 'react-redux'
 import banner from '../../assets/banner.jpg'
 import { GoDotFill } from 'react-icons/go'
 
-// Import all question images
 import quesImg1 from '../../assets/5.jpg'
 import quesImg2 from '../../assets/20.jpg'
 import quesImg3 from '../../assets/8.jpg'
@@ -73,32 +78,6 @@ import acces1 from '../../assets/access1.png'
 import acces2 from '../../assets/access2.png'
 import acces3 from '../../assets/access3.png'
 import acces4 from '../../assets/access4.png'
-
-import {
-  setGroupAnswers,
-  updateCoreObject,
-  updateCosmeticsObject,
-  updateDisplayObject,
-  updateFunctionalObject,
-  updateAccessoriesObject,
-  updateFunctionalMajorObject,
-  updateFunctionalMinorObject,
-  updateWarrantyObject,
-} from '../../store/slices/QNAslice'
-import { setResponseData } from '../../store/slices/responseSlice'
-import useUserProfile from '../../utils/useUserProfile'
-import { CgSpinner } from 'react-icons/cg'
-import { IoIosArrowBack } from 'react-icons/io'
-import styless from '../QuickQuote/QuickQuote.module.css'
-import { IoArrowBack } from 'react-icons/io5'
-
-// Constants
-const currentDomain = window.location.origin
-const DEFAULT_LOGO = '/Grest_Logo.jpg'
-const BUYBACK_LOGO = '/Grest_Logo_2.jpg'
-const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL
-const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO
-
 const imageMap = {
   acces1,
   acces2,
@@ -171,6 +150,24 @@ const imageMap = {
   quesImg56,
 }
 
+import {
+  setGroupAnswers,
+  updateCoreObject,
+  updateCosmeticsObject,
+  updateDisplayObject,
+  updateFunctionalObject,
+  updateAccessoriesObject,
+  updateFunctionalMajorObject,
+  updateFunctionalMinorObject,
+  updateWarrantyObject,
+} from '../../store/slices/QNAslice'
+import { setResponseData } from '../../store/slices/responseSlice'
+import useUserProfile from '../../utils/useUserProfile'
+import { CgSpinner } from 'react-icons/cg'
+import { IoIosArrowBack } from 'react-icons/io'
+import styless from '../QuickQuote/QuickQuote.module.css'
+import { IoArrowBack } from 'react-icons/io5'
+
 const initialState = {
   Core: [],
   Cosmetics: [],
@@ -181,7 +178,6 @@ const initialState = {
   Functional_minor: [],
   Warranty: [],
 }
-
 const whiteText = 'text-white'
 const blackText = 'text-black'
 const pinkBg = 'bg-primary'
@@ -211,10 +207,9 @@ const NewDeviceqs = () => {
     if (action.type === 'SET_GROUP_ANSWERS') {
       return { ...state, [action.group]: action.answers }
     } else {
-      throw new Error('Unknown action type')
+      throw new Error()
     }
   }
-
   const fetchData = async () => {
     try {
       const apiUrl = `${
@@ -281,6 +276,7 @@ const NewDeviceqs = () => {
 
         setAnswers(newAnswers)
         setNewGroupAnswers(newAnswers)
+
         ;[
           'Core',
           'Cosmetics',
@@ -351,7 +347,7 @@ const NewDeviceqs = () => {
           Help us calculate your device value correctly by answering to the
           following questions
         </div>
-        <button onClick={() => setShowPopup(false)}>Got it</button>
+        <button onClick={() => setShowPopup(false)}> Got it</button>
       </div>
       <MainQContainer
         NDstate={NDstate}
@@ -369,9 +365,7 @@ const NewDeviceqs = () => {
     </>
   )
 }
-
 export default NewDeviceqs
-
 const MainQContainer = ({
   NDstate,
   setIsSearchOpen,
@@ -459,7 +453,7 @@ const FirstPart = ({ NDstate, slice }) => {
               {data?.options.map((option, optionIndex) => (
                 <React.Fragment key={optionIndex}>
                   <div
-                    onClick={() => {
+                    onClick={(e) => {
                       console.log(slice)
                       console.log('assssaaaaa', option)
                       console.log('assssaaaaa', data)
@@ -474,20 +468,19 @@ const FirstPart = ({ NDstate, slice }) => {
                         })
                       )
                     }}
-                    className={`px-3 flex flex-col items-center w-[48%] min-h-[150px] shadow-lg rounded-lg ${
+                    className={`px-3 flex flex-col items-center  w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                       !slice[index].selected[optionIndex] ? whiteBg : pinkBg
                     }`}
                   >
-                    <div className='mb-1 mt-3 rounded-md overflow-hidden bg-white'>
+                    <div className=' mb-1  mt-3 rounded-md overflow-hidden bg-white'>
                       <img
                         className='scale-[1.2]'
                         src={imageMap[option?.img] || option?.img}
-                        alt={option.caption}
                       />
                     </div>
-                    <div className='border-t-[1.5px] w-full py-2'>
+                    <div className='border-t-[1.5px]   w-full py-2'>
                       <p
-                        className={`font-medium text-xs text-center ${
+                        className={`font-medium  text-xs text-center ${
                           !slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
@@ -524,7 +517,7 @@ const SecondPart = ({ NDstate, slice }) => {
                 {data?.options.map((option, optionIndex) => (
                   <React.Fragment key={optionIndex}>
                     <div
-                      onClick={() => {
+                      onClick={(e) => {
                         console.log(slice)
                         console.log('assssaaaaa', option)
                         console.log('assssaaaaa', data)
@@ -547,7 +540,6 @@ const SecondPart = ({ NDstate, slice }) => {
                         <img
                           src={imageMap[option?.img] || option?.img}
                           className='scale-[1.2]'
-                          alt={option.caption}
                         />
                       </div>
                       <div className='w-full border-t-[1.5px] py-2'>
@@ -589,7 +581,7 @@ const ThirdPart = ({ NDstate, slice }) => {
               {data?.options.map((option, optionIndex) => (
                 <React.Fragment key={optionIndex}>
                   <div
-                    onClick={() => {
+                    onClick={(e) => {
                       console.log(slice)
                       console.log('assssaaaaa', data)
                       console.log('assssaaaaa', option)
@@ -604,20 +596,19 @@ const ThirdPart = ({ NDstate, slice }) => {
                         })
                       )
                     }}
-                    className={`min-h-[150px] flex flex-col items-center px-3 w-[48%] shadow-lg rounded-lg ${
+                    className={`min-h-[150px] flex flex-col items-center px-3 w-[48%]  shadow-lg rounded-lg ${
                       !slice[index].selected[optionIndex] ? whiteBg : pinkBg
                     }`}
                   >
-                    <div className='overflow-hidden mt-3 mb-1 rounded-md bg-white'>
+                    <div className='  overflow-hidden mt-3 mb-1 rounded-md bg-white'>
                       <img
                         className='scale-[1.2]'
                         src={imageMap[option?.img] || option?.img}
-                        alt={option.caption}
                       />
                     </div>
-                    <div className='w-full py-2 border-t-[1.5px]'>
+                    <div className='w-full py-2 border-t-[1.5px] '>
                       <p
-                        className={`text-center text-xs font-medium ${
+                        className={`text-center text-xs font-medium  ${
                           !slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
@@ -632,7 +623,7 @@ const ThirdPart = ({ NDstate, slice }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className='flex bg-primary mt-4 text-white font-medium py-2 px-3 text-sm text-pretty rounded-md'>
+      <div className='flex bg-primary mt-4  text-white font-medium py-2 px-3 text-sm text-pretty rounded-md'>
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -653,7 +644,7 @@ const FourthPart = ({ NDstate, slice }) => {
               {data?.options.map((option, optionIndex) => (
                 <React.Fragment key={optionIndex}>
                   <div
-                    onClick={() => {
+                    onClick={(e) => {
                       console.log(slice)
                       console.log('assssaaaaa', option)
                       console.log('assssaaaaa', data)
@@ -668,7 +659,7 @@ const FourthPart = ({ NDstate, slice }) => {
                         })
                       )
                     }}
-                    className={`flex px-3 flex-col min-h-[150px] items-center w-[48%] shadow-lg rounded-lg ${
+                    className={`flex  px-3  flex-col min-h-[150px] items-center w-[48%]  shadow-lg rounded-lg ${
                       !slice[index].selected[optionIndex] ? whiteBg : pinkBg
                     }`}
                   >
@@ -676,7 +667,6 @@ const FourthPart = ({ NDstate, slice }) => {
                       <img
                         className='scale-[1.2]'
                         src={imageMap[option?.img] || option?.img}
-                        alt={option.caption}
                       />
                     </div>
                     <div className='border-t-[1.5px] w-full py-2'>
@@ -685,7 +675,7 @@ const FourthPart = ({ NDstate, slice }) => {
                           !slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
-                        } text-center`}
+                        } text-center `}
                       >
                         {option.caption}
                       </p>
@@ -696,7 +686,7 @@ const FourthPart = ({ NDstate, slice }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className='flex mt-4 bg-primary px-3 text-white font-medium py-2 text-sm text-pretty rounded-md'>
+      <div className='flex mt-4 bg-primary  px-3 text-white font-medium py-2 text-sm text-pretty rounded-md'>
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
@@ -720,7 +710,7 @@ const FifthPart = ({ NDstate, slice }) => {
                     className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                       !slice[index].selected[optionIndex] ? whiteBg : pinkBg
                     }`}
-                    onClick={() => {
+                    onClick={(e) => {
                       console.log(slice)
                       console.log('assssaaaaa', option)
                       console.log('assssaaaaa', data)
@@ -740,12 +730,11 @@ const FifthPart = ({ NDstate, slice }) => {
                       <img
                         className='scale-[1.2]'
                         src={imageMap[option?.img] || option?.img}
-                        alt={option.caption}
                       />
                     </div>
-                    <div className='border-t-[1.5px] py-2 w-full'>
+                    <div className='border-t-[1.5px]   py-2 w-full '>
                       <p
-                        className={`text-xs text-center font-medium ${
+                        className={`text-xs    text-center  font-medium${
                           !slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
@@ -760,13 +749,12 @@ const FifthPart = ({ NDstate, slice }) => {
             </React.Fragment>
           ))}
       </div>
-      <div className='flex mt-4 bg-primary text-white font-medium text-pretty py-2 px-3 text-sm rounded-md'>
+      <div className='flex  mt-4 bg-primary text-white font-medium text-pretty  py-2 px-3  text-sm rounded-md'>
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
     </div>
   )
 }
-
 const SixthPart = ({ NDstate, slice }) => {
   return (
     <div className='containClass'>
@@ -805,7 +793,6 @@ const SixthPart = ({ NDstate, slice }) => {
                 <img
                   className='scale-[1.2]'
                   src={imageMap[data?.options[0]?.img] || data?.options[0]?.img}
-                  alt={data.quetion}
                 />
               </div>
               <div className='w-full border-t-[1.5px] py-2'>
@@ -845,7 +832,7 @@ const SeventhPart = ({ NDstate, slice }) => {
                       className={`flex flex-col items-center px-3 w-[48%] min-h-[150px] shadow-lg rounded-lg ${
                         !slice[index].selected[optionIndex] ? whiteBg : pinkBg
                       }`}
-                      onClick={() => {
+                      onClick={(e) => {
                         console.log(slice)
                         console.log('assssaaaaa', option)
                         console.log('assssaaaaa', data)
@@ -865,7 +852,6 @@ const SeventhPart = ({ NDstate, slice }) => {
                         <img
                           className='scale-[1.2]'
                           src={imageMap[option?.img] || option?.img}
-                          alt={option.caption}
                         />
                       </div>
                       <div className='border-t-[1.5px] w-full py-2'>
@@ -907,7 +893,7 @@ const EighthPart = ({ NDstate, slice }) => {
               {data?.options.map((option, optionIndex) => (
                 <React.Fragment key={optionIndex}>
                   <div
-                    onClick={() => {
+                    onClick={(e) => {
                       console.log(slice)
                       console.log('assssaaaaa', option)
                       console.log('assssaaaaa', data)
@@ -920,20 +906,19 @@ const EighthPart = ({ NDstate, slice }) => {
                         })
                       )
                     }}
-                    className={`w-[48%] flex flex-col items-center px-3 min-h-[150px] shadow-lg rounded-lg ${
+                    className={` w-[48%]  flex flex-col items-center px-3 min-h-[150px] shadow-lg rounded-lg ${
                       !slice[index].selected[optionIndex] ? whiteBg : pinkBg
                     }`}
                   >
-                    <div className='mt-3 mb-1 overflow-hidden bg-white rounded-md'>
+                    <div className='mt-3 mb-1 overflow-hidden bg-white  rounded-md '>
                       <img
                         className='scale-[1.2]'
                         src={imageMap[option?.img] || option?.img}
-                        alt={option.caption}
                       />
                     </div>
                     <div className='border-t-[1.5px] w-full py-2'>
                       <p
-                        className={`text-xs text-center font-medium ${
+                        className={`text-xs text-center  font-medium ${
                           !slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
@@ -975,7 +960,6 @@ const AboveSix = ({
       setVisible(visible - 1)
     }
   }
-
   const handlesubmit = async () => {
     const id = JSON.parse(sessionStorage.getItem('dataModel'))
     const userToken2 = sessionStorage.getItem('authToken')
@@ -1002,29 +986,23 @@ const AboveSix = ({
       )
       console.log("No Accessories item with 'bill' found.")
     }
-
-    try {
-      const response = await axios.post(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/calculatePrice`,
-        finalPayload,
-        { headers: { Authorization: userToken2 } }
-      )
-      await logQuickQuoteAttempt(response.data.data, id)
-      sessionStorage.setItem('LeadId', response.data.data.id)
-      sessionStorage.setItem(
-        'responsedatadata',
-        JSON.stringify({ ...response.data.data, bonus: 0 })
-      )
-      sessionStorage.setItem('ExactQuote', true)
-      store.dispatch(setResponseData({ ...response.data.data, bonus: 0 }))
-      setIsLoading(false)
-      navigate('/devicequote')
-    } catch (error) {
-      console.error('Error submitting data:', error)
-      setIsLoading(false)
-    }
+    const response = await axios.post(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/questionnaires/calculatePrice`,
+      finalPayload,
+      { headers: { Authorization: userToken2 } }
+    )
+    await logQuickQuoteAttempt(response.data.data, id)
+    sessionStorage.setItem('LeadId', response.data.data.id)
+    sessionStorage.setItem(
+      'responsedatadata',
+      JSON.stringify({ ...response.data.data, bonus: 0 })
+    )
+    sessionStorage.setItem('ExactQuote', true)
+    store.dispatch(setResponseData({ ...response.data.data, bonus: 0 }))
+    setIsLoading(false)
+    navigate('/devicequote')
   }
 
   const logQuickQuoteAttempt = async (quoteResult, deviceModel) => {
@@ -1091,11 +1069,11 @@ const AboveSix = ({
           {visible > 0 && visible <= availableParts.length && (
             <button
               onClick={handleSubtract}
-              className={`${
+              className={`  ${
                 visible < 2
                   ? 'bg-slate-400 cursor-not-allowed'
                   : 'bg-primary cursor-pointer'
-              } w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
+              }  w-[30%] px-6 py-2 rounded-lg flex items-center justify-center`}
             >
               <ImArrowLeft color='white' size={20} />
             </button>
