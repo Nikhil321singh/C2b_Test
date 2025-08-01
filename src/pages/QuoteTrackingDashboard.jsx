@@ -15,20 +15,8 @@ import {
   FaCheckCircle,
   FaExclamationTriangle,
 } from 'react-icons/fa'
-
-const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value)
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
-}
+import useDebounce from '../hooks/useDebounce'
+import { handleDownloadReport } from '../utils/quoteDownload'
 
 const QuoteTrackingDashboard = () => {
   const [tableData, setTableData] = useState([])
@@ -102,62 +90,17 @@ const QuoteTrackingDashboard = () => {
   }
 
   const handleDownload = async () => {
-    if (isDownloading || tableData.length === 0) {
-      return
-    }
+    if (isDownloading || tableData.length === 0) return
 
     setIsDownloading(true)
-    const toastId = toast.loading(
-      <div className='flex items-center gap-2'>
-        <BeatLoader color='#3B82F6' size={8} />
-        <span>Generating your report...</span>
-      </div>
-    )
-
-    try {
-      const token = sessionStorage.getItem('authToken')
-      const response = await axios.get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/quoteTracking/dashboard/download`,
-        {
-          headers: { Authorization: token },
-          params: { dateRange: filters.dateRange, search: debouncedSearch },
-          responseType: 'blob',
-        }
-      )
-
-      const blob = new Blob([response.data], { type: 'text/csv' })
-      saveAs(
-        blob,
-        `quote_tracking_report_${new Date().toISOString().split('T')[0]}.csv`
-      )
-
-      toast.success(
-        <div className='flex items-center gap-2'>
-          <FaCheckCircle className='text-green-500' />
-          <b>Report downloaded successfully!</b>
-        </div>,
-        { id: toastId }
-      )
-    } catch (error) {
-      console.error('Failed to download report:', error)
-
-      const errorMessage = (
-        <div className='flex items-center gap-2'>
-          <FaExclamationTriangle className='text-red-500' />
-          <b>
-            {error.response?.status === 404
-              ? 'Download failed: No data available.'
-              : 'An unexpected error occurred.'}
-          </b>
-        </div>
-      )
-
-      toast.error(errorMessage, { id: toastId })
-    } finally {
-      setIsDownloading(false)
-    }
+    const token = sessionStorage.getItem('authToken')
+    await handleDownloadReport({
+      token,
+      filters,
+      setIsDownloading,
+      debouncedSearch,
+      setToastIdRef: () => {},
+    })
   }
 
   const openActivityLog = (user) => {
@@ -215,8 +158,7 @@ const QuoteTrackingDashboard = () => {
         <button
           onClick={handleRefresh}
           title='Refresh Filters'
-          className='p-2.5 text-sm font-medium text-white bg-primary rounded-lg border border-gray-300 
-             transition-transform duration-150 ease-in-out active:scale-95'
+          className='p-2.5 text-sm font-medium text-white bg-primary rounded-lg border border-gray-300 transition-transform duration-150 ease-in-out active:scale-95'
         >
           <IoRefresh size={20} />
         </button>

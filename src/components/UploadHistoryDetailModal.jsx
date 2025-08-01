@@ -158,10 +158,12 @@ const UploadHistoryDetailModal = ({ isOpen, onClose, uploadJob }) => {
                 </thead>
                 <tbody className='bg-white'>
                   {logDetails.map((log, index) => {
+                    const statusClassMap = {
+                      Success: 'bg-green-100 text-green-700',
+                      Fail: 'bg-red-100 text-red-700',
+                    }
                     const statusClass =
-                      log.status === 'Success'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
+                      statusClassMap[log.status] || 'bg-gray-100 text-gray-600'
                     const errorMsg = log.errorMessage || '-'
 
                     return (
@@ -190,7 +192,6 @@ const UploadHistoryDetailModal = ({ isOpen, onClose, uploadJob }) => {
                             </td>
                           )
                         })}
-
                         <td className='p-2 md:p-3 text-red-600 max-w-md'>
                           {errorMsg}
                         </td>

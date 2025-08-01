@@ -148,31 +148,40 @@ const QuickActivityLogModal = ({ userId, userName, onClose }) => {
 
         {totalPages > 1 && !error && (
           <div className='flex justify-center items-center border-t p-4'>
-            <button
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`mx-2 px-4 py-2 rounded-lg ${
-                currentPage === 1
-                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                  : 'bg-primary text-white cursor-pointer'
-              }`}
-            >
-              Previous
-            </button>
-            <span className='mx-4 text-sm text-gray-700'>
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`mx-2 px-4 py-2 rounded-lg ${
-                currentPage === totalPages
-                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                  : 'bg-primary text-white cursor-pointer'
-              }`}
-            >
-              Next
-            </button>
+            {(() => {
+              const prevDisabled = currentPage === 1
+              const nextDisabled = currentPage === totalPages
+
+              const prevBtnClass = prevDisabled
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-primary text-white cursor-pointer'
+
+              const nextBtnClass = nextDisabled
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-primary text-white cursor-pointer'
+
+              return (
+                <>
+                  <button
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={prevDisabled}
+                    className={`mx-2 px-4 py-2 rounded-lg ${prevBtnClass}`}
+                  >
+                    Previous
+                  </button>
+                  <span className='mx-4 text-sm text-gray-700'>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={nextDisabled}
+                    className={`mx-2 px-4 py-2 rounded-lg ${nextBtnClass}`}
+                  >
+                    Next
+                  </button>
+                </>
+              )
+            })()}
           </div>
         )}
       </div>

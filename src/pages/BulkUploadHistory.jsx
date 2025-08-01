@@ -115,11 +115,11 @@ const BulkUploadHistory = () => {
                 <tbody>
                   {history.map((job, index) => {
                     const rowBg = index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-
+                    const rowClassName = `${rowBg} hover:bg-blue-50 cursor-pointer`
                     return (
                       <tr
                         key={job._id}
-                        className={`${rowBg} hover:bg-blue-50 cursor-pointer`}
+                        className={rowClassName}
                         onClick={() => handleRowClick(job)}
                       >
                         <td className='p-2 text-sm md:p-3 md:text-base'>
