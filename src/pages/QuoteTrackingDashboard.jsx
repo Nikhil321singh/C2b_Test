@@ -3,12 +3,10 @@ import axios from 'axios'
 import { BeatLoader } from 'react-spinners'
 import { saveAs } from 'file-saver'
 import toast from 'react-hot-toast'
-
 import AdminNavbar from '../components/Admin_Navbar'
 import SideMenu from '../components/SideMenu'
 import QuoteTrackingTable from '../components/QuoteTrackingTable'
 import ActivityLogModal from '../components/QuickActivityLogModal'
-
 import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
 import {
@@ -22,13 +20,13 @@ const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value)
   useEffect(() => {
     const handler = setTimeout(() => {
-      ;``
       setDebouncedValue(value)
     }, delay)
     return () => {
       clearTimeout(handler)
     }
   }, [value, delay])
+
   return debouncedValue
 }
 

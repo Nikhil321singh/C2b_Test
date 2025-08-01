@@ -154,7 +154,7 @@ const QuickQuote = () => {
       aadharNumber: '1234567890',
       name: profile?.name,
     }
-    const response = await axios.post(
+    const { data } = await axios.post(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/questionnaires/calculatePrice`,
@@ -165,14 +165,14 @@ const QuickQuote = () => {
         },
       }
     )
-    await logQuickQuoteAttempt(response.data.data, id)
-    sessionStorage.setItem('LeadId', response.data.data.id)
+    await logQuickQuoteAttempt(data.data, id)
+    sessionStorage.setItem('LeadId', data.data.id)
     sessionStorage.setItem(
       'responsedatadata',
-      JSON.stringify({ ...response.data.data, bonus: 0 })
+      JSON.stringify({ ...data.data, bonus: 0 })
     )
     sessionStorage.setItem('ExactQuote', false)
-    dispatch(setResponseData({ ...response.data.data, bonus: 0 }))
+    dispatch(setResponseData({ ...data.data, bonus: 0 }))
     setIsLoading(false)
     navigate('/devicequote')
   }
@@ -198,7 +198,7 @@ const QuickQuote = () => {
       },
     }
     try {
-      const response = await axios.post(
+      await axios.post(
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/quoteTracking/log-quote-attempt`,
@@ -299,93 +299,47 @@ const QuestionList = ({
   FunctionalMinor,
   Warranty,
 }) => {
+  const sections = [
+    { key: 'Core', task: core, index: 1, updater: updateCoreObjects },
+    {
+      key: 'Cosmetics',
+      task: Cosmetics,
+      index: 3,
+      updater: updateCosmeticsObjects,
+    },
+    { key: 'Display', task: Display, index: 5, updater: updateDisplayObjects },
+    {
+      key: 'Functional_major',
+      task: FunctionalMajor,
+      index: 7,
+      updater: updateFunctionalMajorObjects,
+    },
+    {
+      key: 'Functional_minor',
+      task: FunctionalMinor,
+      index: 9,
+      updater: updateFunctionalMinorObjects,
+    },
+    {
+      key: 'Warranty',
+      task: Warranty,
+      index: 11,
+      updater: updateWarrantyObjects,
+    },
+  ]
+
   return (
-    <div className='questionList '>
-      <QuestionsElement
-        State={QQState.Core}
-        Task={core}
-        dispatch={dispatch}
-        currentIndex={1}
-        taskFun={updateCoreObjects}
-      />
-
-      {/* //for cosmetics */}
-      <QuestionsElement
-        State={QQState.Cosmetics}
-        Task={Cosmetics}
-        dispatch={dispatch}
-        currentIndex={3}
-        taskFun={updateCosmeticsObjects}
-      />
-
-      {/* //for display */}
-      <QuestionsElement
-        State={QQState.Display}
-        Task={Display}
-        dispatch={dispatch}
-        currentIndex={5}
-        taskFun={updateDisplayObjects}
-      />
-
-      {/* //Functional_major*/}
-      <QuestionsElement
-        State={QQState.Functional_major}
-        Task={FunctionalMajor}
-        dispatch={dispatch}
-        currentIndex={7}
-        taskFun={updateFunctionalMajorObjects}
-      />
-
-      {/* //for Functional_minor */}
-      <QuestionsElement
-        State={QQState.Functional_minor}
-        Task={FunctionalMinor}
-        dispatch={dispatch}
-        currentIndex={9}
-        taskFun={updateFunctionalMinorObjects}
-      />
-
-      {/* //fro Warranty */}
-
-      <div className='containClass'>
-        <div className='flex flex-col gap-4 mb-4 one'>
-          <div className='flex gap-1 two'>
-            <p className='text-xl'>11.</p>
-            <p className='text-xl three'>What is your phone's age?</p>
-          </div>
-
-          {QQState.Warranty &&
-            QQState.Warranty.map((data, index) => (
-              <div
-                key={index}
-                className='max-w-[500px] flex gap-4 ml-3 lableconatiner flex-col'
-              >
-                <label
-                  className={`text-primary font-medium w-full h-[40px] flex  gap-1 p-2 rounded-lg ${
-                    Warranty[index].answer === data.yes ? PinkBgWhText : ''
-                  }`}
-                >
-                  <input
-                    type='radio'
-                    value={data.yes}
-                    onChange={(e) => {
-                      store.dispatch(
-                        updateWarrantyObjects({
-                          index: index,
-                          newAnswer: data.yes,
-                          newKey: 'yes',
-                        })
-                      )
-                    }}
-                    checked={Warranty[index].answer === data.yes}
-                  />{' '}
-                  {data.quetion}
-                </label>
-              </div>
-            ))}
-          <div className='border-b-2 opacity-10 border-[#595555] '></div>
-        </div>
-      </div>
+    <div className='questionList'>
+      {sections.map(({ key, task, index, updater }) => (
+        <QuestionsElement
+          key={key}
+          State={QQState[key]}
+          Task={task}
+          dispatch={dispatch}
+          currentIndex={index}
+          taskFun={updater}
+        />
+      ))}
     </div>
   )
 }

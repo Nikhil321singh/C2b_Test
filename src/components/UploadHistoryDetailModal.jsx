@@ -162,6 +162,8 @@ const UploadHistoryDetailModal = ({ isOpen, onClose, uploadJob }) => {
                       log.status === 'Success'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
+                    const errorMsg = log.errorMessage || '-'
+                    const cellValue = log.rowData?.[header] ?? '-'
 
                     return (
                       <tr
@@ -183,11 +185,11 @@ const UploadHistoryDetailModal = ({ isOpen, onClose, uploadJob }) => {
                             key={`${log._id}-${header}`}
                             className='p-2 md:p-3 truncate max-w-xs'
                           >
-                            {log.rowData?.[header] ?? '-'}
+                            {cellValue}
                           </td>
                         ))}
                         <td className='p-2 md:p-3 text-red-600 max-w-md'>
-                          {log.errorMessage || '-'}
+                          {errorMsg}
                         </td>
                       </tr>
                     )

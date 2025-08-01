@@ -1,28 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
-import * as XLSX from 'xlsx'
-import Papa from 'papaparse'
 import UploadSummary from './UploadSummary'
 import FileUploadForm from './FileUploadForm'
 import UploadSpinner from './UploadSpinner'
-
-const buildCSVAndDownload = (headers, rows, filename) => {
-  const escapeCsvCell = (cell) => {
-    const strCell = String(cell ?? '')
-    return /,|"|\n/.test(strCell) ? `"${strCell.replace(/"/g, '""')}"` : strCell
-  }
-
-  const csvContent =
-    'data:text/csv;charset=utf-8,' +
-    [headers, ...rows].map((row) => row.map(escapeCsvCell).join(',')).join('\n')
-
-  const link = document.createElement('a')
-  link.href = encodeURI(csvContent)
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-}
+import { buildCSVAndDownload, generatePreview } from '../utils/bulkUploadUtils'
 
 const BulkUploadModal = ({ isOpen, onClose }) => {
   const [file, setFile] = useState(null)
@@ -51,45 +32,8 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen, resetState])
 
-  const generatePreview = (inputFile) => {
-    const reader = new FileReader()
-    const isExcel =
-      inputFile.type.includes('sheet') || inputFile.type.includes('excel')
-
-    reader.onload = (e) => {
-      try {
-        if (isExcel) {
-          const workbook = XLSX.read(e.target.result, { type: 'binary' })
-          const sheetName = workbook.SheetNames[0]
-          const worksheet = workbook.Sheets[sheetName]
-          const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 })
-          if (json.length > 0) {
-            setPreviewHeaders(json[0])
-            setPreviewData(json.slice(1, 6))
-          }
-        } else {
-          Papa.parse(e.target.result, {
-            header: true,
-            preview: 5,
-            skipEmptyLines: true,
-            complete: (results) => {
-              if (results.data.length > 0) {
-                setPreviewHeaders(results.meta.fields)
-                setPreviewData(results.data.map((row) => Object.values(row)))
-              }
-            },
-          })
-        }
-      } catch (previewError) {
-        setError('Could not generate a preview for this file.')
-      }
-    }
-
-    if (isExcel) {
-      reader.readAsBinaryString(inputFile)
-    } else {
-      reader.readAsText(inputFile)
-    }
+  const handlePreview = (inputFile) => {
+    generatePreview(inputFile, setPreviewHeaders, setPreviewData, setError)
   }
 
   const handleFileChange = (e) => {
@@ -105,7 +49,7 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
       if (allowedTypes.includes(selectedFile.type)) {
         setFile(selectedFile)
         setError('')
-        generatePreview(selectedFile)
+        handlePreview(selectedFile)
       } else {
         setError('Invalid file type. Please upload a .csv or .xlsx file.')
         setFile(null)
@@ -214,6 +158,33 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
     return null
   }
 
+  let content
+  if (isUploading) {
+    content = <UploadSpinner />
+  } else if (uploadResult) {
+    content = (
+      <UploadSummary
+        uploadResult={uploadResult}
+        onReset={resetState}
+        onClose={onClose}
+        onDownloadFailed={handleDownloadFailed}
+      />
+    )
+  } else {
+    content = (
+      <FileUploadForm
+        file={file}
+        error={error}
+        previewData={previewData}
+        previewHeaders={previewHeaders}
+        handleFileChange={handleFileChange}
+        handleUpload={handleUpload}
+        handleDownloadSample={handleDownloadSample}
+        isUploading={isUploading}
+      />
+    )
+  }
+
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4'>
       <div
@@ -230,27 +201,7 @@ const BulkUploadModal = ({ isOpen, onClose }) => {
           Bulk User Upload
         </h2>
 
-        {isUploading ? (
-          <UploadSpinner />
-        ) : uploadResult ? (
-          <UploadSummary
-            uploadResult={uploadResult}
-            onReset={resetState}
-            onClose={onClose}
-            onDownloadFailed={handleDownloadFailed}
-          />
-        ) : (
-          <FileUploadForm
-            file={file}
-            error={error}
-            previewData={previewData}
-            previewHeaders={previewHeaders}
-            handleFileChange={handleFileChange}
-            handleUpload={handleUpload}
-            handleDownloadSample={handleDownloadSample}
-            isUploading={isUploading}
-          />
-        )}
+        {content}
       </div>
     </div>
   )
