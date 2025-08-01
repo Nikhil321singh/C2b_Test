@@ -85,34 +85,41 @@ const QuickActivityLogModal = ({ userId, userName, onClose }) => {
       </tr>
     )
 
-  // Extracted content variable to avoid nested ternary in JSX
-  const content = loading ? (
-    <div className='flex justify-center items-center h-full'>
-      <BeatLoader color='var(--primary-color)' />
-    </div>
-  ) : error ? (
-    <div className='flex justify-center items-center h-full text-red-600 bg-red-50 p-4 rounded-lg'>
-      <p>Error: {error}</p>
-    </div>
-  ) : (
-    <div className='h-full overflow-y-auto border border-primary rounded-lg'>
-      <table className='w-full text-sm text-left'>
-        <thead className='bg-primary text-white sticky top-0 z-10'>
-          <tr>
-            <th className='p-3 font-medium text-center'>S.No.</th>
-            <th className='p-3 font-medium'>Timestamp</th>
-            <th className='p-3 font-medium'>Device Name</th>
-            <th className='p-3 font-medium'>Series </th>
-            <th className='p-3 font-medium'>Category</th>
-            <th className='p-3 font-medium'>Device Details</th>
-            <th className='p-3 font-medium'>Quote </th>
-            <th className='p-3 font-medium text-right'>Quote Amount</th>
-          </tr>
-        </thead>
-        <tbody className='bg-white'>{tableBody}</tbody>
-      </table>
-    </div>
-  )
+  let content = null
+
+  if (loading) {
+    content = (
+      <div className='flex justify-center items-center h-full'>
+        <BeatLoader color='var(--primary-color)' />
+      </div>
+    )
+  } else if (error) {
+    content = (
+      <div className='flex justify-center items-center h-full text-red-600 bg-red-50 p-4 rounded-lg'>
+        <p>Error: {error}</p>
+      </div>
+    )
+  } else {
+    content = (
+      <div className='h-full overflow-y-auto border border-primary rounded-lg'>
+        <table className='w-full text-sm text-left'>
+          <thead className='bg-primary text-white sticky top-0 z-10'>
+            <tr>
+              <th className='p-3 font-medium text-center'>S.No.</th>
+              <th className='p-3 font-medium'>Timestamp</th>
+              <th className='p-3 font-medium'>Device Name</th>
+              <th className='p-3 font-medium'>Series</th>
+              <th className='p-3 font-medium'>Category</th>
+              <th className='p-3 font-medium'>Device Details</th>
+              <th className='p-3 font-medium'>Quote</th>
+              <th className='p-3 font-medium text-right'>Quote Amount</th>
+            </tr>
+          </thead>
+          <tbody className='bg-white'>{tableBody}</tbody>
+        </table>
+      </div>
+    )
+  }
 
   return (
     <div className='fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 p-4'>
@@ -152,13 +159,13 @@ const QuickActivityLogModal = ({ userId, userName, onClose }) => {
               const prevDisabled = currentPage === 1
               const nextDisabled = currentPage === totalPages
 
-              const prevBtnClass = prevDisabled
-                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                : 'bg-primary text-white cursor-pointer'
+              const getButtonClass = (disabled) =>
+                disabled
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  : 'bg-primary text-white cursor-pointer'
 
-              const nextBtnClass = nextDisabled
-                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                : 'bg-primary text-white cursor-pointer'
+              const prevBtnClass = getButtonClass(prevDisabled)
+              const nextBtnClass = getButtonClass(nextDisabled)
 
               return (
                 <>

@@ -18,7 +18,7 @@ import { CgSpinner } from 'react-icons/cg'
 import useUserProfile from '../../utils/useUserProfile'
 import { setResponseData } from '../../store/slices/responseSlice'
 import { IoArrowBack } from 'react-icons/io5'
-import QuestionList from '../../components/QuestionnaireSection'
+import QuestionList from '../../components/QuestionList'
 import { logQuickQuoteAttempt, reducer } from '../../utils/quickQuoteUtils'
 
 const initialState = {

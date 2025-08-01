@@ -1,20 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import axios from 'axios'
 import { BeatLoader } from 'react-spinners'
-import { saveAs } from 'file-saver'
-import toast from 'react-hot-toast'
 import AdminNavbar from '../components/Admin_Navbar'
 import SideMenu from '../components/SideMenu'
 import QuoteTrackingTable from '../components/QuoteTrackingTable'
 import ActivityLogModal from '../components/QuickActivityLogModal'
 import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
-import {
-  FaDownload,
-  FaAngleDown,
-  FaCheckCircle,
-  FaExclamationTriangle,
-} from 'react-icons/fa'
+import { FaDownload, FaAngleDown } from 'react-icons/fa'
 import useDebounce from '../hooks/useDebounce'
 import { handleDownloadReport } from '../utils/quoteDownload'
 
@@ -90,7 +83,9 @@ const QuoteTrackingDashboard = () => {
   }
 
   const handleDownload = async () => {
-    if (isDownloading || tableData.length === 0) return
+    if (isDownloading || tableData.length === 0) {
+      return
+    }
 
     setIsDownloading(true)
     const token = sessionStorage.getItem('authToken')
