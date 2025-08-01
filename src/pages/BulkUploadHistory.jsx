@@ -113,34 +113,36 @@ const BulkUploadHistory = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {history.map((job, index) => (
-                    <tr
-                      key={job._id}
-                      className={`${
-                        index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                      } hover:bg-blue-50 cursor-pointer`}
-                      onClick={() => handleRowClick(job)}
-                    >
-                      <td className='p-2 text-sm md:p-3 md:text-base'>
-                        {job.fileName}
-                      </td>
-                      <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                        {job.category}
-                      </td>
-                      <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                        {new Date(job.createdAt).toLocaleString('en-GB')}
-                      </td>
-                      <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                        {job.status}
-                      </td>
-                      <td className='p-2 text-sm text-center md:p-3 md:text-base text-green-600 font-semibold'>
-                        {job.succeeded}
-                      </td>
-                      <td className='p-2 text-sm text-center md:p-3 md:text-base text-red-600 font-semibold'>
-                        {job.failed}
-                      </td>
-                    </tr>
-                  ))}
+                  {history.map((job, index) => {
+                    const rowBg = index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+
+                    return (
+                      <tr
+                        key={job._id}
+                        className={`${rowBg} hover:bg-blue-50 cursor-pointer`}
+                        onClick={() => handleRowClick(job)}
+                      >
+                        <td className='p-2 text-sm md:p-3 md:text-base'>
+                          {job.fileName}
+                        </td>
+                        <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                          {job.category}
+                        </td>
+                        <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                          {new Date(job.createdAt).toLocaleString('en-GB')}
+                        </td>
+                        <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                          {job.status}
+                        </td>
+                        <td className='p-2 text-sm text-center md:p-3 md:text-base text-green-600 font-semibold'>
+                          {job.succeeded}
+                        </td>
+                        <td className='p-2 text-sm text-center md:p-3 md:text-base text-red-600 font-semibold'>
+                          {job.failed}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
               {history.length === 0 && (

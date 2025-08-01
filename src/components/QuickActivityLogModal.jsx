@@ -47,33 +47,36 @@ const QuickActivityLogModal = ({ userId, userName, onClose }) => {
 
   const tableBody =
     currentRows.length > 0 ? (
-      currentRows.map((log, index) => (
-        <tr
-          key={`${log.timestamp}-${index}`}
-          className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
-        >
-          <td className='p-3 w-16 text-center'>
-            {indexOfFirstRow + index + 1}
-          </td>
-          <td className='p-3 whitespace-nowrap'>
-            {new Date(log.timestamp).toLocaleString('en-IN')}
-          </td>
-          <td className='p-3 max-w-xs truncate'>
-            {log.deviceDetails?.name || '-'}
-          </td>
-          <td className='p-3 max-w-xs truncate'>
-            {log.deviceDetails?.series || '-'}
-          </td>
-          <td className='p-3'>{log.deviceDetails?.categoryName || '-'}</td>
-          <td className='p-3 whitespace-nowrap'>{`RAM: ${
-            log.deviceDetails?.ram || 'N/A'
-          }, ROM: ${log.deviceDetails?.rom || 'N/A'}`}</td>
-          <td className='p-3'>{log.quoteType}</td>
-          <td className='p-3 text-right font-semibold'>
-            ₹{log.quoteAmount.toLocaleString('en-IN')}
-          </td>
-        </tr>
-      ))
+      currentRows.map((log, index) => {
+        const deviceRAM = log.deviceDetails?.ram || 'N/A'
+        const deviceROM = log.deviceDetails?.rom || 'N/A'
+        const deviceInfo = `RAM: ${deviceRAM}, ROM: ${deviceROM}`
+        return (
+          <tr
+            key={`${log.timestamp}-${index}`}
+            className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
+          >
+            <td className='p-3 w-16 text-center'>
+              {indexOfFirstRow + index + 1}
+            </td>
+            <td className='p-3 whitespace-nowrap'>
+              {new Date(log.timestamp).toLocaleString('en-IN')}
+            </td>
+            <td className='p-3 max-w-xs truncate'>
+              {log.deviceDetails?.name || '-'}
+            </td>
+            <td className='p-3 max-w-xs truncate'>
+              {log.deviceDetails?.series || '-'}
+            </td>
+            <td className='p-3'>{log.deviceDetails?.categoryName || '-'}</td>
+            <td className='p-3 whitespace-nowrap'>{deviceInfo}</td>
+            <td className='p-3'>{log.quoteType}</td>
+            <td className='p-3 text-right font-semibold'>
+              ₹{log.quoteAmount.toLocaleString('en-IN')}
+            </td>
+          </tr>
+        )
+      })
     ) : (
       <tr>
         <td colSpan='8' className='text-center p-6 text-gray-500'>

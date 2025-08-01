@@ -19,7 +19,6 @@ import {
   updateFunctionalMinorObjects,
   updateWarrantyObjects,
 } from '../../store/slices/quickQNAslice'
-import store from '../../store/store'
 import { useDispatch, useSelector } from 'react-redux'
 import '../DeviceDetailnew/newDeviceqs.scss'
 import styless from './QuickQuote.module.css'
@@ -344,6 +343,22 @@ const QuestionList = ({
   )
 }
 
+const RadioOption = ({ value, label, isSelected, onChange }) => (
+  <label
+    className={`text-primary font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
+      isSelected ? PinkBgWhText : ''
+    }`}
+  >
+    <input
+      type='radio'
+      value={value}
+      onChange={onChange}
+      checked={isSelected}
+    />
+    {label}
+  </label>
+)
+
 const QuestionsElement = ({ State, Task, dispatch, currentIndex, taskFun }) => {
   console.log(currentIndex)
   return (
@@ -356,50 +371,24 @@ const QuestionsElement = ({ State, Task, dispatch, currentIndex, taskFun }) => {
               <p className='text-xl three'>{data.quetion}</p>
             </div>
             <div className='max-w-[500px] flex gap-4 ml-3 lableconatiner'>
-              <label
-                className={`text-primary font-medium w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                  Task[index].answer === data.yes ? PinkBgWhText : ''
-                }`}
-              >
-                <input
-                  name={data._id}
-                  type='radio'
-                  value={data.yes}
-                  onChange={(e) => {
-                    dispatch(
-                      taskFun({
-                        index: index,
-                        newAnswer: data.yes,
-                        newKey: 'yes',
-                      })
-                    )
-                  }}
-                  checked={Task[index].answer === data.yes}
-                />{' '}
-                Yes
-              </label>
-              <label
-                className={`text-primary font-medium  w-[150px] h-[40px] flex items-center gap-1 p-2 rounded-lg ${
-                  Task[index].answer === data.no ? PinkBgWhText : ''
-                }`}
-              >
-                <input
-                  name={data._id}
-                  type='radio'
-                  value={data.no}
-                  onChange={(e) => {
-                    dispatch(
-                      taskFun({
-                        index: index,
-                        newAnswer: data.no,
-                        newKey: 'no',
-                      })
-                    )
-                  }}
-                  checked={Task[index].answer === data.no}
-                />{' '}
-                No
-              </label>
+              <RadioOption
+                value={data.yes}
+                label='Yes'
+                isSelected={Task[index].answer === data.yes}
+                onChange={() =>
+                  dispatch(
+                    taskFun({ index, newAnswer: data.yes, newKey: 'yes' })
+                  )
+                }
+              />
+              <RadioOption
+                value={data.no}
+                label='No'
+                isSelected={Task[index].answer === data.no}
+                onChange={() =>
+                  dispatch(taskFun({ index, newAnswer: data.no, newKey: 'no' }))
+                }
+              />
             </div>
             <div className='border-b-2 opacity-10 border-[#595555]'></div>
           </div>

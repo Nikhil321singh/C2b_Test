@@ -163,7 +163,6 @@ const UploadHistoryDetailModal = ({ isOpen, onClose, uploadJob }) => {
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
                     const errorMsg = log.errorMessage || '-'
-                    const cellValue = log.rowData?.[header] ?? '-'
 
                     return (
                       <tr
@@ -180,14 +179,18 @@ const UploadHistoryDetailModal = ({ isOpen, onClose, uploadJob }) => {
                             {log.status}
                           </span>
                         </td>
-                        {tableHeaders.map((header) => (
-                          <td
-                            key={`${log._id}-${header}`}
-                            className='p-2 md:p-3 truncate max-w-xs'
-                          >
-                            {cellValue}
-                          </td>
-                        ))}
+                        {tableHeaders.map((header) => {
+                          const cellValue = log.rowData?.[header] ?? '-'
+                          return (
+                            <td
+                              key={`${log._id}-${header}`}
+                              className='p-2 md:p-3 truncate max-w-xs'
+                            >
+                              {cellValue}
+                            </td>
+                          )
+                        })}
+
                         <td className='p-2 md:p-3 text-red-600 max-w-md'>
                           {errorMsg}
                         </td>

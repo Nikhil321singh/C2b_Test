@@ -105,7 +105,8 @@ const QuoteTrackingTable = ({
                 <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
                   <h
                     onClick={() => onViewActivity(row)}
-                    className='flex cursor-pointer items-center gap-2  px-2 py-1 text-md  text-primary rounded-lg hover:bg-opacity-90 focus:ring-2 focus:outline-none focus:ring-purple-300'
+                    className='flex cursor-pointer items-center gap-2  px-2 py-1 text-md  text-primary 
+                    rounded-lg hover:bg-opacity-90 focus:ring-2 focus:outline-none focus:ring-purple-300'
                   >
                     <FaEye />
                     <span> View Log</span>
