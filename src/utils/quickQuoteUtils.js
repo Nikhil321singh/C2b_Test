@@ -1,22 +1,24 @@
+import axios from "axios";
+
 export const reducer = (state, action) => {
-  if (action.type === 'SET_GROUP_ANSWERS') {
-    return { ...state, [action.group]: action.answers }
+  if (action.type === "SET_GROUP_ANSWERS") {
+    return { ...state, [action.group]: action.answers };
   }
-  throw new Error('Unknown action type')
-}
+  throw new Error("Unknown action type");
+};
 
 export const logQuickQuoteAttempt = async (quoteResult, deviceModel, token) => {
   if (!token || !quoteResult?.id || !deviceModel?.models?._id) {
-    console.error('❌ Cannot log quote: Missing critical data.')
-    return
+    console.error("❌ Cannot log quote: Missing critical data.");
+    return;
   }
 
-  const model = deviceModel.models
-  const config = model.config
-  const categoryInfo = model.categoryInfo
+  const model = deviceModel.models;
+  const config = model.config;
+  const categoryInfo = model.categoryInfo;
 
   const logPayload = {
-    quoteType: 'QuickQuote',
+    quoteType: "QuickQuote",
     quoteAmount: quoteResult.price,
     grade: quoteResult.grade,
     deviceDetails: {
@@ -28,7 +30,7 @@ export const logQuickQuoteAttempt = async (quoteResult, deviceModel, token) => {
       rom: config?.storage,
       series: model.series,
     },
-  }
+  };
 
   try {
     await axios.post(
@@ -37,8 +39,8 @@ export const logQuickQuoteAttempt = async (quoteResult, deviceModel, token) => {
       }/api/quoteTracking/log-quote-attempt`,
       logPayload,
       { headers: { Authorization: token } }
-    )
+    );
   } catch (error) {
-    console.error('Error logging quick quote attempt:', error)
+    console.error("Error logging quick quote attempt:", error);
   }
-}
+};
