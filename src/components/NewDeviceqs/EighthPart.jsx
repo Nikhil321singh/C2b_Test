@@ -2,6 +2,12 @@ import React from 'react'
 import { updateWarrantyObject } from '../../store/slices/QNAslice'
 import { GoDotFill } from 'react-icons/go'
 import imageMap from '../../utils/imageMap'
+import store from '../../store/store'
+
+const whiteText = 'text-white'
+const blackText = 'text-black'
+const pinkBg = 'bg-primary'
+const whiteBg = 'bg-white'
 
 const EighthPart = ({ NDstate, slice }) => {
   return (

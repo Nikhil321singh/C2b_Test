@@ -1,6 +1,7 @@
 import React from 'react'
 import { updateFunctionalObject } from '../../store/slices/QNAslice'
 import imageMap from '../../utils/imageMap'
+import store from '../../store/store'
 
 const whiteText = 'text-white'
 const blackText = 'text-black'

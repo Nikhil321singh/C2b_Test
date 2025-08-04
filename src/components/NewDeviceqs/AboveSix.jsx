@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import { CgSpinner } from 'react-icons/cg'
 import { ImArrowLeft } from 'react-icons/im'
 import { useNavigate } from 'react-router-dom'
+import store from '../../store/store'
+import { setResponseData } from '../../store/slices/responseSlice'
 
 const AboveSix = ({
   visible,

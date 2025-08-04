@@ -2,6 +2,7 @@ import React from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { updateFunctionalMajorObject } from '../../store/slices/QNAslice'
 import imageMap from '../../utils/imageMap'
+import store from '../../store/store'
 
 const whiteText = 'text-white'
 const blackText = 'text-black'

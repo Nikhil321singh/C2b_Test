@@ -1,6 +1,7 @@
 import React from 'react'
 import { updateCosmeticsObject } from '../../store/slices/QNAslice'
 import { GoDotFill } from 'react-icons/go'
+import store from '../../store/store'
 import imageMap from '../../utils/imageMap'
 
 const whiteText = 'text-white'

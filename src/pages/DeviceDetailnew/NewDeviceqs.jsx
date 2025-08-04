@@ -5,29 +5,19 @@ import axios from 'axios'
 import store from '../../store/store'
 import { useSelector } from 'react-redux'
 import banner from '../../assets/banner.jpg'
-import { setGroupAnswers } from '../../store/slices/QNAslice'
-import useUserProfile from '../../utils/useUserProfile'
-import styless from '../QuickQuote/QuickQuote.module.css'
 import MainQContainer from '../../components/NewDeviceqs/MainQContainer'
 import FirstPart from '../../components/NewDeviceqs/FirstPart'
-import SixthPart from '../../components/NewDeviceqs/SixthPart'
 import SecondPart from '../../components/NewDeviceqs/SecondPart'
 import ThirdPart from '../../components/NewDeviceqs/ThirdPart'
 import FourthPart from '../../components/NewDeviceqs/FourthPart'
 import FifthPart from '../../components/NewDeviceqs/FifthPart'
+import SixthPart from '../../components/NewDeviceqs/SixthPart'
 import SeventhPart from '../../components/NewDeviceqs/SeventhPart'
 import EighthPart from '../../components/NewDeviceqs/EighthPart'
-
-const initialState = {
-  Core: [],
-  Cosmetics: [],
-  Display: [],
-  Functional: [],
-  Accessories: [],
-  Functional_major: [],
-  Functional_minor: [],
-  Warranty: [],
-}
+import { setGroupAnswers } from '../../store/slices/QNAslice'
+import useUserProfile from '../../utils/useUserProfile'
+import styless from '../QuickQuote/QuickQuote.module.css'
+import { initialState, qnaReducer } from '../../utils/qnaReducer'
 
 const NewDeviceqs = () => {
   const userToken = sessionStorage.getItem('authToken')
@@ -46,16 +36,9 @@ const NewDeviceqs = () => {
   const FunctionalMinor = useSelector((state) => state.qna.Functional_minor)
   const Warranty = useSelector((state) => state.qna.Warranty)
   const [showPopup, setShowPopup] = useState(true)
-  const [NDstate, dispatch] = useReducer(reducer, initialState)
+  const [NDstate, dispatch] = useReducer(qnaReducer, initialState)
   const qna = useSelector((state) => state.qna)
 
-  function reducer(state, action) {
-    if (action.type === 'SET_GROUP_ANSWERS') {
-      return { ...state, [action.group]: action.answers }
-    } else {
-      throw new Error()
-    }
-  }
   const fetchData = async () => {
     try {
       const apiUrl = `${
