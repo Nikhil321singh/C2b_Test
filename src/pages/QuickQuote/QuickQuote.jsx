@@ -58,9 +58,8 @@ const QuickQuote = () => {
     const userToken = sessionStorage.getItem('authToken')
     const fetchData = async () => {
       try {
-        const apiUrl = `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/questionnaires/findAll?page=0&limit=31`
+        const apiUrl = `${import.meta.env.VITE_REACT_APP_ENDPOINT
+          }/api/questionnaires/findAll?page=0&limit=31`
 
         const response = await axios.get(apiUrl, {
           headers: {
@@ -68,20 +67,20 @@ const QuickQuote = () => {
           },
         })
 
-        ;[
-          'Core',
-          'Cosmetics',
-          'Display',
-          'Functional_major',
-          'Functional_minor',
-          'Warranty',
-        ].forEach((group) => {
-          const answers = response.data.data
-            .filter((question) => question.group === group)
-            .slice(0, group !== 'Warranty' ? 2 : undefined)
+          ;[
+            'Core',
+            'Cosmetics',
+            'Display',
+            'Functional_major',
+            'Functional_minor',
+            'Warranty',
+          ].forEach((group) => {
+            const answers = response.data.data
+              .filter((question) => question.group === group)
+              .slice(0, group !== 'Warranty' ? 2 : undefined)
 
-          Dispatch({ type: 'SET_GROUP_ANSWERS', group, answers })
-        })
+            Dispatch({ type: 'SET_GROUP_ANSWERS', group, answers })
+          })
 
         const newPopulateAnswers = response.data.data.map((ele) => ele.default)
 
@@ -95,20 +94,20 @@ const QuickQuote = () => {
             }
           })
           setAnswersQUICK(newAnswers)
-          ;[
-            'Core',
-            'Cosmetics',
-            'Display',
-            'Functional_major',
-            'Functional_minor',
-            'Warranty',
-          ].forEach((group) => {
-            const answers = newAnswers.filter(
-              (question) => question.group === group
-            )
+            ;[
+              'Core',
+              'Cosmetics',
+              'Display',
+              'Functional_major',
+              'Functional_minor',
+              'Warranty',
+            ].forEach((group) => {
+              const answers = newAnswers.filter(
+                (question) => question.group === group
+              )
 
-            dispatch(setGroupAnswerss({ group, answers }))
-          })
+              dispatch(setGroupAnswerss({ group, answers }))
+            })
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -138,8 +137,7 @@ const QuickQuote = () => {
       name: profile?.name,
     }
     const { data } = await axios.post(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/questionnaires/calculatePrice`,
       finalPayload,
       {
@@ -148,7 +146,7 @@ const QuickQuote = () => {
         },
       }
     )
-    await logQuickQuoteAttempt(data.data, id)
+    await logQuickQuoteAttempt(data.data, id, token)
     sessionStorage.setItem('LeadId', data.data.id)
     sessionStorage.setItem(
       'responsedatadata',
