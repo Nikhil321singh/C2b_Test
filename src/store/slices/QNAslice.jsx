@@ -35,6 +35,8 @@ const qnaSlice = createSlice({
         state[group] = answers.map((item) => ({
           ...item,
           selected: item.options?.map(() => false) || [],
+          answer: item.no || '',
+          key: 'no',
         }))
       }
     },
@@ -84,6 +86,13 @@ const qnaSlice = createSlice({
     },
     updateAccessoriesObject: (state, action) => {
       const { index, noKey, yesKey, selectedIndex } = action.payload
+      console.log('updateAccessoriesObject called with:', { index, noKey, yesKey, selectedIndex })
+      console.log('Before update - Accessories state:', state.Accessories.map(item => ({ 
+        quetion: item.quetion, 
+        key: item.key, 
+        selected: item.selected 
+      })))
+      
       let loopEntered = false
       state.Accessories[index].selected[selectedIndex] =
         !state.Accessories[index].selected[selectedIndex]
@@ -100,9 +109,14 @@ const qnaSlice = createSlice({
         if (state.Accessories[index]) {
           state.Accessories[index].answer = noKey
           state.Accessories[index].key = 'no'
-          loopEntered = false
         }
       }
+      
+      console.log('After update - Accessories state:', state.Accessories.map(item => ({ 
+        quetion: item.quetion, 
+        key: item.key, 
+        selected: item.selected 
+      })))
     },
     updateDisplayObject: (state, action) => {
       const { index, noKey, yesKey, selectedIndex } = action.payload
