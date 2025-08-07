@@ -27,7 +27,7 @@ const qnaSlice = createSlice({
           return {
             ...item,
             selected: [isAbove11Months],
-            answer: isAbove11Months ? 'W1' : 'W2',
+            answer: isAbove11Months ? 'W2' : 'W1',
             key: isAbove11Months ? 'yes' : 'no',
           }
         })
@@ -205,14 +205,14 @@ const qnaSlice = createSlice({
           item !== index &&
           state.Warranty[item].quetion !== 'Above 11 months'
         ) {
-          state.Warranty[item].answer = 'W2'
+          state.Warranty[item].answer = 'W1'
           state.Warranty[item].key = 'no'
           state.Warranty[item].selected[0] = false
         } else if (
           item !== index &&
           state.Warranty[item].quetion === 'Above 11 months'
         ) {
-          state.Warranty[item].answer = 'W1'
+          state.Warranty[item].answer = 'W2'
           state.Warranty[item].key = 'no'
           state.Warranty[item].selected[0] = false
         }
