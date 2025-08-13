@@ -166,7 +166,7 @@ const DeviceQuote = () => {
                         }}
                         onChange={(e) => {
                           if (
-                            Number(e.target.value) >= 0 && Number(e.target.value) < 100001
+                            Number(e.target.value) >= 0 && Number(e.target.value) <= 10000
                           ) {
                             setBonus(e.target.value);
                           }
