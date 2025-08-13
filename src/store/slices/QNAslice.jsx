@@ -19,26 +19,7 @@ const qnaSlice = createSlice({
   reducers: {
     setGroupAnswers: (state, action) => {
       const { group, answers } = action.payload
-
-      if (group === 'Warranty') {
-        state[group] = answers.map((item) => {
-          const isAbove11Months = item.quetion === 'Above 11 months'
-
-          return {
-            ...item,
-            selected: [isAbove11Months],
-            answer: isAbove11Months ? 'W2' : 'W1',
-            key: isAbove11Months ? 'yes' : 'no',
-          }
-        })
-      } else {
-        state[group] = answers.map((item) => ({
-          ...item,
-          selected: item.options?.map(() => false) || [],
-          answer: item.no || '',
-          key: 'no',
-        }))
-      }
+      state[group] = answers
     },
     updateCoreObject: (state, action) => {
       const { index, noKey, yesKey, selectedIndex } = action.payload
@@ -86,13 +67,6 @@ const qnaSlice = createSlice({
     },
     updateAccessoriesObject: (state, action) => {
       const { index, noKey, yesKey, selectedIndex } = action.payload
-      console.log('updateAccessoriesObject called with:', { index, noKey, yesKey, selectedIndex })
-      console.log('Before update - Accessories state:', state.Accessories.map(item => ({ 
-        quetion: item.quetion, 
-        key: item.key, 
-        selected: item.selected 
-      })))
-      
       let loopEntered = false
       state.Accessories[index].selected[selectedIndex] =
         !state.Accessories[index].selected[selectedIndex]
@@ -109,14 +83,9 @@ const qnaSlice = createSlice({
         if (state.Accessories[index]) {
           state.Accessories[index].answer = noKey
           state.Accessories[index].key = 'no'
+          loopEntered = false
         }
       }
-      
-      console.log('After update - Accessories state:', state.Accessories.map(item => ({ 
-        quetion: item.quetion, 
-        key: item.key, 
-        selected: item.selected 
-      })))
     },
     updateDisplayObject: (state, action) => {
       const { index, noKey, yesKey, selectedIndex } = action.payload
@@ -205,14 +174,14 @@ const qnaSlice = createSlice({
           item !== index &&
           state.Warranty[item].quetion !== 'Above 11 months'
         ) {
-          state.Warranty[item].answer = 'W1'
+          state.Warranty[item].answer = 'W2'
           state.Warranty[item].key = 'no'
           state.Warranty[item].selected[0] = false
         } else if (
           item !== index &&
           state.Warranty[item].quetion === 'Above 11 months'
         ) {
-          state.Warranty[item].answer = 'W2'
+          state.Warranty[item].answer = 'W1'
           state.Warranty[item].key = 'no'
           state.Warranty[item].selected[0] = false
         }
