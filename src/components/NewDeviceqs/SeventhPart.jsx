@@ -1,8 +1,14 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { updateAccessoriesObject } from '../../store/slices/QNAslice'
 import imageMap from '../../utils/imageMap'
 import store from '../../store/store'
+import { 
+  calculateMobileAccessoriesDeduction, 
+  calculateIPadAccessoriesDeduction, 
+  calculateWatchAccessoriesDeduction,
+  getDeviceType
+} from '../../utils/pricingUtils'
 
 const whiteText = 'text-white'
 const blackText = 'text-black'
@@ -10,17 +16,9 @@ const pinkBg = 'bg-primary'
 const whiteBg = 'bg-white'
 
 // Reusable OptionCard component
-const OptionCard = ({ index, option, optionIndex, data, isSelected }) => {
+const OptionCard = ({ index, option, optionIndex, data, isSelected, onAccessoryClick }) => {
   const handleClick = () => {
-    store.dispatch(
-      updateAccessoriesObject({
-        index,
-        yesKey: data.yes,
-        noKey: data.no,
-        newKey: 'yes',
-        selectedIndex: optionIndex,
-      })
-    )
+    onAccessoryClick(index, option, optionIndex, data)
   }
 
   return (
@@ -50,6 +48,93 @@ const OptionCard = ({ index, option, optionIndex, data, isSelected }) => {
 }
 
 const SeventhPart = ({ NDstate, slice }) => {
+  const [missingAccessories, setMissingAccessories] = useState({
+    box: false,
+    cable: false,
+    strap: false, // for watches
+    invoice: false
+  })
+  const [priceDeduction, setPriceDeduction] = useState(0)
+  
+  // Get device price and type
+  const getDevicePrice = () => {
+    try {
+      const dataModel = JSON.parse(sessionStorage.getItem('dataModel'))
+      return dataModel?.models?.price || 0
+    } catch {
+      return 0
+    }
+  }
+
+  const devicePrice = getDevicePrice()
+  const deviceType = getDeviceType()
+
+  // Calculate price deduction based on selected accessories
+  const calculateDeduction = (accessories) => {
+    let deduction = 0
+    
+    switch (deviceType) {
+      case 'mobile':
+        deduction = calculateMobileAccessoriesDeduction(
+          devicePrice,
+          accessories.box,
+          accessories.cable
+        )
+        break
+      case 'ipad':
+        deduction = calculateIPadAccessoriesDeduction(
+          devicePrice,
+          accessories.box,
+          accessories.cable
+        )
+        break
+      case 'watch':
+        deduction = calculateWatchAccessoriesDeduction(
+          devicePrice,
+          accessories.box,
+          accessories.cable,
+          accessories.strap
+        )
+        break
+    }
+    
+    return deduction
+  }
+
+  // Handle accessory selection
+  const handleAccessoryClick = (index, option, optionIndex, data) => {
+    // Update the original store
+    store.dispatch(
+      updateAccessoriesObject({
+        index,
+        yesKey: data.yes,
+        noKey: data.no,
+        newKey: 'yes',
+        selectedIndex: optionIndex,
+      })
+    )
+
+    // Track missing accessories based on option caption
+    const caption = option.caption.toLowerCase()
+    const newMissingAccessories = { ...missingAccessories }
+
+    if (caption.includes('box')) {
+      newMissingAccessories.box = !newMissingAccessories.box
+    } else if (caption.includes('cable') || caption.includes('charger')) {
+      newMissingAccessories.cable = !newMissingAccessories.cable
+    } else if (caption.includes('strap')) {
+      newMissingAccessories.strap = !newMissingAccessories.strap
+    } else if (caption.includes('invoice') || caption.includes('bill')) {
+      newMissingAccessories.invoice = !newMissingAccessories.invoice
+    }
+
+    setMissingAccessories(newMissingAccessories)
+    
+    // Calculate new deduction
+    const deduction = calculateDeduction(newMissingAccessories)
+    setPriceDeduction(deduction)
+  }
+
   return (
     <div className='containClass'>
       <div className='subheading'>
@@ -66,6 +151,7 @@ const SeventhPart = ({ NDstate, slice }) => {
               optionIndex={optionIndex}
               data={data}
               isSelected={slice[index].selected[optionIndex]}
+              onAccessoryClick={handleAccessoryClick}
             />
           ))
         )}
@@ -73,6 +159,40 @@ const SeventhPart = ({ NDstate, slice }) => {
       <div className='flex mt-4 bg-primary text-white font-medium py-2 px-3 text-sm text-pretty rounded-md'>
         Continue, If you don't have any Above-Mentioned Issues.
       </div>
+
+      {/* Price impact display */}
+      {priceDeduction > 0 && (
+        <div className='mt-4 bg-red-50 border border-red-200 rounded-lg p-4'>
+          <div className='text-center'>
+            <p className='text-sm text-red-700 mb-1'>Price after accessories deduction:</p>
+            <p className='text-lg font-bold text-red-800'>
+              ₹{(devicePrice - priceDeduction).toLocaleString()}
+            </p>
+            <p className='text-xs text-red-600'>
+              Base: ₹{devicePrice.toLocaleString()} - ₹{priceDeduction.toLocaleString()} deduction
+            </p>
+            <p className='text-xs text-gray-600 mt-1'>
+              Device type: {deviceType.charAt(0).toUpperCase() + deviceType.slice(1)}
+              {deviceType === 'mobile' && devicePrice >= 30000 && ' (Tier B)'}
+              {deviceType === 'mobile' && devicePrice < 30000 && ' (Tier A)'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {Object.values(missingAccessories).some(Boolean) && priceDeduction === 0 && (
+        <div className='mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3'>
+          <p className='text-sm text-gray-700 text-center'>
+            {deviceType === 'ipad' && devicePrice < 10000 && 
+              'No deduction applied - iPad price below ₹10,000 threshold.'}
+            {deviceType === 'watch' && devicePrice <= 5000 && 
+              'No deduction applied - Watch price below ₹5,000 threshold.'}
+            {(deviceType === 'mobile' || (deviceType === 'ipad' && devicePrice >= 10000) || (deviceType === 'watch' && devicePrice > 5000)) && 
+              missingAccessories.invoice && !missingAccessories.box && !missingAccessories.cable && !missingAccessories.strap &&
+              'Invoice selection is informational only and does not affect pricing.'}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
