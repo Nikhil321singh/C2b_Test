@@ -5,6 +5,46 @@ import { IoClose } from 'react-icons/io5'
 import { LuDot } from 'react-icons/lu'
 import { useNavigate } from 'react-router-dom'
 
+// Shared helper function to render question options with answers
+const renderQuestionOptions = (selectedAnswers, rawQuestionsGroup) => {
+  if (!rawQuestionsGroup || rawQuestionsGroup.length === 0) return null
+  
+  return rawQuestionsGroup.map((questionData, questionIndex) => {
+    if (!questionData.options || questionData.options.length === 0) {
+      // If no options, show the original question
+      const answer = selectedAnswers[questionIndex]
+      return (
+        <div key={questionIndex} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: 'rgba(236, 39, 82, 0.05)', borderColor: 'rgba(236, 39, 82, 0.2)'}}>
+          <LuDot size={20} className="shrink-0" style={{color: 'var(--primary-color)'}} />
+          <div className="flex justify-between w-[85%] questionkey">
+            <p className="text-sm font-medium text-gray-800">{questionData.quetion}</p>
+            <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase" style={{backgroundColor: 'rgba(236, 39, 82, 0.1)', color: 'var(--primary-color)'}}>{answer?.key}</span>
+          </div>
+        </div>
+      )
+    }
+    
+    // Show individual options with their selection status
+    return questionData.options.map((option, optionIndex) => {
+      const answer = selectedAnswers[questionIndex]
+      const isSelected = answer?.selected[optionIndex]
+      
+      // Show all options with YES/NO based on selection status
+      return (
+        <div key={`${questionIndex}-${optionIndex}`} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.05)' : 'rgba(107, 114, 128, 0.05)', borderColor: isSelected ? 'rgba(236, 39, 82, 0.2)' : 'rgba(107, 114, 128, 0.2)'}}>
+          <LuDot size={20} className="shrink-0" style={{color: isSelected ? 'var(--primary-color)' : '#9CA3AF'}} />
+          <div className="flex justify-between w-[85%] questionkey">
+            <p className={`text-sm font-medium ${isSelected ? 'text-gray-800' : 'text-gray-600'}`}>{option.caption}</p>
+            <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.1)' : 'rgba(107, 114, 128, 0.1)', color: isSelected ? 'var(--primary-color)' : '#6B7280'}}>
+              {isSelected ? 'YES' : 'NO'}
+            </span>
+          </div>
+        </div>
+      )
+    })
+  }).flat().filter(Boolean)
+}
+
 const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
   console.log(quoteSaved)
   const exactQuoteValue = sessionStorage.getItem('ExactQuote')
@@ -109,48 +149,14 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
             exactQuoteValue={exactQuoteValue}
           />
         </>
-        <div className={`${styles.ques_box}`}>
-          <p className={`${styles.ques_head} font-medium text-base`}>
-            Warranty
-          </p>
-          <div className='flex div'>
-            <LuDot size={25} className='shrink-0' style={{color: 'var(--primary-color)'}} />
-            <p className='text-sm font-medium opacity-[0.8]'>
-              What is your phone's age?
-            </p>
-          </div>
-          <div className={`${styles.ques_wrap}`}>
-            {exactQuoteValue === 'false'
-              ? quickData.Warranty.map((item) => (
-                  <div
-                    key={item.index}
-                    className='flex flex-row items-center w-full'
-                  >
-                    {item.key === 'yes' && (
-                      <div className='flex justify-between w-[85%] questionkey'>
-                        <p className='text-sm font-medium opacity-60 ml-[30px]'>
-                          {item.quetion}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))
-              : data.Warranty.map((item) => (
-                  <div
-                    key={item.index}
-                    className='flex flex-row items-center w-full'
-                  >
-                    {item.key === 'yes' && (
-                      <div className='flex justify-between w-[85%] questionkey'>
-                        <p className='text-sm font-medium opacity-60 ml-[30px]'>
-                          {item.quetion}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-          </div>
-        </div>
+        <QuestionSection 
+          title="Warranty" 
+          data={data?.Warranty} 
+          quickData={quickData?.Warranty}
+          rawQuestions={rawQuestions?.Warranty}
+          exactQuoteValue={exactQuoteValue}
+          showQuestionHeader="What is your phone's age?"
+        />
       </div>
     </div>
   )
@@ -159,48 +165,34 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
 export default DeviceReport
 
 // Helper component for rendering question sections
-const QuestionSection = ({ title, data, quickData, rawQuestions, exactQuoteValue }) => {
-  // Helper function to render question options with answers
-  const renderQuestionOptions = (selectedAnswers, rawQuestionsGroup) => {
-    if (!rawQuestionsGroup || rawQuestionsGroup.length === 0) return null
-    
-    return rawQuestionsGroup.map((questionData, questionIndex) => {
-      if (!questionData.options || questionData.options.length === 0) {
-        // If no options, show the original question
-        const answer = selectedAnswers[questionIndex]
-        return (
-          <div key={questionIndex} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: 'rgba(236, 39, 82, 0.05)', borderColor: 'rgba(236, 39, 82, 0.2)'}}>
-            <LuDot size={20} className="shrink-0" style={{color: 'var(--primary-color)'}} />
-            <div className="flex justify-between w-[85%] questionkey">
-              <p className="text-sm font-medium text-gray-800">{questionData.quetion}</p>
-              <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase" style={{backgroundColor: 'rgba(236, 39, 82, 0.1)', color: 'var(--primary-color)'}}>{answer?.key}</span>
-            </div>
-          </div>
-        )
-      }
-      
-      // Show individual options with their selection status
-      return questionData.options.map((option, optionIndex) => {
-        const answer = selectedAnswers[questionIndex]
-        const isSelected = answer?.selected[optionIndex]
-        
-        // Show all options with YES/NO based on selection status
-        return (
-          <div key={`${questionIndex}-${optionIndex}`} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.05)' : 'rgba(107, 114, 128, 0.05)', borderColor: isSelected ? 'rgba(236, 39, 82, 0.2)' : 'rgba(107, 114, 128, 0.2)'}}>
-            <LuDot size={20} className="shrink-0" style={{color: isSelected ? 'var(--primary-color)' : '#9CA3AF'}} />
-            <div className="flex justify-between w-[85%] questionkey">
-              <p className={`text-sm font-medium ${isSelected ? 'text-gray-800' : 'text-gray-600'}`}>{option.caption}</p>
-              <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.1)' : 'rgba(107, 114, 128, 0.1)', color: isSelected ? 'var(--primary-color)' : '#6B7280'}}>
-                {isSelected ? 'YES' : 'NO'}
-              </span>
-            </div>
-          </div>
-        )
-      })
-    }).flat().filter(Boolean)
-  }
-  
+const QuestionSection = ({ title, data, quickData, rawQuestions, exactQuoteValue, showQuestionHeader }) => {
   const selectedAnswers = exactQuoteValue === 'false' ? quickData : data
+  
+  // For warranty section, use legacy rendering if no rawQuestions
+  if (title === 'Warranty' && (!rawQuestions || rawQuestions.length === 0)) {
+    return (
+      <div className={`${styles.ques_box}`}>
+        <p className={`${styles.ques_head} font-medium text-base`}>{title}</p>
+        {showQuestionHeader && (
+          <div className='flex div'>
+            <LuDot size={25} className='shrink-0' style={{color: 'var(--primary-color)'}} />
+            <p className='text-sm font-medium opacity-[0.8]'>{showQuestionHeader}</p>
+          </div>
+        )}
+        <div className={`${styles.ques_wrap}`}>
+          {selectedAnswers?.map((item) => (
+            <div key={item.index} className='flex flex-row items-center w-full'>
+              {item.key === 'yes' && (
+                <div className='flex justify-between w-[85%] questionkey'>
+                  <p className='text-sm font-medium opacity-60 ml-[30px]'>{item.quetion}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
   
   return (
     <div className={`${styles.ques_box}`}>
@@ -213,46 +205,6 @@ const QuestionSection = ({ title, data, quickData, rawQuestions, exactQuoteValue
 }
 
 const CoreCosDis = ({ data, quickData, rawQuestions, exactQuoteValue }) => {
-  
-  // Helper function to render question options with answers
-  const renderQuestionOptions = (groupName, selectedAnswers, rawQuestionsGroup) => {
-    if (!rawQuestionsGroup || rawQuestionsGroup.length === 0) return null
-    
-    return rawQuestionsGroup.map((questionData, questionIndex) => {
-      if (!questionData.options || questionData.options.length === 0) {
-        // If no options, show the original question
-        const answer = selectedAnswers[questionIndex]
-        return (
-          <div key={questionIndex} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: 'rgba(236, 39, 82, 0.05)', borderColor: 'rgba(236, 39, 82, 0.2)'}}>
-            <LuDot size={20} className="shrink-0" style={{color: 'var(--primary-color)'}} />
-            <div className="flex justify-between w-[85%] questionkey">
-              <p className="text-sm font-medium text-gray-800">{questionData.quetion}</p>
-              <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase" style={{backgroundColor: 'rgba(236, 39, 82, 0.1)', color: 'var(--primary-color)'}}>{answer?.key}</span>
-            </div>
-          </div>
-        )
-      }
-      
-      // Show individual options with their selection status
-      return questionData.options.map((option, optionIndex) => {
-        const answer = selectedAnswers[questionIndex]
-        const isSelected = answer?.selected[optionIndex]
-        
-        // Show all options with YES/NO based on selection status
-        return (
-          <div key={`${questionIndex}-${optionIndex}`} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.05)' : 'rgba(107, 114, 128, 0.05)', borderColor: isSelected ? 'rgba(236, 39, 82, 0.2)' : 'rgba(107, 114, 128, 0.2)'}}>
-            <LuDot size={20} className="shrink-0" style={{color: isSelected ? 'var(--primary-color)' : '#9CA3AF'}} />
-            <div className="flex justify-between w-[85%] questionkey">
-              <p className={`text-sm font-medium ${isSelected ? 'text-gray-800' : 'text-gray-600'}`}>{option.caption}</p>
-              <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.1)' : 'rgba(107, 114, 128, 0.1)', color: isSelected ? 'var(--primary-color)' : '#6B7280'}}>
-                {isSelected ? 'YES' : 'NO'}
-              </span>
-            </div>
-          </div>
-        )
-      })
-    }).flat().filter(Boolean)
-  }
   return (
     <React.Fragment>
       {(quickData?.Core.length > 0 || data?.Core.length > 0) && (
@@ -260,7 +212,6 @@ const CoreCosDis = ({ data, quickData, rawQuestions, exactQuoteValue }) => {
           <p className={`${styles.ques_head} font-medium text-base`}>Core</p>
           <div className={`${styles.ques_wrap}`}>
             {renderQuestionOptions(
-              'Core',
               exactQuoteValue === 'false' ? quickData?.Core.slice(0, 2) : data?.Core,
               rawQuestions?.Core
             )}
@@ -274,7 +225,6 @@ const CoreCosDis = ({ data, quickData, rawQuestions, exactQuoteValue }) => {
           </p>
           <div className={`${styles.ques_wrap}`}>
             {renderQuestionOptions(
-              'Cosmetics',
               exactQuoteValue === 'false' ? quickData?.Cosmetics.slice(0, 2) : data?.Cosmetics,
               rawQuestions?.Cosmetics
             )}
@@ -286,7 +236,6 @@ const CoreCosDis = ({ data, quickData, rawQuestions, exactQuoteValue }) => {
           <p className={`${styles.ques_head} font-medium text-base`}>Display</p>
           <div className={`${styles.ques_wrap}`}>
             {renderQuestionOptions(
-              'Display',
               exactQuoteValue === 'false' ? quickData?.Display.slice(0, 2) : data?.Display,
               rawQuestions?.Display
             )}
@@ -298,45 +247,6 @@ const CoreCosDis = ({ data, quickData, rawQuestions, exactQuoteValue }) => {
 }
 
 const FunctionalList = ({ title, data, quickData, rawQuestions, exactQuoteValue }) => {
-  // Helper function to render question options with answers
-  const renderQuestionOptions = (selectedAnswers, rawQuestionsGroup) => {
-    if (!rawQuestionsGroup || rawQuestionsGroup.length === 0) return null
-    
-    return rawQuestionsGroup.map((questionData, questionIndex) => {
-      if (!questionData.options || questionData.options.length === 0) {
-        // If no options, show the original question
-        const answer = selectedAnswers[questionIndex]
-        return (
-          <div key={questionIndex} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: 'rgba(236, 39, 82, 0.05)', borderColor: 'rgba(236, 39, 82, 0.2)'}}>
-            <LuDot size={20} className="shrink-0" style={{color: 'var(--primary-color)'}} />
-            <div className="flex justify-between w-[85%] questionkey">
-              <p className="text-sm font-medium text-gray-800">{questionData.quetion}</p>
-              <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase" style={{backgroundColor: 'rgba(236, 39, 82, 0.1)', color: 'var(--primary-color)'}}>{answer?.key}</span>
-            </div>
-          </div>
-        )
-      }
-      
-      // Show individual options with their selection status
-      return questionData.options.map((option, optionIndex) => {
-        const answer = selectedAnswers[questionIndex]
-        const isSelected = answer?.selected[optionIndex]
-        
-        // Show all options with YES/NO based on selection status
-        return (
-          <div key={`${questionIndex}-${optionIndex}`} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.05)' : 'rgba(107, 114, 128, 0.05)', borderColor: isSelected ? 'rgba(236, 39, 82, 0.2)' : 'rgba(107, 114, 128, 0.2)'}}>
-            <LuDot size={20} className="shrink-0" style={{color: isSelected ? 'var(--primary-color)' : '#9CA3AF'}} />
-            <div className="flex justify-between w-[85%] questionkey">
-              <p className={`text-sm font-medium ${isSelected ? 'text-gray-800' : 'text-gray-600'}`}>{option.caption}</p>
-              <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.1)' : 'rgba(107, 114, 128, 0.1)', color: isSelected ? 'var(--primary-color)' : '#6B7280'}}>
-                {isSelected ? 'YES' : 'NO'}
-              </span>
-            </div>
-          </div>
-        )
-      })
-    }).flat().filter(Boolean)
-  }
   
   const items = exactQuoteValue === 'false' ? quickData?.slice(0, 2) : data
 
