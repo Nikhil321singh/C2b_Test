@@ -10,6 +10,17 @@ const initialState = {
   Functional_major: [],
   Functional_minor: [],
   Warranty: [],
+  // Store raw questions data with options
+  rawQuestions: {
+    Core: [],
+    Cosmetics: [],
+    Accessories: [],
+    Display: [],
+    Functional: [],
+    Functional_major: [],
+    Functional_minor: [],
+    Warranty: [],
+  }
 }
 
 // Create a slice for the QNA object
@@ -20,6 +31,10 @@ const qnaSlice = createSlice({
     setGroupAnswers: (state, action) => {
       const { group, answers } = action.payload
       state[group] = answers
+    },
+    setRawQuestions: (state, action) => {
+      const { group, questions } = action.payload
+      state.rawQuestions[group] = questions
     },
     updateCoreObject: (state, action) => {
       const { index, noKey, yesKey, selectedIndex } = action.payload
@@ -199,6 +214,7 @@ const qnaSlice = createSlice({
 
 export const {
   setGroupAnswers,
+  setRawQuestions,
   updateCoreObject,
   updateCosmeticsObject,
   updateAccessoriesObject,
