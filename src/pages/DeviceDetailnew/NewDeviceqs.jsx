@@ -14,7 +14,7 @@ import FifthPart from '../../components/NewDeviceqs/FifthPart'
 import SixthPart from '../../components/NewDeviceqs/SixthPart'
 import SeventhPart from '../../components/NewDeviceqs/SeventhPart'
 import EighthPart from '../../components/NewDeviceqs/EighthPart'
-import { setGroupAnswers } from '../../store/slices/QNAslice'
+import { setGroupAnswers, setRawQuestions } from '../../store/slices/QNAslice'
 import useUserProfile from '../../utils/useUserProfile'
 import styless from '../QuickQuote/QuickQuote.module.css'
 import { initialState, qnaReducer } from '../../utils/qnaReducer'
@@ -68,6 +68,8 @@ const NewDeviceqs = () => {
           (question) => question.group === group
         )
         dispatch({ type: 'SET_GROUP_ANSWERS', group, answers: answersTemp })
+        // Store raw questions data with options for DeviceReport
+        store.dispatch(setRawQuestions({ group, questions: answersTemp }))
       })
 
       const newPopulateAnswers = sortedData.map((ele) => ele.default)

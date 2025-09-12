@@ -5,7 +5,11 @@ import { ImArrowLeft } from 'react-icons/im'
 import { useNavigate } from 'react-router-dom'
 import store from '../../store/store'
 import { setResponseData } from '../../store/slices/responseSlice'
-import { calculateFinalPrice, getDeviceType, isBillAvailable } from '../../utils/pricingUtils'
+import {
+  calculateFinalPrice,
+  getDeviceType,
+  isBillAvailable,
+} from '../../utils/pricingUtils'
 
 const AboveSix = ({
   visible,
@@ -30,37 +34,60 @@ const AboveSix = ({
       setVisible(visible - 1)
     }
   }
+
+  const getDevicePrice = () => {
+    try {
+      const dataModel = JSON.parse(sessionStorage.getItem('dataModel'))
+      console.log({ dataModel })
+      return dataModel?.models?.config.price || 0
+    } catch {
+      return 0
+    }
+  }
+
   const handlesubmit = async () => {
     const id = JSON.parse(sessionStorage.getItem('dataModel'))
     const userToken2 = sessionStorage.getItem('authToken')
     setIsLoading(true)
     console.log(id, profile)
-    
+
     // Extract warranty selection
     let warrantyRange = 'out_of_warranty'
     const billAvailable = isBillAvailable(qna.Accessories)
-    const warrantyItem = qna.Warranty?.find(item => item.key === 'yes')
+    const warrantyItem = qna.Warranty?.find((item) => item.key === 'yes')
     if (warrantyItem && billAvailable) {
       const warrantyCaption = warrantyItem.quetion?.toLowerCase() || ''
-      if (warrantyCaption.includes('0') || warrantyCaption.includes('3 months')) {
+      if (
+        warrantyCaption.includes('0') ||
+        warrantyCaption.includes('3 months')
+      ) {
         warrantyRange = '0_3_months'
-      } else if (warrantyCaption.includes('3') || warrantyCaption.includes('6 months')) {
+      } else if (
+        warrantyCaption.includes('3') ||
+        warrantyCaption.includes('6 months')
+      ) {
         warrantyRange = '3_6_months'
-      } else if (warrantyCaption.includes('6') || warrantyCaption.includes('11 months')) {
+      } else if (
+        warrantyCaption.includes('6') ||
+        warrantyCaption.includes('11 months')
+      ) {
         warrantyRange = '6_11_months'
-      } else if (warrantyCaption.includes('11') || warrantyCaption.includes('more')) {
+      } else if (
+        warrantyCaption.includes('11') ||
+        warrantyCaption.includes('more')
+      ) {
         warrantyRange = 'above_11_months'
       }
     }
-    
+
     // Extract accessories selection
     const accessories = {
       boxMissing: false,
       cableMissing: false,
-      strapMissing: false
+      strapMissing: false,
     }
-    
-    qna.Accessories?.forEach(item => {
+
+    qna.Accessories?.forEach((item) => {
       if (item.key === 'yes') {
         const caption = item.quetion?.toLowerCase() || ''
         if (caption.includes('box')) {
@@ -84,8 +111,8 @@ const AboveSix = ({
       // Include pricing adjustments in payload
       pricingAdjustments: {
         warrantyRange,
-        accessories
-      }
+        accessories,
+      },
     }
     const billData = finalPayload.QNA.Accessories.find(
       (item) => item.quetion && item.quetion.toLowerCase().includes('bill')
@@ -106,48 +133,56 @@ const AboveSix = ({
       finalPayload,
       { headers: { Authorization: userToken2 } }
     )
-    
+
     // Now calculate frontend pricing adjustments using the backend response
-    const devicePrice = id?.models?.price || response.data.data.price || 0
+    const devicePrice = getDevicePrice()
+
+    console.log('Device Price Retrieved:', devicePrice)
     const deviceType = getDeviceType()
-    
+
     console.log('Device price sources:', {
       fromModel: id?.models?.price,
       fromBackend: response.data.data.price,
-      selected: devicePrice
+      selected: devicePrice,
     })
-    
+
     // Calculate final price with adjustments
-    const priceBreakdown = calculateFinalPrice(devicePrice, deviceType, warrantyRange, accessories)
-    
+    const priceBreakdown = calculateFinalPrice(
+      devicePrice,
+      deviceType,
+      warrantyRange,
+      accessories
+    )
+
     // Debug logging
     console.log('Price Calculation Debug:', {
       devicePrice,
       deviceType,
       warrantyRange,
       accessories,
-      priceBreakdown
+      priceBreakdown,
     })
-    
+
     // Store price breakdown for later use
     sessionStorage.setItem('priceBreakdown', JSON.stringify(priceBreakdown))
-    
+
     await logQuickQuoteAttempt(response.data.data, id)
     sessionStorage.setItem('LeadId', response.data.data.id)
-    
+
     // Apply frontend pricing adjustments to backend response
     const backendResponse = response.data.data
     const adjustedPrice = priceBreakdown.finalPrice
-    
+
     // Fallback: if our calculation resulted in 0 or invalid price, use backend price
-    const finalPrice = adjustedPrice && adjustedPrice > 0 ? adjustedPrice : backendResponse.price
-    
+    const finalPrice =
+      adjustedPrice && adjustedPrice > 0 ? adjustedPrice : backendResponse.price
+
     console.log('Final Price Selection:', {
       backendPrice: backendResponse.price,
       calculatedPrice: adjustedPrice,
-      selectedPrice: finalPrice
+      selectedPrice: finalPrice,
     })
-    
+
     const adjustedResponse = {
       ...backendResponse,
       price: finalPrice,
@@ -155,13 +190,10 @@ const AboveSix = ({
       warrantyUplift: priceBreakdown.warrantyUplift || 0,
       accessoriesDeduction: priceBreakdown.accessoriesDeduction || 0,
       priceBreakdown: priceBreakdown,
-      bonus: 0
+      bonus: 0,
     }
-    
-    sessionStorage.setItem(
-      'responsedatadata',
-      JSON.stringify(adjustedResponse)
-    )
+
+    sessionStorage.setItem('responsedatadata', JSON.stringify(adjustedResponse))
     sessionStorage.setItem('ExactQuote', true)
     store.dispatch(setResponseData(adjustedResponse))
     setIsLoading(false)
