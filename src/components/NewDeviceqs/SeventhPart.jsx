@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { updateAccessoriesObject } from '../../store/slices/QNAslice'
 import imageMap from '../../utils/imageMap'
@@ -61,7 +61,6 @@ const SeventhPart = ({ NDstate, slice }) => {
     strap: false, // for watches
     invoice: false,
   })
-  const [priceDeduction, setPriceDeduction] = useState(0)
 
   // Get device price and type
   const getDevicePrice = () => {
@@ -136,10 +135,6 @@ const SeventhPart = ({ NDstate, slice }) => {
     }
 
     setMissingAccessories(newMissingAccessories)
-
-    // Calculate new deduction
-    const deduction = calculateDeduction(newMissingAccessories)
-    setPriceDeduction(deduction)
   }
 
   return (

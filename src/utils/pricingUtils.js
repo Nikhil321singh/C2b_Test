@@ -137,19 +137,21 @@ export const calculateWatchAccessoriesDeduction = (
 }
 
 export const calculateFinalPrice = (
+  a_plus_price,
   basePrice,
   deviceType,
   warrantyRange,
   accessories
 ) => {
   console.log('calculateFinalPrice inputs:', {
+    a_plus_price,
     basePrice,
     deviceType,
     warrantyRange,
     accessories,
   })
 
-  const warrantyUplift = calculateWarrantyUplift(basePrice, warrantyRange)
+  const warrantyUplift = calculateWarrantyUplift(a_plus_price, warrantyRange)
   console.log('Warranty uplift calculated:', warrantyUplift)
 
   let accessoriesDeduction = 0
@@ -158,7 +160,7 @@ export const calculateFinalPrice = (
     case 'mobile':
     case 'phone':
       accessoriesDeduction = calculateMobileAccessoriesDeduction(
-        basePrice,
+        a_plus_price,
         accessories.boxMissing,
         accessories.cableMissing
       )
@@ -166,14 +168,14 @@ export const calculateFinalPrice = (
     case 'ipad':
     case 'tablet':
       accessoriesDeduction = calculateIPadAccessoriesDeduction(
-        basePrice,
+        a_plus_price,
         accessories.boxMissing,
         accessories.cableMissing
       )
       break
     case 'watch':
       accessoriesDeduction = calculateWatchAccessoriesDeduction(
-        basePrice,
+        a_plus_price,
         accessories.boxMissing,
         accessories.cableMissing,
         accessories.strapMissing
@@ -200,9 +202,15 @@ export const calculateFinalPrice = (
 
 export const getDeviceType = () => {
   const deviceType = sessionStorage.getItem('DeviceType')
-  if (deviceType === 'CTG1') return 'mobile'
-  if (deviceType === 'CTG2') return 'ipad'
-  if (deviceType === 'CTG3') return 'watch'
+  if (deviceType === 'CTG1') {
+    return 'mobile'
+  }
+  if (deviceType === 'CTG2') {
+    return 'ipad'
+  }
+  if (deviceType === 'CTG3') {
+    return 'watch'
+  }
   return 'mobile' // default
 }
 
