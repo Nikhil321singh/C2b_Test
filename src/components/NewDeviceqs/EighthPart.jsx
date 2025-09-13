@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { updateWarrantyObject } from '../../store/slices/QNAslice'
 import { GoDotFill } from 'react-icons/go'
 import imageMap from '../../utils/imageMap'
 import store from '../../store/store'
-import {
-  calculateWarrantyUplift,
-  isBillAvailable,
-} from '../../utils/pricingUtils'
+import { isBillAvailable } from '../../utils/pricingUtils'
 import { useSelector } from 'react-redux'
 
 const whiteText = 'text-white'
@@ -15,8 +12,6 @@ const pinkBg = 'bg-primary'
 const whiteBg = 'bg-white'
 
 const EighthPart = ({ NDstate, slice }) => {
-  const [selectedWarranty, setSelectedWarranty] = useState(null)
-  const [priceImpact, setPriceImpact] = useState(0)
   const accessories = useSelector((state) => state.qna.Accessories)
 
   // Get device price from session storage
@@ -42,28 +37,6 @@ const EighthPart = ({ NDstate, slice }) => {
   ]
 
   const handleWarrantySelection = (option, data, index) => {
-    // Find warranty range by matching option caption
-    const warrantyRange = warrantyRanges.find(
-      (range) =>
-        range.label
-          .toLowerCase()
-          .includes(option.caption.toLowerCase().split(' ')[0]) ||
-        option.caption.toLowerCase().includes('out of warranty')
-    )
-
-    if (warrantyRange) {
-      setSelectedWarranty(warrantyRange)
-
-      // Calculate price impact only if bill is available or it's out of warranty
-      if (billAvailable || warrantyRange.key === 'out_of_warranty') {
-        console.log('Device price:', devicePrice)
-        const uplift = calculateWarrantyUplift(devicePrice, warrantyRange.key)
-        setPriceImpact(uplift)
-      } else {
-        setPriceImpact(0)
-      }
-    }
-
     // Original store dispatch
     store.dispatch(
       updateWarrantyObject({

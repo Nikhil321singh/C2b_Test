@@ -1,9 +1,6 @@
-import React from "react";
+import React from 'react'
 
 const GradePricingTable = ({ deviceCategory, tableData }) => {
-  console.log("tabledata", tableData);
-  
-  // Define all possible grade columns with their display info
   const gradeColumns = [
     { key: 'A_PLUS', display: 'A+', percentage: '(0.00%)' },
     { key: 'A', display: 'A', percentage: '(10.00%)' },
@@ -20,27 +17,33 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
     { key: 'D_PLUS', display: 'D+', percentage: '(70.00%)' },
     { key: 'D', display: 'D', percentage: '(75.00%)' },
     { key: 'D_MINUS', display: 'D-', percentage: '(80.00%)' },
-    { key: 'E', display: 'E', percentage: '(90.00%)' }
-  ];
+    { key: 'E', display: 'E', percentage: '(90.00%)' },
+  ]
 
   // Determine which grade columns have data
-  const availableGradeColumns = gradeColumns.filter(column => 
-    tableData.some(item => item.grades?.[column.key] !== undefined && item.grades?.[column.key] !== null)
-  );
+  const availableGradeColumns = gradeColumns.filter((column) =>
+    tableData.some(
+      (item) =>
+        item.grades?.[column.key] !== undefined &&
+        item.grades?.[column.key] !== null
+    )
+  )
 
   return (
-    <div className="m-2  w-[90%] md:m-5 overflow-x-auto">
-      <div className="min-w-full">
-        <table className="w-full border border-primary">
-          <thead className="bg-primary text-white">
+    <div className='m-2  w-[90%] md:m-5 overflow-x-auto'>
+      <div className='min-w-full'>
+        <table className='w-full border border-primary'>
+          <thead className='bg-primary text-white'>
             <tr>
-              <th className="p-2 text-sm md:p-3 md:text-base">Model Details</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Brand</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Updated At</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Storage</th>
-
-              {availableGradeColumns.map(column => (
-                <th key={column.key} className="p-2 text-sm md:p-3 md:text-base">
+              <th className='p-2 text-sm md:p-3 md:text-base'>Model Details</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Brand</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Updated At</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Storage</th>
+              {availableGradeColumns.map((column) => (
+                <th
+                  key={column.key}
+                  className='p-2 text-sm md:p-3 md:text-base'
+                >
                   <p>{column.display}</p>
                   <p>{column.percentage}</p>
                 </th>
@@ -49,23 +52,25 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
           </thead>
           <tbody>
             {tableData.map((listItem, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+              <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {listItem.model?.name}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {listItem.model.name.split(" ")[0]}
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  {listItem.model.name.split(' ')[0]}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {new Date(listItem.updatedAt).toLocaleDateString("en-GB")}
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  {new Date(listItem.updatedAt).toLocaleDateString('en-GB')}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {listItem.storage}
                 </td>
-                
-                {availableGradeColumns.map(column => (
-                  <td key={column.key} className="p-2 text-sm text-center md:p-3 md:text-base">
-                    {listItem.grades?.[column.key] || "-"}
+                {availableGradeColumns.map((column) => (
+                  <td
+                    key={column.key}
+                    className='p-2 text-sm text-center md:p-3 md:text-base'
+                  >
+                    {listItem.grades?.[column.key] || '-'}
                   </td>
                 ))}
               </tr>
@@ -74,7 +79,7 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
         </table>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default GradePricingTable;
+export default GradePricingTable

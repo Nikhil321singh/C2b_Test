@@ -8,41 +8,92 @@ import { useNavigate } from 'react-router-dom'
 // Shared helper function to render question options with answers
 const renderQuestionOptions = (selectedAnswers, rawQuestionsGroup) => {
   if (!rawQuestionsGroup || rawQuestionsGroup.length === 0) return null
-  
-  return rawQuestionsGroup.map((questionData, questionIndex) => {
-    if (!questionData.options || questionData.options.length === 0) {
-      // If no options, show the original question
-      const answer = selectedAnswers[questionIndex]
-      return (
-        <div key={questionIndex} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: 'rgba(236, 39, 82, 0.05)', borderColor: 'rgba(236, 39, 82, 0.2)'}}>
-          <LuDot size={20} className="shrink-0" style={{color: 'var(--primary-color)'}} />
-          <div className="flex justify-between w-[85%] questionkey">
-            <p className="text-sm font-medium text-gray-800">{questionData.quetion}</p>
-            <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase" style={{backgroundColor: 'rgba(236, 39, 82, 0.1)', color: 'var(--primary-color)'}}>{answer?.key}</span>
+
+  return rawQuestionsGroup
+    .map((questionData, questionIndex) => {
+      if (!questionData.options || questionData.options.length === 0) {
+        // If no options, show the original question
+        const answer = selectedAnswers[questionIndex]
+        return (
+          <div
+            key={questionIndex}
+            className='flex flex-row items-center w-full p-3 rounded-lg border'
+            style={{
+              backgroundColor: 'rgba(236, 39, 82, 0.05)',
+              borderColor: 'rgba(236, 39, 82, 0.2)',
+            }}
+          >
+            <LuDot
+              size={20}
+              className='shrink-0'
+              style={{ color: 'var(--primary-color)' }}
+            />
+            <div className='flex justify-between w-[85%] questionkey'>
+              <p className='text-sm font-medium text-gray-800'>
+                {questionData.quetion}
+              </p>
+              <span
+                className='ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase'
+                style={{
+                  backgroundColor: 'rgba(236, 39, 82, 0.1)',
+                  color: 'var(--primary-color)',
+                }}
+              >
+                {answer?.key}
+              </span>
+            </div>
           </div>
-        </div>
-      )
-    }
-    
-    // Show individual options with their selection status
-    return questionData.options.map((option, optionIndex) => {
-      const answer = selectedAnswers[questionIndex]
-      const isSelected = answer?.selected[optionIndex]
-      
-      // Show all options with YES/NO based on selection status
-      return (
-        <div key={`${questionIndex}-${optionIndex}`} className="flex flex-row items-center w-full p-3 rounded-lg border" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.05)' : 'rgba(107, 114, 128, 0.05)', borderColor: isSelected ? 'rgba(236, 39, 82, 0.2)' : 'rgba(107, 114, 128, 0.2)'}}>
-          <LuDot size={20} className="shrink-0" style={{color: isSelected ? 'var(--primary-color)' : '#9CA3AF'}} />
-          <div className="flex justify-between w-[85%] questionkey">
-            <p className={`text-sm font-medium ${isSelected ? 'text-gray-800' : 'text-gray-600'}`}>{option.caption}</p>
-            <span className="ml-2 text-xs font-semibold px-2 py-1 rounded-full" style={{backgroundColor: isSelected ? 'rgba(236, 39, 82, 0.1)' : 'rgba(107, 114, 128, 0.1)', color: isSelected ? 'var(--primary-color)' : '#6B7280'}}>
-              {isSelected ? 'YES' : 'NO'}
-            </span>
+        )
+      }
+      // Show individual options with their selection status
+      return questionData.options.map((option, optionIndex) => {
+        const answer = selectedAnswers[questionIndex]
+        const isSelected = answer?.selected[optionIndex]
+        // Show all options with YES/NO based on selection status
+        return (
+          <div
+            key={`${questionIndex}-${optionIndex}`}
+            className='flex flex-row items-center w-full p-3 rounded-lg border'
+            style={{
+              backgroundColor: isSelected
+                ? 'rgba(236, 39, 82, 0.05)'
+                : 'rgba(107, 114, 128, 0.05)',
+              borderColor: isSelected
+                ? 'rgba(236, 39, 82, 0.2)'
+                : 'rgba(107, 114, 128, 0.2)',
+            }}
+          >
+            <LuDot
+              size={20}
+              className='shrink-0'
+              style={{ color: isSelected ? 'var(--primary-color)' : '#9CA3AF' }}
+            />
+            <div className='flex justify-between w-[85%] questionkey'>
+              <p
+                className={`text-sm font-medium ${
+                  isSelected ? 'text-gray-800' : 'text-gray-600'
+                }`}
+              >
+                {option.caption}
+              </p>
+              <span
+                className='ml-2 text-xs font-semibold px-2 py-1 rounded-full'
+                style={{
+                  backgroundColor: isSelected
+                    ? 'rgba(236, 39, 82, 0.1)'
+                    : 'rgba(107, 114, 128, 0.1)',
+                  color: isSelected ? 'var(--primary-color)' : '#6B7280',
+                }}
+              >
+                {isSelected ? 'YES' : 'NO'}
+              </span>
+            </div>
           </div>
-        </div>
-      )
+        )
+      })
     })
-  }).flat().filter(Boolean)
+    .flat()
+    .filter(Boolean)
 }
 
 const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
@@ -82,7 +133,13 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
       <div className={`${styles.devrep_wrap}`}>
         <div className={`${styles.devrep_nav}`}>
           <div className='flex-1 flex items-center'>
-            <p className='px-2 text-xl font-medium border-r-2 cursor-default' style={{color: 'var(--primary-color)', borderColor: 'var(--primary-color)'}}>
+            <p
+              className='px-2 text-xl font-medium border-r-2 cursor-default'
+              style={{
+                color: 'var(--primary-color)',
+                borderColor: 'var(--primary-color)',
+              }}
+            >
               Device Report
             </p>
             {!quoteSaved && (
@@ -97,37 +154,50 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
           <button
             onClick={closeHandler}
             className='ml-4 p-2 rounded-full transition-colors duration-200 flex items-center justify-center'
-            style={{'&:hover': {backgroundColor: 'rgba(236, 39, 82, 0.1)'}}}
-            onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(236, 39, 82, 0.1)'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            style={{ '&:hover': { backgroundColor: 'rgba(236, 39, 82, 0.1)' } }}
+            onMouseEnter={(e) =>
+              (e.target.style.backgroundColor = 'rgba(236, 39, 82, 0.1)')
+            }
+            onMouseLeave={(e) =>
+              (e.target.style.backgroundColor = 'transparent')
+            }
             aria-label='Close device report'
           >
-            <IoClose size={24} className='hover:opacity-80' style={{color: 'var(--primary-color)'}} />
+            <IoClose
+              size={24}
+              className='hover:opacity-80'
+              style={{ color: 'var(--primary-color)' }}
+            />
           </button>
         </div>
-        <CoreCosDis data={data} quickData={quickData} rawQuestions={rawQuestions} exactQuoteValue={exactQuoteValue} />
+        <CoreCosDis
+          data={data}
+          quickData={quickData}
+          rawQuestions={rawQuestions}
+          exactQuoteValue={exactQuoteValue}
+        />
         {data?.Accessories.length > 0 && (
-          <QuestionSection 
-            title="Accessories" 
-            data={data?.Accessories} 
+          <QuestionSection
+            title='Accessories'
+            data={data?.Accessories}
             quickData={quickData?.Accessories}
             rawQuestions={rawQuestions?.Accessories}
             exactQuoteValue={exactQuoteValue}
           />
         )}
         {data?.Functional.length > 0 && (
-          <QuestionSection 
-            title="Functional" 
-            data={data?.Functional} 
+          <QuestionSection
+            title='Functional'
+            data={data?.Functional}
             quickData={quickData?.Functional}
             rawQuestions={rawQuestions?.Functional}
             exactQuoteValue={exactQuoteValue}
           />
         )}
         {data?.Physical && (
-          <QuestionSection 
-            title="Physical" 
-            data={data?.Physical} 
+          <QuestionSection
+            title='Physical'
+            data={data?.Physical}
             quickData={quickData?.Physical}
             rawQuestions={rawQuestions?.Physical}
             exactQuoteValue={exactQuoteValue}
@@ -149,9 +219,9 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
             exactQuoteValue={exactQuoteValue}
           />
         </>
-        <QuestionSection 
-          title="Warranty" 
-          data={data?.Warranty} 
+        <QuestionSection
+          title='Warranty'
+          data={data?.Warranty}
           quickData={quickData?.Warranty}
           rawQuestions={rawQuestions?.Warranty}
           exactQuoteValue={exactQuoteValue}
@@ -165,9 +235,16 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
 export default DeviceReport
 
 // Helper component for rendering question sections
-const QuestionSection = ({ title, data, quickData, rawQuestions, exactQuoteValue, showQuestionHeader }) => {
+const QuestionSection = ({
+  title,
+  data,
+  quickData,
+  rawQuestions,
+  exactQuoteValue,
+  showQuestionHeader,
+}) => {
   const selectedAnswers = exactQuoteValue === 'false' ? quickData : data
-  
+
   // For warranty section, use legacy rendering if no rawQuestions
   if (title === 'Warranty' && (!rawQuestions || rawQuestions.length === 0)) {
     return (
@@ -175,8 +252,14 @@ const QuestionSection = ({ title, data, quickData, rawQuestions, exactQuoteValue
         <p className={`${styles.ques_head} font-medium text-base`}>{title}</p>
         {showQuestionHeader && (
           <div className='flex div'>
-            <LuDot size={25} className='shrink-0' style={{color: 'var(--primary-color)'}} />
-            <p className='text-sm font-medium opacity-[0.8]'>{showQuestionHeader}</p>
+            <LuDot
+              size={25}
+              className='shrink-0'
+              style={{ color: 'var(--primary-color)' }}
+            />
+            <p className='text-sm font-medium opacity-[0.8]'>
+              {showQuestionHeader}
+            </p>
           </div>
         )}
         <div className={`${styles.ques_wrap}`}>
@@ -184,7 +267,9 @@ const QuestionSection = ({ title, data, quickData, rawQuestions, exactQuoteValue
             <div key={item.index} className='flex flex-row items-center w-full'>
               {item.key === 'yes' && (
                 <div className='flex justify-between w-[85%] questionkey'>
-                  <p className='text-sm font-medium opacity-60 ml-[30px]'>{item.quetion}</p>
+                  <p className='text-sm font-medium opacity-60 ml-[30px]'>
+                    {item.quetion}
+                  </p>
                 </div>
               )}
             </div>
@@ -193,7 +278,7 @@ const QuestionSection = ({ title, data, quickData, rawQuestions, exactQuoteValue
       </div>
     )
   }
-  
+
   return (
     <div className={`${styles.ques_box}`}>
       <p className={`${styles.ques_head} font-medium text-base`}>{title}</p>
@@ -212,7 +297,9 @@ const CoreCosDis = ({ data, quickData, rawQuestions, exactQuoteValue }) => {
           <p className={`${styles.ques_head} font-medium text-base`}>Core</p>
           <div className={`${styles.ques_wrap}`}>
             {renderQuestionOptions(
-              exactQuoteValue === 'false' ? quickData?.Core.slice(0, 2) : data?.Core,
+              exactQuoteValue === 'false'
+                ? quickData?.Core.slice(0, 2)
+                : data?.Core,
               rawQuestions?.Core
             )}
           </div>
@@ -225,7 +312,9 @@ const CoreCosDis = ({ data, quickData, rawQuestions, exactQuoteValue }) => {
           </p>
           <div className={`${styles.ques_wrap}`}>
             {renderQuestionOptions(
-              exactQuoteValue === 'false' ? quickData?.Cosmetics.slice(0, 2) : data?.Cosmetics,
+              exactQuoteValue === 'false'
+                ? quickData?.Cosmetics.slice(0, 2)
+                : data?.Cosmetics,
               rawQuestions?.Cosmetics
             )}
           </div>
@@ -236,7 +325,9 @@ const CoreCosDis = ({ data, quickData, rawQuestions, exactQuoteValue }) => {
           <p className={`${styles.ques_head} font-medium text-base`}>Display</p>
           <div className={`${styles.ques_wrap}`}>
             {renderQuestionOptions(
-              exactQuoteValue === 'false' ? quickData?.Display.slice(0, 2) : data?.Display,
+              exactQuoteValue === 'false'
+                ? quickData?.Display.slice(0, 2)
+                : data?.Display,
               rawQuestions?.Display
             )}
           </div>
@@ -246,14 +337,19 @@ const CoreCosDis = ({ data, quickData, rawQuestions, exactQuoteValue }) => {
   )
 }
 
-const FunctionalList = ({ title, data, quickData, rawQuestions, exactQuoteValue }) => {
-  
+const FunctionalList = ({
+  title,
+  data,
+  quickData,
+  rawQuestions,
+  exactQuoteValue,
+}) => {
   const items = exactQuoteValue === 'false' ? quickData?.slice(0, 2) : data
 
   if (!items || items.length === 0) {
     return null
   }
-  
+
   return (
     <div className={`${styles.ques_box}`}>
       <p className={`${styles.ques_head} font-medium text-base`}>{title}</p>

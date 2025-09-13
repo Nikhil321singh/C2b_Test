@@ -55,27 +55,16 @@ const AboveSix = ({
     let warrantyRange = 'out_of_warranty'
     const billAvailable = isBillAvailable(qna.Accessories)
     const warrantyItem = qna.Warranty?.find((item) => item.key === 'yes')
+    console.log({ warrantyItem, billAvailable })
     if (warrantyItem && billAvailable) {
-      const warrantyCaption = warrantyItem.quetion?.toLowerCase() || ''
-      if (
-        warrantyCaption.includes('0') ||
-        warrantyCaption.includes('3 months')
-      ) {
+      const warrantyCaption = warrantyItem.quetion || ''
+      if (warrantyCaption === 'Below 3 Months ') {
         warrantyRange = '0_3_months'
-      } else if (
-        warrantyCaption.includes('3') ||
-        warrantyCaption.includes('6 months')
-      ) {
+      } else if (warrantyCaption === 'Between 3 months - 6 months') {
         warrantyRange = '3_6_months'
-      } else if (
-        warrantyCaption.includes('6') ||
-        warrantyCaption.includes('11 months')
-      ) {
+      } else if (warrantyCaption === 'Between 6months - 11 months') {
         warrantyRange = '6_11_months'
-      } else if (
-        warrantyCaption.includes('11') ||
-        warrantyCaption.includes('more')
-      ) {
+      } else if (warrantyCaption === 'Above 11 months') {
         warrantyRange = 'above_11_months'
       }
     }
@@ -108,8 +97,7 @@ const AboveSix = ({
       storage: id?.models?.config?.storage,
       ram: id?.models?.config?.RAM,
       name: id?.customerName ? id?.customerName : profile?.name,
-      // Include pricing adjustments in payload
-      pricingAdjustments: {
+      pricingAdjustment: {
         warrantyRange,
         accessories,
       },
@@ -135,7 +123,8 @@ const AboveSix = ({
     )
 
     // Now calculate frontend pricing adjustments using the backend response
-    const devicePrice = getDevicePrice()
+    const devicePrice = id?.models?.price || response.data.data.price || 0
+    const a_plus_price = getDevicePrice()
 
     console.log('Device Price Retrieved:', devicePrice)
     const deviceType = getDeviceType()
@@ -148,6 +137,7 @@ const AboveSix = ({
 
     // Calculate final price with adjustments
     const priceBreakdown = calculateFinalPrice(
+      a_plus_price,
       devicePrice,
       deviceType,
       warrantyRange,
@@ -156,6 +146,7 @@ const AboveSix = ({
 
     // Debug logging
     console.log('Price Calculation Debug:', {
+      a_plus_price,
       devicePrice,
       deviceType,
       warrantyRange,
