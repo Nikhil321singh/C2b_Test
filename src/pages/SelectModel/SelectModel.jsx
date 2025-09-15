@@ -134,7 +134,7 @@ const SelectModel = () => {
                     : 'N/A'}
                 </p>
               </div>
-              {Device !== 'Watch' && (
+              {Device !== 'CTG2' && (
                 <div className='flex flex-wrap gap-2'>
                   {configData?.config?.map((configItem, index) => (
                     <button

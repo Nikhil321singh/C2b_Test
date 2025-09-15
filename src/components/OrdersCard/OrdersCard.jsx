@@ -281,16 +281,17 @@ const OrdersCard = ({
     const currentDate = new Date()
     const timeDiff = currentDate - createdDate
     const oneDay = 24 * 60 * 60 * 1000 // 1 day in milliseconds
-    const threeDays = 6 * oneDay // 6 days in milliseconds
+    const fifteenDays = 15 * oneDay // 15 days in milliseconds
 
     if (title === quoteSaved) {
-      return timeDiff > oneDay
+      return timeDiff > fifteenDays
     } else if (title === 'Order Saved') {
-      return timeDiff > threeDays
+      return timeDiff > fifteenDays
     } else {
       return false
     }
   }
+
   const handleInitiate = () => {
     if (isExpired()) {
       return
