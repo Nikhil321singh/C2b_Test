@@ -52,6 +52,21 @@ const Price = () => {
   const [aadharNumber, setAadharNumber] = useState("");
   const [imeinumber, setImeiNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Upload status tracking for each file
+  const [uploadStatus, setUploadStatus] = useState({
+    adhaarFront: { status: 'pending', progress: 0 },
+    adhaarBack: { status: 'pending', progress: 0 },
+    phoneBill: { status: 'pending', progress: 0 },
+    phoneFront: { status: 'pending', progress: 0 },
+    phoneBack: { status: 'pending', progress: 0 },
+    phoneLeft: { status: 'pending', progress: 0 },
+    phoneRight: { status: 'pending', progress: 0 },
+    phoneTop: { status: 'pending', progress: 0 },
+    phoneBottom: { status: 'pending', progress: 0 },
+    signature: { status: 'pending', progress: 0 }
+  });
+  
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const idproofBackRef = useRef(null);
@@ -78,12 +93,119 @@ const Price = () => {
     }
     ref.current.click();
   };
-  const handleChange = (setMEthod, e) => {
+  // Function to upload individual file
+  const uploadIndividualFile = async (file, fileName, fileType, fileKey) => {
+    if (!file || !imeinumber) {
+      toast.error("Please enter IMEI number first");
+      return;
+    }
+
+    // Update status to uploading
+    setUploadStatus(prev => ({
+      ...prev,
+      [fileKey]: { status: 'uploading', progress: 0 }
+    }));
+
+    try {
+      const fullFileName = `${imeinumber}-${fileName}`;
+      await fileUploader(token, file, fullFileName, fileType);
+      
+      // Update status to success
+      setUploadStatus(prev => ({
+        ...prev,
+        [fileKey]: { status: 'success', progress: 100 }
+      }));
+      
+      toast.success(`${fileName} uploaded successfully!`);
+    } catch (error) {
+      // Update status to error
+      setUploadStatus(prev => ({
+        ...prev,
+        [fileKey]: { status: 'error', progress: 0 }
+      }));
+      
+      toast.error(`Failed to upload ${fileName}. Please try again.`);
+      console.error(`Upload error for ${fileName}:`, error);
+    }
+  };
+
+  const handleChange = (setMEthod, e, fileName, fileKey) => {
     const doc = e.target.files[0];
     setMEthod(doc);
+    
+    // Upload file immediately after selection
+    if (doc) {
+      uploadIndividualFile(doc, fileName, doc.type, fileKey);
+    }
   };
+  // Function to retry failed uploads
+  const retryFailedUploads = async () => {
+    const requiredFiles = ['adhaarFront', 'adhaarBack', 'phoneFront', 'phoneBack', 'phoneLeft', 'phoneRight', 'phoneTop', 'phoneBottom'];
+    if (isBillRequired) requiredFiles.push('phoneBill');
+    
+    const failedUploads = requiredFiles.filter(fileKey => 
+      uploadStatus[fileKey]?.status === 'error' || uploadStatus[fileKey]?.status === 'pending'
+    );
+    
+    if (failedUploads.length === 0) return true;
+    
+    toast.info(`Retrying ${failedUploads.length} failed uploads...`);
+    
+    // Retry each failed upload
+    for (const fileKey of failedUploads) {
+      let fileToUpload, fileName;
+      
+      switch (fileKey) {
+        case 'adhaarFront':
+          fileToUpload = file;
+          fileName = 'adhaarFront';
+          break;
+        case 'adhaarBack':
+          fileToUpload = idProofBack;
+          fileName = 'adhaarBack';
+          break;
+        case 'phoneBill':
+          fileToUpload = phoneBill;
+          fileName = 'phoneBill';
+          break;
+        case 'phoneFront':
+          fileToUpload = phoneFront;
+          fileName = 'phoneFront';
+          break;
+        case 'phoneBack':
+          fileToUpload = phoneBack;
+          fileName = 'phoneBack';
+          break;
+        case 'phoneLeft':
+          fileToUpload = phoneLeft;
+          fileName = 'phoneLeft';
+          break;
+        case 'phoneRight':
+          fileToUpload = phoneRight;
+          fileName = 'phoneRight';
+          break;
+        case 'phoneTop':
+          fileToUpload = phoneTop;
+          fileName = 'phoneTop';
+          break;
+        case 'phoneBottom':
+          fileToUpload = phoneBottom;
+          fileName = 'phoneBottom';
+          break;
+      }
+      
+      if (fileToUpload) {
+        await uploadIndividualFile(fileToUpload, fileName, fileToUpload.type, fileKey);
+      }
+    }
+    
+    return false; // Still has failures
+  };
+
   const uploadAllImages = async () => {
     setIsLoading(true);
+    
+    // Validation
     if(aadharNumber.length !== 12){
       toast.error("Aadhar number must be exactly 12 digits.");
       setIsLoading(false);
@@ -92,25 +214,47 @@ const Price = () => {
     if (!imeinumber || !aadharNumber || !phoneFront || !phoneBack || !phoneLeft ||
       !phoneRight || !phoneTop || !phoneBottom || (isBillRequired && !phoneBill)
     ) {
-      alert("Please fill in all mandatory fields (IMEI/Serial number and device images).");
+      toast.error("Please fill in all mandatory fields (IMEI/Serial number and device images).");
       setIsLoading(false);
       return;
     }
-    try{
-      await fileUploader(token, file, imeinumber + "-adhaarFront", file.type);
-      await fileUploader(token, file, imeinumber + "-adhaarFront", file.type);
-      await fileUploader(token, idProofBack, imeinumber + "-adhaarBack", idProofBack.type);
-      await fileUploader(token, phoneBill, imeinumber + "-phoneBill", phoneBill.type);
-      await fileUploader(token, phoneFront, imeinumber + "-phoneFront", phoneFront.type);
-      await fileUploader(token, phoneBack, imeinumber + "-phoneBack", phoneBack.type);
-      await fileUploader(token, phoneTop, imeinumber + "-phoneTop", phoneTop.type);
-      await fileUploader(token, phoneLeft, imeinumber + "-phoneLeft", phoneLeft.type);
-      await fileUploader(token, phoneRight, imeinumber + "-phoneRight", phoneRight.type);
-      await fileUploader(token, phoneBottom, imeinumber + "-phoneBottom", phoneBottom.type);
-      await fileUploader(token, phoneBottom, imeinumber + "-signature", phoneBottom.type);
-    }catch (error) {
-      setIsLoading(false);
+
+    // Check if all required files are uploaded successfully
+    const requiredFiles = ['adhaarFront', 'adhaarBack', 'phoneFront', 'phoneBack', 'phoneLeft', 'phoneRight', 'phoneTop', 'phoneBottom'];
+    if (isBillRequired) requiredFiles.push('phoneBill');
+    
+    const failedUploads = requiredFiles.filter(fileKey => 
+      uploadStatus[fileKey]?.status !== 'success'
+    );
+    
+    // Debug: Log the upload status to see what's happening
+    console.log('Upload Status:', uploadStatus);
+    console.log('Required Files:', requiredFiles);
+    console.log('Failed Uploads:', failedUploads);
+    
+    if (failedUploads.length > 0) {
+      // Try to retry failed uploads
+      const stillHasFailures = await retryFailedUploads();
+      
+      if (stillHasFailures) {
+        toast.error(`Please ensure all files are uploaded successfully. ${failedUploads.length} files still pending: ${failedUploads.join(', ')}`);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Check again after retry
+      const stillFailed = requiredFiles.filter(fileKey => 
+        uploadStatus[fileKey]?.status !== 'success'
+      );
+      
+      if (stillFailed.length > 0) {
+        toast.error(`Still ${stillFailed.length} files pending after retry: ${stillFailed.join(', ')}`);
+        setIsLoading(false);
+        return;
+      }
     }
+
+    // Submit form data (files are already uploaded)
     const formData = new FormData();
     formData.append("IMEI", imeinumber);
     formData.append("leadId", leadsubmitDATA?.id);
@@ -118,14 +262,19 @@ const Price = () => {
     formData.append("name", savedOtpData?.name);
     formData.append("phoneNumber", savedOtpData?.phone);
     formData.append("aadharNumber", aadharNumber);
+    
     try {
       await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/questionnaires/upload-documents`,
         formData,
         { headers: { Authorization: token } }
       );
+      
+      toast.success("Documents submitted successfully!");
       setIsLoading(false);
       navigate("/specialoffers");
     } catch (error) {
+      console.error('Submission error:', error);
+      toast.error("Failed to submit documents. Please try again.");
       setIsLoading(false);
     }
   };
@@ -161,6 +310,7 @@ const Price = () => {
             idProofBack={idProofBack}
             idproofBackRef={idproofBackRef}
             prod={prod}
+            uploadStatus={uploadStatus}
           />
           <PhoneBill
             handleChange={handleChange}
@@ -171,6 +321,7 @@ const Price = () => {
             phoneBill={phoneBill}
             isBillRequired={isBillRequired}
             prod={prod}
+            uploadStatus={uploadStatus}
           />
           <PhonePhotos1
             handleCameraButtonClick={handleCameraButtonClick}
@@ -194,10 +345,26 @@ const Price = () => {
             setPhoneRight={setPhoneRight}
             phoneLeftRef={phoneLeftRef}
             prod={prod}
+            uploadStatus={uploadStatus}
           />
         </div>
       </div>
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
+        {/* Debug button - remove in production */}
+        <button
+          onClick={() => {
+            console.log('Current Upload Status:', uploadStatus);
+            const requiredFiles = ['adhaarFront', 'adhaarBack', 'phoneFront', 'phoneBack', 'phoneLeft', 'phoneRight', 'phoneTop', 'phoneBottom'];
+            if (isBillRequired) requiredFiles.push('phoneBill');
+            const failed = requiredFiles.filter(f => uploadStatus[f]?.status !== 'success');
+            console.log('Failed files:', failed);
+            toast.info(`Status: ${failed.length} files pending`);
+          }}
+          className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded"
+        >
+          Debug Upload Status
+        </button>
+        
         <div
           onClick={() => uploadAllImages()}
           className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
@@ -358,7 +525,21 @@ const AdharField = ({
   setIdProofBack,
   idProofBack,
   idproofBackRef,
+  uploadStatus,
 }) => {
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'uploading':
+        return <CgSpinner className="animate-spin text-blue-500" size={16} />;
+      case 'success':
+        return <span className="text-green-500">✓</span>;
+      case 'error':
+        return <span className="text-red-500">✗</span>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="flex flex-col adharcard mt-[10px]">
       <div className="flex gap-1 two">
@@ -377,7 +558,7 @@ const AdharField = ({
           <p className="font-semibold text-center">Adhaar(Front)</p>
           <input
             type="file"
-            onChange={(e) => handleChange(setFile, e)}
+            onChange={(e) => handleChange(setFile, e, "adhaarFront", "adhaarFront")}
             style={{ display: "none" }}
             ref={fileInputRef}
           />
@@ -385,11 +566,16 @@ const AdharField = ({
             {!file ? (
               <FaCamera className="text-3xl text-gray-500" />
             ) : (
-              <img
-                className="w-full h-[60px]"
-                src={URL.createObjectURL(file)}
-                alt="Uploaded file"
-              />
+              <div className="relative">
+                <img
+                  className="w-full h-[60px]"
+                  src={URL.createObjectURL(file)}
+                  alt="Uploaded file"
+                />
+                <div className="absolute top-1 right-1">
+                  {getStatusIcon(uploadStatus.adhaarFront?.status)}
+                </div>
+              </div>
             )}
           </button>
         </div>
@@ -397,7 +583,7 @@ const AdharField = ({
           <p className="font-semibold text-center">Adhaar(Back)</p>
           <input
             type="file"
-            onChange={(e) => handleChange(setIdProofBack, e)}
+            onChange={(e) => handleChange(setIdProofBack, e, "adhaarBack", "adhaarBack")}
             style={{ display: "none" }}
             ref={idproofBackRef}
           />
@@ -405,11 +591,16 @@ const AdharField = ({
             {!idProofBack ? (
               <FaCamera className="text-3xl text-gray-500" />
             ) : (
-              <img
-                className="w-full h-[60px]"
-                src={URL.createObjectURL(idProofBack)}
-                alt="Uploaded file"
-              />
+              <div className="relative">
+                <img
+                  className="w-full h-[60px]"
+                  src={URL.createObjectURL(idProofBack)}
+                  alt="Uploaded file"
+                />
+                <div className="absolute top-1 right-1">
+                  {getStatusIcon(uploadStatus.adhaarBack?.status)}
+                </div>
+              </div>
             )}
           </button>
         </div>
@@ -426,8 +617,22 @@ const PhoneBill = ({
   phoneBillRef,
   phoneBill,
   isBillRequired,
-  prod
+  prod,
+  uploadStatus
 }) => {
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'uploading':
+        return <CgSpinner className="animate-spin text-blue-500" size={16} />;
+      case 'success':
+        return <span className="text-green-500">✓</span>;
+      case 'error':
+        return <span className="text-red-500">✗</span>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="flex flex-col adharcard mt-[10px]">
       <div className="flex gap-1 two">
@@ -450,7 +655,7 @@ const PhoneBill = ({
           </p>
           <input
             type="file"
-            onChange={(e) => handleChange(setPhoneBill, e)}
+            onChange={(e) => handleChange(setPhoneBill, e, "phoneBill", "phoneBill")}
             style={{ display: "none" }}
             ref={phoneBillRef}
           />
@@ -458,11 +663,16 @@ const PhoneBill = ({
             {!phoneBill ? (
               <FaCamera className="text-3xl text-gray-500" />
             ) : (
-              <img
-                className="w-full h-[60px]"
-                src={URL.createObjectURL(phoneBill)}
-                alt="Uploaded file"
-              />
+              <div className="relative">
+                <img
+                  className="w-full h-[60px]"
+                  src={URL.createObjectURL(phoneBill)}
+                  alt="Uploaded file"
+                />
+                <div className="absolute top-1 right-1">
+                  {getStatusIcon(uploadStatus.phoneBill?.status)}
+                </div>
+              </div>
             )}
           </button>
         </div>
@@ -493,8 +703,22 @@ const PhonePhotos1 = ({
   phoneRightRef,
   setPhoneRight,
   prod,
+  uploadStatus,
 }) => {
   const [showHoldModal, setShowHoldModal] = useState(false);
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'uploading':
+        return <CgSpinner className="animate-spin text-blue-500" size={16} />;
+      case 'success':
+        return <span className="text-green-500">✓</span>;
+      case 'error':
+        return <span className="text-red-500">✗</span>;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="flex flex-col adharcard mt-[10px] ">
@@ -518,7 +742,7 @@ const PhonePhotos1 = ({
         <div className="mt-4 p-1 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <p className="text-center font-semibold">{`${prod[0]?.categoryName} Front`}</p>
           <input
-            onChange={(e) => handleChange(setPhoneFront, e)}
+            onChange={(e) => handleChange(setPhoneFront, e, "phoneFront", "phoneFront")}
             type="file"
             ref={phoneFrontRef}
             style={{ display: "none" }}
@@ -527,11 +751,16 @@ const PhonePhotos1 = ({
             {!phoneFront ? (
               <FaCamera className="text-3xl text-gray-500" />
             ) : (
-              <img
-                src={URL.createObjectURL(phoneFront)}
-                className="h-[60px] w-full"
-                alt="Uploaded file"
-              />
+              <div className="relative">
+                <img
+                  src={URL.createObjectURL(phoneFront)}
+                  className="h-[60px] w-full"
+                  alt="Uploaded file"
+                />
+                <div className="absolute top-1 right-1">
+                  {getStatusIcon(uploadStatus.phoneFront?.status)}
+                </div>
+              </div>
             )}
           </button>
         </div>
@@ -541,17 +770,22 @@ const PhonePhotos1 = ({
             ref={phoneBackRef}
             type="file"
             style={{ display: "none" }}
-            onChange={(e) => handleChange(setPhoneBack, e)}
+            onChange={(e) => handleChange(setPhoneBack, e, "phoneBack", "phoneBack")}
           />
           <button onClick={() => handleCameraButtonClick(phoneBackRef)}>
             {!phoneBack ? (
               <FaCamera className="text-3xl text-gray-500" />
             ) : (
-              <img
-                className="w-full h-[60px]"
-                alt="Uploaded file"
-                src={URL.createObjectURL(phoneBack)}
-              />
+              <div className="relative">
+                <img
+                  className="w-full h-[60px]"
+                  alt="Uploaded file"
+                  src={URL.createObjectURL(phoneBack)}
+                />
+                <div className="absolute top-1 right-1">
+                  {getStatusIcon(uploadStatus.phoneBack?.status)}
+                </div>
+              </div>
             )}
           </button>
         </div>
@@ -563,7 +797,7 @@ const PhonePhotos1 = ({
             {`${prod[0]?.categoryName} Left Side`}
           </p>
           <input
-            onChange={(e) => handleChange(setPhoneLeft, e)}
+            onChange={(e) => handleChange(setPhoneLeft, e, "phoneLeft", "phoneLeft")}
             type="file"
             style={{ display: "none" }}
             ref={phoneLeftRef}
@@ -572,11 +806,16 @@ const PhonePhotos1 = ({
             {!phoneLeft ? (
               <FaCamera className="text-3xl text-gray-500" />
             ) : (
-              <img
-                className="h-[60px] w-full"
-                alt="Uploaded file"
-                src={URL.createObjectURL(phoneLeft)}
-              />
+              <div className="relative">
+                <img
+                  className="h-[60px] w-full"
+                  alt="Uploaded file"
+                  src={URL.createObjectURL(phoneLeft)}
+                />
+                <div className="absolute top-1 right-1">
+                  {getStatusIcon(uploadStatus.phoneLeft?.status)}
+                </div>
+              </div>
             )}
           </button>
         </div>
@@ -587,7 +826,7 @@ const PhonePhotos1 = ({
             {`${prod[0]?.categoryName} Right Side`}
           </p>
           <input
-            onChange={(e) => handleChange(setPhoneRight, e)}
+            onChange={(e) => handleChange(setPhoneRight, e, "phoneRight", "phoneRight")}
             type="file"
             style={{ display: "none" }}
             ref={phoneRightRef}
@@ -596,11 +835,16 @@ const PhonePhotos1 = ({
             {!phoneRight ? (
               <FaCamera className="text-3xl text-gray-500" />
             ) : (
-              <img
-                src={URL.createObjectURL(phoneRight)}
-                className="w-full h-[60px]"
-                alt="Uploaded file"
-              />
+              <div className="relative">
+                <img
+                  src={URL.createObjectURL(phoneRight)}
+                  className="w-full h-[60px]"
+                  alt="Uploaded file"
+                />
+                <div className="absolute top-1 right-1">
+                  {getStatusIcon(uploadStatus.phoneRight?.status)}
+                </div>
+              </div>
             )}
           </button>
         </div>
@@ -613,18 +857,23 @@ const PhonePhotos1 = ({
           <input
             type="file"
             style={{ display: "none" }}
-            onChange={(e) => handleChange(setPhoneTop, e)}
+            onChange={(e) => handleChange(setPhoneTop, e, "phoneTop", "phoneTop")}
             ref={phoneTopRef}
           />
           <button onClick={() => handleCameraButtonClick(phoneTopRef)}>
             {!phoneTop ? (
               <FaCamera className="text-3xl text-gray-500" />
             ) : (
-              <img
-                src={URL.createObjectURL(phoneTop)}
-                className="w-full h-[60px]"
-                alt="Uploaded file"
-              />
+              <div className="relative">
+                <img
+                  src={URL.createObjectURL(phoneTop)}
+                  className="w-full h-[60px]"
+                  alt="Uploaded file"
+                />
+                <div className="absolute top-1 right-1">
+                  {getStatusIcon(uploadStatus.phoneTop?.status)}
+                </div>
+              </div>
             )}
           </button>
         </div>
@@ -635,7 +884,7 @@ const PhonePhotos1 = ({
             {`${prod[0]?.categoryName} Bottom Side`}
           </p>
           <input
-            onChange={(e) => handleChange(setPhoneBottom, e)}
+            onChange={(e) => handleChange(setPhoneBottom, e, "phoneBottom", "phoneBottom")}
             type="file"
             style={{ display: "none" }}
             ref={phoneBottomRef}
@@ -644,11 +893,16 @@ const PhonePhotos1 = ({
             {!phoneBottom ? (
               <FaCamera className="text-3xl text-gray-500" />
             ) : (
-              <img
-                src={URL.createObjectURL(phoneBottom)}
-                alt="Uploaded file"
-                className="w-full h-[60px]"
-              />
+              <div className="relative">
+                <img
+                  src={URL.createObjectURL(phoneBottom)}
+                  alt="Uploaded file"
+                  className="w-full h-[60px]"
+                />
+                <div className="absolute top-1 right-1">
+                  {getStatusIcon(uploadStatus.phoneBottom?.status)}
+                </div>
+              </div>
             )}
           </button>
         </div>
