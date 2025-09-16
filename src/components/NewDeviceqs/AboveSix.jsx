@@ -48,6 +48,9 @@ const AboveSix = ({
   const handlesubmit = async () => {
     const id = JSON.parse(sessionStorage.getItem('dataModel'))
     const userToken2 = sessionStorage.getItem('authToken')
+    const deviceType = getDeviceType()
+    const deviceCategory = sessionStorage.getItem('DeviceType')
+
     setIsLoading(true)
     console.log(id, profile)
 
@@ -97,6 +100,7 @@ const AboveSix = ({
       storage: id?.models?.config?.storage,
       ram: id?.models?.config?.RAM,
       name: id?.customerName ? id?.customerName : profile?.name,
+      deviceType: deviceCategory,
       pricingAdjustment: {
         warrantyRange,
         accessories,
@@ -127,7 +131,6 @@ const AboveSix = ({
     const a_plus_price = getDevicePrice()
 
     console.log('Device Price Retrieved:', devicePrice)
-    const deviceType = getDeviceType()
 
     console.log('Device price sources:', {
       fromModel: id?.models?.price,
