@@ -87,6 +87,39 @@ const NewDeviceqs = () => {
               selected: Array(questionData.options.length).fill(false),
             }
           } else if (questionData.yes === answer) {
+            // Special handling for Accessories group - start unselected for iPad
+            if (questionData.group === 'Accessories') {
+              return {
+                quetion: questionData.quetion,
+                answer: questionData.no, // Set to 'no' value instead of 'yes'
+                key: 'no',
+                group: questionData.group,
+                selected: Array(questionData.options.length).fill(false),
+              }
+            }
+
+            // For Warranty group, check if it's "out of warranty" option
+            if (questionData.group === 'Warranty') {
+              // Find the "out of warranty" option and select only that one
+              const outOfWarrantyIndex = questionData.options.findIndex(option =>
+                option.caption.toLowerCase().includes('out of warranty')
+              )
+
+              const selected = Array(questionData.options.length).fill(false)
+              if (outOfWarrantyIndex !== -1) {
+                selected[outOfWarrantyIndex] = true
+              }
+
+              return {
+                quetion: questionData.quetion,
+                answer,
+                key: 'yes',
+                group: questionData.group,
+                selected,
+              }
+            }
+
+            // Default behavior for other groups
             return {
               quetion: questionData.quetion,
               answer,

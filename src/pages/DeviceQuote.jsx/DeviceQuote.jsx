@@ -272,7 +272,7 @@ const SubDeviceQuote = ({
   return (
     <div className='flex items-center justify-between gap-2'>
       <div className='flex flex-col w-1/2 text-xl font-medium'>
-        <p>₹{Number(Price) + Number(bonus)}</p>
+        <p>₹{Math.round(Number(Price) + Number(bonus))}</p>
       </div>
       {quoteSaved === false && exactQuoteValue === 'true' && (
         <div
