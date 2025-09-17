@@ -206,10 +206,10 @@ export const getDeviceType = () => {
     return 'mobile'
   }
   if (deviceType === 'CTG2') {
-    return 'ipad'
-  }
-  if (deviceType === 'CTG3') {
     return 'watch'
+  }
+  if (deviceType === 'CTG5') {
+    return 'ipad'
   }
   return 'mobile' // default
 }
