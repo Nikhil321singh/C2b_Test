@@ -54,19 +54,18 @@ export const ACCESSORIES_DEDUCTIONS = {
   },
 }
 
-export const calculateWarrantyUplift = (basePrice, warrantyRange) => {
-  console.log('Calculating warranty uplift for:', { basePrice, warrantyRange })
+export const calculateWarrantyUplift = (devicePrice, warrantyRange) => {
   const upliftPercentage = WARRANTY_UPLIFTS[warrantyRange] || 0
-  return basePrice * upliftPercentage
+  return devicePrice * upliftPercentage
 }
 
 export const calculateMobileAccessoriesDeduction = (
-  basePrice,
+  devicePrice,
   boxMissing,
   cableMissing
 ) => {
   const config = ACCESSORIES_DEDUCTIONS.mobile
-  const tier = basePrice >= config.thresholds.tierB ? 'tierB' : 'tierA'
+  const tier = devicePrice >= config.thresholds.tierB ? 'tierB' : 'tierA'
 
   let deductionKey
   if (!boxMissing && !cableMissing) {
@@ -83,14 +82,14 @@ export const calculateMobileAccessoriesDeduction = (
 }
 
 export const calculateIPadAccessoriesDeduction = (
-  basePrice,
+  devicePrice,
   boxMissing,
   cableMissing
 ) => {
   const config = ACCESSORIES_DEDUCTIONS.ipad
 
   // If price is below threshold, no deduction
-  if (basePrice < config.threshold) {
+  if (devicePrice < config.threshold) {
     return 0
   }
 
@@ -109,7 +108,7 @@ export const calculateIPadAccessoriesDeduction = (
 }
 
 export const calculateWatchAccessoriesDeduction = (
-  basePrice,
+  devicePrice,
   boxMissing,
   cableMissing,
   strapMissing
@@ -117,7 +116,7 @@ export const calculateWatchAccessoriesDeduction = (
   const config = ACCESSORIES_DEDUCTIONS.watch
 
   // If price is below threshold, no deduction
-  if (basePrice <= config.threshold) {
+  if (devicePrice <= config.threshold) {
     return 0
   }
 
@@ -137,22 +136,13 @@ export const calculateWatchAccessoriesDeduction = (
 }
 
 export const calculateFinalPrice = (
-  a_plus_price,
-  basePrice,
+  aPlusPrice,
+  devicePrice,
   deviceType,
   warrantyRange,
   accessories
 ) => {
-  console.log('calculateFinalPrice inputs:', {
-    a_plus_price,
-    basePrice,
-    deviceType,
-    warrantyRange,
-    accessories,
-  })
-
-  const warrantyUplift = calculateWarrantyUplift(a_plus_price, warrantyRange)
-  console.log('Warranty uplift calculated:', warrantyUplift)
+  const warrantyUplift = calculateWarrantyUplift(aPlusPrice, warrantyRange)
 
   let accessoriesDeduction = 0
 
@@ -160,7 +150,7 @@ export const calculateFinalPrice = (
     case 'mobile':
     case 'phone':
       accessoriesDeduction = calculateMobileAccessoriesDeduction(
-        a_plus_price,
+        aPlusPrice,
         accessories.boxMissing,
         accessories.cableMissing
       )
@@ -168,14 +158,14 @@ export const calculateFinalPrice = (
     case 'ipad':
     case 'tablet':
       accessoriesDeduction = calculateIPadAccessoriesDeduction(
-        a_plus_price,
+        aPlusPrice,
         accessories.boxMissing,
         accessories.cableMissing
       )
       break
     case 'watch':
       accessoriesDeduction = calculateWatchAccessoriesDeduction(
-        a_plus_price,
+        aPlusPrice,
         accessories.boxMissing,
         accessories.cableMissing,
         accessories.strapMissing
@@ -183,21 +173,16 @@ export const calculateFinalPrice = (
       break
   }
 
-  console.log('Accessories deduction calculated:', accessoriesDeduction)
-
-  const priceAfterWarranty = basePrice + warrantyUplift
+  const priceAfterWarranty = devicePrice + warrantyUplift
   const finalPrice = priceAfterWarranty - accessoriesDeduction
 
-  const result = {
-    basePrice,
+  return {
+    devicePrice,
     warrantyUplift,
     accessoriesDeduction,
     priceAfterWarranty,
-    finalPrice: Math.max(finalPrice, 0), // Ensure price doesn't go negative
+    finalPrice: Math.max(finalPrice, 0),
   }
-
-  console.log('Final price calculation result:', result)
-  return result
 }
 
 export const getDeviceType = () => {
@@ -206,10 +191,10 @@ export const getDeviceType = () => {
     return 'mobile'
   }
   if (deviceType === 'CTG2') {
-    return 'ipad'
-  }
-  if (deviceType === 'CTG3') {
     return 'watch'
+  }
+  if (deviceType === 'CTG5') {
+    return 'ipad'
   }
   return 'mobile' // default
 }
