@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { updateAccessoriesObject } from '../../store/slices/QNAslice'
 import imageMap from '../../utils/imageMap'
@@ -10,17 +10,16 @@ const pinkBg = 'bg-primary'
 const whiteBg = 'bg-white'
 
 // Reusable OptionCard component
-const OptionCard = ({ index, option, optionIndex, data, isSelected }) => {
+const OptionCard = ({
+  index,
+  option,
+  optionIndex,
+  data,
+  isSelected,
+  onAccessoryClick,
+}) => {
   const handleClick = () => {
-    store.dispatch(
-      updateAccessoriesObject({
-        index,
-        yesKey: data.yes,
-        noKey: data.no,
-        newKey: 'yes',
-        selectedIndex: optionIndex,
-      })
-    )
+    onAccessoryClick(index, option, optionIndex, data)
   }
 
   return (
@@ -50,6 +49,43 @@ const OptionCard = ({ index, option, optionIndex, data, isSelected }) => {
 }
 
 const SeventhPart = ({ NDstate, slice }) => {
+  const [missingAccessories, setMissingAccessories] = useState({
+    box: false,
+    cable: false,
+    strap: false, // for watches
+    invoice: false,
+  })
+
+  // Handle accessory selection
+  const handleAccessoryClick = (index, option, optionIndex, data) => {
+    // Update the original store
+    store.dispatch(
+      updateAccessoriesObject({
+        index,
+        yesKey: data.yes,
+        noKey: data.no,
+        newKey: 'yes',
+        selectedIndex: optionIndex,
+      })
+    )
+
+    // Track missing accessories based on option caption
+    const caption = option.caption.toLowerCase()
+    const newMissingAccessories = { ...missingAccessories }
+
+    if (caption.includes('box')) {
+      newMissingAccessories.box = !newMissingAccessories.box
+    } else if (caption.includes('cable') || caption.includes('charger')) {
+      newMissingAccessories.cable = !newMissingAccessories.cable
+    } else if (caption.includes('strap')) {
+      newMissingAccessories.strap = !newMissingAccessories.strap
+    } else if (caption.includes('invoice') || caption.includes('bill')) {
+      newMissingAccessories.invoice = !newMissingAccessories.invoice
+    }
+
+    setMissingAccessories(newMissingAccessories)
+  }
+
   return (
     <div className='containClass'>
       <div className='subheading'>
@@ -66,6 +102,7 @@ const SeventhPart = ({ NDstate, slice }) => {
               optionIndex={optionIndex}
               data={data}
               isSelected={slice[index].selected[optionIndex]}
+              onAccessoryClick={handleAccessoryClick}
             />
           ))
         )}

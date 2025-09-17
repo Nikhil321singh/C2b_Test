@@ -3,6 +3,8 @@ import { updateWarrantyObject } from '../../store/slices/QNAslice'
 import { GoDotFill } from 'react-icons/go'
 import imageMap from '../../utils/imageMap'
 import store from '../../store/store'
+import { isBillAvailable } from '../../utils/pricingUtils'
+import { useSelector } from 'react-redux'
 
 const whiteText = 'text-white'
 const blackText = 'text-black'
@@ -10,6 +12,35 @@ const pinkBg = 'bg-primary'
 const whiteBg = 'bg-white'
 
 const EighthPart = ({ NDstate, slice }) => {
+  const accessories = useSelector((state) => state.qna.Accessories)
+
+  const billAvailable = isBillAvailable(accessories)
+
+  const handleWarrantySelection = (option, data, index) => {
+    store.dispatch(
+      updateWarrantyObject({
+        index: index,
+        newKey: 'yes',
+        newAnswer: data.yes,
+      })
+    )
+  }
+
+  const getOptionClass = (option, index, optionIndex) => {
+    const isOutOfWarranty = option.caption
+      .toLowerCase()
+      .includes('out of warranty')
+    const isSelected = slice[index].selected[optionIndex]
+
+    if (!billAvailable && !isOutOfWarranty) {
+      return 'bg-gray-100 cursor-not-allowed opacity-50'
+    }
+    if (!isSelected) {
+      return `${whiteBg} hover:shadow-md`
+    }
+    return pinkBg
+  }
+
   return (
     <div className='containClass'>
       <div className='subheading'>
@@ -23,22 +54,21 @@ const EighthPart = ({ NDstate, slice }) => {
               {data?.options.map((option, optionIndex) => (
                 <React.Fragment key={optionIndex}>
                   <div
-                    onClick={(e) => {
-                      console.log(slice)
-                      console.log('assssaaaaa', option)
-                      console.log('assssaaaaa', data)
-                      console.log(optionIndex + 'ok')
-                      store.dispatch(
-                        updateWarrantyObject({
-                          index: index,
-                          newKey: 'yes',
-                          newAnswer: data.yes,
-                        })
-                      )
+                    onClick={() => {
+                      const isDisabled =
+                        !billAvailable &&
+                        !option.caption
+                          .toLowerCase()
+                          .includes('out of warranty')
+                      if (!isDisabled) {
+                        handleWarrantySelection(option, data, index)
+                      }
                     }}
-                    className={` w-[48%]  flex flex-col items-center px-3 min-h-[150px] shadow-lg rounded-lg ${
-                      !slice[index].selected[optionIndex] ? whiteBg : pinkBg
-                    }`}
+                    className={`w-[48%] flex flex-col items-center px-3 min-h-[150px] shadow-lg rounded-lg cursor-pointer transition-all duration-200 ${getOptionClass(
+                      option,
+                      index,
+                      optionIndex
+                    )}`}
                   >
                     <div className='mt-3 mb-1 overflow-hidden bg-white  rounded-md '>
                       <img
@@ -48,7 +78,7 @@ const EighthPart = ({ NDstate, slice }) => {
                     </div>
                     <div className='border-t-[1.5px] w-full py-2'>
                       <p
-                        className={`text-xs text-center  font-medium ${
+                        className={`text-xs text-center font-medium ${
                           !slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText
@@ -63,6 +93,16 @@ const EighthPart = ({ NDstate, slice }) => {
             </React.Fragment>
           ))}
       </div>
+
+      {/* Bill availability warning */}
+      {!billAvailable && (
+        <div className='mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3'>
+          <p className='text-sm text-yellow-800'>
+            <strong>Note:</strong> Since bill is not available, warranty ranges
+            are disabled except "Out of Warranty".
+          </p>
+        </div>
+      )}
     </div>
   )
 }

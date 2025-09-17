@@ -14,10 +14,83 @@ import FifthPart from '../../components/NewDeviceqs/FifthPart'
 import SixthPart from '../../components/NewDeviceqs/SixthPart'
 import SeventhPart from '../../components/NewDeviceqs/SeventhPart'
 import EighthPart from '../../components/NewDeviceqs/EighthPart'
-import { setGroupAnswers } from '../../store/slices/QNAslice'
+import { setGroupAnswers, setRawQuestions } from '../../store/slices/QNAslice'
 import useUserProfile from '../../utils/useUserProfile'
 import styless from '../QuickQuote/QuickQuote.module.css'
 import { initialState, qnaReducer } from '../../utils/qnaReducer'
+
+const GROUPS = [
+  'Core',
+  'Cosmetics',
+  'Display',
+  'Accessories',
+  'Functional',
+  'Functional_major',
+  'Functional_minor',
+  'Warranty',
+]
+
+const createDefaultSelected = (length, fillTrue = false) =>
+  Array(length).fill(fillTrue)
+
+const createAnswer = (questionData, answer) => {
+  const { group, options, yes, no, quetion } = questionData
+
+  // Case 1: both yes/no equal to default answer
+  if (yes === answer && no === answer) {
+    return {
+      quetion,
+      answer,
+      key: 'no',
+      group,
+      selected: createDefaultSelected(options.length, false),
+    }
+  }
+
+  // Case 2: default answer equals yes
+  if (yes === answer) {
+    if (group === 'Accessories') {
+      // Accessories → start unselected
+      return {
+        quetion,
+        answer: no,
+        key: 'no',
+        group,
+        selected: createDefaultSelected(options.length, false),
+      }
+    }
+
+    if (group === 'Warranty') {
+      // Warranty → select "out of warranty"
+      const outOfWarrantyIndex = options.findIndex((option) =>
+        option.caption.toLowerCase().includes('out of warranty')
+      )
+      const selected = createDefaultSelected(options.length, false)
+      if (outOfWarrantyIndex !== -1) {
+        selected[outOfWarrantyIndex] = true
+      }
+      return { quetion, answer, key: 'yes', group, selected }
+    }
+
+    // Default for other groups
+    return {
+      quetion,
+      answer,
+      key: 'yes',
+      group,
+      selected: createDefaultSelected(options.length, true),
+    }
+  }
+
+  // Case 3: default answer equals no
+  return {
+    quetion,
+    answer,
+    group,
+    key: 'no',
+    selected: createDefaultSelected(options.length, false),
+  }
+}
 
 const NewDeviceqs = () => {
   const userToken = sessionStorage.getItem('authToken')
@@ -46,78 +119,26 @@ const NewDeviceqs = () => {
       }/api/questionnaires/findAll?page=0&limit=99&type=${DeviceType}`
 
       const response = await axios.get(apiUrl, {
-        headers: {
-          authorization: `${userToken}`,
-        },
+        headers: { authorization: `${userToken}` },
       })
 
-      // Sort by viewOn field (assuming it's a number; modify for strings)
+      // Sort by viewOn
       const sortedData = response.data.data.sort((a, b) => a.viewOn - b.viewOn)
 
-      ;[
-        'Core',
-        'Cosmetics',
-        'Display',
-        'Accessories',
-        'Functional',
-        'Functional_major',
-        'Functional_minor',
-        'Warranty',
-      ].forEach((group) => {
-        const answersTemp = sortedData.filter(
-          (question) => question.group === group
-        )
+      GROUPS.forEach((group) => {
+        const answersTemp = sortedData.filter((q) => q.group === group)
         dispatch({ type: 'SET_GROUP_ANSWERS', group, answers: answersTemp })
+        store.dispatch(setRawQuestions({ group, questions: answersTemp }))
       })
 
-      const newPopulateAnswers = sortedData.map((ele) => ele.default)
-
       if (answers.length === 0) {
-        const newAnswers = newPopulateAnswers.map((answer, index) => {
-          const questionData = sortedData[index]
-
-          if (questionData.yes === answer && questionData.no === answer) {
-            return {
-              quetion: questionData.quetion,
-              answer,
-              key: 'no',
-              group: questionData.group,
-              selected: Array(questionData.options.length).fill(false),
-            }
-          } else if (questionData.yes === answer) {
-            return {
-              quetion: questionData.quetion,
-              answer,
-              key: 'yes',
-              group: questionData.group,
-              selected: Array(questionData.options.length).fill(true),
-            }
-          } else {
-            return {
-              quetion: questionData.quetion,
-              answer,
-              group: questionData.group,
-              key: 'no',
-              selected: Array(questionData.options.length).fill(false),
-            }
-          }
-        })
+        const newAnswers = sortedData.map((q) => createAnswer(q, q.default))
 
         setAnswers(newAnswers)
         setNewGroupAnswers(newAnswers)
-        ;[
-          'Core',
-          'Cosmetics',
-          'Display',
-          'Accessories',
-          'Functional',
-          'Functional_major',
-          'Functional_minor',
-          'Warranty',
-        ].forEach((group) => {
-          const answersTemp = newAnswers.filter(
-            (question) => question.group === group
-          )
+
+        GROUPS.forEach((group) => {
+          const answersTemp = newAnswers.filter((q) => q.group === group)
           store.dispatch(setGroupAnswers({ group, answers: answersTemp }))
         })
       }
