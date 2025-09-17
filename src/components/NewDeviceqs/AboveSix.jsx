@@ -38,70 +38,63 @@ const AboveSix = ({
   const getDevicePrice = () => {
     try {
       const dataModel = JSON.parse(sessionStorage.getItem('dataModel'))
-      console.log({ dataModel })
       return dataModel?.models?.config.price || 0
     } catch {
       return 0
     }
   }
 
-  const handlesubmit = async () => {
-    const id = JSON.parse(sessionStorage.getItem('dataModel'))
-    const userToken2 = sessionStorage.getItem('authToken')
-    setIsLoading(true)
-    console.log(id, profile)
+  // ---------------- HELPER FUNCTIONS ----------------
 
-    // Extract warranty selection
+  const extractWarrantyRange = () => {
     let warrantyRange = 'out_of_warranty'
     const billAvailable = isBillAvailable(qna.Accessories)
     const warrantyItem = qna.Warranty?.find((item) => item.key === 'yes')
-    console.log({ warrantyItem, billAvailable })
-    if (warrantyItem && billAvailable) {
-      const warrantyCaption = warrantyItem.quetion || ''
-      if (warrantyCaption === 'Below 3 Months ') {
-        warrantyRange = '0_3_months'
-      } else if (warrantyCaption === 'Between 3 months - 6 months') {
-        warrantyRange = '3_6_months'
-      } else if (warrantyCaption === 'Between 6months - 11 months') {
-        warrantyRange = '6_11_months'
-      } else if (warrantyCaption === 'Above 11 months') {
-        warrantyRange = 'above_11_months'
-      }
-    }
 
-    // Extract accessories selection
+    if (warrantyItem && billAvailable) {
+      const caption = warrantyItem.quetion || ''
+      if (caption === 'Below 3 Months ') warrantyRange = '0_3_months'
+      else if (caption === 'Between 3 months - 6 months')
+        warrantyRange = '3_6_months'
+      else if (caption === 'Between 6months - 11 months')
+        warrantyRange = '6_11_months'
+      else if (caption === 'Above 11 months') warrantyRange = 'above_11_months'
+    }
+    return warrantyRange
+  }
+
+  const extractAccessories = () => {
     const accessories = {
       boxMissing: false,
       cableMissing: false,
       strapMissing: false,
     }
-
     qna.Accessories?.forEach((item) => {
       if (item.key === 'yes') {
         const caption = item.quetion?.toLowerCase() || ''
-        if (caption.includes('box')) {
-          accessories.boxMissing = true
-        } else if (caption.includes('cable') || caption.includes('charger')) {
+        if (caption.includes('box')) accessories.boxMissing = true
+        else if (caption.includes('cable') || caption.includes('charger'))
           accessories.cableMissing = true
-        } else if (caption.includes('strap')) {
-          accessories.strapMissing = true
-        }
+        else if (caption.includes('strap')) accessories.strapMissing = true
       }
     })
+    return accessories
+  }
 
-    const finalPayload = {
+  const buildFinalPayload = (id, warrantyRange, accessories) => {
+    return {
       QNA: qna,
-      phoneNumber: id?.phoneNumber ? id?.phoneNumber : '123456789',
-      aadharNumber: id?.aadharNumber ? id?.aadharNumber : '123456789012',
+      phoneNumber: id?.phoneNumber || '123456789',
+      aadharNumber: id?.aadharNumber || '123456789012',
       modelId: id?.models?._id,
       storage: id?.models?.config?.storage,
       ram: id?.models?.config?.RAM,
-      name: id?.customerName ? id?.customerName : profile?.name,
-      pricingAdjustment: {
-        warrantyRange,
-        accessories,
-      },
+      name: id?.customerName || profile?.name,
+      pricingAdjustment: { warrantyRange, accessories },
     }
+  }
+
+  const saveBillData = (finalPayload) => {
     const billData = finalPayload.QNA.Accessories.find(
       (item) => item.quetion && item.quetion.toLowerCase().includes('bill')
     )
@@ -112,92 +105,44 @@ const AboveSix = ({
         'billData',
         JSON.stringify(finalPayload.QNA.Cosmetics[6])
       )
-      console.log("No Accessories item with 'bill' found.")
     }
-    const response = await axios.post(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/questionnaires/calculatePrice`,
-      finalPayload,
-      { headers: { Authorization: userToken2 } }
-    )
+  }
 
-    // Now calculate frontend pricing adjustments using the backend response
+  const calculateAdjustedPrice = (response, id, warrantyRange, accessories) => {
     const devicePrice = id?.models?.price || response.data.data.price || 0
-    const a_plus_price = getDevicePrice()
-
-    console.log('Device Price Retrieved:', devicePrice)
+    const aPlusPrice = getDevicePrice()
     const deviceType = getDeviceType()
 
-    console.log('Device price sources:', {
-      fromModel: id?.models?.price,
-      fromBackend: response.data.data.price,
-      selected: devicePrice,
-    })
-
-    // Calculate final price with adjustments
     const priceBreakdown = calculateFinalPrice(
-      a_plus_price,
+      aPlusPrice,
       devicePrice,
       deviceType,
       warrantyRange,
       accessories
     )
 
-    // Debug logging
-    console.log('Price Calculation Debug:', {
-      a_plus_price,
-      devicePrice,
-      deviceType,
-      warrantyRange,
-      accessories,
-      priceBreakdown,
-    })
-
-    // Store price breakdown for later use
     sessionStorage.setItem('priceBreakdown', JSON.stringify(priceBreakdown))
 
-    await logQuickQuoteAttempt(response.data.data, id)
-    sessionStorage.setItem('LeadId', response.data.data.id)
-
-    // Apply frontend pricing adjustments to backend response
     const backendResponse = response.data.data
     const adjustedPrice = priceBreakdown.finalPrice
-
-    // Fallback: if our calculation resulted in 0 or invalid price, use backend price
     const finalPrice =
       adjustedPrice && adjustedPrice > 0 ? adjustedPrice : backendResponse.price
 
-    console.log('Final Price Selection:', {
-      backendPrice: backendResponse.price,
-      calculatedPrice: adjustedPrice,
-      selectedPrice: finalPrice,
-    })
-
-    const adjustedResponse = {
+    return {
       ...backendResponse,
       price: finalPrice,
       originalPrice: backendResponse.price,
       warrantyUplift: priceBreakdown.warrantyUplift || 0,
       accessoriesDeduction: priceBreakdown.accessoriesDeduction || 0,
-      priceBreakdown: priceBreakdown,
+      priceBreakdown,
       bonus: 0,
     }
-
-    sessionStorage.setItem('responsedatadata', JSON.stringify(adjustedResponse))
-    sessionStorage.setItem('ExactQuote', true)
-    store.dispatch(setResponseData(adjustedResponse))
-    setIsLoading(false)
-    navigate('/devicequote')
   }
 
   const logQuickQuoteAttempt = async (quoteResult, deviceModel) => {
     const token = sessionStorage.getItem('authToken')
+    if (!token || !quoteResult?.id || !deviceModel?.models?._id) return
 
-    if (!token || !quoteResult?.id || !deviceModel?.models?._id) {
-      console.error('Cannot log quote: Missing critical data.')
-      return
-    }
     const logPayload = {
       quoteType: 'Get Exact Value',
       quoteAmount: quoteResult.price,
@@ -224,6 +169,46 @@ const AboveSix = ({
       console.error('Error logging Quick Quote attempt:', error)
     }
   }
+
+  // ---------------- MAIN SUBMIT ----------------
+  const handleSubmit = async () => {
+    const id = JSON.parse(sessionStorage.getItem('dataModel'))
+    const userToken2 = sessionStorage.getItem('authToken')
+    setIsLoading(true)
+
+    const warrantyRange = extractWarrantyRange()
+    const accessories = extractAccessories()
+    const finalPayload = buildFinalPayload(id, warrantyRange, accessories)
+
+    saveBillData(finalPayload)
+
+    const response = await axios.post(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/questionnaires/calculatePrice`,
+      finalPayload,
+      { headers: { Authorization: userToken2 } }
+    )
+
+    const adjustedResponse = calculateAdjustedPrice(
+      response,
+      id,
+      warrantyRange,
+      accessories
+    )
+
+    await logQuickQuoteAttempt(response.data.data, id)
+
+    sessionStorage.setItem('responsedatadata', JSON.stringify(adjustedResponse))
+    sessionStorage.setItem('ExactQuote', true)
+    sessionStorage.setItem('LeadId', response.data.data.id)
+
+    store.dispatch(setResponseData(adjustedResponse))
+    setIsLoading(false)
+    navigate('/devicequote')
+  }
+
+  // ---------------- RENDER ----------------
   return (
     <React.Fragment>
       {visible >= availableParts.length ? (
@@ -235,7 +220,7 @@ const AboveSix = ({
             <ImArrowLeft color='white' size={20} />
           </div>
           <div
-            onClick={handlesubmit}
+            onClick={handleSubmit}
             className='bg-primary w-[70%] relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center'
           >
             {isLoading && (

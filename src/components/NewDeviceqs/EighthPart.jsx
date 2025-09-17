@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { updateWarrantyObject } from '../../store/slices/QNAslice'
 import { GoDotFill } from 'react-icons/go'
 import imageMap from '../../utils/imageMap'
@@ -14,30 +14,9 @@ const whiteBg = 'bg-white'
 const EighthPart = ({ NDstate, slice }) => {
   const accessories = useSelector((state) => state.qna.Accessories)
 
-  // Get device price from session storage
-  const getDevicePrice = () => {
-    try {
-      const dataModel = JSON.parse(sessionStorage.getItem('dataModel'))
-      return dataModel?.models?.config.price || 0
-    } catch {
-      return 0
-    }
-  }
-
-  const devicePrice = getDevicePrice()
   const billAvailable = isBillAvailable(accessories)
 
-  // Warranty configuration with uplifts
-  const warrantyRanges = [
-    { key: '0_3_months', label: '0–3 Months', uplift: 0.08 },
-    { key: '3_6_months', label: '3–6 Months', uplift: 0.03 },
-    { key: '6_11_months', label: '6–11 Months', uplift: 0.01 },
-    { key: 'above_11_months', label: 'More than 11 Months', uplift: 0.005 },
-    { key: 'out_of_warranty', label: 'Out of Warranty', uplift: 0 },
-  ]
-
   const handleWarrantySelection = (option, data, index) => {
-    // Original store dispatch
     store.dispatch(
       updateWarrantyObject({
         index: index,
@@ -45,6 +24,21 @@ const EighthPart = ({ NDstate, slice }) => {
         newAnswer: data.yes,
       })
     )
+  }
+
+  const getOptionClass = (option, index, optionIndex) => {
+    const isOutOfWarranty = option.caption
+      .toLowerCase()
+      .includes('out of warranty')
+    const isSelected = slice[index].selected[optionIndex]
+
+    if (!billAvailable && !isOutOfWarranty) {
+      return 'bg-gray-100 cursor-not-allowed opacity-50'
+    }
+    if (!isSelected) {
+      return `${whiteBg} hover:shadow-md`
+    }
+    return pinkBg
   }
 
   return (
@@ -60,7 +54,7 @@ const EighthPart = ({ NDstate, slice }) => {
               {data?.options.map((option, optionIndex) => (
                 <React.Fragment key={optionIndex}>
                   <div
-                    onClick={(e) => {
+                    onClick={() => {
                       const isDisabled =
                         !billAvailable &&
                         !option.caption
@@ -70,14 +64,11 @@ const EighthPart = ({ NDstate, slice }) => {
                         handleWarrantySelection(option, data, index)
                       }
                     }}
-                    className={` w-[48%] flex flex-col items-center px-3 min-h-[150px] shadow-lg rounded-lg cursor-pointer transition-all duration-200 ${
-                      !billAvailable &&
-                      !option.caption.toLowerCase().includes('out of warranty')
-                        ? 'bg-gray-100 cursor-not-allowed opacity-50'
-                        : !slice[index].selected[optionIndex]
-                        ? `${whiteBg} hover:shadow-md`
-                        : pinkBg
-                    }`}
+                    className={`w-[48%] flex flex-col items-center px-3 min-h-[150px] shadow-lg rounded-lg cursor-pointer transition-all duration-200 ${getOptionClass(
+                      option,
+                      index,
+                      optionIndex
+                    )}`}
                   >
                     <div className='mt-3 mb-1 overflow-hidden bg-white  rounded-md '>
                       <img
@@ -87,7 +78,7 @@ const EighthPart = ({ NDstate, slice }) => {
                     </div>
                     <div className='border-t-[1.5px] w-full py-2'>
                       <p
-                        className={`text-xs text-center  font-medium ${
+                        className={`text-xs text-center font-medium ${
                           !slice[index].selected[optionIndex]
                             ? blackText
                             : whiteText

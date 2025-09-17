@@ -3,12 +3,6 @@ import { GoDotFill } from 'react-icons/go'
 import { updateAccessoriesObject } from '../../store/slices/QNAslice'
 import imageMap from '../../utils/imageMap'
 import store from '../../store/store'
-import {
-  calculateMobileAccessoriesDeduction,
-  calculateIPadAccessoriesDeduction,
-  calculateWatchAccessoriesDeduction,
-  getDeviceType,
-} from '../../utils/pricingUtils'
 
 const whiteText = 'text-white'
 const blackText = 'text-black'
@@ -61,51 +55,6 @@ const SeventhPart = ({ NDstate, slice }) => {
     strap: false, // for watches
     invoice: false,
   })
-
-  // Get device price and type
-  const getDevicePrice = () => {
-    try {
-      const dataModel = JSON.parse(sessionStorage.getItem('dataModel'))
-      return dataModel?.models?.price || 0
-    } catch {
-      return 0
-    }
-  }
-
-  const devicePrice = getDevicePrice()
-  const deviceType = getDeviceType()
-
-  // Calculate price deduction based on selected accessories
-  const calculateDeduction = (accessories) => {
-    let deduction = 0
-
-    switch (deviceType) {
-      case 'mobile':
-        deduction = calculateMobileAccessoriesDeduction(
-          devicePrice,
-          accessories.box,
-          accessories.cable
-        )
-        break
-      case 'ipad':
-        deduction = calculateIPadAccessoriesDeduction(
-          devicePrice,
-          accessories.box,
-          accessories.cable
-        )
-        break
-      case 'watch':
-        deduction = calculateWatchAccessoriesDeduction(
-          devicePrice,
-          accessories.box,
-          accessories.cable,
-          accessories.strap
-        )
-        break
-    }
-
-    return deduction
-  }
 
   // Handle accessory selection
   const handleAccessoryClick = (index, option, optionIndex, data) => {
