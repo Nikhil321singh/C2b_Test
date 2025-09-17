@@ -308,7 +308,9 @@ const BonusInput = ({ bonus, setBonus }) => (
         value={bonus}
         maxLength={6}
         onKeyDown={(e) => {
-          if (['-', '+', 'e', 'E', '.'].includes(e.key)) e.preventDefault()
+          if (['-', '+', 'e', 'E', '.'].includes(e.key)) {
+            e.preventDefault()
+          }
         }}
         onChange={(e) => {
           if (Number(e.target.value) >= 0 && Number(e.target.value) <= 10000) {
