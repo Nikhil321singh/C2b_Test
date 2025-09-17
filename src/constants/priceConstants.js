@@ -25,4 +25,3 @@ export const FILE_KEYS = {
 export const GREST_LOGO = window.location.origin === import.meta.env.VITE_BUYBACK_URL
   ? '/Grest_Logo_2.jpg'
   : '/Grest_Logo.jpg'
-  
