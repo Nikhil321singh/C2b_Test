@@ -6,6 +6,9 @@ import { LuDot } from 'react-icons/lu'
 import { useNavigate } from 'react-router-dom'
 
 const PRIMARY_COLOR = 'var(--primary-color)'
+const PRIMARY_BG_LIGHT = 'rgba(236, 39, 82, 0.1)' // 🔹 extracted constant
+const PRIMARY_BG_LIGHTER = 'rgba(236, 39, 82, 0.05)'
+const PRIMARY_BORDER = 'rgba(236, 39, 82, 0.2)'
 
 // Shared helper function to render a single question without options
 const renderQuestionWithoutOptions = (questionData, answer, index) => (
@@ -13,8 +16,8 @@ const renderQuestionWithoutOptions = (questionData, answer, index) => (
     key={index}
     className='flex flex-row items-center w-full p-3 rounded-lg border'
     style={{
-      backgroundColor: 'rgba(236, 39, 82, 0.05)',
-      borderColor: 'rgba(236, 39, 82, 0.2)',
+      backgroundColor: PRIMARY_BG_LIGHTER,
+      borderColor: PRIMARY_BORDER,
     }}
   >
     <LuDot size={20} className='shrink-0' style={{ color: PRIMARY_COLOR }} />
@@ -25,7 +28,7 @@ const renderQuestionWithoutOptions = (questionData, answer, index) => (
       <span
         className='ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase'
         style={{
-          backgroundColor: 'rgba(236, 39, 82, 0.1)',
+          backgroundColor: PRIMARY_BG_LIGHT,
           color: PRIMARY_COLOR,
         }}
       >
@@ -42,11 +45,9 @@ const renderOption = (option, isSelected, questionIndex, optionIndex) => (
     className='flex flex-row items-center w-full p-3 rounded-lg border'
     style={{
       backgroundColor: isSelected
-        ? 'rgba(236, 39, 82, 0.05)'
+        ? PRIMARY_BG_LIGHTER
         : 'rgba(107, 114, 128, 0.05)',
-      borderColor: isSelected
-        ? 'rgba(236, 39, 82, 0.2)'
-        : 'rgba(107, 114, 128, 0.2)',
+      borderColor: isSelected ? PRIMARY_BORDER : 'rgba(107, 114, 128, 0.2)',
     }}
   >
     <LuDot
@@ -66,7 +67,7 @@ const renderOption = (option, isSelected, questionIndex, optionIndex) => (
         className='ml-2 text-xs font-semibold px-2 py-1 rounded-full'
         style={{
           backgroundColor: isSelected
-            ? 'rgba(236, 39, 82, 0.1)'
+            ? PRIMARY_BG_LIGHT
             : 'rgba(107, 114, 128, 0.1)',
           color: isSelected ? PRIMARY_COLOR : '#6B7280',
         }}
@@ -79,7 +80,9 @@ const renderOption = (option, isSelected, questionIndex, optionIndex) => (
 
 // Main function simplified
 const renderQuestionOptions = (selectedAnswers, rawQuestionsGroup) => {
-  if (!rawQuestionsGroup?.length) return null
+  if (!rawQuestionsGroup?.length) {
+    return null
+  }
 
   return rawQuestionsGroup
     .map((questionData, questionIndex) => {
@@ -158,7 +161,7 @@ const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
             onClick={closeHandler}
             className='ml-4 p-2 rounded-full transition-colors duration-200 flex items-center justify-center'
             onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = 'rgba(236, 39, 82, 0.1)')
+              (e.currentTarget.style.backgroundColor = PRIMARY_BG_LIGHT)
             }
             onMouseLeave={(e) =>
               (e.currentTarget.style.backgroundColor = 'transparent')
@@ -343,7 +346,9 @@ const FunctionalList = ({
 }) => {
   const items = exactQuoteValue === 'false' ? quickData?.slice(0, 2) : data
 
-  if (!items?.length) return null
+  if (!items?.length) {
+    return null
+  }
 
   return (
     <div className={`${styles.ques_box}`}>

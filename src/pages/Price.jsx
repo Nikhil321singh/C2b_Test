@@ -153,7 +153,9 @@ const Price = () => {
       'phoneTop',
       'phoneBottom',
     ]
-    if (isBillRequired) requiredFiles.push('phoneBill')
+    if (isBillRequired) {
+      requiredFiles.push('phoneBill')
+    }
 
     const failedUploads = requiredFiles.filter(
       (fileKey) =>
@@ -161,7 +163,9 @@ const Price = () => {
         uploadStatus[fileKey]?.status === 'pending'
     )
 
-    if (failedUploads.length === 0) return true
+    if (failedUploads.length === 0) {
+      return true
+    }
 
     toast.info(`Retrying ${failedUploads.length} failed uploads...`)
 
@@ -259,7 +263,9 @@ const Price = () => {
       'phoneTop',
       'phoneBottom',
     ]
-    if (isBillRequired) requiredFiles.push('phoneBill')
+    if (isBillRequired) {
+      requiredFiles.push('phoneBill')
+    }
 
     const failedUploads = requiredFiles.filter(
       (fileKey) => uploadStatus[fileKey]?.status !== 'success'
@@ -413,7 +419,9 @@ const Price = () => {
               'phoneTop',
               'phoneBottom',
             ]
-            if (isBillRequired) requiredFiles.push('phoneBill')
+            if (isBillRequired) {
+              requiredFiles.push('phoneBill')
+            }
             const failed = requiredFiles.filter(
               (f) => uploadStatus[f]?.status !== 'success'
             )

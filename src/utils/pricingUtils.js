@@ -176,15 +176,13 @@ export const calculateFinalPrice = (
   const priceAfterWarranty = devicePrice + warrantyUplift
   const finalPrice = priceAfterWarranty - accessoriesDeduction
 
-  const result = {
+  return {
     devicePrice,
     warrantyUplift,
     accessoriesDeduction,
     priceAfterWarranty,
-    finalPrice: Math.max(finalPrice, 0), // Ensure price doesn't go negative
+    finalPrice: Math.max(finalPrice, 0),
   }
-
-  return result
 }
 
 export const getDeviceType = () => {

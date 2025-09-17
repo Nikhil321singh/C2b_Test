@@ -53,12 +53,15 @@ const AboveSix = ({
 
     if (warrantyItem && billAvailable) {
       const caption = warrantyItem.quetion || ''
-      if (caption === 'Below 3 Months ') warrantyRange = '0_3_months'
-      else if (caption === 'Between 3 months - 6 months')
+      if (caption === 'Below 3 Months ') {
+        warrantyRange = '0_3_months'
+      } else if (caption === 'Between 3 months - 6 months') {
         warrantyRange = '3_6_months'
-      else if (caption === 'Between 6months - 11 months')
+      } else if (caption === 'Between 6months - 11 months') {
         warrantyRange = '6_11_months'
-      else if (caption === 'Above 11 months') warrantyRange = 'above_11_months'
+      } else if (caption === 'Above 11 months') {
+        warrantyRange = 'above_11_months'
+      }
     }
     return warrantyRange
   }
@@ -72,10 +75,13 @@ const AboveSix = ({
     qna.Accessories?.forEach((item) => {
       if (item.key === 'yes') {
         const caption = item.quetion?.toLowerCase() || ''
-        if (caption.includes('box')) accessories.boxMissing = true
-        else if (caption.includes('cable') || caption.includes('charger'))
+        if (caption.includes('box')) {
+          accessories.boxMissing = true
+        } else if (caption.includes('cable') || caption.includes('charger')) {
           accessories.cableMissing = true
-        else if (caption.includes('strap')) accessories.strapMissing = true
+        } else if (caption.includes('strap')) {
+          accessories.strapMissing = true
+        }
       }
     })
     return accessories
@@ -141,7 +147,9 @@ const AboveSix = ({
 
   const logQuickQuoteAttempt = async (quoteResult, deviceModel) => {
     const token = sessionStorage.getItem('authToken')
-    if (!token || !quoteResult?.id || !deviceModel?.models?._id) return
+    if (!token || !quoteResult?.id || !deviceModel?.models?._id) {
+      return
+    }
 
     const logPayload = {
       quoteType: 'Get Exact Value',
