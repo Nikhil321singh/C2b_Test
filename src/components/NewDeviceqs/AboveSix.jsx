@@ -120,7 +120,9 @@ const calculateAdjustedPrice = (response, id, warrantyRange, accessories) => {
 
 const logQuickQuoteAttempt = async (quoteResult, deviceModel) => {
   const token = sessionStorage.getItem('authToken')
-  if (!token || !quoteResult?.id || !deviceModel?.models?._id) return
+  if (!token || !quoteResult?.id || !deviceModel?.models?._id) {
+    return
+  }
 
   const logPayload = {
     quoteType: 'Get Exact Value',

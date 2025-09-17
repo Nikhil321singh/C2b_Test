@@ -21,12 +21,20 @@ const buyback = import.meta.env.VITE_BUYBACK_URL
 const switchKart = import.meta.env.VITE_SWITCHKART_URL
 const deviceTypePage = '/selectdevicetype'
 
-const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) =>
-  quoteSaved
-    ? savedBonus
-      ? Number(Price) + Number(bonus) - Number(savedBonus)
-      : Number(Price) + Number(bonus)
-    : Number(Price)
+const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) => {
+  const basePrice = Number(Price)
+  const bonusValue = Number(bonus) || 0
+  const savedBonusValue = Number(savedBonus) || 0
+
+  if (quoteSaved) {
+    if (savedBonus) {
+      return basePrice + bonusValue - savedBonusValue
+    }
+    return basePrice + bonusValue
+  }
+
+  return basePrice
+}
 
 const DeviceQuote = () => {
   const dispatch = useDispatch()
