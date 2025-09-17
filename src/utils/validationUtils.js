@@ -42,11 +42,11 @@ export const getRequiredFiles = (isBillRequired) => {
     FILE_KEYS.PHONE_TOP,
     FILE_KEYS.PHONE_BOTTOM,
   ]
-  
+
   if (isBillRequired) {
     requiredFiles.push(FILE_KEYS.PHONE_BILL)
   }
-  
+
   return requiredFiles
 }
 
