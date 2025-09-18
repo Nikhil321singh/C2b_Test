@@ -142,7 +142,7 @@ export const calculateFinalPrice = (
   warrantyRange,
   accessories
 ) => {
-  const warrantyUplift = calculateWarrantyUplift(aPlusPrice, warrantyRange)
+  const warrantyUplift = calculateWarrantyUplift(devicePrice, warrantyRange)
 
   let accessoriesDeduction = 0
 
