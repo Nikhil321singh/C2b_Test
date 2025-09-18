@@ -129,6 +129,10 @@ const qnaSlice = createSlice({
       if (state.Functional[index]) {
         state.Functional[index].answer = newAnswer
         state.Functional[index].key = newKey
+        // Update selected array to reflect the choice
+        if (state.Functional[index].selected) {
+          state.Functional[index].selected = state.Functional[index].selected.map(() => newKey === 'yes')
+        }
       }
     },
     updateFunctionalMajorObject: (state, action) => {
