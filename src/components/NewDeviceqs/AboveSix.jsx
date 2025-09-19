@@ -87,8 +87,8 @@ const getDevicePrice = () => {
   }
 }
 
-const calculateAdjustedPrice = (response, id, warrantyRange, accessories) => {
-  const devicePrice = id?.models?.price || response.data.data.price || 0
+const calculateAdjustedPrice = (response, warrantyRange, accessories) => {
+  const devicePrice = response.data.data.price || 0
   const aPlusPrice = getDevicePrice()
   const deviceType = getDeviceType()
 
@@ -257,7 +257,6 @@ const AboveSix = ({
 
     const adjustedResponse = calculateAdjustedPrice(
       response,
-      id,
       warrantyRange,
       accessories
     )
