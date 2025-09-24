@@ -21,13 +21,15 @@ const TechnicianWiseReport = () => {
   const [searchValue, setSearchValue] = useState("");
   const [fromDateDup, setFromDateDup] = useState(null);
   const [toDateDup, setToDateDup] = useState(null);
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
 
   const getTableData = () => {
     setLoading(true);
     const userToken = sessionStorage.getItem("authToken");
 
     const queryParams = new URLSearchParams();
-    if (searchValue !== null) {
+    if (isSuperAdmin && searchValue !== null) {
       queryParams.append("search", searchValue);
     }
 
@@ -40,9 +42,7 @@ const TechnicianWiseReport = () => {
     }
     axios
       .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pickupDevices/technicianReport?&${queryParams.toString()}`,
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pickupDevices/technicianReport?&${queryParams.toString()}`,
         {
           headers: {
             authorization: `${userToken}`,
@@ -100,9 +100,7 @@ const TechnicianWiseReport = () => {
     const userToken = sessionStorage.getItem("authToken");
     axios
       .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pickupDevices/technicianReport`,
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pickupDevices/technicianReport`,
         {
           headers: {
             authorization: `${userToken}`,

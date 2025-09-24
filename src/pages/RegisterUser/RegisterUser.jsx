@@ -57,6 +57,8 @@ const initForm = {
 
 const RegisterUser = () => {
   const token = sessionStorage.getItem("authToken");
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
   const [sideMenu, setsideMenu] = useState(false);
   const [isGrest, setIsGrest] = useState(null);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -76,13 +78,19 @@ const RegisterUser = () => {
     });
   }, [isGrest]);
 
-  const saveStrCmp = async () => {
-    const tempStr = await getStore();
-    setStoreData(tempStr);
+  const fetchAndSetStores = async () => {
+    setIsTableLoaded(true);
+    const stores = await getStore();
+    setStoreData(stores);
+    if (!isSuperAdmin && stores.length === 1) {
+      setFormData(prevData => ({ ...prevData, storeId: stores[0]._id }));
+    }
+    setIsTableLoaded(false);
   };
+
   useEffect(() => {
-    saveStrCmp();
-  }, []);
+    fetchAndSetStores();
+  }, [isSuperAdmin]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -216,6 +224,7 @@ const RegisterUser = () => {
             handleChange={handleChange}
             setIsGrest={setIsGrest}
             storeData={storeData}
+            isSuperAdmin={isSuperAdmin}
           />
         </div>
       </div>
@@ -225,7 +234,7 @@ const RegisterUser = () => {
 
 export default RegisterUser;
 
-const UserForm = ({ formData, submitHandler, handleChange, storeData }) => {
+const UserForm = ({ formData, submitHandler, handleChange, storeData, isSuperAdmin }) => {
   const [showUserPassword, setShowUserPassword] = useState(false);
 
   return (
@@ -314,24 +323,26 @@ const UserForm = ({ formData, submitHandler, handleChange, storeData }) => {
           required
         />
       </label>
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Store Name*</span>
-        <select
-          name="storeId"
-          id="storeId"
-          value={formData.storeId}
-          className="outline-none text-base border-2 p-2 rounded-lg"
-          onChange={handleChange}
-          required
-        >
-          <option value=""> None </option>
-          {storeData.map((item) => (
-            <option key={item._id} value={item._id}>
-              {`${item.storeName}, ${item.region}`}
-            </option>
-          ))}
-        </select>
-      </label>
+      {isSuperAdmin && (
+        <label className="flex flex-col w-[70%] gap-2">
+          <span className="font-medium text-xl">Store Name*</span>
+          <select
+            name="storeId"
+            id="storeId"
+            value={formData.storeId}
+            className="outline-none text-base border-2 p-2 rounded-lg"
+            onChange={handleChange}
+            required
+          >
+            <option value=""> None </option>
+            {storeData.map((item) => (
+              <option key={item._id} value={item._id}>
+                {`${item.storeName}, ${item.region}`}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label className="flex flex-col w-[70%] gap-2">
         <span className="font-medium text-xl">Role*</span>
         <select

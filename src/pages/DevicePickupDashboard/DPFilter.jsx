@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { IoRefresh } from "react-icons/io5";
 import { BsCalendarDate } from "react-icons/bs";
-import {IoMdSearch} from "react-icons/io";
+import { IoMdSearch } from "react-icons/io";
 import styles from "./DevicePickupDashboard.module.css";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
@@ -59,8 +59,10 @@ const DPFilter = ({
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filteredStores, setFilteredStores] = useState(storeData);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredStores, setFilteredStores] = useState(storeData);
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
   const dispatch = useDispatch();
   const handleRegionChange = (value) => {
     setRegionDrop(false);
@@ -163,77 +165,79 @@ const DPFilter = ({
         setStatusValue={setStatusValue}
         pendingTableData={pendingTableData}
       />
-      <div className="flex gap-2 w-100 items-center outline-none">
-        <div className="relative w-[45%]">
-          <div
-            className={`w-[100%] ${styles.filter_button}`}
-            onClick={() => {
-              setRegionDrop(!regionDrop);
-            }}
-          >
-            <p className="truncate">
-              {region === "" ? "Select Region" : region}
-            </p>
-            <FaAngleDown size={17} className={`${regionDrop && RotateCss}`} />
-          </div>
-          {regionDrop && (
-            <div className={`w-[100%] ${styles.filter_drop}`}>
-              {regionData.map((item) => (
-                <div
-                  key={item}
-                  onClick={() => handleRegionChange(item)}
-                  className={`${styles.filter_option}`}
-                >
-                  <p className="truncate">{item}</p>
-                </div>
-              ))}
+      {isSuperAdmin && (
+        <div className="flex gap-2 w-100 items-center outline-none">
+          <div className="relative w-[45%]">
+            <div
+              className={`w-[100%] ${styles.filter_button}`}
+              onClick={() => {
+                setRegionDrop(!regionDrop);
+              }}
+            >
+              <p className="truncate">
+                {region === "" ? "Select Region" : region}
+              </p>
+              <FaAngleDown size={17} className={`${regionDrop && RotateCss}`} />
             </div>
-          )}
-        </div>
-        <div className="relative w-[70%]">
-          <div
-            className={`${styles.filter_button} w-full`}
-            onClick={() => setStoreDrop(!storeDrop)}
-          >
-            <p className="truncate">
-              {searchTerm === "" ? "Select Store" : searchTerm}
-            </p>
-            <FaAngleDown size={17} className={`${storeDrop && RotateCss}`} />
-          </div>
-          {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
-                placeholder="Search store..."
-              />
-              <div
-                className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
-              >
-                {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item);
-                        setStoreDrop(false);
-                      }}
-                      className={`${styles.filter_option}`}
-                    >
-                      <p className="truncate">{item}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="p-2 text-gray-500">No stores found</p>
-                )}
+            {regionDrop && (
+              <div className={`w-[100%] ${styles.filter_drop}`}>
+                {regionData.map((item) => (
+                  <div
+                    key={item}
+                    onClick={() => handleRegionChange(item)}
+                    className={`${styles.filter_option}`}
+                  >
+                    <p className="truncate">{item}</p>
+                  </div>
+                ))}
               </div>
+            )}
+          </div>
+          <div className="relative w-[70%]">
+            <div
+              className={`${styles.filter_button} w-full`}
+              onClick={() => setStoreDrop(!storeDrop)}
+            >
+              <p className="truncate">
+                {searchTerm === "" ? "Select Store" : searchTerm}
+              </p>
+              <FaAngleDown size={17} className={`${storeDrop && RotateCss}`} />
             </div>
-          )}
+            {storeDrop && (
+              <div className="absolute w-full bg-white shadow-md">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="w-full p-2 border-b border-gray-300"
+                  placeholder="Search store..."
+                />
+                <div
+                  className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
+                >
+                  {filteredStores.length > 0 ? (
+                    filteredStores.map((item, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          handleStoreChange(item);
+                          setSearchTerm(item);
+                          setStoreDrop(false);
+                        }}
+                        className={`${styles.filter_option}`}
+                      >
+                        <p className="truncate">{item}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="p-2 text-gray-500">No stores found</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
