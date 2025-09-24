@@ -8,12 +8,12 @@ import NavigateTable from "../../components/NavigateTable/NavigateTable";
 import PendingDevicesTable from "../../components/PendingDevicesTable/PendingDevicesTable";
 import axios from "axios";
 import { BeatLoader } from "react-spinners";
-import {IoIosCheckmarkCircle, IoIosCloseCircle} from "react-icons/io";
+import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 import styles from "./DevicePickupDashboard.module.css";
 import SideMenu from "../../components/SideMenu";
 import AdminNavbar from "../../components/Admin_Navbar";
 import ProfileBox from "../../components/ProfileBox/ProfileBox";
-import {  useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import DPFilter from "./DPFilter";
 const buttonStyles = "bg-primary text-white";
 const updateStatusError = "Failed to update status";
@@ -48,13 +48,13 @@ const DevicePickupDashboard = () => {
   const [regionData, setRegionData] = useState([]);
   const [allStore, setAllStore] = useState([]);
   const firsttime = useRef(true);
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/all?region=${region}&storeName=${storeName}`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/pendingDevices/all?region=${region}&storeName=${storeName}`,
       headers: { Authorization: token },
     };
     axios
@@ -77,9 +77,8 @@ const DevicePickupDashboard = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=0&limit=9999`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
     axios
@@ -105,9 +104,8 @@ const DevicePickupDashboard = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/search?rid=${searchValue}&date=${dateValue}&status=${statusValue}&region=${region}&storeName=${storeName}`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/pendingDevices/search?rid=${searchValue}&date=${dateValue}&status=${statusValue}&region=${region}&storeName=${storeName}`,
       headers: { Authorization: token },
     };
     axios
@@ -130,15 +128,17 @@ const DevicePickupDashboard = () => {
         setIsTableLoaded(false);
       });
   };
+
   useEffect(() => {
-    if (firsttime.current && !!storeName && !!region) {
+    if (firsttime.current) {
       getData();
       getStore();
       firsttime.current = false;
-    } else if (!firsttime.current && !!storeName && !!region) {
+    } else {
       getDataBySearch();
     }
-  }, [statusValue, dateValue, storeName, region]);
+  }, [statusValue, dateValue, storeName, region, searchValue]);
+
   return (
     <div className="min-h-screen bg-white pb-8">
       <ExtComps
@@ -193,6 +193,7 @@ const DevicePickupDashboard = () => {
         pendingTableData={pendingTableData}
         setSelectedStatus={setSelectedStatus}
         getData={getData}
+        isSuperAdmin={isSuperAdmin}
       />
       <PDTable
         pendingTableData={pendingTableData}
@@ -268,9 +269,8 @@ const ExtComps = ({
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/pickupreq`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/pendingDevices/pickupreq`,
       headers: {
         Authorization: token1,
       },
@@ -423,9 +423,8 @@ const PDTable = ({
     if (newStatus === PickupAvail) {
       config = {
         method: "post",
-        url: `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pendingDevices/update`,
+        url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+          }/api/pendingDevices/update`,
         headers: {
           Authorization: token2,
         },
@@ -443,9 +442,8 @@ const PDTable = ({
     } else {
       config = {
         method: "post",
-        url: `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pendingDevices/updatereq`,
+        url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+          }/api/pendingDevices/updatereq`,
         headers: {
           Authorization: token2,
         },
@@ -572,9 +570,8 @@ const CancelModal = ({
     setIsTableLoaded(true);
     const config = {
       method: "post",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/update`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/pendingDevices/update`,
       headers: {
         Authorization: token2,
       },
@@ -652,9 +649,8 @@ const HoldModal = ({
     setIsTableLoaded(true);
     const config = {
       method: "post",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/update`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/pendingDevices/update`,
       headers: {
         Authorization: token2,
       },

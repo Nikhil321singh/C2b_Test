@@ -90,9 +90,8 @@ const RegisterUserDetails = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/userregistry/search?uid=${searchValue}&storeName=${storeValue}&role=${roleValue}`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/userregistry/search?uid=${searchValue}&storeName=${storeValue}&role=${roleValue}`,
       headers: { Authorization: token },
     };
     axios
@@ -309,6 +308,8 @@ const TableFilters = ({
   getData,
   data,
 }) => {
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
   const navigate = useNavigate();
   const handleSearchClear = () => {
     setSearchValue("");
@@ -348,16 +349,18 @@ const TableFilters = ({
           />
           <IoMdSearch onClick={handleSearchClick} size={25} />
         </div>
-        <div className={`${styles.search_bar_wrap}`}>
-          <input
-            onChange={(e) => setStoreValue(e.target.value)}
-            className="text-sm"
-            type="text"
-            placeholder="Search Store"
-            value={storeValue}
-          />
-          <IoMdSearch onClick={handleSearchClick} size={25} />
-        </div>
+        {isSuperAdmin && (
+          <div className={`${styles.search_bar_wrap}`}>
+            <input
+              onChange={(e) => setStoreValue(e.target.value)}
+              className="text-sm"
+              type="text"
+              placeholder="Search Store"
+              value={storeValue}
+            />
+            <IoMdSearch onClick={handleSearchClick} size={25} />
+          </div>
+        )}
         <div className={styles.icons_box}>
           <IoRefresh onClick={handleSearchClear} className="" size={25} />
         </div>
