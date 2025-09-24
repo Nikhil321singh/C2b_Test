@@ -10,6 +10,7 @@ const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
 const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
 const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import ViewPickupTable from "../../components/ViewPickupTable/ViewPickupTable";
+import UploadReceiptModal from "../../components/UploadReceiptModal";
 import {
   IoIosCheckmarkCircle,
   IoIosCloseCircle,
@@ -58,6 +59,7 @@ const PickedUpDevices = () => {
   const [storeData, setStoreData] = useState([]);
   const firsttime = useRef(true);
   const [allStore, setAllStore] = useState([]);
+  const [uploadReceiptMod, setUploadReceiptMod] = useState(false);
 
   const getData = () => {
     setIsTableLoaded(true);
@@ -144,7 +146,6 @@ const PickedUpDevices = () => {
     console.log(id);
     setTempId(id);
     setTempUCode(uniqueCode);
-    setIsTableLoaded(true);
     setConfMod(true);
   };
 
@@ -168,6 +169,8 @@ const PickedUpDevices = () => {
         setErrorMsg2={setErrorMsg2}
         getData={getData}
         tempId={tempId}
+        uploadReceiptMod={uploadReceiptMod}
+        setUploadReceiptMod={setUploadReceiptMod}
       />
       <div className="flex flex-row m-2 gap-4"></div>
       <NavigateTable />
@@ -223,12 +226,51 @@ const ExtComps = ({
   setErrorMsg2,
   getData,
   tempId,
+  uploadReceiptMod,
+  setUploadReceiptMod,
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
   const token1 = sessionStorage.getItem("authToken");
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
   const userRole = LoggedInUser?.role || "";
-  const statusUpdHandler = (refID, newStatus) => {
+
+  const handleUploadReceipt = (file, remarks) => {
+    const formData = new FormData();
+    formData.append('paymentReceipt', file);
+    formData.append('remarks', remarks || '');
+
+    const config = {
+      method: "put",
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pickupDevices/updatePaymentReceipt/${tempId}`,
+      headers: {
+        Authorization: token1,
+        // Don't set Content-Type, let axios handle it for multipart/form-data
+      },
+      data: formData,
+      timeout: 60000, // 60 second timeout
+    };
+
+    // Debug logging
+
+    return axios.request(config)
+      .then((response) => {
+        setUploadReceiptMod(false); // Close modal on success
+        setErrorMsg(`Payment confirmed successfully for Lot ${tempUCode}`);
+        setErrorMsg1("Status updated to 'Pending Admin Approval'.");
+        setErrorMsg2("Receipt uploaded and email sent to store with Excel report.");
+        setSuccessMod(true);
+        getData(); // Refresh data
+      })
+      .catch((error) => {
+        const errorMessage = error.response?.data?.message || `Failed to upload receipt for Lot ${tempUCode}`;
+        setErrorMsg(errorMessage);
+        setFailMode(true);
+        throw error; // Re-throw so modal can handle it
+      });
+  };
+  const statusUpdHandler = (refID, newStatus, skipSuccessModal = false) => {
     setConfMod(false);
     setIsTableLoaded(true);
     const config = {
@@ -246,15 +288,20 @@ const ExtComps = ({
       .request(config)
       .then((response) => {
         getData();
-        setErrorMsg(
-          `Successfully Updated Status of Lot ${tempUCode} to ${newStatus}`
-        );
-        if (newStatus === ApprovDelivery) {
-          setErrorMsg(`Delivery Approved for Lot ${refID}.`);
-          setErrorMsg1("Check it on history.");
+        if (!skipSuccessModal) {
+          setErrorMsg(
+            `Successfully Updated Status of Lot ${tempUCode} to ${newStatus}`
+          );
+          if (newStatus === ApprovDelivery) {
+            setErrorMsg(`Delivery Approved for Lot ${refID}.`);
+            setErrorMsg1("Check it on history.");
+          }
+          setSuccessMod(true);
+        } else {
+          // Open upload modal after successful status update
+          setUploadReceiptMod(true);
         }
         setIsTableLoaded(false);
-        setSuccessMod(true);
       })
       .catch((error) => {
         setErrorMsg(`Failed to Updated Status of Lot ${refID} to ${newStatus}`);
@@ -324,9 +371,9 @@ const ExtComps = ({
             </p>
             <div className="flex flex-row gap-2">
               <button
-                onClick={() =>
-                  statusUpdHandler(tempId, "Pending Admin Approval")
-                }
+                onClick={() => {
+                  statusUpdHandler(tempId, "Pending Admin Approval", true);
+                }}
                 className={"bg-primary text-white"}
               >
                 Okay
@@ -334,7 +381,6 @@ const ExtComps = ({
               <button
                 onClick={() => {
                   setConfMod(false);
-                  setIsTableLoaded(false);
                 }}
                 className="bg-white text-primary"
               >
@@ -344,6 +390,16 @@ const ExtComps = ({
           </div>
         </div>
       )}
+      <UploadReceiptModal
+        isOpen={uploadReceiptMod}
+        onClose={() => {
+          setUploadReceiptMod(false);
+          setIsTableLoaded(false);
+        }}
+        onUpload={handleUploadReceipt}
+        lotCode={tempUCode}
+        isLoading={false}
+      />
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
