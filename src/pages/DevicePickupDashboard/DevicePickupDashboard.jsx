@@ -48,6 +48,7 @@ const DevicePickupDashboard = () => {
   const [regionData, setRegionData] = useState([])
   const [allStore, setAllStore] = useState([])
   const firsttime = useRef(true)
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin'
   const getData = () => {
     setIsTableLoaded(true)
     const config = {
@@ -130,15 +131,17 @@ const DevicePickupDashboard = () => {
         setIsTableLoaded(false)
       })
   }
+
   useEffect(() => {
-    if (firsttime.current && !!storeName && !!region) {
+    if (firsttime.current) {
       getData()
       getStore()
       firsttime.current = false
-    } else if (!firsttime.current && !!storeName && !!region) {
+    } else {
       getDataBySearch()
     }
-  }, [statusValue, dateValue, storeName, region])
+  }, [statusValue, dateValue, storeName, region, searchValue])
+
   return (
     <div className='min-h-screen bg-white pb-8'>
       <ExtComps
@@ -193,6 +196,7 @@ const DevicePickupDashboard = () => {
         pendingTableData={pendingTableData}
         setSelectedStatus={setSelectedStatus}
         getData={getData}
+        isSuperAdmin={isSuperAdmin}
       />
       <PDTable
         pendingTableData={pendingTableData}

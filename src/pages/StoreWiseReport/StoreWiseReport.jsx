@@ -55,7 +55,7 @@ const downloadExcelStoreWise = (apiData) => {
   saveAs(dataFileStoreWise, "StoreWise_Report" + fileExtension);
 };
 
-const fetchDownloadDataStoreWise = (deviceCategory, fromDate, toDate) => {
+const fetchDownloadDataStoreWise = (deviceCategory, fromDate, toDate, storeId, token) => {
   if (!fromDate || !toDate) {
     alert("Set dates before Downloading");
     return;
@@ -63,9 +63,8 @@ const fetchDownloadDataStoreWise = (deviceCategory, fromDate, toDate) => {
   const userToken = sessionStorage.getItem("authToken");
   axios
     .get(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}&startDate=${fromDate}&endDate=${toDate}`,
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}&startDate=${fromDate}&endDate=${toDate}&store=${storeId}`,
       {
         headers: {
           authorization: `${userToken}`,
@@ -81,6 +80,8 @@ const fetchDownloadDataStoreWise = (deviceCategory, fromDate, toDate) => {
 };
 const StoreWiseReport = () => {
   const token = sessionStorage.getItem("authToken");
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
   const [maxPages, setMaxPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [tableData, setTableData] = useState();
@@ -109,7 +110,7 @@ const StoreWiseReport = () => {
         &limit=${pageLimit}&is_selled=${isSelled}
         &store=${storeId}&rid=${searchValue}&grestRec=${grestRec}&endDate=${toDateDup}
         &startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
-        { headers: { Authorization: token } })
+      { headers: { Authorization: token } })
       .then((res) => {
         setMaxPages(Math.ceil(res.data.totalCounts / 10));
         setTableData(res.data.data);
@@ -182,10 +183,12 @@ const StoreWiseReport = () => {
     }
   };
   useEffect(() => {
-    getStore();
     getCategories();
-    getTechnicians();
-  }, []);
+    if (isSuperAdmin) {
+      getStore();
+      getTechnicians();
+    }
+  }, [isSuperAdmin]);
 
   useEffect(() => {
     fetchStoreData();
@@ -197,38 +200,38 @@ const StoreWiseReport = () => {
     }
   }, [storeId]);
 
- const handleSearchClear = () => {
-  setStoreName(ALLstore);
-  setStoreId("");
-  setRegion("");
-  setSearchValue("");
-  setFromDate("");
-  setFromDateDup(startDateFillter);
-  setToDate("");
-  setToDateDup(new Date().toISOString().split("T")[0]);
-  setGrestRec("");
-  setTechId("");
-  setTechName("");
-  setSearchTerm("");
- };
+  const handleSearchClear = () => {
+    setStoreName(ALLstore);
+    setStoreId("");
+    setRegion("");
+    setSearchValue("");
+    setFromDate("");
+    setFromDateDup(startDateFillter);
+    setToDate("");
+    setToDateDup(new Date().toISOString().split("T")[0]);
+    setGrestRec("");
+    setTechId("");
+    setTechName("");
+    setSearchTerm("");
+  };
   useEffect(() => {
-     if (storeId === "" &&
-       region === "" &&
-       searchValue === "" &&
-       fromDate === "" &&
-       fromDateDup === startDateFillter &&
-       toDate === "" &&
-       toDateDup === new Date().toISOString().split("T")[0] &&
-       grestRec === "" &&
-       techId === "" &&
-       techName === "" &&
-       searchTerm === ""
-     ) {
-       fetchStoreData();
-     }
-   }, [storeId, region, searchValue, fromDate, fromDateDup, toDate, toDateDup, grestRec,
-     techId, techName, searchTerm
-    ]);
+    if (storeId === "" &&
+      region === "" &&
+      searchValue === "" &&
+      fromDate === "" &&
+      fromDateDup === startDateFillter &&
+      toDate === "" &&
+      toDateDup === new Date().toISOString().split("T")[0] &&
+      grestRec === "" &&
+      techId === "" &&
+      techName === "" &&
+      searchTerm === ""
+    ) {
+      fetchStoreData();
+    }
+  }, [storeId, region, searchValue, fromDate, fromDateDup, toDate, toDateDup, grestRec,
+    techId, techName, searchTerm
+  ]);
   return (
     <div>
       <UpperFilter
@@ -242,6 +245,8 @@ const StoreWiseReport = () => {
         handleSearchClear={handleSearchClear}
         fetchStoreData={fetchStoreData}
         categories={categories}
+        token={token}
+        storeId={storeId}
       />
       <MainFilter
         techName={techName}
@@ -266,6 +271,7 @@ const StoreWiseReport = () => {
         setToDate={setToDate}
         setFromDate={setFromDate}
         handleSearchClear={handleSearchClear}
+        isSuperAdmin={isSuperAdmin}
       />
       <TableCont
         currentPage={currentPage}
@@ -289,7 +295,9 @@ const UpperFilter = ({
   toDate,
   handleSearchClear,
   fetchStoreData,
-  categories
+  categories,
+  storeId,
+  token
 }) => {
   const [sideMenu, setsideMenu] = useState(false);
   return (
@@ -344,7 +352,7 @@ const UpperFilter = ({
           <button
             className={`${styles.bulkdown_button}`}
             onClick={() =>
-              fetchDownloadDataStoreWise(deviceCategory, fromDate, toDate)
+              fetchDownloadDataStoreWise(deviceCategory, fromDate, toDate, storeId, token)
             }
           >
             <FaDownload /> Bulk Download
@@ -378,6 +386,7 @@ const MainFilter = ({
   setToDate,
   setFromDate,
   handleSearchClear,
+  isSuperAdmin,
 }) => {
   const [regionDrop, setRegionDrop] = useState(false);
   const [storeDrop, setStoreDrop] = useState(false);
@@ -423,7 +432,7 @@ const MainFilter = ({
         );
         const formattedFromDate = new Date(
           fromDateOneYearBefore.getTime() -
-            fromDateOneYearBefore.getTimezoneOffset() * 60000
+          fromDateOneYearBefore.getTimezoneOffset() * 60000
         )
           .toISOString()
           .split("T")[0];
@@ -492,6 +501,7 @@ const MainFilter = ({
         toDate={toDate}
         handleToDateChange={handleToDateChange}
         handleSearchClear={handleSearchClear}
+        isSuperAdmin={isSuperAdmin}
       />
     </div>
   );
@@ -524,6 +534,7 @@ const MainFilterSub = ({
   toDate,
   handleToDateChange,
   handleSearchClear,
+  isSuperAdmin,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStores, setFilteredStores] = useState(storeData);
@@ -600,82 +611,86 @@ const MainFilterSub = ({
           </div>
         )}
       </div>
-      <div className="relative w-[20%]">
-        <div
-          className={`${styles.filter_button}`}
-          onClick={() => {
-            setRegionDrop(!regionDrop);
-          }}
-        >
-          <p className="truncate">{region === "" ? "Select Region" : region}</p>
-          <FaAngleDown size={17} className={`${regionDrop && rotateCss}`} />
-        </div>
-        {regionDrop && (
-          <div className={`${styles.filter_drop}`}>
-            {regionalData.map((item) => (
-              <div
-                key={item}
-                onClick={() => handleRegionChange(item)}
-                className={`${styles.filter_option}`}
-              >
-                <p className="truncate">{item}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="relative w-[35%]">
-        <div
-          className={`${styles.filter_button}`}
-          onClick={() => setStoreDrop(!storeDrop)}
-        >
-          <p className="truncate">
-            {searchTerm === "" ? "Select Store" : searchTerm}
-          </p>
-          <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
-        </div>
-        {storeDrop && (
-          <div className="absolute w-full bg-white shadow-md">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleSearch}
-              className="w-full p-2 border-b border-gray-300"
-              placeholder="Search store..."
-            />
+      {isSuperAdmin && (
+        <>
+          <div className="relative w-[20%]">
             <div
-              className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
+              className={`${styles.filter_button}`}
+              onClick={() => {
+                setRegionDrop(!regionDrop);
+              }}
             >
-              {filteredStores.length > 0 ? (
-                filteredStores.map((item, index) => (
+              <p className="truncate">{region === "" ? "Select Region" : region}</p>
+              <FaAngleDown size={17} className={`${regionDrop && rotateCss}`} />
+            </div>
+            {regionDrop && (
+              <div className={`${styles.filter_drop}`}>
+                {regionalData.map((item) => (
                   <div
-                    key={index}
-                    onClick={() => {
-                      handleStoreChange(item);
-                      setSearchTerm(item.storeName);
-                      setStoreDrop(false);
-                    }}
+                    key={item}
+                    onClick={() => handleRegionChange(item)}
                     className={`${styles.filter_option}`}
                   >
-                    <p className="truncate">{item.storeName}</p>
+                    <p className="truncate">{item}</p>
                   </div>
-                ))
-              ) : (
-                <p className="p-2 text-gray-500">No stores found</p>
-              )}
-              <div
-                className={`${styles.filter_option}`}
-                onClick={() => {
-                  handleSearchClear();
-                  setStoreDrop(false);
-                }}
-                >
-                <p className="truncate">{ALLstore}</p>
+                ))}
               </div>
-            </div>
+            )}
           </div>
-        )}
-      </div>
+          <div className="relative w-[35%]">
+            <div
+              className={`${styles.filter_button}`}
+              onClick={() => setStoreDrop(!storeDrop)}
+            >
+              <p className="truncate">
+                {searchTerm === "" ? "Select Store" : searchTerm}
+              </p>
+              <FaAngleDown size={17} className={`${storeDrop && rotateCss}`} />
+            </div>
+            {storeDrop && (
+              <div className="absolute w-full bg-white shadow-md">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="w-full p-2 border-b border-gray-300"
+                  placeholder="Search store..."
+                />
+                <div
+                  className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop}`}
+                >
+                  {filteredStores.length > 0 ? (
+                    filteredStores.map((item, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          handleStoreChange(item);
+                          setSearchTerm(item.storeName);
+                          setStoreDrop(false);
+                        }}
+                        className={`${styles.filter_option}`}
+                      >
+                        <p className="truncate">{item.storeName}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="p-2 text-gray-500">No stores found</p>
+                  )}
+                  <div
+                    className={`${styles.filter_option}`}
+                    onClick={() => {
+                      handleSearchClear();
+                      setStoreDrop(false);
+                    }}
+                  >
+                    <p className="truncate">{ALLstore}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
       <div className="w-[15%]">
         <DatePicker
           selected={fromDate}
@@ -708,20 +723,18 @@ const TableCont = ({ currentPage, tableData, setCurrentPage, maxPages }) => {
         <button
           onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
-          className={`mx-2 px-4 py-2 rounded-lg ${
-            currentPage === 0
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-primary text-white cursor-pointer"
-          }`}
+          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === 0
+            ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+            : "bg-primary text-white cursor-pointer"
+            }`}
         >Previous</button>
         <button
           onClick={() => setCurrentPage(currentPage + 1)}
           disabled={currentPage === maxPages - 1}
-          className={`mx-2 px-4 py-2 rounded-lg ${
-            currentPage === maxPages - 1
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-primary text-white cursor-pointer"
-          }`}
+          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === maxPages - 1
+            ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+            : "bg-primary text-white cursor-pointer"
+            }`}
         >Next</button>
       </div>
     </React.Fragment>

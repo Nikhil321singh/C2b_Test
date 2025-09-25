@@ -20,9 +20,8 @@ const getStore = async () => {
   const token = sessionStorage.getItem("authToken");
   const config = {
     method: "get",
-    url: `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/store/findAll?page=0&limit=9999`,
+    url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/store/findAll?page=0&limit=9999`,
     headers: { Authorization: token },
   };
   let storeNamesArray = [];
@@ -51,8 +50,7 @@ const fetchDownloadDataCustomerTable = (
   const userToken = sessionStorage.getItem("authToken");
   axios
     .get(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/prospects/findAll/ordercreated?page=${currentSalesPage}&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
       { headers: { authorization: userToken } }
     )
@@ -143,7 +141,7 @@ const CustomerTable = () => {
     const userToken = sessionStorage.getItem("authToken");
     axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll/ordercreated?page=${currentSalesPage
       }&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
-      {headers: {authorization: userToken}})
+      { headers: { authorization: userToken } })
       .then((res) => {
         setTableDataDup(res.data.data.orderData.data);
         setLoading(false);
@@ -231,15 +229,17 @@ const CustomerTable = () => {
           /><IoMdSearch size={25} onClick={() => myordercretad()} /></div>
         <div className={styles.icons_box}><IoRefresh onClick={handleSearchClear} className="" size={25} /></div>
         <button className={`${styles.bulkdown_button}`}
-          onClick={() => fetchDownloadDataCustomerTable(toDateDup,fromDateDup,search,selStoreId)}
+          onClick={() => fetchDownloadDataCustomerTable(toDateDup, fromDateDup, search, selStoreId)}
         ><FaDownload /> Bulk Download</button>
-        <div className="[bg-[#F5F4F9]"><DatePicker
+        <div className="[bg-[#F5F4F9]">
+          <DatePicker
             selected={fromDate}
             onChange={handleFromDateChange}
             dateFormat="yyyy-MM-dd"
             className={` mt-1 py-[6px] px-[15px] border rounded-md`}
             placeholderText="Select from date"
-        /></div>
+          />
+        </div>
         <div>
           <DatePicker
             selected={toDate}
@@ -249,46 +249,48 @@ const CustomerTable = () => {
             placeholderText="Select to date"
           />
         </div>
-        <div className="relative w-[250px]">
-          <div className={`${styless.filter_button}`}
-            onClick={() => {
-              setStoreDrop(!storeDrop);
-            }}
-          ><p className="truncate">{storeName === allStore ? "Select Store" : storeName}</p>
-            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
-          </div>
-          {storeDrop && (
-            <div className="absolute w-full bg-white shadow-md">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
-                placeholder="Search store..."
-              />
-              <div className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}>
-                {filteredStores.length > 0 ? (
-                  filteredStores.map((item, index) => (
-                    <div key={index}
-                      onClick={() => {
-                        handleStoreChange(item);
-                        setSearchTerm(item.storeName);
-                        setStoreDrop(false);
-                      }}
-                      className={`${styles.filter_option}`}
-                    ><p className="truncate">{item.storeName}</p></div>
-                  ))
-                ) : (<p className="p-2 text-gray-500">No stores found</p>)}
-                <div className={`${styles.filter_option}`}
-                  onClick={() => {
-                    handleStoreChange({ _id: "", storeName: ALLstore });
-                    setSearchTerm(ALLstore);
-                  }}
-                ><p className="truncate">{ALLstore}</p></div>
-              </div>
+        {storeData && storeData.length > 1 && (
+          <div className="relative w-[250px]">
+            <div className={`${styless.filter_button}`}
+              onClick={() => {
+                setStoreDrop(!storeDrop);
+              }}
+            ><p className="truncate">{storeName === allStore ? "Select Store" : storeName}</p>
+              <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
             </div>
-          )}
-        </div>
+            {storeDrop && (
+              <div className="absolute w-full bg-white shadow-md">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="w-full p-2 border-b border-gray-300"
+                  placeholder="Search store..."
+                />
+                <div className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}>
+                  <div className={`${styles.filter_option}`}
+                    onClick={() => {
+                      handleStoreChange({ _id: "", storeName: ALLstore });
+                      setSearchTerm(ALLstore);
+                    }}
+                  ><p className="truncate">{ALLstore}</p></div>
+                  {filteredStores.length > 0 ? (
+                    filteredStores.map((item, index) => (
+                      <div key={index}
+                        onClick={() => {
+                          handleStoreChange(item);
+                          setSearchTerm(item.storeName);
+                          setStoreDrop(false);
+                        }}
+                        className={`${styles.filter_option}`}
+                      ><p className="truncate">{item.storeName}</p></div>
+                    ))
+                  ) : (<p className="p-2 text-gray-500">No stores found</p>)}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       <UserTable data={tableDataDup} />
     </div>

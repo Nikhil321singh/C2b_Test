@@ -43,6 +43,7 @@ const PickedUpDevices = () => {
   const userRole = LoggedInUser?.role || ''
   const QRole = userRole === 'Technician' ? userRole : 'Admin'
   const token = sessionStorage.getItem('authToken')
+  const isSuperAdmin = userRole === 'Super Admin'
   const userProfile = useSelector((state) => state.user)
   const [data, setData] = useState([])
   const [isTableLoaded, setIsTableLoaded] = useState(false)
@@ -138,12 +139,14 @@ const PickedUpDevices = () => {
   useEffect(() => {
     if (firsttime.current && !!storeName && !!region) {
       getData()
-      getStore()
+      if (isSuperAdmin) {
+        getStore()
+      }
       firsttime.current = false
-    } else if (!firsttime.current && !!storeName && !!region) {
+    } else if (!firsttime.current) {
       getDataBySearch()
     }
-  }, [dateValue, storeName, region])
+  }, [dateValue, storeName, region, searchValue])
 
   const confHandler = (id, uniqueCode) => {
     console.log(id)
@@ -192,6 +195,7 @@ const PickedUpDevices = () => {
         setStoreData={setStoreData}
         storeData={storeData}
         getData={getData}
+        isSuperAdmin={isSuperAdmin}
       />
       <PickedUpDevicesTable
         data={data}
@@ -436,6 +440,7 @@ const PickedUpFilter = ({
   setStoreData,
   storeData,
   getData,
+  isSuperAdmin,
 }) => {
   const [regionDrop, setRegionDrop] = useState(false)
   const [storeDrop, setStoreDrop] = useState(false)
@@ -536,80 +541,85 @@ const PickedUpFilter = ({
           </div>
         </div>
       </div>
-      <div className='flex gap-2 w-100 items-center outline-none'>
-        <div className='relative w-[45%]'>
-          <div
-            className={`${styles.filter_button}`}
-            onClick={() => {
-              setRegionDrop(!regionDrop)
-            }}
-          >
-            <p className='truncate'>
-              {region === '' ? 'Select Region' : region}
-            </p>
-            <FaAngleDown
-              size={17}
-              className={`${regionDrop && 'rotate-180'}`}
-            />
-          </div>
-          {regionDrop && (
-            <div className={`${styles.filter_drop}`}>
-              {regionData.map((element) => (
-                <div
-                  key={element}
-                  className={`${styles.filter_option}`}
-                  onClick={() => handleRegionChange(element)}
-                >
-                  <p className='truncate'>{element}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className='relative w-[70%]'>
-          <div
-            className={`${styles.filter_button} w-full`}
-            onClick={() => setStoreDrop(!storeDrop)}
-          >
-            <p className='  truncate'>
-              {searchTerm === '' ? 'Select Store' : searchTerm}
-            </p>
-            <FaAngleDown className={`${storeDrop && 'rotate-180'}`} size={17} />
-          </div>
-          {storeDrop && (
-            <div className='absolute w-full bg-white   shadow-md'>
-              <input
-                type='text'
-                onChange={handleSearch}
-                value={searchTerm}
-                className='w-full p-2 border-b   border-gray-300'
-                placeholder='Search store...'
+      {isSuperAdmin && (
+        <div className='flex gap-2 w-100 items-center outline-none'>
+          <div className='relative w-[45%]'>
+            <div
+              className={`${styles.filter_button}`}
+              onClick={() => {
+                setRegionDrop(!regionDrop)
+              }}
+            >
+              <p className='truncate'>
+                {region === '' ? 'Select Region' : region}
+              </p>
+              <FaAngleDown
+                size={17}
+                className={`${regionDrop && 'rotate-180'}`}
               />
-              <div
-                className={`overflow-y-scroll   max-h-[200px] ${styles.filter_drop} w-full`}
-              >
-                {filteredStores.length > 0 ? (
-                  filteredStores.map((item2, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        handleStoreChange(item2)
-                        setSearchTerm(item2)
-                        setStoreDrop(false)
-                      }}
-                      className={`${styles.filter_option}`}
-                    >
-                      <p className='truncate'>{item2}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className='p-2   text-gray-500'>No stores found</p>
-                )}
-              </div>
             </div>
-          )}
+            {regionDrop && (
+              <div className={`${styles.filter_drop}`}>
+                {regionData.map((element) => (
+                  <div
+                    key={element}
+                    className={`${styles.filter_option}`}
+                    onClick={() => handleRegionChange(element)}
+                  >
+                    <p className='truncate'>{element}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className='relative w-[70%]'>
+            <div
+              className={`${styles.filter_button} w-full`}
+              onClick={() => setStoreDrop(!storeDrop)}
+            >
+              <p className='  truncate'>
+                {searchTerm === '' ? 'Select Store' : searchTerm}
+              </p>
+              <FaAngleDown
+                className={`${storeDrop && 'rotate-180'}`}
+                size={17}
+              />
+            </div>
+            {storeDrop && (
+              <div className='absolute w-full bg-white   shadow-md'>
+                <input
+                  type='text'
+                  onChange={handleSearch}
+                  value={searchTerm}
+                  className='w-full p-2 border-b   border-gray-300'
+                  placeholder='Search store...'
+                />
+                <div
+                  className={`overflow-y-scroll   max-h-[200px] ${styles.filter_drop} w-full`}
+                >
+                  {filteredStores.length > 0 ? (
+                    filteredStores.map((item2, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          handleStoreChange(item2)
+                          setSearchTerm(item2)
+                          setStoreDrop(false)
+                        }}
+                        className={`${styles.filter_option}`}
+                      >
+                        <p className='truncate'>{item2}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className='p-2   text-gray-500'>No stores found</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
