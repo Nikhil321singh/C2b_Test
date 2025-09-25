@@ -414,6 +414,8 @@ const PDTable = ({
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showHoldModal, setShowHoldModal] = useState(false)
   const [showQCDoneModal, setShowQCDoneModal] = useState(false)
+  const [showAvailableForPickupModal, setShowAvailableForPickupModal] = useState(false)
+  const [showPendingInQCModal, setShowPendingInQCModal] = useState(false)
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {
       setErrorMsg('No device selected')
@@ -428,24 +430,16 @@ const PDTable = ({
       .map((obj) => obj._id.toString())
     let config
     if (newStatus === PickupAvail) {
-      config = {
-        method: 'post',
-        url: `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pendingDevices/update`,
-        headers: {
-          Authorization: token2,
-        },
-        data: {
-          deviceIDs: selectedIds,
-          newStatus: newStatus,
-        },
-      }
+      setShowAvailableForPickupModal(true)
+      return
     } else if (newStatus === 'On Hold') {
       setShowHoldModal(true)
       return
     } else if (newStatus === 'QC Done') {
       setShowQCDoneModal(true)
+      return
+    } else if (newStatus === 'Pending in QC') {
+      setShowPendingInQCModal(true)
       return
     } else if (newStatus === 'Cancelled') {
       setShowCancelModal(true)
@@ -517,6 +511,7 @@ const PDTable = ({
           <option value=''>Status</option>
           <option value={PickupAvail}>Available For Pickup</option>
           <option value='QC Done'>QC Done</option>
+          <option value='Pending in QC'>Pending in QC</option>
           <option value='On Hold'>On Hold</option>
           <option value='Cancelled'>Cancelled</option>
         </select>
@@ -562,6 +557,36 @@ const PDTable = ({
       {showQCDoneModal && (
         <QCDoneModal
           setShowQCDoneModal={setShowQCDoneModal}
+          setIsTableLoaded={setIsTableLoaded}
+          token2={token2}
+          selectedIds={selectedIds}
+          getData={getData}
+          setSelectedIds={setSelectedIds}
+          setSelectedData={setSelectedData}
+          setSelectedRows={setSelectedRows}
+          setErrorMsg={setErrorMsg}
+          setSuccessMod={setSuccessMod}
+          setFailMode={setFailMode}
+        />
+      )}
+      {showAvailableForPickupModal && (
+        <AvailableForPickupModal
+          setShowAvailableForPickupModal={setShowAvailableForPickupModal}
+          setIsTableLoaded={setIsTableLoaded}
+          token2={token2}
+          selectedIds={selectedIds}
+          getData={getData}
+          setSelectedIds={setSelectedIds}
+          setSelectedData={setSelectedData}
+          setSelectedRows={setSelectedRows}
+          setErrorMsg={setErrorMsg}
+          setSuccessMod={setSuccessMod}
+          setFailMode={setFailMode}
+        />
+      )}
+      {showPendingInQCModal && (
+        <PendingInQCModal
+          setShowPendingInQCModal={setShowPendingInQCModal}
           setIsTableLoaded={setIsTableLoaded}
           token2={token2}
           selectedIds={selectedIds}
@@ -784,7 +809,7 @@ const QCDoneModal = ({
         setFailMode(true)
       })
     setShowQCDoneModal(false)
-    setHoldReason('')
+    setQCDoneReason('')
   }
   return (
     <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
@@ -804,6 +829,162 @@ const QCDoneModal = ({
           <button
             onClick={() => {
               setShowQCDoneModal(false)
+              setIsTableLoaded(false)
+            }}
+            className='bg-white text-primary'
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const AvailableForPickupModal = ({
+  setShowAvailableForPickupModal,
+  setIsTableLoaded,
+  token2,
+  selectedIds,
+  getData,
+  setSelectedIds,
+  setSelectedData,
+  setSelectedRows,
+  setErrorMsg,
+  setSuccessMod,
+  setFailMode,
+}) => {
+  const [availableForPickupReason, setAvailableForPickupReason] = useState('')
+  const handleAvailableForPickupSubmit = () => {
+    setIsTableLoaded(true)
+    const config = {
+      method: 'post',
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/update`,
+      headers: {
+        Authorization: token2,
+      },
+      data: {
+        deviceIDs: selectedIds,
+        newStatus: 'Available For Pickup',
+        reason: availableForPickupReason,
+      },
+    }
+    axios
+      .request(config)
+      .then((response) => {
+        getData()
+        setSelectedIds([])
+        setSelectedData([])
+        setSelectedRows([])
+        setErrorMsg(`Successfully updated status to Available For Pickup`)
+        setSuccessMod(true)
+      })
+      .catch((error) => {
+        setIsTableLoaded(false)
+        setErrorMsg(updateStatusError)
+        setFailMode(true)
+      })
+    setShowAvailableForPickupModal(false)
+    setAvailableForPickupReason('')
+  }
+  return (
+    <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>Available For Pickup Reason</h6>
+        <input
+          type='text'
+          value={availableForPickupReason}
+          onChange={(e) => setAvailableForPickupReason(e.target.value)}
+          className='border-2 border-primary rounded-md px-4 py-2 mb-4 w-full'
+          placeholder='Enter Reason for Available For Pickup'
+        />
+        <div className='flex flex-row gap-2'>
+          <button onClick={handleAvailableForPickupSubmit} className={buttonStyles}>
+            Okay
+          </button>
+          <button
+            onClick={() => {
+              setShowAvailableForPickupModal(false)
+              setIsTableLoaded(false)
+            }}
+            className='bg-white text-primary'
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const PendingInQCModal = ({
+  setShowPendingInQCModal,
+  setIsTableLoaded,
+  token2,
+  selectedIds,
+  getData,
+  setSelectedIds,
+  setSelectedData,
+  setSelectedRows,
+  setErrorMsg,
+  setSuccessMod,
+  setFailMode,
+}) => {
+  const [pendingInQCReason, setPendingInQCReason] = useState('')
+  const handlePendingInQCSubmit = () => {
+    setIsTableLoaded(true)
+    const config = {
+      method: 'post',
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pendingDevices/update`,
+      headers: {
+        Authorization: token2,
+      },
+      data: {
+        deviceIDs: selectedIds,
+        newStatus: 'Pending in QC',
+        reason: pendingInQCReason,
+      },
+    }
+    axios
+      .request(config)
+      .then((response) => {
+        getData()
+        setSelectedIds([])
+        setSelectedData([])
+        setSelectedRows([])
+        setErrorMsg(`Successfully updated status to Pending in QC`)
+        setSuccessMod(true)
+      })
+      .catch((error) => {
+        setIsTableLoaded(false)
+        setErrorMsg(updateStatusError)
+        setFailMode(true)
+      })
+    setShowPendingInQCModal(false)
+    setPendingInQCReason('')
+  }
+  return (
+    <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>Pending in QC Reason</h6>
+        <input
+          type='text'
+          value={pendingInQCReason}
+          onChange={(e) => setPendingInQCReason(e.target.value)}
+          className='border-2 border-primary rounded-md px-4 py-2 mb-4 w-full'
+          placeholder='Enter Reason for Pending in QC'
+        />
+        <div className='flex flex-row gap-2'>
+          <button onClick={handlePendingInQCSubmit} className={buttonStyles}>
+            Okay
+          </button>
+          <button
+            onClick={() => {
+              setShowPendingInQCModal(false)
               setIsTableLoaded(false)
             }}
             className='bg-white text-primary'
