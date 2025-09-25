@@ -32,8 +32,9 @@ const checkOnPkd = 'Check it On Picked Up'
 const PendingConf = 'Pending Pickup Confirmation'
 const DeliveredConf = 'Delivered At Warehouse'
 const PickupCompleteConf = 'Pickup Complete'
-const PickupCancelConf = 'Out for Pickup'
+const PickupCancelConf = 'Pickup Cancelled'
 const PickConf = 'Pending Delivery At Warehouse' //Technican Earlier - Pickup Confirmed
+const OutForPickup = 'Out For Pickup'
 const PickDelivered = 'Pickup Delivered At Warehouse' //Technican
 const ApprovDelivery = 'Approved Delivery At Warehouse' //Admin Manager
 const FinalStatus = 'Payment Confirmed' //Admin Manager
@@ -682,6 +683,7 @@ const PickedUpDevicesTable = ({
   const [showPickupDeliveredModal, setShowPickupDeliveredModal] = useState(false)
   const [showAcceptModal, setShowAcceptModal] = useState(false)
   const [showApproveDeliveryModal, setShowApproveDeliveryModal] = useState(false)
+  const [showOutForPickupModal, setShowOutForPickupModal] = useState(false)
   const [tempRefId, setTempRefId] = useState('')
   const [tempUniqueCode, setTempUniqueCode] = useState('')
   const [tempNewStatus, setTempNewStatus] = useState('')
@@ -708,6 +710,8 @@ const PickedUpDevicesTable = ({
       setShowAcceptModal(true)
     } else if (newStatus === ApprovDelivery) {
       setShowApproveDeliveryModal(true)
+    } else if (newStatus === OutForPickup) {
+      setShowOutForPickupModal(true)
     } else {
       // Direct update for other statuses
       performStatusUpdate(refID, newStatus, uniqueCode, '')
@@ -942,6 +946,17 @@ const PickedUpDevicesTable = ({
           onClose={() => setShowApproveDeliveryModal(false)}
         />
       )}
+      {showOutForPickupModal && (
+        <ReasonModal
+          title="Out For Pickup Reason"
+          placeholder="Enter reason for sending out for pickup"
+          onSubmit={(reason) => {
+            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            setShowOutForPickupModal(false)
+          }}
+          onClose={() => setShowOutForPickupModal(false)}
+        />
+      )}
     </div>
   )
 }
@@ -1020,6 +1035,18 @@ const UserAdminContent = ({
               Pickup Cancel
             </button>
           </div>
+        </div>
+      )}
+      {val.status === PickupCancelConf && (
+        <div className='flex flex-col gap-1'>
+          <button
+            onClick={() =>
+              statusUpdateHandler(val?._id, OutForPickup, val?.uniqueCode)
+            }
+            className={`${styles.acpt_btn}`}
+          >
+            Out For Pickup
+          </button>
         </div>
       )}
     </div>
