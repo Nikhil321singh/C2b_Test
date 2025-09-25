@@ -1,153 +1,160 @@
-import React, { useEffect, useState, useRef } from "react";
-import NavigateTable from "../../components/NavigateTable/NavigateTable";
-import axios from "axios";
-import styles from "./PickedUpDevices.module.css";
-import ProfileBox from "../../components/ProfileBox/ProfileBox";
-const currentDomain = window.location.origin;
-const DEFAULT_LOGO = "/Grest_Logo.jpg";
-const BUYBACK_LOGO = "/Grest_Logo_2.jpg"; // Use your actual buyback logo
+import React, { useEffect, useState, useRef } from 'react'
+import NavigateTable from '../../components/NavigateTable/NavigateTable'
+import axios from 'axios'
+import styles from './PickedUpDevices.module.css'
+import ProfileBox from '../../components/ProfileBox/ProfileBox'
+const currentDomain = window.location.origin
+const DEFAULT_LOGO = '/Grest_Logo.jpg'
+const BUYBACK_LOGO = '/Grest_Logo_2.jpg' // Use your actual buyback logo
 
-const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
-const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
-import ViewPickupTable from "../../components/ViewPickupTable/ViewPickupTable";
-import UploadReceiptModal from "../../components/UploadReceiptModal";
+const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL
+const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO
+import ViewPickupTable from '../../components/ViewPickupTable/ViewPickupTable'
+import UploadReceiptModal from '../../components/UploadReceiptModal'
 import {
   IoIosCheckmarkCircle,
   IoIosCloseCircle,
   IoMdSearch,
-} from "react-icons/io";
-import { IoRefresh } from "react-icons/io5";
-import { FaAngleDown } from "react-icons/fa6";
-import AdminNavbar from "../../components/Admin_Navbar";
-import SideMenu from "../../components/SideMenu";
-import { BsCalendarDate } from "react-icons/bs";
-import { BeatLoader } from "react-spinners";
-import { useDispatch, useSelector } from "react-redux";
-import { setStoreFilter } from "../../store/slices/userSlice";
+} from 'react-icons/io'
+import { IoRefresh } from 'react-icons/io5'
+import { FaAngleDown } from 'react-icons/fa6'
+import AdminNavbar from '../../components/Admin_Navbar'
+import SideMenu from '../../components/SideMenu'
+import { BsCalendarDate } from 'react-icons/bs'
+import { BeatLoader } from 'react-spinners'
+import { useDispatch, useSelector } from 'react-redux'
+import { setStoreFilter } from '../../store/slices/userSlice'
 
-const userRoles = ["Pickup", "Payroll"];
-const succTextColor = "text-green-500";
-const failTextColor = "text-primary";
-const checkOnPkd = "Check it On Picked Up";
-const PendingConf = "Pending Pickup Confirmation";
-const PickConf = "Pending Delivery At Warehouse"; //Technican Earlier - Pickup Confirmed
-const PickDelivered = "Pickup Delivered At Warehouse"; //Technican
-const ApprovDelivery = "Approved Delivery At Warehouse"; //Admin Manager
-const FinalStatus = "Payment Confirmed"; //Admin Manager
+const userRoles = ['Pickup', 'Payroll']
+const succTextColor = 'text-green-500'
+const failTextColor = 'text-primary'
+const checkOnPkd = 'Check it On Picked Up'
+const PendingConf = 'Pending Pickup Confirmation'
+const DeliveredConf = 'Delivered At Warehouse'
+const PickupCompleteConf = 'Pickup Complete'
+const PickupCancelConf = 'Pickup Cancelled'
+const PickConf = 'Pending Delivery At Warehouse' //Technican Earlier - Pickup Confirmed
+const OutForPickup = 'Out For Pickup'
+const PickDelivered = 'Pickup Delivered At Warehouse' //Technican
+const ApprovDelivery = 'Approved Delivery At Warehouse' //Admin Manager
+const FinalStatus = 'Payment Confirmed' //Admin Manager
 
 const PickedUpDevices = () => {
-  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-  const userRole = LoggedInUser?.role || "";
-  const QRole = userRole === "Technician" ? userRole : "Admin";
-  const token = sessionStorage.getItem("authToken");
-  const isSuperAdmin = userRole === 'Super Admin';
-  const userProfile = useSelector((state) => state.user);
-  const [data, setData] = useState([]);
-  const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [dateValue, setDateValue] = useState("");
-  const [searchValue, setSearchValue] = useState("");
-  const [tempId, setTempId] = useState();
-  const [tempUCode, setTempUCode] = useState();
-  const [successMod, setSuccessMod] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("successfully updated status");
-  const [errorMsg1, setErrorMsg1] = useState(null);
-  const [errorMsg2, setErrorMsg2] = useState(null);
-  const [confMod, setConfMod] = useState(false);
-  const [failMod, setFailMode] = useState(false);
-  const [region, setRegion] = useState(userProfile.selRegion);
-  const [storeName, setStoreName] = useState(userProfile.selStore);
-  const [regionData, setRegionData] = useState([]);
-  const [storeData, setStoreData] = useState([]);
-  const firsttime = useRef(true);
-  const [allStore, setAllStore] = useState([]);
-  const [uploadReceiptMod, setUploadReceiptMod] = useState(false);
+  const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
+  const userRole = LoggedInUser?.role || ''
+  const QRole = userRole === 'Technician' ? userRole : 'Admin'
+  const token = sessionStorage.getItem('authToken')
+  const isSuperAdmin = userRole === 'Super Admin'
+  const userProfile = useSelector((state) => state.user)
+  const [data, setData] = useState([])
+  const [isTableLoaded, setIsTableLoaded] = useState(false)
+  const [dateValue, setDateValue] = useState('')
+  const [searchValue, setSearchValue] = useState('')
+  const [tempId, setTempId] = useState()
+  const [tempUCode, setTempUCode] = useState()
+  const [successMod, setSuccessMod] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('successfully updated status')
+  const [errorMsg1, setErrorMsg1] = useState(null)
+  const [errorMsg2, setErrorMsg2] = useState(null)
+  const [confMod, setConfMod] = useState(false)
+  const [failMod, setFailMode] = useState(false)
+  const [region, setRegion] = useState(userProfile.selRegion)
+  const [storeName, setStoreName] = useState(userProfile.selStore)
+  const [regionData, setRegionData] = useState([])
+  const [storeData, setStoreData] = useState([])
+  const firsttime = useRef(true)
+  const [allStore, setAllStore] = useState([])
+  const [uploadReceiptMod, setUploadReceiptMod] = useState(false)
 
   const getData = () => {
-    setIsTableLoaded(true);
+    setIsTableLoaded(true)
     const configuration = {
-      method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pickupDevices/all?region=${region}&storeName=${storeName}&userRole=${QRole}`,
+      method: 'get',
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pickupDevices/all?region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
-    };
+    }
     axios
       .request(configuration)
       .then((res) => {
-        setData(res.data.data);
-        setIsTableLoaded(false);
+        setData(res.data.data)
+        setIsTableLoaded(false)
       })
       .catch((error) => {
-        setErrorMsg(`Failed to load data`);
-        setIsTableLoaded(false);
-        setFailMode(true);
-      });
-  };
+        setErrorMsg(`Failed to load data`)
+        setIsTableLoaded(false)
+        setFailMode(true)
+      })
+  }
 
   const getStore = () => {
-    setIsTableLoaded(true);
+    setIsTableLoaded(true)
     const configuration = {
-      method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/store/findAll?page=0&limit=9999`,
+      method: 'get',
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
-    };
+    }
     axios
       .request(configuration)
       .then((res) => {
-        const allData = res.data.result;
-        const storeNamesArr = res.data.result.map((store) => store.storeName);
+        const allData = res.data.result
+        const storeNamesArr = res.data.result.map((store) => store.storeName)
         const uniqueRegionsArr = [
           ...new Set(res.data.result.map((store) => store.region)),
-        ];
-        setStoreData(storeNamesArr);
-        setAllStore(allData);
-        setIsTableLoaded(false);
-        setRegionData(uniqueRegionsArr);
+        ]
+        setStoreData(storeNamesArr)
+        setAllStore(allData)
+        setIsTableLoaded(false)
+        setRegionData(uniqueRegionsArr)
       })
       .catch((error) => {
-        setIsTableLoaded(false);
-      });
-  };
+        setIsTableLoaded(false)
+      })
+  }
 
   const getDataBySearch = () => {
-    setIsTableLoaded(true);
+    setIsTableLoaded(true)
     const configuration = {
-      method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pickupDevices/search?rid=${searchValue}&date=${dateValue}&region=${region}&storeName=${storeName}&userRole=${QRole}`,
+      method: 'get',
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pickupDevices/search?rid=${searchValue}&date=${dateValue}&region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
-    };
+    }
     axios
       .request(configuration)
       .then((response) => {
-        setData(response.data.data);
-        setIsTableLoaded(false);
+        setData(response.data.data)
+        setIsTableLoaded(false)
       })
       .catch((error) => {
-        setErrorMsg(`Failed to load data`);
-        setFailMode(true);
-        setIsTableLoaded(false);
-      });
-  };
+        setErrorMsg(`Failed to load data`)
+        setFailMode(true)
+        setIsTableLoaded(false)
+      })
+  }
 
   useEffect(() => {
     if (firsttime.current && !!storeName && !!region) {
-      getData();
+      getData()
       if (isSuperAdmin) {
-        getStore();
+        getStore()
       }
-      firsttime.current = false;
+      firsttime.current = false
     } else if (!firsttime.current) {
-      getDataBySearch();
+      getDataBySearch()
     }
-  }, [dateValue, storeName, region, searchValue]);
+  }, [dateValue, storeName, region, searchValue])
 
   const confHandler = (id, uniqueCode) => {
-    console.log(id);
-    setTempId(id);
-    setTempUCode(uniqueCode);
-    setConfMod(true);
-  };
+    console.log(id)
+    setTempId(id)
+    setTempUCode(uniqueCode)
+    setConfMod(true)
+  }
 
   return (
     <div className={`${styles.pickedup_page}`}>
@@ -172,7 +179,7 @@ const PickedUpDevices = () => {
         uploadReceiptMod={uploadReceiptMod}
         setUploadReceiptMod={setUploadReceiptMod}
       />
-      <div className="flex flex-row m-2 gap-4"></div>
+      <div className='flex flex-row m-2 gap-4'></div>
       <NavigateTable />
       <PickedUpFilter
         setSearchValue={setSearchValue}
@@ -204,10 +211,45 @@ const PickedUpDevices = () => {
         setFailMode={setFailMode}
       />
     </div>
-  );
-};
+  )
+}
 
-export default PickedUpDevices;
+const ReasonModal = ({ title, placeholder, onSubmit, onClose }) => {
+  const [reason, setReason] = useState('')
+
+  const handleSubmit = () => {
+    onSubmit(reason)
+    setReason('')
+  }
+
+  return (
+    <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+      <div className={`${styles.err_mod_box} ${failTextColor}`}>
+        <h6 className={failTextColor}>{title}</h6>
+        <input
+          type='text'
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          className='border-2 border-primary rounded-md px-4 py-2 mb-4 w-full'
+          placeholder={placeholder}
+        />
+        <div className='flex flex-row gap-2'>
+          <button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded'>
+            Submit
+          </button>
+          <button
+            onClick={onClose}
+            className='bg-white text-primary border border-primary px-4 py-2 rounded'
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default PickedUpDevices
 
 const ExtComps = ({
   successMod,
@@ -230,113 +272,120 @@ const ExtComps = ({
   uploadReceiptMod,
   setUploadReceiptMod,
 }) => {
-  const [sideMenu, setsideMenu] = useState(false);
-  const token1 = sessionStorage.getItem("authToken");
-  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-  const userRole = LoggedInUser?.role || "";
+  const [sideMenu, setsideMenu] = useState(false)
+  const token1 = sessionStorage.getItem('authToken')
+  const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
+  const userRole = LoggedInUser?.role || ''
 
   const handleUploadReceipt = (file, remarks) => {
-    const formData = new FormData();
-    formData.append('paymentReceipt', file);
-    formData.append('remarks', remarks || '');
+    const formData = new FormData()
+    formData.append('paymentReceipt', file)
+    formData.append('remarks', remarks || '')
 
     const config = {
-      method: "put",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pickupDevices/updatePaymentReceipt/${tempId}`,
+      method: 'put',
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pickupDevices/updatePaymentReceipt/${tempId}`,
       headers: {
         Authorization: token1,
         // Don't set Content-Type, let axios handle it for multipart/form-data
       },
       data: formData,
       timeout: 60000, // 60 second timeout
-    };
+    }
 
     // Debug logging
 
-    return axios.request(config)
+    return axios
+      .request(config)
       .then((response) => {
-        setUploadReceiptMod(false); // Close modal on success
-        setErrorMsg(`Payment confirmed successfully for Lot ${tempUCode}`);
-        setErrorMsg1("Status updated to 'Pending Admin Approval'.");
-        setErrorMsg2("Receipt uploaded and email sent to store with Excel report.");
-        setSuccessMod(true);
-        getData(); // Refresh data
+        setUploadReceiptMod(false) // Close modal on success
+        setErrorMsg(`Payment confirmed successfully for Lot ${tempUCode}`)
+        setErrorMsg1("Status updated to 'Pending Admin Approval'.")
+        setErrorMsg2(
+          'Receipt uploaded and email sent to store with Excel report.'
+        )
+        setSuccessMod(true)
+        getData() // Refresh data
       })
       .catch((error) => {
-        const errorMessage = error.response?.data?.message || `Failed to upload receipt for Lot ${tempUCode}`;
-        setErrorMsg(errorMessage);
-        setFailMode(true);
-        throw error; // Re-throw so modal can handle it
-      });
-  };
+        const errorMessage =
+          error.response?.data?.message ||
+          `Failed to upload receipt for Lot ${tempUCode}`
+        setErrorMsg(errorMessage)
+        setFailMode(true)
+        throw error // Re-throw so modal can handle it
+      })
+  }
   const statusUpdHandler = (refID, newStatus, skipSuccessModal = false) => {
-    setConfMod(false);
-    setIsTableLoaded(true);
+    setConfMod(false)
+    setIsTableLoaded(true)
     const config = {
-      method: "post",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pickupDevices/update`,
+      method: 'post',
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pickupDevices/update`,
       headers: { Authorization: token1 },
       data: {
         refIDs: [refID],
         newStatus: newStatus,
       },
-    };
+    }
     axios
       .request(config)
       .then((response) => {
-        getData();
+        getData()
         if (!skipSuccessModal) {
           setErrorMsg(
             `Successfully Updated Status of Lot ${tempUCode} to ${newStatus}`
-          );
+          )
           if (newStatus === ApprovDelivery) {
-            setErrorMsg(`Delivery Approved for Lot ${refID}.`);
-            setErrorMsg1("Check it on history.");
+            setErrorMsg(`Delivery Approved for Lot ${refID}.`)
+            setErrorMsg1('Check it on history.')
           }
-          setSuccessMod(true);
+          setSuccessMod(true)
         } else {
           // Open upload modal after successful status update
-          setUploadReceiptMod(true);
+          setUploadReceiptMod(true)
         }
-        setIsTableLoaded(false);
+        setIsTableLoaded(false)
       })
       .catch((error) => {
-        setErrorMsg(`Failed to Updated Status of Lot ${refID} to ${newStatus}`);
-        setFailMode(true);
-        setIsTableLoaded(false);
-      });
-  };
+        setErrorMsg(`Failed to Updated Status of Lot ${refID} to ${newStatus}`)
+        setFailMode(true)
+        setIsTableLoaded(false)
+      })
+  }
   return (
     <React.Fragment>
-      <div className="flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER ">
-        {userRole === "Technician" ? (
-          <div className="flex items-center justify-between w-full ">
+      <div className='flex items-center border-b-2 w-screen h-16 py-4 bg-white HEADER '>
+        {userRole === 'Technician' ? (
+          <div className='flex items-center justify-between w-full '>
             <ProfileBox />
-            <img className="w-40" src={GREST_LOGO} alt="app logo" />
+            <img className='w-40' src={GREST_LOGO} alt='app logo' />
           </div>
         ) : (
-          <div className="navbar">
+          <div className='navbar'>
             <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
             <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
           </div>
         )}
       </div>
       {successMod && (
-        <div className="fixed left-0 top-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div className='fixed left-0 top-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
             <IoIosCheckmarkCircle size={90} className={succTextColor} />
             <h6 className={succTextColor}>Success!</h6>
-            <p className="text-green-500 block">{errorMsg}</p>
-            {errorMsg1 && <p className="text-slate-700 block">{errorMsg1}</p>}
-            {errorMsg2 && <p className="text-slate-700 block">{errorMsg2}</p>}
+            <p className='text-green-500 block'>{errorMsg}</p>
+            {errorMsg1 && <p className='text-slate-700 block'>{errorMsg1}</p>}
+            {errorMsg2 && <p className='text-slate-700 block'>{errorMsg2}</p>}
             <button
-              className={"text-white bg-green-500 "}
+              className={'text-white bg-green-500 '}
               onClick={() => {
-                setSuccessMod(false);
-                setErrorMsg1(null);
-                setErrorMsg2(null);
+                setSuccessMod(false)
+                setErrorMsg1(null)
+                setErrorMsg2(null)
               }}
             >
               Okay
@@ -345,16 +394,16 @@ const ExtComps = ({
         </div>
       )}
       {failMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
           <div className={`${styles.err_mod_box} ${failTextColor}`}>
             <IoIosCloseCircle className={failTextColor} size={90} />
             <h6 className={failTextColor}>Error!</h6>
-            <p className="text-slate-700">{errorMsg}</p>
+            <p className='text-slate-700'>{errorMsg}</p>
             <button
               onClick={() => {
-                setFailMode(false);
+                setFailMode(false)
               }}
-              className={"bg-primary text-white"}
+              className={'bg-primary text-white'}
             >
               Okay
             </button>
@@ -362,26 +411,26 @@ const ExtComps = ({
         </div>
       )}
       {confMod && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50">
+        <div className='fixed top-0 left-0 z-50 flex items-center justify-center h-full w-full bg-black bg-opacity-50'>
           <div className={`${failTextColor} ${styles.err_mod_box} `}>
             <h6 className={failTextColor}>Confirmation!</h6>
-            <p className="text-slate-700">
+            <p className='text-slate-700'>
               {`Confirm Payment for lot - ${tempUCode} ?`}
             </p>
-            <div className="flex flex-row gap-2">
+            <div className='flex flex-row gap-2'>
               <button
                 onClick={() => {
-                  statusUpdHandler(tempId, "Pending Admin Approval", true);
+                  statusUpdHandler(tempId, 'Out For Pickup', true)
                 }}
-                className={"bg-primary text-white"}
+                className={'bg-primary text-white'}
               >
                 Okay
               </button>
               <button
                 onClick={() => {
-                  setConfMod(false);
+                  setConfMod(false)
                 }}
-                className="bg-white text-primary"
+                className='bg-white text-primary'
               >
                 Cancel
               </button>
@@ -392,21 +441,25 @@ const ExtComps = ({
       <UploadReceiptModal
         isOpen={uploadReceiptMod}
         onClose={() => {
-          setUploadReceiptMod(false);
-          setIsTableLoaded(false);
+          setUploadReceiptMod(false)
+          setIsTableLoaded(false)
         }}
         onUpload={handleUploadReceipt}
         lotCode={tempUCode}
         isLoading={false}
       />
       {isTableLoaded && (
-        <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
+        <div className='fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+          <BeatLoader
+            color='var(--primary-color)'
+            loading={isTableLoaded}
+            size={15}
+          />
         </div>
       )}
     </React.Fragment>
-  );
-};
+  )
+}
 
 const PickedUpFilter = ({
   setSearchValue,
@@ -425,118 +478,120 @@ const PickedUpFilter = ({
   getData,
   isSuperAdmin,
 }) => {
-  const [regionDrop, setRegionDrop] = useState(false);
-  const [storeDrop, setStoreDrop] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredStores, setFilteredStores] = useState(storeData);
-  const dispatch = useDispatch();
+  const [regionDrop, setRegionDrop] = useState(false)
+  const [storeDrop, setStoreDrop] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filteredStores, setFilteredStores] = useState(storeData)
+  const dispatch = useDispatch()
   const handleSearchClear = () => {
-    setSearchValue("");
-    setSearchTerm("");
-    setDateValue("");
-    setRegion("");
-    setStoreName(import.meta.env.VITE_USER_STORE_NAME);
-  };
+    setSearchValue('')
+    setSearchTerm('')
+    setDateValue('')
+    setRegion('')
+    setStoreName(import.meta.env.VITE_USER_STORE_NAME)
+  }
 
   useEffect(() => {
-    if (dateValue === "" && searchValue === "") {
-      getData();
+    if (dateValue === '' && searchValue === '') {
+      getData()
     }
-  }, [dateValue, searchValue]);
+  }, [dateValue, searchValue])
 
   const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
+    const value = e.target.value
+    setSearchTerm(value)
 
-    if (value === "") {
-      setFilteredStores(storeData);
+    if (value === '') {
+      setFilteredStores(storeData)
     } else {
       const filtered = storeData.filter((store) =>
         store.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredStores(filtered);
+      )
+      setFilteredStores(filtered)
     }
-  };
+  }
 
   const handleRegionChange = (value) => {
-    setRegionDrop(false);
-    setStoreName("");
-    const filteredStoresTemp = allStore?.filter((store) => store.region === value);
-    const storeNamesArray = filteredStoresTemp.map((store) => store.storeName);
-    dispatch(setStoreFilter({ selStore: "", selRegion: value }));
-    setStoreData(storeNamesArray);
-    setRegion(value);
-  };
+    setRegionDrop(false)
+    setStoreName('')
+    const filteredStoresTemp = allStore?.filter(
+      (store) => store.region === value
+    )
+    const storeNamesArray = filteredStoresTemp.map((store) => store.storeName)
+    dispatch(setStoreFilter({ selStore: '', selRegion: value }))
+    setStoreData(storeNamesArray)
+    setRegion(value)
+  }
 
   const handleStoreChange = (value) => {
-    setStoreDrop(false);
+    setStoreDrop(false)
     const filteredStoresTemp2 = allStore?.filter(
       (store) => store.storeName === value
-    );
-    const newRegion = filteredStoresTemp2[0].region;
-    setRegion(newRegion);
-    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
-    setStoreName(value);
-  };
+    )
+    const newRegion = filteredStoresTemp2[0].region
+    setRegion(newRegion)
+    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }))
+    setStoreName(value)
+  }
 
   const dateChangeHandler = (event) => {
     const formattedDate = new Date(event.target.value).toLocaleDateString(
-      "en-GB"
-    );
-    setDateValue(formattedDate);
-  };
+      'en-GB'
+    )
+    setDateValue(formattedDate)
+  }
 
   return (
-    <div className="m-2 flex flex-col gap-2">
-      <div className="mt-[3px] flex gap-2 items-center outline-none">
+    <div className='m-2 flex flex-col gap-2'>
+      <div className='mt-[3px] flex gap-2 items-center outline-none'>
         <div className={`${styles.search_bar_wrap}`}>
           <input
-            className="text-sm"
+            className='text-sm'
             onChange={(e) => setSearchValue(e.target.value)}
-            type="text"
+            type='text'
             value={searchValue}
-            placeholder="Search"
+            placeholder='Search'
           />
           <IoMdSearch size={34} onClick={() => getDataBySearch()} />
         </div>
         <div className={styles.icons_box}>
-          <IoRefresh className="" onClick={handleSearchClear} size={25} />
+          <IoRefresh className='' onClick={handleSearchClear} size={25} />
         </div>
         <div
           className={`flex flex-row  items-center justify-center ${styles.date_picker_wrap}`}
         >
           <input
-            id="datepicker"
-            style={{ color: "var(--primary-color)" }}
-            type="date"
+            id='datepicker'
+            style={{ color: 'var(--primary-color)' }}
+            type='date'
             value={dateValue}
             onChange={dateChangeHandler}
-            className=""
+            className=''
           />
           <div
-            onClick={() => document.getElementById("datepicker").showPicker()}
+            onClick={() => document.getElementById('datepicker').showPicker()}
             className={styles.date_box}
           >
-            <p>{dateValue ? dateValue : "DD/MM/YYYY"}</p>
+            <p>{dateValue ? dateValue : 'DD/MM/YYYY'}</p>
             <BsCalendarDate size={25} />
           </div>
         </div>
       </div>
       {isSuperAdmin && (
-        <div className="flex gap-2 w-100 items-center outline-none">
-          <div className="relative w-[45%]">
+        <div className='flex gap-2 w-100 items-center outline-none'>
+          <div className='relative w-[45%]'>
             <div
               className={`${styles.filter_button}`}
               onClick={() => {
-                setRegionDrop(!regionDrop);
+                setRegionDrop(!regionDrop)
               }}
             >
-              <p className="truncate">
-                {region === "" ? "Select Region" : region}
+              <p className='truncate'>
+                {region === '' ? 'Select Region' : region}
               </p>
               <FaAngleDown
                 size={17}
-                className={`${regionDrop && "rotate-180"}`}
+                className={`${regionDrop && 'rotate-180'}`}
               />
             </div>
             {regionDrop && (
@@ -547,30 +602,33 @@ const PickedUpFilter = ({
                     className={`${styles.filter_option}`}
                     onClick={() => handleRegionChange(element)}
                   >
-                    <p className="truncate">{element}</p>
+                    <p className='truncate'>{element}</p>
                   </div>
                 ))}
               </div>
             )}
           </div>
-          <div className="relative w-[70%]">
+          <div className='relative w-[70%]'>
             <div
               className={`${styles.filter_button} w-full`}
               onClick={() => setStoreDrop(!storeDrop)}
             >
-              <p className="  truncate">
-                {searchTerm === "" ? "Select Store" : searchTerm}
+              <p className='  truncate'>
+                {searchTerm === '' ? 'Select Store' : searchTerm}
               </p>
-              <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
+              <FaAngleDown
+                className={`${storeDrop && 'rotate-180'}`}
+                size={17}
+              />
             </div>
             {storeDrop && (
-              <div className="absolute w-full bg-white   shadow-md">
+              <div className='absolute w-full bg-white   shadow-md'>
                 <input
-                  type="text"
+                  type='text'
                   onChange={handleSearch}
                   value={searchTerm}
-                  className="w-full p-2 border-b   border-gray-300"
-                  placeholder="Search store..."
+                  className='w-full p-2 border-b   border-gray-300'
+                  placeholder='Search store...'
                 />
                 <div
                   className={`overflow-y-scroll   max-h-[200px] ${styles.filter_drop} w-full`}
@@ -580,17 +638,17 @@ const PickedUpFilter = ({
                       <div
                         key={index}
                         onClick={() => {
-                          handleStoreChange(item2);
-                          setSearchTerm(item2);
-                          setStoreDrop(false);
+                          handleStoreChange(item2)
+                          setSearchTerm(item2)
+                          setStoreDrop(false)
                         }}
                         className={`${styles.filter_option}`}
                       >
-                        <p className="truncate">{item2}</p>
+                        <p className='truncate'>{item2}</p>
                       </div>
                     ))
                   ) : (
-                    <p className="p-2   text-gray-500">No stores found</p>
+                    <p className='p-2   text-gray-500'>No stores found</p>
                   )}
                 </div>
               </div>
@@ -599,8 +657,8 @@ const PickedUpFilter = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 const PickedUpDevicesTable = ({
   data,
@@ -614,93 +672,131 @@ const PickedUpDevicesTable = ({
   setSuccessMod,
   setFailMode,
 }) => {
-  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-  const userRole = LoggedInUser?.role || "";
-  const [showView, setShowView] = useState(false);
-  const [viewRef, setViewRef] = useState("");
-  const token2 = sessionStorage.getItem("authToken");
+  const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
+  const userRole = LoggedInUser?.role || ''
+  const [showView, setShowView] = useState(false)
+  const [viewRef, setViewRef] = useState('')
+  const token2 = sessionStorage.getItem('authToken')
+  const [showPickupModal, setShowPickupModal] = useState(false)
+  const [showPickupCompleteModal, setShowPickupCompleteModal] = useState(false)
+  const [showPickupCancelModal, setShowPickupCancelModal] = useState(false)
+  const [showPickupDeliveredModal, setShowPickupDeliveredModal] = useState(false)
+  const [showAcceptModal, setShowAcceptModal] = useState(false)
+  const [showApproveDeliveryModal, setShowApproveDeliveryModal] = useState(false)
+  const [showOutForPickupModal, setShowOutForPickupModal] = useState(false)
+  const [tempRefId, setTempRefId] = useState('')
+  const [tempUniqueCode, setTempUniqueCode] = useState('')
+  const [tempNewStatus, setTempNewStatus] = useState('')
   const viewHandler = (refID) => {
-    setViewRef(refID);
-    setShowView(true);
-  };
+    setViewRef(refID)
+    setShowView(true)
+  }
 
   const statusUpdateHandler = (refID, newStatus, uniqueCode) => {
-    setIsTableLoaded(true);
-    setConfMod(false);
+    setTempRefId(refID)
+    setTempUniqueCode(uniqueCode)
+    setTempNewStatus(newStatus)
+
+    // Show appropriate modal based on status
+    if (newStatus === PickConf) {
+      setShowPickupModal(true)
+    } else if (newStatus === PickupCompleteConf) {
+      setShowPickupCompleteModal(true)
+    } else if (newStatus === PickupCancelConf) {
+      setShowPickupCancelModal(true)
+    } else if (newStatus === PickDelivered) {
+      setShowPickupDeliveredModal(true)
+    } else if (newStatus === DeliveredConf) {
+      setShowAcceptModal(true)
+    } else if (newStatus === ApprovDelivery) {
+      setShowApproveDeliveryModal(true)
+    } else if (newStatus === OutForPickup) {
+      setShowOutForPickupModal(true)
+    } else {
+      // Direct update for other statuses
+      performStatusUpdate(refID, newStatus, uniqueCode, '')
+    }
+  }
+
+  const performStatusUpdate = (refID, newStatus, uniqueCode, reason = '') => {
+    setIsTableLoaded(true)
+    setConfMod(false)
     const config = {
-      method: "post",
+      method: 'post',
       maxBodyLength: Infinity,
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/pickupDevices/update`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pickupDevices/update`,
       headers: { Authorization: token2 },
       data: {
         refIDs: [refID],
         newStatus: newStatus,
+        reason: reason,
       },
-    };
-    console.log(config);
+    }
     axios
       .request(config)
       .then((response) => {
-        setErrorMsg(`Successfully Updated Status to ${newStatus}`);
-        setErrorMsg1(`Lot No. :- ${uniqueCode}`);
-        setErrorMsg2(checkOnPkd);
+        setErrorMsg(`Successfully Updated Status to ${newStatus}`)
+        setErrorMsg1(`Lot No. :- ${uniqueCode}`)
+        setErrorMsg2(checkOnPkd)
         if (newStatus === PickConf) {
-          setErrorMsg(`Pickup Confirmed Successfully, Lot No. ${uniqueCode}`);
-          setErrorMsg1(`Status Pending for Delivery at Warehouse`);
-          setErrorMsg2(checkOnPkd);
+          setErrorMsg(`Pickup Confirmed Successfully, Lot No. ${uniqueCode}`)
+          setErrorMsg1(`Status Pending for Delivery at Warehouse`)
+          setErrorMsg2(checkOnPkd)
         }
         if (newStatus === PickDelivered) {
-          setErrorMsg(`Successfully Updated Status to ${newStatus}`);
+          setErrorMsg(`Successfully Updated Status to ${newStatus}`)
           setErrorMsg1(
             `Pending Admin Approval for Delivery for Lot No. :- ${uniqueCode}`
-          );
-          setErrorMsg2("Check it On History");
+          )
+          setErrorMsg2('Check it On History')
         }
         if (newStatus === ApprovDelivery) {
-          setErrorMsg(`Successfully Updated Status to ${newStatus}`);
-          setErrorMsg1(`Lot No. :- ${uniqueCode}`);
-          setErrorMsg2("Check it On History");
+          setErrorMsg(`Successfully Updated Status to ${newStatus}`)
+          setErrorMsg1(`Lot No. :- ${uniqueCode}`)
+          setErrorMsg2('Check it On History')
         }
-        console.log(response);
-        setSuccessMod(true);
-        getData();
+        setSuccessMod(true)
+        getData()
+        setIsTableLoaded(false)
       })
       .catch((error) => {
         setErrorMsg(
           `Failed to updated the status of lot ${uniqueCode} to ${newStatus}`
-        );
-        setFailMode(true);
-        setIsTableLoaded(false);
-      });
-  };
+        )
+        setFailMode(true)
+        setIsTableLoaded(false)
+      })
+  }
   return (
     <div className={`${styles.pd_cont}`}>
-      <div className="m-2 overflow-x-auto md:m-5">
+      <div className='m-2 overflow-x-auto md:m-5'>
         {showView && (
           <div className={styles.view_wrap}>
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
           </div>
         )}
-        <table className="w-full border border-primary">
-          <thead className="bg-primary text-white">
+        <table className='w-full border border-primary'>
+          <thead className='bg-primary text-white'>
             <tr>
-              <th className="p-2 text-sm md:p-3 md:text-base">Action</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Status</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Date</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Lot Number</th>
-              <th className="p-2 text-sm md:p-3 md:text-base">
+              <th className='p-2 text-sm md:p-3 md:text-base'>Action</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Status</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Date</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Lot Number</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>
                 Number Of Device
               </th>
-              <th className="p-2 text-sm md:p-3 md:text-base">Amount</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Amount</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Reason</th>
             </tr>
           </thead>
           <tbody>
             {data.map((val, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {userRoles[userRole] === "Store" && (
-                    <div className="flex flex-col gap-1">
+              <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  {userRoles[userRole] === 'Store' && (
+                    <div className='flex flex-col gap-1'>
                       <button
                         className={`${styles.view_btn}`}
                         onClick={() => viewHandler(val?._id)}
@@ -709,17 +805,17 @@ const PickedUpDevicesTable = ({
                       </button>
                     </div>
                   )}
-                  {(userRole === "Super Admin" ||
-                    userRole === "Admin Manager") && (
-                      <UserAdminContent
-                        confHandler={confHandler}
-                        val={val}
-                        statusUpdateHandler={statusUpdateHandler}
-                        viewHandler={viewHandler}
-                      />
-                    )}
-                  {userRole === "Technician" && (
-                    <div className="flex flex-col gap-1">
+                  {(userRole === 'Super Admin' ||
+                    userRole === 'Admin Manager') && (
+                    <UserAdminContent
+                      confHandler={confHandler}
+                      val={val}
+                      statusUpdateHandler={statusUpdateHandler}
+                      viewHandler={viewHandler}
+                    />
+                  )}
+                  {userRole === 'Technician' && (
+                    <div className='flex flex-col gap-1'>
                       <button
                         className={`${styles.view_btn}`}
                         onClick={() => viewHandler(val?._id)}
@@ -727,7 +823,7 @@ const PickedUpDevicesTable = ({
                         View
                       </button>
                       {val?.status === PendingConf && (
-                        <div className="flex flex-col gap-1">
+                        <div className='flex flex-col gap-1'>
                           <button
                             onClick={() =>
                               statusUpdateHandler(
@@ -743,7 +839,7 @@ const PickedUpDevicesTable = ({
                         </div>
                       )}
                       {val?.status === PickConf && (
-                        <div className="flex flex-col gap-1">
+                        <div className='flex flex-col gap-1'>
                           <button
                             onClick={() =>
                               statusUpdateHandler(
@@ -761,29 +857,109 @@ const PickedUpDevicesTable = ({
                     </div>
                   )}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {val?.status}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {new Date(val.createdAt).toLocaleDateString("en-GB")}
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  {new Date(val.createdAt).toLocaleDateString('en-GB')}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {val?.uniqueCode || val?._id}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {val?.totalDevice}
                 </td>
-                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {val?.totalAmount}
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  {val?.remarks || ''}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {showPickupModal && (
+        <ReasonModal
+          title="Pickup Reason"
+          placeholder="Enter reason for pickup"
+          onSubmit={(reason) => {
+            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            setShowPickupModal(false)
+          }}
+          onClose={() => setShowPickupModal(false)}
+        />
+      )}
+      {showPickupCompleteModal && (
+        <ReasonModal
+          title="Pickup Complete Reason"
+          placeholder="Enter reason for pickup complete"
+          onSubmit={(reason) => {
+            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            setShowPickupCompleteModal(false)
+          }}
+          onClose={() => setShowPickupCompleteModal(false)}
+        />
+      )}
+      {showPickupCancelModal && (
+        <ReasonModal
+          title="Pickup Cancel Reason"
+          placeholder="Enter reason for pickup cancellation"
+          onSubmit={(reason) => {
+            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            setShowPickupCancelModal(false)
+          }}
+          onClose={() => setShowPickupCancelModal(false)}
+        />
+      )}
+      {showPickupDeliveredModal && (
+        <ReasonModal
+          title="Pickup Delivered Reason"
+          placeholder="Enter reason for pickup delivered"
+          onSubmit={(reason) => {
+            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            setShowPickupDeliveredModal(false)
+          }}
+          onClose={() => setShowPickupDeliveredModal(false)}
+        />
+      )}
+      {showAcceptModal && (
+        <ReasonModal
+          title="Accept Delivery Reason"
+          placeholder="Enter reason for accepting delivery"
+          onSubmit={(reason) => {
+            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            setShowAcceptModal(false)
+          }}
+          onClose={() => setShowAcceptModal(false)}
+        />
+      )}
+      {showApproveDeliveryModal && (
+        <ReasonModal
+          title="Approve Delivery Reason"
+          placeholder="Enter reason for approving delivery"
+          onSubmit={(reason) => {
+            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            setShowApproveDeliveryModal(false)
+          }}
+          onClose={() => setShowApproveDeliveryModal(false)}
+        />
+      )}
+      {showOutForPickupModal && (
+        <ReasonModal
+          title="Out For Pickup Reason"
+          placeholder="Enter reason for sending out for pickup"
+          onSubmit={(reason) => {
+            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            setShowOutForPickupModal(false)
+          }}
+          onClose={() => setShowOutForPickupModal(false)}
+        />
+      )}
     </div>
-  );
-};
+  )
+}
 
 const UserAdminContent = ({
   confHandler,
@@ -792,15 +968,15 @@ const UserAdminContent = ({
   viewHandler,
 }) => {
   return (
-    <div className="flex flex-col gap-1">
+    <div className='flex flex-col gap-1'>
       <button
         className={`${styles.view_btn}`}
         onClick={() => viewHandler(val?._id)}
       >
         View
       </button>
-      {val?.status === "Pending Payment Confirmation" && (
-        <div className="flex flex-col gap-1">
+      {val?.status === 'Pending Payment Confirmation' && (
+        <div className='flex flex-col gap-1'>
           <button
             onClick={() => confHandler(val?._id, val?.uniqueCode)}
             className={`${styles.acpt_btn}`}
@@ -809,11 +985,11 @@ const UserAdminContent = ({
           </button>
         </div>
       )}
-      {val?.status === "Pending Admin Approval" && (
-        <div className="flex flex-col gap-1">
+      {val?.status === 'Pickup Complete' && (
+        <div className='flex flex-col gap-1'>
           <button
             onClick={() =>
-              statusUpdateHandler(val?._id, PendingConf, val?.uniqueCode)
+              statusUpdateHandler(val?._id, DeliveredConf, val?.uniqueCode)
             }
             className={`${styles.acpt_btn}`}
           >
@@ -822,7 +998,7 @@ const UserAdminContent = ({
         </div>
       )}
       {val?.status === PickDelivered && (
-        <div className="flex flex-col gap-1">
+        <div className='flex flex-col gap-1'>
           <button
             onClick={() =>
               statusUpdateHandler(val?._id, ApprovDelivery, val?.uniqueCode)
@@ -833,6 +1009,46 @@ const UserAdminContent = ({
           </button>
         </div>
       )}
+      {val.status === 'Out For Pickup' && (
+        <div className='flex flex-col gap-1'>
+          <div className='flex flex-col gap-1'>
+            <button
+              onClick={() =>
+                statusUpdateHandler(
+                  val?._id,
+                  PickupCompleteConf,
+                  val?.uniqueCode
+                )
+              }
+              className={`${styles.acpt_btn}`}
+            >
+              Pickup Complete
+            </button>
+          </div>
+          <div className='flex flex-col gap-1'>
+            <button
+              onClick={() =>
+                statusUpdateHandler(val?._id, PickupCancelConf, val?.uniqueCode)
+              }
+              className={`${styles.acpt_btn}`}
+            >
+              Pickup Cancel
+            </button>
+          </div>
+        </div>
+      )}
+      {val.status === PickupCancelConf && (
+        <div className='flex flex-col gap-1'>
+          <button
+            onClick={() =>
+              statusUpdateHandler(val?._id, OutForPickup, val?.uniqueCode)
+            }
+            className={`${styles.acpt_btn}`}
+          >
+            Out For Pickup
+          </button>
+        </div>
+      )}
     </div>
-  );
-};
+  )
+}
