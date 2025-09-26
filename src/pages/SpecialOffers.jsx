@@ -354,7 +354,7 @@ const SubSpecialOffers = ({
       </div>
       <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 '>
         <div className='flex justify-between text-lg font-medium'>
-          <p className='text-xl'>₹{Number(phonePrice)}</p>
+          <p className='text-xl'>₹{Math.round(Number(phonePrice))}</p>
           <p
             onClick={handleViewSummary}
             className='text-primary cursor-pointer'
