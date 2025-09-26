@@ -1042,14 +1042,14 @@ const UserAdminContent = ({
             </button>
           </div>
           <div className='flex flex-col gap-1'>
-            <button
+            {/* <button
               onClick={() =>
                 statusUpdateHandler(val?._id, PickupCancelConf, val?.uniqueCode)
               }
               className={`${styles.acpt_btn}`}
             >
               Pickup Cancel
-            </button>
+            </button> */}
           </div>
         </div>
       )}
