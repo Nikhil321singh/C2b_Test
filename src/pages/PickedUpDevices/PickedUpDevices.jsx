@@ -30,10 +30,10 @@ const succTextColor = 'text-green-500'
 const failTextColor = 'text-primary'
 
 // CSS class constants
-const FLEX_COL_GAP_1 = FLEX_COL_GAP_1
-const TABLE_CELL_BASE = TABLE_CELL_BASE
-const TABLE_CELL_CENTER = TABLE_CELL_CENTER
-const OUT_FOR_PICKUP = OUT_FOR_PICKUP
+const FLEX_COL_GAP_1 = 'flex flex-col gap-1'
+const TABLE_CELL_BASE = 'p-2 text-sm md:p-3 md:text-base'
+const TABLE_CELL_CENTER = 'p-2 text-sm text-center md:p-3 md:text-base'
+const OUT_FOR_PICKUP = 'Out For Pickup'
 const checkOnPkd = 'Check it On Picked Up'
 const PendingConf = 'Pending Pickup Confirmation'
 const DeliveredConf = 'Delivered At Warehouse'
@@ -240,7 +240,10 @@ const ReasonModal = ({ title, placeholder, onSubmit, onClose }) => {
           placeholder={placeholder}
         />
         <div className='flex flex-row gap-2'>
-          <button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded'>
+          <button
+            onClick={handleSubmit}
+            className='bg-primary text-white px-4 py-2 rounded'
+          >
             Submit
           </button>
           <button
@@ -322,7 +325,7 @@ const ExtComps = ({
         return axios.request(statusConfig).then(() => {
           setUploadReceiptMod(false) // Close modal on success
           setErrorMsg(`Payment confirmed successfully for Lot ${tempUCode}`)
-          setErrorMsg1("Status updated to OUT_FOR_PICKUP.")
+          setErrorMsg1('Status updated to OUT_FOR_PICKUP.')
           setErrorMsg2(
             'Receipt uploaded and email sent to store with Excel report.'
           )
@@ -369,7 +372,9 @@ const ExtComps = ({
           setIsTableLoaded(false)
         })
         .catch((error) => {
-          setErrorMsg(`Failed to Updated Status of Lot ${refID} to ${newStatus}`)
+          setErrorMsg(
+            `Failed to Updated Status of Lot ${refID} to ${newStatus}`
+          )
           setFailMode(true)
           setIsTableLoaded(false)
         })
@@ -702,9 +707,11 @@ const PickedUpDevicesTable = ({
   const [showPickupModal, setShowPickupModal] = useState(false)
   const [showPickupCompleteModal, setShowPickupCompleteModal] = useState(false)
   const [showPickupCancelModal, setShowPickupCancelModal] = useState(false)
-  const [showPickupDeliveredModal, setShowPickupDeliveredModal] = useState(false)
+  const [showPickupDeliveredModal, setShowPickupDeliveredModal] =
+    useState(false)
   const [showAcceptModal, setShowAcceptModal] = useState(false)
-  const [showApproveDeliveryModal, setShowApproveDeliveryModal] = useState(false)
+  const [showApproveDeliveryModal, setShowApproveDeliveryModal] =
+    useState(false)
   const [showOutForPickupModal, setShowOutForPickupModal] = useState(false)
   const [tempRefId, setTempRefId] = useState('')
   const [tempUniqueCode, setTempUniqueCode] = useState('')
@@ -802,23 +809,21 @@ const PickedUpDevicesTable = ({
         <table className='w-full border border-primary'>
           <thead className='bg-primary text-white'>
             <tr>
-              <th className=TABLE_CELL_BASE>Action</th>
-              <th className=TABLE_CELL_BASE>Status</th>
-              <th className=TABLE_CELL_BASE>Date</th>
-              <th className=TABLE_CELL_BASE>Lot Number</th>
-              <th className=TABLE_CELL_BASE>
-                Number Of Device
-              </th>
-              <th className=TABLE_CELL_BASE>Amount</th>
-              <th className=TABLE_CELL_BASE>Reason</th>
+              <th className={TABLE_CELL_BASE}>Action</th>
+              <th className={TABLE_CELL_BASE}>Status</th>
+              <th className={TABLE_CELL_BASE}>Date</th>
+              <th className={TABLE_CELL_BASE}>Lot Number</th>
+              <th className={TABLE_CELL_BASE}>Number Of Device</th>
+              <th className={TABLE_CELL_BASE}>Amount</th>
+              <th className={TABLE_CELL_BASE}>Reason</th>
             </tr>
           </thead>
           <tbody>
             {data.map((val, index) => (
               <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
-                <td className=TABLE_CELL_CENTER>
+                <td className={TABLE_CELL_CENTER}>
                   {userRoles[userRole] === 'Store' && (
-                    <div className=FLEX_COL_GAP_1>
+                    <div className={FLEX_COL_GAP_1}>
                       <button
                         className={`${styles.view_btn}`}
                         onClick={() => viewHandler(val?._id)}
@@ -837,7 +842,7 @@ const PickedUpDevicesTable = ({
                     />
                   )}
                   {userRole === 'Technician' && (
-                    <div className=FLEX_COL_GAP_1>
+                    <div className={FLEX_COL_GAP_1}>
                       <button
                         className={`${styles.view_btn}`}
                         onClick={() => viewHandler(val?._id)}
@@ -845,7 +850,7 @@ const PickedUpDevicesTable = ({
                         View
                       </button>
                       {val?.status === PendingConf && (
-                        <div className=FLEX_COL_GAP_1>
+                        <div className={FLEX_COL_GAP_1}>
                           <button
                             onClick={() =>
                               statusUpdateHandler(
@@ -861,7 +866,7 @@ const PickedUpDevicesTable = ({
                         </div>
                       )}
                       {val?.status === PickConf && (
-                        <div className=FLEX_COL_GAP_1>
+                        <div className={FLEX_COL_GAP_1}>
                           <button
                             onClick={() =>
                               statusUpdateHandler(
@@ -879,24 +884,16 @@ const PickedUpDevicesTable = ({
                     </div>
                   )}
                 </td>
-                <td className=TABLE_CELL_CENTER>
-                  {val?.status}
-                </td>
-                <td className=TABLE_CELL_CENTER>
+                <td className={TABLE_CELL_CENTER}>{val?.status}</td>
+                <td className={TABLE_CELL_CENTER}>
                   {new Date(val.createdAt).toLocaleDateString('en-GB')}
                 </td>
-                <td className=TABLE_CELL_CENTER>
+                <td className={TABLE_CELL_CENTER}>
                   {val?.uniqueCode || val?._id}
                 </td>
-                <td className=TABLE_CELL_CENTER>
-                  {val?.totalDevice}
-                </td>
-                <td className=TABLE_CELL_CENTER>
-                  {val?.totalAmount}
-                </td>
-                <td className=TABLE_CELL_CENTER>
-                  {val?.remarks || ''}
-                </td>
+                <td className={TABLE_CELL_CENTER}>{val?.totalDevice}</td>
+                <td className={TABLE_CELL_CENTER}>{val?.totalAmount}</td>
+                <td className={TABLE_CELL_CENTER}>{val?.remarks || ''}</td>
               </tr>
             ))}
           </tbody>
@@ -904,10 +901,15 @@ const PickedUpDevicesTable = ({
       </div>
       {showPickupModal && (
         <ReasonModal
-          title="Pickup Reason"
-          placeholder="Enter reason for pickup"
+          title='Pickup Reason'
+          placeholder='Enter reason for pickup'
           onSubmit={(reason) => {
-            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            performStatusUpdate(
+              tempRefId,
+              tempNewStatus,
+              tempUniqueCode,
+              reason
+            )
             setShowPickupModal(false)
           }}
           onClose={() => setShowPickupModal(false)}
@@ -915,10 +917,15 @@ const PickedUpDevicesTable = ({
       )}
       {showPickupCompleteModal && (
         <ReasonModal
-          title="Pickup Complete Reason"
-          placeholder="Enter reason for pickup complete"
+          title='Pickup Complete Reason'
+          placeholder='Enter reason for pickup complete'
           onSubmit={(reason) => {
-            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            performStatusUpdate(
+              tempRefId,
+              tempNewStatus,
+              tempUniqueCode,
+              reason
+            )
             setShowPickupCompleteModal(false)
           }}
           onClose={() => setShowPickupCompleteModal(false)}
@@ -926,10 +933,15 @@ const PickedUpDevicesTable = ({
       )}
       {showPickupCancelModal && (
         <ReasonModal
-          title="Pickup Cancel Reason"
-          placeholder="Enter reason for pickup cancellation"
+          title='Pickup Cancel Reason'
+          placeholder='Enter reason for pickup cancellation'
           onSubmit={(reason) => {
-            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            performStatusUpdate(
+              tempRefId,
+              tempNewStatus,
+              tempUniqueCode,
+              reason
+            )
             setShowPickupCancelModal(false)
           }}
           onClose={() => setShowPickupCancelModal(false)}
@@ -937,10 +949,15 @@ const PickedUpDevicesTable = ({
       )}
       {showPickupDeliveredModal && (
         <ReasonModal
-          title="Pickup Delivered Reason"
-          placeholder="Enter reason for pickup delivered"
+          title='Pickup Delivered Reason'
+          placeholder='Enter reason for pickup delivered'
           onSubmit={(reason) => {
-            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            performStatusUpdate(
+              tempRefId,
+              tempNewStatus,
+              tempUniqueCode,
+              reason
+            )
             setShowPickupDeliveredModal(false)
           }}
           onClose={() => setShowPickupDeliveredModal(false)}
@@ -948,10 +965,15 @@ const PickedUpDevicesTable = ({
       )}
       {showAcceptModal && (
         <ReasonModal
-          title="Accept Delivery Reason"
-          placeholder="Enter reason for accepting delivery"
+          title='Accept Delivery Reason'
+          placeholder='Enter reason for accepting delivery'
           onSubmit={(reason) => {
-            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            performStatusUpdate(
+              tempRefId,
+              tempNewStatus,
+              tempUniqueCode,
+              reason
+            )
             setShowAcceptModal(false)
           }}
           onClose={() => setShowAcceptModal(false)}
@@ -959,10 +981,15 @@ const PickedUpDevicesTable = ({
       )}
       {showApproveDeliveryModal && (
         <ReasonModal
-          title="Approve Delivery Reason"
-          placeholder="Enter reason for approving delivery"
+          title='Approve Delivery Reason'
+          placeholder='Enter reason for approving delivery'
           onSubmit={(reason) => {
-            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            performStatusUpdate(
+              tempRefId,
+              tempNewStatus,
+              tempUniqueCode,
+              reason
+            )
             setShowApproveDeliveryModal(false)
           }}
           onClose={() => setShowApproveDeliveryModal(false)}
@@ -970,10 +997,15 @@ const PickedUpDevicesTable = ({
       )}
       {showOutForPickupModal && (
         <ReasonModal
-          title="Out For Pickup Reason"
-          placeholder="Enter reason for sending out for pickup"
+          title='Out For Pickup Reason'
+          placeholder='Enter reason for sending out for pickup'
           onSubmit={(reason) => {
-            performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+            performStatusUpdate(
+              tempRefId,
+              tempNewStatus,
+              tempUniqueCode,
+              reason
+            )
             setShowOutForPickupModal(false)
           }}
           onClose={() => setShowOutForPickupModal(false)}
@@ -990,7 +1022,7 @@ const UserAdminContent = ({
   viewHandler,
 }) => {
   return (
-    <div className=FLEX_COL_GAP_1>
+    <div className={FLEX_COL_GAP_1}>
       <button
         className={`${styles.view_btn}`}
         onClick={() => viewHandler(val?._id)}
@@ -998,7 +1030,7 @@ const UserAdminContent = ({
         View
       </button>
       {val?.status === 'Pending Payment Confirmation' && (
-        <div className=FLEX_COL_GAP_1>
+        <div className={FLEX_COL_GAP_1}>
           <button
             onClick={() => confHandler(val?._id, val?.uniqueCode)}
             className={`${styles.acpt_btn}`}
@@ -1008,7 +1040,7 @@ const UserAdminContent = ({
         </div>
       )}
       {val?.status === 'Pickup Complete' && (
-        <div className=FLEX_COL_GAP_1>
+        <div className={FLEX_COL_GAP_1}>
           <button
             onClick={() =>
               statusUpdateHandler(val?._id, DeliveredConf, val?.uniqueCode)
@@ -1020,7 +1052,7 @@ const UserAdminContent = ({
         </div>
       )}
       {val?.status === PickDelivered && (
-        <div className=FLEX_COL_GAP_1>
+        <div className={FLEX_COL_GAP_1}>
           <button
             onClick={() =>
               statusUpdateHandler(val?._id, ApprovDelivery, val?.uniqueCode)
@@ -1032,8 +1064,8 @@ const UserAdminContent = ({
         </div>
       )}
       {val.status === OUT_FOR_PICKUP && (
-        <div className=FLEX_COL_GAP_1>
-          <div className=FLEX_COL_GAP_1>
+        <div className={FLEX_COL_GAP_1}>
+          <div className={FLEX_COL_GAP_1}>
             <button
               onClick={() =>
                 statusUpdateHandler(
@@ -1047,7 +1079,7 @@ const UserAdminContent = ({
               Pickup Complete
             </button>
           </div>
-          <div className=FLEX_COL_GAP_1>
+          <div className={FLEX_COL_GAP_1}>
             {/* <button
               onClick={() =>
                 statusUpdateHandler(val?._id, PickupCancelConf, val?.uniqueCode)
@@ -1060,7 +1092,7 @@ const UserAdminContent = ({
         </div>
       )}
       {val.status === PickupCancelConf && (
-        <div className=FLEX_COL_GAP_1>
+        <div className={FLEX_COL_GAP_1}>
           <button
             onClick={() =>
               statusUpdateHandler(val?._id, OutForPickup, val?.uniqueCode)
