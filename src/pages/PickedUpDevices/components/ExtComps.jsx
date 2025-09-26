@@ -1,18 +1,11 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io'
 import { BeatLoader } from 'react-spinners'
 import AdminNavbar from '../../../components/Admin_Navbar'
 import SideMenu from '../../../components/SideMenu'
 import ProfileBox from '../../../components/ProfileBox/ProfileBox'
 import UploadReceiptModal from '../../../components/UploadReceiptModal'
-import styles from '../PickedUpDevices.module.css'
-import {
-  succTextColor,
-  failTextColor,
-  OUT_FOR_PICKUP,
-  ApprovDelivery,
-} from '../constants'
+import { OUT_FOR_PICKUP, ApprovDelivery } from '../constants'
 import { StatusModals } from './StatusModals'
 
 const currentDomain = window.location.origin
