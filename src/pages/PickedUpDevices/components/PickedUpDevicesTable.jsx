@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import ViewPickupTable from '../../../components/ViewPickupTable/ViewPickupTable'
-import ReasonModal from './ReasonModal'
 import UserAdminContent from './UserAdminContent'
 import styles from '../PickedUpDevices.module.css'
+import { StatusReasonModal } from './StatusReasonModal'
 import {
   userRoles,
   TABLE_CELL_BASE,
@@ -20,6 +20,20 @@ import {
   OutForPickup,
 } from '../constants'
 
+const renderTableRow = (val, index, renderActionCell) => (
+  <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
+    {renderActionCell(val)}
+    <td className={TABLE_CELL_CENTER}>{val?.status}</td>
+    <td className={TABLE_CELL_CENTER}>
+      {new Date(val.createdAt).toLocaleDateString('en-GB')}
+    </td>
+    <td className={TABLE_CELL_CENTER}>{val?.uniqueCode || val?._id}</td>
+    <td className={TABLE_CELL_CENTER}>{val?.totalDevice}</td>
+    <td className={TABLE_CELL_CENTER}>{val?.totalAmount}</td>
+    <td className={TABLE_CELL_CENTER}>{val?.remarks || ''}</td>
+  </tr>
+)
+
 const PickedUpDevicesTable = ({
   data,
   confHandler,
@@ -34,18 +48,12 @@ const PickedUpDevicesTable = ({
 }) => {
   const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
   const userRole = LoggedInUser?.role || ''
+  const token2 = sessionStorage.getItem('authToken')
+
   const [showView, setShowView] = useState(false)
   const [viewRef, setViewRef] = useState('')
-  const token2 = sessionStorage.getItem('authToken')
-  const [showPickupModal, setShowPickupModal] = useState(false)
-  const [showPickupCompleteModal, setShowPickupCompleteModal] = useState(false)
-  const [showPickupCancelModal, setShowPickupCancelModal] = useState(false)
-  const [showPickupDeliveredModal, setShowPickupDeliveredModal] =
-    useState(false)
-  const [showAcceptModal, setShowAcceptModal] = useState(false)
-  const [showApproveDeliveryModal, setShowApproveDeliveryModal] =
-    useState(false)
-  const [showOutForPickupModal, setShowOutForPickupModal] = useState(false)
+
+  const [activeModal, setActiveModal] = useState(null)
   const [tempRefId, setTempRefId] = useState('')
   const [tempUniqueCode, setTempUniqueCode] = useState('')
   const [tempNewStatus, setTempNewStatus] = useState('')
@@ -60,23 +68,19 @@ const PickedUpDevicesTable = ({
     setTempUniqueCode(uniqueCode)
     setTempNewStatus(newStatus)
 
-    // Show appropriate modal based on status
-    if (newStatus === PickConf) {
-      setShowPickupModal(true)
-    } else if (newStatus === PickupCompleteConf) {
-      setShowPickupCompleteModal(true)
-    } else if (newStatus === PickupCancelConf) {
-      setShowPickupCancelModal(true)
-    } else if (newStatus === PickDelivered) {
-      setShowPickupDeliveredModal(true)
-    } else if (newStatus === DeliveredConf) {
-      setShowAcceptModal(true)
-    } else if (newStatus === ApprovDelivery) {
-      setShowApproveDeliveryModal(true)
-    } else if (newStatus === OutForPickup) {
-      setShowOutForPickupModal(true)
+    const modalStatuses = [
+      PickConf,
+      PickupCompleteConf,
+      PickupCancelConf,
+      PickDelivered,
+      DeliveredConf,
+      ApprovDelivery,
+      OutForPickup,
+    ]
+
+    if (modalStatuses.includes(newStatus)) {
+      setActiveModal(newStatus)
     } else {
-      // Direct update for other statuses
       performStatusUpdate(refID, newStatus, uniqueCode, '')
     }
   }
@@ -84,49 +88,38 @@ const PickedUpDevicesTable = ({
   const performStatusUpdate = (refID, newStatus, uniqueCode, reason = '') => {
     setIsTableLoaded(true)
     setConfMod(false)
-    const config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/update`,
-      headers: { Authorization: token2 },
-      data: {
-        refIDs: [refID],
-        newStatus: newStatus,
-        reason: reason,
-      },
-    }
     axios
-      .request(config)
-      .then((response) => {
-        setErrorMsg(`Successfully Updated Status to ${newStatus}`)
-        setErrorMsg1(`Lot No. :- ${uniqueCode}`)
-        setErrorMsg2(checkOnPkd)
+      .post(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pickupDevices/update`,
+        { refIDs: [refID], newStatus, reason },
+        { headers: { Authorization: token2 } }
+      )
+      .then(() => {
+        // Success messages
+        let msg = `Successfully Updated Status to ${newStatus}`
+        let msg1 = `Lot No. :- ${uniqueCode}`
+        let msg2 = checkOnPkd
+
         if (newStatus === PickConf) {
-          setErrorMsg(`Pickup Confirmed Successfully, Lot No. ${uniqueCode}`)
-          setErrorMsg1(`Status Pending for Delivery at Warehouse`)
-          setErrorMsg2(checkOnPkd)
+          msg = `Pickup Confirmed Successfully, Lot No. ${uniqueCode}`
+          msg1 = `Status Pending for Delivery at Warehouse`
+        } else if (newStatus === PickDelivered) {
+          msg1 = `Pending Admin Approval for Delivery for Lot No. :- ${uniqueCode}`
+          msg2 = 'Check it On History'
+        } else if (newStatus === ApprovDelivery) {
+          msg2 = 'Check it On History'
         }
-        if (newStatus === PickDelivered) {
-          setErrorMsg(`Successfully Updated Status to ${newStatus}`)
-          setErrorMsg1(
-            `Pending Admin Approval for Delivery for Lot No. :- ${uniqueCode}`
-          )
-          setErrorMsg2('Check it On History')
-        }
-        if (newStatus === ApprovDelivery) {
-          setErrorMsg(`Successfully Updated Status to ${newStatus}`)
-          setErrorMsg1(`Lot No. :- ${uniqueCode}`)
-          setErrorMsg2('Check it On History')
-        }
+
+        setErrorMsg(msg)
+        setErrorMsg1(msg1)
+        setErrorMsg2(msg2)
         setSuccessMod(true)
         getData()
         setIsTableLoaded(false)
       })
-      .catch((error) => {
+      .catch(() => {
         setErrorMsg(
-          `Failed to updated the status of lot ${uniqueCode} to ${newStatus}`
+          `Failed to update the status of lot ${uniqueCode} to ${newStatus}`
         )
         setFailMode(true)
         setIsTableLoaded(false)
@@ -135,45 +128,35 @@ const PickedUpDevicesTable = ({
 
   const renderTechnicianActions = (val) => (
     <div className={FLEX_COL_GAP_1}>
-      <button
-        className={`${styles.view_btn}`}
-        onClick={() => viewHandler(val?._id)}
-      >
+      <button className={styles.view_btn} onClick={() => viewHandler(val?._id)}>
         View
       </button>
       {val?.status === PendingConf && (
-        <div className={FLEX_COL_GAP_1}>
-          <button
-            onClick={() =>
-              statusUpdateHandler(val?._id, PickConf, val?.uniqueCode)
-            }
-            className={`${styles.acpt_btn}`}
-          >
-            Pickup
-          </button>
-        </div>
+        <button
+          className={styles.acpt_btn}
+          onClick={() =>
+            statusUpdateHandler(val?._id, PickConf, val?.uniqueCode)
+          }
+        >
+          Pickup
+        </button>
       )}
       {val?.status === PickConf && (
-        <div className={FLEX_COL_GAP_1}>
-          <button
-            onClick={() =>
-              statusUpdateHandler(val?._id, PickDelivered, val?.uniqueCode)
-            }
-            className={`${styles.acpt_btn}`}
-          >
-            Pickup Delivered
-          </button>
-        </div>
+        <button
+          className={styles.acpt_btn}
+          onClick={() =>
+            statusUpdateHandler(val?._id, PickDelivered, val?.uniqueCode)
+          }
+        >
+          Pickup Delivered
+        </button>
       )}
     </div>
   )
 
   const renderStoreActions = (val) => (
     <div className={FLEX_COL_GAP_1}>
-      <button
-        className={`${styles.view_btn}`}
-        onClick={() => viewHandler(val?._id)}
-      >
+      <button className={styles.view_btn} onClick={() => viewHandler(val?._id)}>
         View
       </button>
     </div>
@@ -195,13 +178,14 @@ const PickedUpDevicesTable = ({
   )
 
   return (
-    <div className={`${styles.pd_cont}`}>
+    <div className={styles.pd_cont}>
       <div className='m-2 overflow-x-auto md:m-5'>
         {showView && (
           <div className={styles.view_wrap}>
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
           </div>
         )}
+
         <table className='w-full border border-primary'>
           <thead className='bg-primary text-white'>
             <tr>
@@ -215,137 +199,22 @@ const PickedUpDevicesTable = ({
             </tr>
           </thead>
           <tbody>
-            {data.map((val, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
-                {renderActionCell(val)}
-                <td className={TABLE_CELL_CENTER}>{val?.status}</td>
-                <td className={TABLE_CELL_CENTER}>
-                  {new Date(val.createdAt).toLocaleDateString('en-GB')}
-                </td>
-                <td className={TABLE_CELL_CENTER}>
-                  {val?.uniqueCode || val?._id}
-                </td>
-                <td className={TABLE_CELL_CENTER}>{val?.totalDevice}</td>
-                <td className={TABLE_CELL_CENTER}>{val?.totalAmount}</td>
-                <td className={TABLE_CELL_CENTER}>{val?.remarks || ''}</td>
-              </tr>
-            ))}
+            {data.map((val, index) =>
+              renderTableRow(val, index, renderActionCell)
+            )}
           </tbody>
         </table>
       </div>
 
-      {showPickupModal && (
-        <ReasonModal
-          title='Pickup Reason'
-          placeholder='Enter reason for pickup'
-          onSubmit={(reason) => {
-            performStatusUpdate(
-              tempRefId,
-              tempNewStatus,
-              tempUniqueCode,
-              reason
-            )
-            setShowPickupModal(false)
-          }}
-          onClose={() => setShowPickupModal(false)}
-        />
-      )}
-      {showPickupCompleteModal && (
-        <ReasonModal
-          title='Pickup Complete Reason'
-          placeholder='Enter reason for pickup complete'
-          onSubmit={(reason) => {
-            performStatusUpdate(
-              tempRefId,
-              tempNewStatus,
-              tempUniqueCode,
-              reason
-            )
-            setShowPickupCompleteModal(false)
-          }}
-          onClose={() => setShowPickupCompleteModal(false)}
-        />
-      )}
-      {showPickupCancelModal && (
-        <ReasonModal
-          title='Pickup Cancel Reason'
-          placeholder='Enter reason for pickup cancellation'
-          onSubmit={(reason) => {
-            performStatusUpdate(
-              tempRefId,
-              tempNewStatus,
-              tempUniqueCode,
-              reason
-            )
-            setShowPickupCancelModal(false)
-          }}
-          onClose={() => setShowPickupCancelModal(false)}
-        />
-      )}
-      {showPickupDeliveredModal && (
-        <ReasonModal
-          title='Pickup Delivered Reason'
-          placeholder='Enter reason for pickup delivered'
-          onSubmit={(reason) => {
-            performStatusUpdate(
-              tempRefId,
-              tempNewStatus,
-              tempUniqueCode,
-              reason
-            )
-            setShowPickupDeliveredModal(false)
-          }}
-          onClose={() => setShowPickupDeliveredModal(false)}
-        />
-      )}
-      {showAcceptModal && (
-        <ReasonModal
-          title='Accept Delivery Reason'
-          placeholder='Enter reason for accepting delivery'
-          onSubmit={(reason) => {
-            performStatusUpdate(
-              tempRefId,
-              tempNewStatus,
-              tempUniqueCode,
-              reason
-            )
-            setShowAcceptModal(false)
-          }}
-          onClose={() => setShowAcceptModal(false)}
-        />
-      )}
-      {showApproveDeliveryModal && (
-        <ReasonModal
-          title='Approve Delivery Reason'
-          placeholder='Enter reason for approving delivery'
-          onSubmit={(reason) => {
-            performStatusUpdate(
-              tempRefId,
-              tempNewStatus,
-              tempUniqueCode,
-              reason
-            )
-            setShowApproveDeliveryModal(false)
-          }}
-          onClose={() => setShowApproveDeliveryModal(false)}
-        />
-      )}
-      {showOutForPickupModal && (
-        <ReasonModal
-          title='Out For Pickup Reason'
-          placeholder='Enter reason for sending out for pickup'
-          onSubmit={(reason) => {
-            performStatusUpdate(
-              tempRefId,
-              tempNewStatus,
-              tempUniqueCode,
-              reason
-            )
-            setShowOutForPickupModal(false)
-          }}
-          onClose={() => setShowOutForPickupModal(false)}
-        />
-      )}
+      <StatusReasonModal
+        statusKey={activeModal}
+        isOpen={!!activeModal}
+        onClose={() => setActiveModal(null)}
+        onSubmit={(reason) => {
+          performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+          setActiveModal(null)
+        }}
+      />
     </div>
   )
 }
