@@ -28,13 +28,19 @@ import { setStoreFilter } from '../../store/slices/userSlice'
 const userRoles = ['Pickup', 'Payroll']
 const succTextColor = 'text-green-500'
 const failTextColor = 'text-primary'
+
+// CSS class constants
+const FLEX_COL_GAP_1 = FLEX_COL_GAP_1
+const TABLE_CELL_BASE = TABLE_CELL_BASE
+const TABLE_CELL_CENTER = TABLE_CELL_CENTER
+const OUT_FOR_PICKUP = OUT_FOR_PICKUP
 const checkOnPkd = 'Check it On Picked Up'
 const PendingConf = 'Pending Pickup Confirmation'
 const DeliveredConf = 'Delivered At Warehouse'
 const PickupCompleteConf = 'Pickup Complete'
 const PickupCancelConf = 'Pickup Cancelled'
 const PickConf = 'Pending Delivery At Warehouse' //Technican Earlier - Pickup Confirmed
-const OutForPickup = 'Out For Pickup'
+const OutForPickup = OUT_FOR_PICKUP
 const PickDelivered = 'Pickup Delivered At Warehouse' //Technican
 const ApprovDelivery = 'Approved Delivery At Warehouse' //Admin Manager
 const FinalStatus = 'Payment Confirmed' //Admin Manager
@@ -309,14 +315,14 @@ const ExtComps = ({
           headers: { Authorization: token1 },
           data: {
             refIDs: [tempId],
-            newStatus: 'Out For Pickup',
+            newStatus: OUT_FOR_PICKUP,
           },
         }
 
         return axios.request(statusConfig).then(() => {
           setUploadReceiptMod(false) // Close modal on success
           setErrorMsg(`Payment confirmed successfully for Lot ${tempUCode}`)
-          setErrorMsg1("Status updated to 'Out For Pickup'.")
+          setErrorMsg1("Status updated to OUT_FOR_PICKUP.")
           setErrorMsg2(
             'Receipt uploaded and email sent to store with Excel report.'
           )
@@ -436,7 +442,7 @@ const ExtComps = ({
             <div className='flex flex-row gap-2'>
               <button
                 onClick={() => {
-                  statusUpdHandler(tempId, 'Out For Pickup', true)
+                  statusUpdHandler(tempId, OUT_FOR_PICKUP, true)
                 }}
                 className={'bg-primary text-white'}
               >
@@ -796,23 +802,23 @@ const PickedUpDevicesTable = ({
         <table className='w-full border border-primary'>
           <thead className='bg-primary text-white'>
             <tr>
-              <th className='p-2 text-sm md:p-3 md:text-base'>Action</th>
-              <th className='p-2 text-sm md:p-3 md:text-base'>Status</th>
-              <th className='p-2 text-sm md:p-3 md:text-base'>Date</th>
-              <th className='p-2 text-sm md:p-3 md:text-base'>Lot Number</th>
-              <th className='p-2 text-sm md:p-3 md:text-base'>
+              <th className=TABLE_CELL_BASE>Action</th>
+              <th className=TABLE_CELL_BASE>Status</th>
+              <th className=TABLE_CELL_BASE>Date</th>
+              <th className=TABLE_CELL_BASE>Lot Number</th>
+              <th className=TABLE_CELL_BASE>
                 Number Of Device
               </th>
-              <th className='p-2 text-sm md:p-3 md:text-base'>Amount</th>
-              <th className='p-2 text-sm md:p-3 md:text-base'>Reason</th>
+              <th className=TABLE_CELL_BASE>Amount</th>
+              <th className=TABLE_CELL_BASE>Reason</th>
             </tr>
           </thead>
           <tbody>
             {data.map((val, index) => (
               <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                <td className=TABLE_CELL_CENTER>
                   {userRoles[userRole] === 'Store' && (
-                    <div className='flex flex-col gap-1'>
+                    <div className=FLEX_COL_GAP_1>
                       <button
                         className={`${styles.view_btn}`}
                         onClick={() => viewHandler(val?._id)}
@@ -831,7 +837,7 @@ const PickedUpDevicesTable = ({
                     />
                   )}
                   {userRole === 'Technician' && (
-                    <div className='flex flex-col gap-1'>
+                    <div className=FLEX_COL_GAP_1>
                       <button
                         className={`${styles.view_btn}`}
                         onClick={() => viewHandler(val?._id)}
@@ -839,7 +845,7 @@ const PickedUpDevicesTable = ({
                         View
                       </button>
                       {val?.status === PendingConf && (
-                        <div className='flex flex-col gap-1'>
+                        <div className=FLEX_COL_GAP_1>
                           <button
                             onClick={() =>
                               statusUpdateHandler(
@@ -855,7 +861,7 @@ const PickedUpDevicesTable = ({
                         </div>
                       )}
                       {val?.status === PickConf && (
-                        <div className='flex flex-col gap-1'>
+                        <div className=FLEX_COL_GAP_1>
                           <button
                             onClick={() =>
                               statusUpdateHandler(
@@ -873,22 +879,22 @@ const PickedUpDevicesTable = ({
                     </div>
                   )}
                 </td>
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                <td className=TABLE_CELL_CENTER>
                   {val?.status}
                 </td>
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                <td className=TABLE_CELL_CENTER>
                   {new Date(val.createdAt).toLocaleDateString('en-GB')}
                 </td>
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                <td className=TABLE_CELL_CENTER>
                   {val?.uniqueCode || val?._id}
                 </td>
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                <td className=TABLE_CELL_CENTER>
                   {val?.totalDevice}
                 </td>
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                <td className=TABLE_CELL_CENTER>
                   {val?.totalAmount}
                 </td>
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                <td className=TABLE_CELL_CENTER>
                   {val?.remarks || ''}
                 </td>
               </tr>
@@ -984,7 +990,7 @@ const UserAdminContent = ({
   viewHandler,
 }) => {
   return (
-    <div className='flex flex-col gap-1'>
+    <div className=FLEX_COL_GAP_1>
       <button
         className={`${styles.view_btn}`}
         onClick={() => viewHandler(val?._id)}
@@ -992,7 +998,7 @@ const UserAdminContent = ({
         View
       </button>
       {val?.status === 'Pending Payment Confirmation' && (
-        <div className='flex flex-col gap-1'>
+        <div className=FLEX_COL_GAP_1>
           <button
             onClick={() => confHandler(val?._id, val?.uniqueCode)}
             className={`${styles.acpt_btn}`}
@@ -1002,7 +1008,7 @@ const UserAdminContent = ({
         </div>
       )}
       {val?.status === 'Pickup Complete' && (
-        <div className='flex flex-col gap-1'>
+        <div className=FLEX_COL_GAP_1>
           <button
             onClick={() =>
               statusUpdateHandler(val?._id, DeliveredConf, val?.uniqueCode)
@@ -1014,7 +1020,7 @@ const UserAdminContent = ({
         </div>
       )}
       {val?.status === PickDelivered && (
-        <div className='flex flex-col gap-1'>
+        <div className=FLEX_COL_GAP_1>
           <button
             onClick={() =>
               statusUpdateHandler(val?._id, ApprovDelivery, val?.uniqueCode)
@@ -1025,9 +1031,9 @@ const UserAdminContent = ({
           </button>
         </div>
       )}
-      {val.status === 'Out For Pickup' && (
-        <div className='flex flex-col gap-1'>
-          <div className='flex flex-col gap-1'>
+      {val.status === OUT_FOR_PICKUP && (
+        <div className=FLEX_COL_GAP_1>
+          <div className=FLEX_COL_GAP_1>
             <button
               onClick={() =>
                 statusUpdateHandler(
@@ -1041,7 +1047,7 @@ const UserAdminContent = ({
               Pickup Complete
             </button>
           </div>
-          <div className='flex flex-col gap-1'>
+          <div className=FLEX_COL_GAP_1>
             {/* <button
               onClick={() =>
                 statusUpdateHandler(val?._id, PickupCancelConf, val?.uniqueCode)
@@ -1054,7 +1060,7 @@ const UserAdminContent = ({
         </div>
       )}
       {val.status === PickupCancelConf && (
-        <div className='flex flex-col gap-1'>
+        <div className=FLEX_COL_GAP_1>
           <button
             onClick={() =>
               statusUpdateHandler(val?._id, OutForPickup, val?.uniqueCode)

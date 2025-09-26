@@ -22,33 +22,12 @@ const failTextColor = 'text-primary'
 const PickupAvail = 'Available For Pickup'
 const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
 
-const DevicePickupDashboard = () => {
-  const token = sessionStorage.getItem('authToken')
-  const userProfile = useSelector((state) => state.user)
-  const [selectedIds, setSelectedIds] = useState([])
-  const [selectedRows, setSelectedRows] = useState([])
-  const [selectedData, setSelectedData] = useState([])
+const useDevicePickupData = (token, region, storeName) => {
   const [pendingTableData, setPendingTableData] = useState([])
   const [isTableLoaded, setIsTableLoaded] = useState(false)
   const [devicesCount, setDevicesCount] = useState(0)
   const [devicesPrice, setDevicesPrice] = useState('0')
-  const [dateValue, setDateValue] = useState('')
-  const [searchValue, setSearchValue] = useState('')
-  const [statusValue, setStatusValue] = useState('')
-  const [selectedStatus, setSelectedStatus] = useState('')
-  const [errorMsg, setErrorMsg] = useState('successfully updated status')
-  const [errorMsg1, setErrorMsg1] = useState(null)
-  const [errorMsg2, setErrorMsg2] = useState(null)
-  const [successMod, setSuccessMod] = useState(false)
-  const [failMod, setFailMode] = useState(false)
-  const [confMod, setConfMod] = useState(false)
-  const [storeName, setStoreName] = useState(userProfile.selStore)
-  const [region, setRegion] = useState(userProfile.selRegion)
-  const [storeData, setStoreData] = useState([])
-  const [regionData, setRegionData] = useState([])
-  const [allStore, setAllStore] = useState([])
-  const firsttime = useRef(true)
-  const isSuperAdmin = LoggedInUser?.role === 'Super Admin'
+
   const getData = () => {
     setIsTableLoaded(true)
     const config = {
@@ -62,20 +41,33 @@ const DevicePickupDashboard = () => {
       .request(config)
       .then((response) => {
         if (response?.data?.data?.length > 0) {
-          setPendingTableData(response?.data?.data[0]?.documents)
-          setDevicesPrice(response?.data?.data[0]?.totalPrices.toString())
-          setDevicesCount(response?.data?.data[0]?.count)
+          setPendingTableData(response?.data?.data[0]?.documents || [])
+          setDevicesPrice(response?.data?.data[0]?.totalPrices?.toString() || '0')
+          setDevicesCount(response?.data?.data[0]?.count || 0)
+        } else {
+          setPendingTableData([])
+          setDevicesPrice('0')
+          setDevicesCount(0)
         }
         setIsTableLoaded(false)
       })
       .catch((error) => {
-        setErrorMsg(`Failed to load data`)
-        setFailMode(true)
+        console.error('Failed to load data:', error)
         setIsTableLoaded(false)
       })
   }
+
+  return { pendingTableData, isTableLoaded, devicesCount, devicesPrice, getData, setPendingTableData, setDevicesCount, setDevicesPrice, setIsTableLoaded }
+}
+
+const useStoreData = (token) => {
+  const [storeData, setStoreData] = useState([])
+  const [regionData, setRegionData] = useState([])
+  const [allStore, setAllStore] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+
   const getStore = () => {
-    setIsTableLoaded(true)
+    setIsLoading(true)
     const config = {
       method: 'get',
       url: `${
@@ -86,22 +78,49 @@ const DevicePickupDashboard = () => {
     axios
       .request(config)
       .then((response) => {
-        const allData = response.data.result
-        const storeNamesArray = response.data.result.map(
-          (store) => store.storeName
-        )
+        const allData = response.data.result || []
+        const storeNamesArray = allData.map((store) => store.storeName)
         const uniqueRegionsArray = [
-          ...new Set(response.data.result.map((store) => store.region)),
+          ...new Set(allData.map((store) => store.region)),
         ]
         setAllStore(allData)
         setStoreData(storeNamesArray)
         setRegionData(uniqueRegionsArray)
-        setIsTableLoaded(false)
+        setIsLoading(false)
       })
       .catch((error) => {
-        setIsTableLoaded(false)
+        console.error('Failed to load store data:', error)
+        setIsLoading(false)
       })
   }
+
+  return { storeData, regionData, allStore, getStore, setStoreData }
+}
+
+const DevicePickupDashboard = () => {
+  const token = sessionStorage.getItem('authToken')
+  const userProfile = useSelector((state) => state.user)
+  const [selectedIds, setSelectedIds] = useState([])
+  const [selectedRows, setSelectedRows] = useState([])
+  const [selectedData, setSelectedData] = useState([])
+  const [dateValue, setDateValue] = useState('')
+  const [searchValue, setSearchValue] = useState('')
+  const [statusValue, setStatusValue] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState('')
+  const [errorMsg, setErrorMsg] = useState('successfully updated status')
+  const [errorMsg1, setErrorMsg1] = useState(null)
+  const [errorMsg2, setErrorMsg2] = useState(null)
+  const [successMod, setSuccessMod] = useState(false)
+  const [failMod, setFailMode] = useState(false)
+  const [confMod, setConfMod] = useState(false)
+  const [storeName, setStoreName] = useState(userProfile.selStore)
+  const [region, setRegion] = useState(userProfile.selRegion)
+  const firsttime = useRef(true)
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin'
+
+  const { pendingTableData, isTableLoaded, devicesCount, devicesPrice, getData, setPendingTableData, setDevicesCount, setDevicesPrice, setIsTableLoaded } = useDevicePickupData(token, region, storeName)
+  const { storeData, regionData, allStore, getStore, setStoreData } = useStoreData(token)
+
   const getDataBySearch = () => {
     setIsTableLoaded(true)
     const config = {
@@ -115,13 +134,13 @@ const DevicePickupDashboard = () => {
       .request(config)
       .then((response) => {
         setPendingTableData([])
-        if (response.data.data.length === 0) {
+        if (response?.data?.data?.length === 0) {
           setDevicesPrice('0')
           setDevicesCount(0)
         } else {
-          setPendingTableData(response.data.data[0].documents)
-          setDevicesPrice(response.data.data[0].totalPrices.toString())
-          setDevicesCount(response.data.data[0].count)
+          setPendingTableData(response.data.data[0]?.documents || [])
+          setDevicesPrice(response.data.data[0]?.totalPrices?.toString() || '0')
+          setDevicesCount(response.data.data[0]?.count || 0)
         }
         setIsTableLoaded(false)
       })

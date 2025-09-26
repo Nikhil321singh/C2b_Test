@@ -11,6 +11,11 @@ import { setStoreFilter } from '../../store/slices/userSlice'
 const PickupAvail = 'Available For Pickup'
 const RotateCss = 'rotate-180'
 const downloadExcel = (pendDataDown) => {
+  if (!pendDataDown || !Array.isArray(pendDataDown)) {
+    console.error('Invalid data provided for Excel download')
+    return
+  }
+
   const fileType =
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
   const fileExtension = '.xlsx'
@@ -72,16 +77,20 @@ const DPFilter = ({
     setRegion(value)
     dispatch(setStoreFilter({ selStore: '', selRegion: value }))
   }
+
   const handleStoreChange = (value) => {
     setStoreDrop(false)
     const filteredStores2 = allStore?.filter(
       (store) => store.storeName === value
     )
-    const newRegion = filteredStores2[0].region
-    setRegion(newRegion)
-    setStoreName(value)
-    dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }))
+    if (filteredStores2?.length > 0) {
+      const newRegion = filteredStores2[0].region
+      setRegion(newRegion)
+      setStoreName(value)
+      dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }))
+    }
   }
+
   const handleSearchClear = () => {
     setSearchValue('')
     setSelectedStatus('')
@@ -101,6 +110,7 @@ const DPFilter = ({
       setFilteredStores(storeData)
     }
   }, [storeDrop, searchTerm])
+
   const handleSearch = (e) => {
     const value = e.target.value
     setSearchTerm(value)
@@ -114,9 +124,11 @@ const DPFilter = ({
       setFilteredStores(filtered)
     }
   }
+
   const handleFilterClick = () => {
     setShowFilterDropdown(!showFilterDropdown)
   }
+
   const dateChangeHandler = (event) => {
     const formattedDate = new Date(event.target.value).toLocaleDateString(
       'en-GB'
@@ -167,77 +179,20 @@ const DPFilter = ({
         pendingTableData={pendingTableData}
       />
       {isSuperAdmin && (
-        <div className='flex gap-2 w-100 items-center outline-none'>
-          <div className='relative w-[45%]'>
-            <div
-              className={`w-[100%] ${styles.filter_button}`}
-              onClick={() => {
-                setRegionDrop(!regionDrop)
-              }}
-            >
-              <p className='truncate'>
-                {region === '' ? 'Select Region' : region}
-              </p>
-              <FaAngleDown size={17} className={`${regionDrop && RotateCss}`} />
-            </div>
-            {regionDrop && (
-              <div className={`w-[100%] ${styles.filter_drop}`}>
-                {regionData.map((item) => (
-                  <div
-                    key={item}
-                    onClick={() => handleRegionChange(item)}
-                    className={`${styles.filter_option}`}
-                  >
-                    <p className='truncate'>{item}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className='relative w-[70%]'>
-            <div
-              className={`${styles.filter_button} w-full`}
-              onClick={() => setStoreDrop(!storeDrop)}
-            >
-              <p className='truncate'>
-                {searchTerm === '' ? 'Select Store' : searchTerm}
-              </p>
-              <FaAngleDown size={17} className={`${storeDrop && RotateCss}`} />
-            </div>
-            {storeDrop && (
-              <div className='absolute w-full bg-white shadow-md'>
-                <input
-                  type='text'
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className='w-full p-2 border-b border-gray-300'
-                  placeholder='Search store...'
-                />
-                <div
-                  className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
-                >
-                  {filteredStores.length > 0 ? (
-                    filteredStores.map((item, index) => (
-                      <div
-                        key={index}
-                        onClick={() => {
-                          handleStoreChange(item)
-                          setSearchTerm(item)
-                          setStoreDrop(false)
-                        }}
-                        className={`${styles.filter_option}`}
-                      >
-                        <p className='truncate'>{item}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className='p-2 text-gray-500'>No stores found</p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <SuperAdminFilters
+          region={region}
+          regionDrop={regionDrop}
+          setRegionDrop={setRegionDrop}
+          regionData={regionData}
+          handleRegionChange={handleRegionChange}
+          searchTerm={searchTerm}
+          storeDrop={storeDrop}
+          setStoreDrop={setStoreDrop}
+          handleSearch={handleSearch}
+          filteredStores={filteredStores}
+          handleStoreChange={handleStoreChange}
+          setSearchTerm={setSearchTerm}
+        />
       )}
     </div>
   )
@@ -319,6 +274,93 @@ const DPFilterSub = ({
       >
         <FaDownload /> Bulk Download
       </button>
+    </div>
+  )
+}
+
+const SuperAdminFilters = ({
+  region,
+  regionDrop,
+  setRegionDrop,
+  regionData,
+  handleRegionChange,
+  searchTerm,
+  storeDrop,
+  setStoreDrop,
+  handleSearch,
+  filteredStores,
+  handleStoreChange,
+  setSearchTerm,
+}) => {
+  return (
+    <div className='flex gap-2 w-100 items-center outline-none'>
+      <div className='relative w-[45%]'>
+        <div
+          className={`w-[100%] ${styles.filter_button}`}
+          onClick={() => setRegionDrop(!regionDrop)}
+        >
+          <p className='truncate'>
+            {region === '' ? 'Select Region' : region}
+          </p>
+          <FaAngleDown size={17} className={`${regionDrop && RotateCss}`} />
+        </div>
+        {regionDrop && (
+          <div className={`w-[100%] ${styles.filter_drop}`}>
+            {regionData.map((item) => (
+              <div
+                key={item}
+                onClick={() => handleRegionChange(item)}
+                className={`${styles.filter_option}`}
+              >
+                <p className='truncate'>{item}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className='relative w-[70%]'>
+        <div
+          className={`${styles.filter_button} w-full`}
+          onClick={() => setStoreDrop(!storeDrop)}
+        >
+          <p className='truncate'>
+            {searchTerm === '' ? 'Select Store' : searchTerm}
+          </p>
+          <FaAngleDown size={17} className={`${storeDrop && RotateCss}`} />
+        </div>
+        {storeDrop && (
+          <div className='absolute w-full bg-white shadow-md'>
+            <input
+              type='text'
+              value={searchTerm}
+              onChange={handleSearch}
+              className='w-full p-2 border-b border-gray-300'
+              placeholder='Search store...'
+            />
+            <div
+              className={`overflow-y-scroll max-h-[200px] ${styles.filter_drop} w-full`}
+            >
+              {filteredStores.length > 0 ? (
+                filteredStores.map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      handleStoreChange(item)
+                      setSearchTerm(item)
+                      setStoreDrop(false)
+                    }}
+                    className={`${styles.filter_option}`}
+                  >
+                    <p className='truncate'>{item}</p>
+                  </div>
+                ))
+              ) : (
+                <p className='p-2 text-gray-500'>No stores found</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

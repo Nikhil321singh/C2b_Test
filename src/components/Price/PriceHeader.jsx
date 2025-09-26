@@ -10,7 +10,7 @@ const PriceHeader = ({ navigate }) => {
       <div className='flex items-center justify-between w-full pr-4'>
         <div className='flex items-center gap-2 ml-4'>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/selectdevicetype')}
             className='text-xs ml-2 flex items-center justify-center text-white bg-[--primary-color] hover:cursor-pointer p-2 rounded-full'
           >
             <IoArrowBack size={24} />
