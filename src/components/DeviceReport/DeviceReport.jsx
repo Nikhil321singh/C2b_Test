@@ -80,8 +80,38 @@ const renderOption = (option, isSelected, questionIndex, optionIndex) => (
 
 // Main function simplified
 const renderQuestionOptions = (selectedAnswers, rawQuestionsGroup) => {
+  // If no raw questions (quick quote scenario), render answers directly
   if (!rawQuestionsGroup?.length) {
-    return null
+    if (!selectedAnswers?.length) {
+      return null
+    }
+
+    return selectedAnswers.map((answer, index) => (
+      <div
+        key={index}
+        className='flex flex-row items-center w-full p-3 rounded-lg border'
+        style={{
+          backgroundColor: PRIMARY_BG_LIGHTER,
+          borderColor: PRIMARY_BORDER,
+        }}
+      >
+        <LuDot size={20} className='shrink-0' style={{ color: PRIMARY_COLOR }} />
+        <div className='flex justify-between w-[85%] questionkey'>
+          <p className='text-sm font-medium text-gray-800'>
+            {answer.quetion}
+          </p>
+          <span
+            className='ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase'
+            style={{
+              backgroundColor: PRIMARY_BG_LIGHT,
+              color: PRIMARY_COLOR,
+            }}
+          >
+            {answer?.key}
+          </span>
+        </div>
+      </div>
+    ))
   }
 
   return rawQuestionsGroup
