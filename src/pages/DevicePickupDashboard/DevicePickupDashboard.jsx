@@ -263,7 +263,11 @@ const ExtComps = ({
       setFailMode(true)
       return
     }
-    const address = allStore.find((store) => store.storeName === storeName)?._id
+    const address =
+      allStore.find((store) => store.storeName === storeName)?._id ||
+      pendingTableData?.filter((obj) => selectedIds[0] === obj._id)[0]
+        ?.storeDetails?.storeId
+
     const LDIds = pendingTableData
       ?.filter((obj) => selectedIds.includes(obj._id))
       .map((obj) => obj._id.toString())
@@ -414,7 +418,8 @@ const PDTable = ({
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showHoldModal, setShowHoldModal] = useState(false)
   const [showQCDoneModal, setShowQCDoneModal] = useState(false)
-  const [showAvailableForPickupModal, setShowAvailableForPickupModal] = useState(false)
+  const [showAvailableForPickupModal, setShowAvailableForPickupModal] =
+    useState(false)
   const [showPendingInQCModal, setShowPendingInQCModal] = useState(false)
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {
@@ -901,7 +906,10 @@ const AvailableForPickupModal = ({
           placeholder='Enter Reason for Available For Pickup'
         />
         <div className='flex flex-row gap-2'>
-          <button onClick={handleAvailableForPickupSubmit} className={buttonStyles}>
+          <button
+            onClick={handleAvailableForPickupSubmit}
+            className={buttonStyles}
+          >
             Okay
           </button>
           <button
