@@ -300,14 +300,29 @@ const ExtComps = ({
     return axios
       .request(config)
       .then((response) => {
-        setUploadReceiptMod(false) // Close modal on success
-        setErrorMsg(`Payment confirmed successfully for Lot ${tempUCode}`)
-        setErrorMsg1("Status updated to 'Pending Admin Approval'.")
-        setErrorMsg2(
-          'Receipt uploaded and email sent to store with Excel report.'
-        )
-        setSuccessMod(true)
-        getData() // Refresh data
+        // First update the status to "Out For Pickup"
+        const statusConfig = {
+          method: 'post',
+          url: `${
+            import.meta.env.VITE_REACT_APP_ENDPOINT
+          }/api/pickupDevices/update`,
+          headers: { Authorization: token1 },
+          data: {
+            refIDs: [tempId],
+            newStatus: 'Out For Pickup',
+          },
+        }
+
+        return axios.request(statusConfig).then(() => {
+          setUploadReceiptMod(false) // Close modal on success
+          setErrorMsg(`Payment confirmed successfully for Lot ${tempUCode}`)
+          setErrorMsg1("Status updated to 'Out For Pickup'.")
+          setErrorMsg2(
+            'Receipt uploaded and email sent to store with Excel report.'
+          )
+          setSuccessMod(true)
+          getData() // Refresh data
+        })
       })
       .catch((error) => {
         const errorMessage =
@@ -320,23 +335,23 @@ const ExtComps = ({
   }
   const statusUpdHandler = (refID, newStatus, skipSuccessModal = false) => {
     setConfMod(false)
-    setIsTableLoaded(true)
-    const config = {
-      method: 'post',
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/update`,
-      headers: { Authorization: token1 },
-      data: {
-        refIDs: [refID],
-        newStatus: newStatus,
-      },
-    }
-    axios
-      .request(config)
-      .then((response) => {
-        getData()
-        if (!skipSuccessModal) {
+    if (!skipSuccessModal) {
+      setIsTableLoaded(true)
+      const config = {
+        method: 'post',
+        url: `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/pickupDevices/update`,
+        headers: { Authorization: token1 },
+        data: {
+          refIDs: [refID],
+          newStatus: newStatus,
+        },
+      }
+      axios
+        .request(config)
+        .then((response) => {
+          getData()
           setErrorMsg(
             `Successfully Updated Status of Lot ${tempUCode} to ${newStatus}`
           )
@@ -345,17 +360,18 @@ const ExtComps = ({
             setErrorMsg1('Check it on history.')
           }
           setSuccessMod(true)
-        } else {
-          // Open upload modal after successful status update
-          setUploadReceiptMod(true)
-        }
-        setIsTableLoaded(false)
-      })
-      .catch((error) => {
-        setErrorMsg(`Failed to Updated Status of Lot ${refID} to ${newStatus}`)
-        setFailMode(true)
-        setIsTableLoaded(false)
-      })
+          setIsTableLoaded(false)
+        })
+        .catch((error) => {
+          setErrorMsg(`Failed to Updated Status of Lot ${refID} to ${newStatus}`)
+          setFailMode(true)
+          setIsTableLoaded(false)
+        })
+    } else {
+      // For payment confirmation, just open the upload modal without updating status first
+      setUploadReceiptMod(true)
+      setIsTableLoaded(false)
+    }
   }
   return (
     <React.Fragment>

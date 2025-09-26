@@ -66,6 +66,17 @@ const downloadExcelLeadsompleted = (apiData) => {
       }
     }
 
+    // Get variant info (same logic as getStorage in table)
+    const getVariant = (val) => {
+      if (val?.modelId?.type === "CTG1") {
+        return `${
+          val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
+        }`;
+      } else {
+        return "-";
+      }
+    };
+
     return {
       "Date Created": new Date(item?.updatedAt).toLocaleDateString("en-IN"),
       "Store user Mobile No.": item.phoneNumber,
@@ -73,6 +84,7 @@ const downloadExcelLeadsompleted = (apiData) => {
       "Customer Mobile No.": item.phoneNumber,
       "Customer Name": item.name,
       Product: item.modelId?.name,
+      Variant: getVariant(item),
       Price: item.actualPrice,
       "Final Price Offered to Customer": item?.price,
       "Order Id": item?.uniqueCode,
