@@ -2,7 +2,11 @@ import React from 'react'
 
 const PickupAvail = 'Available For Pickup'
 
-const StatusSelector = ({ selectedStatus, handleStatusUpdate, confHandler }) => (
+const StatusSelector = ({
+  selectedStatus,
+  handleStatusUpdate,
+  confHandler,
+}) => (
   <div className='mx-2 flex gap-2'>
     <select
       className='border-2 w-1/2 outline-none border-primary bg-primary text-white text-[12px] px-4 py-2 rounded'

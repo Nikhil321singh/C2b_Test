@@ -32,13 +32,7 @@ const PDTable = ({
     useState(false)
   const [showPendingInQCModal, setShowPendingInQCModal] = useState(false)
 
-  const {
-    showModalForStatus,
-    createStatusUpdateConfig,
-    handleUpdateSuccess,
-    handleUpdateError,
-  } = useStatusHandlers(
-    token2,
+  const statusHandlers = {
     setSelectedIds,
     setSelectedData,
     setSelectedRows,
@@ -49,7 +43,14 @@ const PDTable = ({
     setSuccessMod,
     setFailMode,
     getData
-  )
+  }
+
+  const {
+    showModalForStatus,
+    createStatusUpdateConfig,
+    handleUpdateSuccess,
+    handleUpdateError,
+  } = useStatusHandlers(token2, statusHandlers)
 
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {

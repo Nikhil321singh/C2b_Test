@@ -1,21 +1,20 @@
-import axios from 'axios'
-
 const PickupAvail = 'Available For Pickup'
 const updateStatusError = 'Failed to update status'
 
-export const useStatusHandlers = (
-  token2,
-  setSelectedIds,
-  setSelectedData,
-  setSelectedRows,
-  setIsTableLoaded,
-  setErrorMsg,
-  setErrorMsg1,
-  setErrorMsg2,
-  setSuccessMod,
-  setFailMode,
-  getData
-) => {
+export const useStatusHandlers = (token2, handlers) => {
+  const {
+    setSelectedIds,
+    setSelectedData,
+    setSelectedRows,
+    setIsTableLoaded,
+    setErrorMsg,
+    setErrorMsg1,
+    setErrorMsg2,
+    setSuccessMod,
+    setFailMode,
+    getData,
+  } = handlers
+
   const showModalForStatus = (
     status,
     setShowAvailableForPickupModal,
@@ -29,7 +28,7 @@ export const useStatusHandlers = (
       'On Hold': setShowHoldModal,
       'QC Done': setShowQCDoneModal,
       'Pending in QC': setShowPendingInQCModal,
-      'Cancelled': setShowCancelModal,
+      Cancelled: setShowCancelModal,
     }
     return modalMap[status]?.(true)
   }

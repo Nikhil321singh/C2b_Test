@@ -19,9 +19,15 @@ export const useAdminReport = () => {
     setIsLoading(true)
     const token = sessionStorage.getItem('authToken')
     const queryParams = new URLSearchParams()
-    if (searchValue?.trim()) queryParams.append('search', searchValue)
-    if (toDateDup) queryParams.append('toDate', toDateDup)
-    if (fromDateDup) queryParams.append('fromDate', fromDateDup)
+    if (searchValue?.trim()) {
+      queryParams.append('search', searchValue)
+    }
+    if (toDateDup) {
+      queryParams.append('toDate', toDateDup)
+    }
+    if (fromDateDup) {
+      queryParams.append('fromDate', fromDateDup)
+    }
 
     getAdminReport(token, queryParams.toString())
       .then((res) => {
@@ -50,7 +56,9 @@ export const useAdminReport = () => {
     const token = sessionStorage.getItem('authToken')
     downloadAdminReport(token)
       .then((res) => {
-        if (res.data?.result) downloadExcel(res.data.result)
+        if (res.data?.result) {
+          downloadExcel(res.data.result)
+        }
       })
       .catch((err) => console.error('Download Error:', err))
   }
