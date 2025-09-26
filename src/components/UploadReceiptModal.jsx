@@ -112,12 +112,12 @@ const UploadReceiptModal = ({
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Remarks (Optional)
+            UTR Number
           </label>
           <textarea
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
-            placeholder="Add any additional remarks about the payment..."
+            placeholder="Add UTR Number about the payment..."
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
             rows="3"
             disabled={isUploading}
