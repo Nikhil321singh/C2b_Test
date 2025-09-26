@@ -20,6 +20,11 @@ const currentDomain = window.location.origin;
 const WEBSITE_SHORT_NAME = currentDomain === import.meta.env.VITE_BUYBACK_URL ? import.meta.env.VITE_BUYBACK_SHORT_NAME : import.meta.env.VITE_WEBSITE_SHORT_NAME;
 
 const downloadExcelStoreWise = (apiData) => {
+  if (!apiData || !Array.isArray(apiData)) {
+    console.error('Invalid data provided for Excel download');
+    return;
+  }
+
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
@@ -78,50 +83,50 @@ const fetchDownloadDataStoreWise = (deviceCategory, fromDate, toDate, storeId, t
       console.log(err);
     });
 };
-const StoreWiseReport = () => {
-  const token = sessionStorage.getItem("authToken");
-  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
-  const [maxPages, setMaxPages] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
+const useStoreWiseData = (token, currentPage, storeId, searchValue, grestRec, toDateDup, fromDateDup, techId, deviceCategory) => {
   const [tableData, setTableData] = useState();
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [storeName, setStoreName] = useState(ALLstore);
-  const [storeId, setStoreId] = useState("");
-  const [region, setRegion] = useState("");
-  const [storeData, setStoreData] = useState([]);
-  const [regionalData, setRegionalData] = useState([]);
-  const [entireStore, setEntireStore] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [fromDateDup, setFromDateDup] = useState(startDateFillter);
-  const [toDate, setToDate] = useState("");
-  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
-  const [grestRec, setGrestRec] = useState("");
-  const [allUser, setAllUser] = useState([]);
-  const [techId, setTechId] = useState("");
-  const [techName, setTechName] = useState("");
-  const [deviceCategory, setDeviceCategory] = useState("CTG1");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categories, setCategories] = useState([]);
+  const [maxPages, setMaxPages] = useState(0);
+
   const fetchStoreData = () => {
     setIsTableLoaded(true);
-    axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll?page=${currentPage}
-        &limit=${pageLimit}&is_selled=${isSelled}
-        &store=${storeId}&rid=${searchValue}&grestRec=${grestRec}&endDate=${toDateDup}
-        &startDate=${fromDateDup}&userId=${techId}&deviceType=${deviceCategory}`,
+    const queryParams = new URLSearchParams({
+      page: currentPage,
+      limit: pageLimit,
+      is_selled: isSelled,
+      store: storeId,
+      rid: searchValue,
+      grestRec: grestRec,
+      endDate: toDateDup,
+      startDate: fromDateDup,
+      userId: techId,
+      deviceType: deviceCategory
+    });
+
+    axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll?${queryParams.toString()}`,
       { headers: { Authorization: token } })
       .then((res) => {
         setMaxPages(Math.ceil(res.data.totalCounts / 10));
-        setTableData(res.data.data);
+        setTableData(res.data.data || []);
         setIsTableLoaded(false);
       })
       .catch((err) => {
+        console.error('Failed to fetch store data:', err);
         setIsTableLoaded(false);
       });
   };
+
+  return { tableData, isTableLoaded, maxPages, fetchStoreData, setTableData, setIsTableLoaded, setMaxPages };
+};
+
+const useStoreMetadata = (token) => {
+  const [storeData, setStoreData] = useState([]);
+  const [regionalData, setRegionalData] = useState([]);
+  const [entireStore, setEntireStore] = useState([]);
+  const [allUser, setAllUser] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const getStore = () => {
-    setIsTableLoaded(true);
     const config = {
       method: "get",
       url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll?page=0&limit=9999`,
@@ -130,63 +135,80 @@ const StoreWiseReport = () => {
     axios
       .request(config)
       .then((response) => {
-        const allStoreData = response.data.result;
-        const storeArr = response.data.result.map((store) => ({
-          storeName: store.storeName,
-          _id: store._id,
-        }));
-        const regionsUniqueArray = [
-          ...new Set(response.data.result.map((store) => store.region)),
-        ];
-        setStoreData(storeArr);
-        setEntireStore(allStoreData);
-        setIsTableLoaded(false);
-        setRegionalData(regionsUniqueArray);
+        const allData = response.data.result || [];
+        const storeNamesArray = allData.map((store) => store.storeName);
+        const uniqueRegionsArray = [...new Set(allData.map((store) => store.region))];
+        setEntireStore(allData);
+        setStoreData(storeNamesArray);
+        setRegionalData(uniqueRegionsArray);
       })
       .catch((error) => {
-        setIsTableLoaded(false);
+        console.error('Failed to fetch store data:', error);
       });
   };
-  const getTechnicians = () => {
-    setIsTableLoaded(true);
-    const config = {
-      method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/userregistry/all`,
-      headers: { Authorization: token },
-    };
+
+  const getAllUser = () => {
     axios
-      .request(config)
-      .then((response) => {
-        const allStoresData = response.data.data;
-        const userNamesArray = allStoresData.filter(user => user.role === "Sale User").map((user) => ({
-          userName: user?.name || user?.firstName,
-          _id: user._id,
-        }));
-        setAllUser(userNamesArray);
-        setIsTableLoaded(false);
+      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/user/find`, {
+        headers: { Authorization: token },
       })
-      .catch((error) => {
-        setIsTableLoaded(false);
+      .then((res) => {
+        setAllUser(res.data.data || []);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch users:', err);
       });
   };
-  const getCategories = async () => {
-    try {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
-        {
-          headers: { Authorization: token },
-        }
-      );
-      setCategories(data.data);
-    } catch (err) {
-      console.log(err);
-    }
+
+  const getCategories = () => {
+    axios
+      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/findAll`, {
+        headers: { Authorization: token },
+      })
+      .then((res) => {
+        setCategories(res.data.data || []);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch categories:', err);
+      });
   };
+
+  return {
+    storeData, regionalData, entireStore, allUser, categories,
+    getStore, getAllUser, getCategories, setStoreData
+  };
+};
+
+const StoreWiseReport = () => {
+  const token = sessionStorage.getItem("authToken");
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
+  const [currentPage, setCurrentPage] = useState(0);
+  const [storeName, setStoreName] = useState(ALLstore);
+  const [storeId, setStoreId] = useState("");
+  const [region, setRegion] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [fromDateDup, setFromDateDup] = useState(startDateFillter);
+  const [toDate, setToDate] = useState("");
+  const [toDateDup, setToDateDup] = useState(new Date().toISOString().split("T")[0]);
+  const [grestRec, setGrestRec] = useState("");
+  const [techId, setTechId] = useState("");
+  const [techName, setTechName] = useState("");
+  const [deviceCategory, setDeviceCategory] = useState("CTG1");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const { tableData, isTableLoaded, maxPages, fetchStoreData } = useStoreWiseData(
+    token, currentPage, storeId, searchValue, grestRec, toDateDup, fromDateDup, techId, deviceCategory
+  );
+
+  const { storeData, regionalData, entireStore, allUser, categories, getStore, getAllUser, getCategories, setStoreData } = useStoreMetadata(token);
+
   useEffect(() => {
     getCategories();
     if (isSuperAdmin) {
       getStore();
-      getTechnicians();
+      getAllUser();
     }
   }, [isSuperAdmin]);
 

@@ -157,8 +157,18 @@ const LeadsCompleted = () => {
   };
   function getSalesData() {
     setLoading(true);
-    const endpoint = `${import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=${fromDateDup}&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=${search1}&deviceType=${deviceType}`;
+    const baseUrl = `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAllSelled`
+    const queryParams = new URLSearchParams({
+      page: currentPage,
+      limit: pageLimit,
+      startDate: fromDateDup,
+      endDate: toDateDup,
+      store: selStoreId,
+      rid: search,
+      customerPhone: search1,
+      deviceType: deviceType
+    })
+    const endpoint = `${baseUrl}?${queryParams.toString()}`
     axios
       .get(endpoint, {
         headers: { authorization: userToken },
