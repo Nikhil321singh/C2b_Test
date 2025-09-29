@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import DashboardTable from '../../components/DashboardTable/DashboardTable'
 import styles from '../CompanyListingDetails/CompanyListingDetails.module.css'
 import { IoMdSearch } from 'react-icons/io'
@@ -13,6 +13,7 @@ import { useAdminReport } from './hooks/useAdminReport'
 import { formatDateToString } from './utils/dateUtils'
 
 const AdminDashboard = () => {
+  const [sideMenu, setsideMenu] = useState(false)
   const {
     tableData,
     isLoading,
@@ -52,8 +53,8 @@ const AdminDashboard = () => {
         </div>
       )}
       <div className='navbar'>
-        <AdminNavbar />
-        <SideMenu />
+        <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
+        <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
 
       <div className='flex gap-2 items-center justify-center mt-5 w-full'>
