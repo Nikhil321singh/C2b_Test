@@ -30,7 +30,14 @@ export const useStatusHandlers = (token2, handlers) => {
       'Pending in QC': setShowPendingInQCModal,
       Cancelled: setShowCancelModal,
     }
-    return modalMap[status]?.(true)
+    const setter = modalMap[status]
+    if (setter) {
+      // Open the corresponding modal and stop direct update flow
+      setter(true)
+      setIsTableLoaded(false)
+      return true
+    }
+    return false
   }
 
   const createStatusUpdateConfig = (LDIds, newStatus) => ({

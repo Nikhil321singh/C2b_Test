@@ -114,7 +114,7 @@ const LeadsCompletedTable = ({ data }) => {
           {data.map((val, index) => (
             <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {new Date(val?.updatedAt).toLocaleDateString("en-IN", {
+                {new Date(val?.createdAt).toLocaleDateString("en-IN", {
                   day: "2-digit",
                   month: "2-digit",
                   year: "numeric",
