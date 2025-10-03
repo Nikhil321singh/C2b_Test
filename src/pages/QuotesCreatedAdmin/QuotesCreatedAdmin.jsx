@@ -67,10 +67,8 @@ const fetchDownloadData = (str) => {
   const userToken1 = sessionStorage.getItem("authToken");
   axios
     .get(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll/quotecreated?fromdate=2020-01-01&todate=${
-        new Date().toISOString().split("T")[0]
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/prospects/findAll/quotecreated?fromdate=2020-01-01&todate=${new Date().toISOString().split("T")[0]
       }&search=$&store=${str}`,
       {
         headers: {
@@ -90,9 +88,8 @@ const getStore = async () => {
   const token = sessionStorage.getItem("authToken");
   const config = {
     method: "get",
-    url: `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/store/findAll?page=0&limit=9999`,
+    url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/store/findAll?page=0&limit=9999`,
     headers: { Authorization: token },
   };
   let storeNamesArr = [];
@@ -131,8 +128,8 @@ const QuotesCreatedAdmin = () => {
     setIsTableLoaded(true);
     axios.get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll/quotecreated?fromdate=${fromDateDup
       }&todate=${toDateDup}&search=${searchValue}&store=${storeId}`,
-        { headers: { authorization: userToken } }
-      )
+      { headers: { authorization: userToken } }
+    )
       .then((res) => {
         setTableData(res.data.data.quoteData.data);
         setIsTableLoaded(false);
@@ -162,27 +159,27 @@ const QuotesCreatedAdmin = () => {
     setFromDateDup(initDate);
     setFilFlag(!filFlag);
   };
- useEffect(() => {
-   if (
-     searchValue === "" &&
-     storeName === ALLstore &&
-     storeId === "" &&
-     fromDateDup === initDate
-   ) {
-     getTableData();
-   }
- }, [searchValue, storeName, storeId, fromDateDup]);
+  useEffect(() => {
+    if (
+      searchValue === "" &&
+      storeName === ALLstore &&
+      storeId === "" &&
+      fromDateDup === initDate
+    ) {
+      getTableData();
+    }
+  }, [searchValue, storeName, storeId, fromDateDup]);
 
- const handleSearch = (e) => {
-   const value = e.target.value;
-   setSearchTerm(value);
-   if (value === "") {
-     setFilteredStores(storeData);
-   } else {
-     const filtered = storeData.filter((store) => store.storeName.toLowerCase().includes(value.toLowerCase()));
-     setFilteredStores(filtered);
-   }
- };
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (value === "") {
+      setFilteredStores(storeData);
+    } else {
+      const filtered = storeData.filter((store) => store.storeName.toLowerCase().includes(value.toLowerCase()));
+      setFilteredStores(filtered);
+    }
+  };
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     setStoreName(value.storeName);
@@ -224,7 +221,7 @@ const QuotesCreatedAdmin = () => {
             placeholder="Search...."
           />
           <IoMdSearch onClick={() => {
-              getTableData();
+            getTableData();
           }} size={25} />
         </div>
         <div className={styles.icons_box}><IoRefresh onClick={handleSearchClear} className=" " size={25} /></div>
@@ -251,54 +248,56 @@ const QuotesCreatedAdmin = () => {
             placeholderText="Select to date"
           />
         </div>
-        <div className="relative w-[250px]">
-          <div
-            className={`${styles.filter_button}`}
-            onClick={() => {
-              setStoreDrop(!storeDrop);
-            }}
-          >
-            <p className="truncate">{searchTerm === "" ? "Select Store" : searchTerm}</p>
-            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
-          </div>
-          {storeDrop && (
-            <div className="absolute   w-full bg-white shadow-md">
-              <input
-                type="text"
-                onChange={handleSearch}
-                className="w-full p-2 border-b border-gray-300"
-                placeholder="Search store..."
-                value={searchTerm}
-              />
-              <div
-                className={` overflow-y-scroll  max-h-[200px] ${styles.filter_drop}`}
-              >
-                {filteredStores.length > 0 ? (
-                  filteredStores.map((item5, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        handleStoreChange(item5);
-                        setSearchTerm(item5.storeName);
-                        setStoreDrop(false);
-                      }}
-                      className={`${styles.filter_option}`}
-                    ><p className="truncate  ">{item5.storeName}</p></div>
-                  ))
-                ) : (<p className="p-2 text-gray-500">No stores found</p>)}
+        {storeData && storeData.length > 1 && (
+          <div className="relative w-[250px]">
+            <div
+              className={`${styles.filter_button}`}
+              onClick={() => {
+                setStoreDrop(!storeDrop);
+              }}
+            >
+              <p className="truncate">{searchTerm === "" ? "Select Store" : searchTerm}</p>
+              <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
+            </div>
+            {storeDrop && (
+              <div className="absolute   w-full bg-white shadow-md">
+                <input
+                  type="text"
+                  onChange={handleSearch}
+                  className="w-full p-2 border-b border-gray-300"
+                  placeholder="Search store..."
+                  value={searchTerm}
+                />
                 <div
-                  className={`${styles.filter_option}`}
-                  onClick={() => {
-                    handleStoreChange({ _id: "", storeName: ALLstore });
-                    setSearchTerm(ALLstore);
-                  }}
+                  className={` overflow-y-scroll  max-h-[200px] ${styles.filter_drop}`}
                 >
-                  <p className="truncate">{ALLstore}</p>
+                  <div
+                    className={`${styles.filter_option}`}
+                    onClick={() => {
+                      handleStoreChange({ _id: "", storeName: ALLstore });
+                      setSearchTerm(ALLstore);
+                    }}
+                  >
+                    <p className="truncate">{ALLstore}</p>
+                  </div>
+                  {filteredStores.length > 0 ? (
+                    filteredStores.map((item5, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          handleStoreChange(item5);
+                          setSearchTerm(item5.storeName);
+                          setStoreDrop(false);
+                        }}
+                        className={`${styles.filter_option}`}
+                      ><p className="truncate  ">{item5.storeName}</p></div>
+                    ))
+                  ) : (<p className="p-2 text-gray-500">No stores found</p>)}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
       <QuotesCreatedAdminTable tableData={tableData} currentPage={0} />
     </div>

@@ -24,9 +24,8 @@ const getStore = async () => {
   const token = sessionStorage.getItem("authToken");
   const config = {
     method: "get",
-    url: `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/store/findAll?page=0&limit=9999`,
+    url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/store/findAll?page=0&limit=9999`,
     headers: { Authorization: token },
   };
   await axios
@@ -67,6 +66,17 @@ const downloadExcelLeadsompleted = (apiData) => {
       }
     }
 
+    // Get variant info (same logic as getStorage in table)
+    const getVariant = (val) => {
+      if (val?.modelId?.type === "CTG1") {
+        return `${
+          val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
+        }`;
+      } else {
+        return "-";
+      }
+    };
+
     return {
       "Date Created": new Date(item?.updatedAt).toLocaleDateString("en-IN"),
       "Store user Mobile No.": item.phoneNumber,
@@ -74,6 +84,7 @@ const downloadExcelLeadsompleted = (apiData) => {
       "Customer Mobile No.": item.phoneNumber,
       "Customer Name": item.name,
       Product: item.modelId?.name,
+      Variant: getVariant(item),
       Price: item.actualPrice,
       "Final Price Offered to Customer": item?.price,
       "Order Id": item?.uniqueCode,
@@ -121,8 +132,8 @@ const LeadsCompleted = () => {
   const [storeData, setStoreData] = useState([]);
   const [categories, setCategories] = useState([]);
   const [reset, setReset] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filteredStores, setFilteredStores] = useState(storeData);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredStores, setFilteredStores] = useState(storeData);
   const saveStore = async () => {
     const temparr = await getStore();
     setStoreData(temparr);
@@ -146,11 +157,18 @@ const LeadsCompleted = () => {
   };
   function getSalesData() {
     setLoading(true);
-    const endpoint = `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/prospects/findAllSelled?page=${currentPage}&limit=${pageLimit}&startDate=${
-    fromDateDup}&endDate=${toDateDup}&store=${selStoreId}&rid=${search}&customerPhone=${
-    search1}&deviceType=${deviceType}`;
+    const baseUrl = `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAllSelled`
+    const queryParams = new URLSearchParams({
+      page: currentPage,
+      limit: pageLimit,
+      startDate: fromDateDup,
+      endDate: toDateDup,
+      store: selStoreId,
+      rid: search,
+      customerPhone: search1,
+      deviceType: deviceType
+    })
+    const endpoint = `${baseUrl}?${queryParams.toString()}`
     axios
       .get(endpoint, {
         headers: { authorization: userToken },
@@ -225,31 +243,31 @@ const LeadsCompleted = () => {
     }
   };
 
-useEffect(() => {
-  if (
-    search === "" &&
-    search1 === "" &&
-    storeName === ALLstore &&
-    selStoreId === "" &&
-    fromDateDup === iniDate
-  ) {
-    getSalesData();
-  }
-}, [search, search1, storeName, selStoreId, fromDateDup]);
+  useEffect(() => {
+    if (
+      search === "" &&
+      search1 === "" &&
+      storeName === ALLstore &&
+      selStoreId === "" &&
+      fromDateDup === iniDate
+    ) {
+      getSalesData();
+    }
+  }, [search, search1, storeName, selStoreId, fromDateDup]);
 
-const handleSearch = (e) => {
-  const value = e.target.value;
-  setSearchTerm(value);
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
 
-  if (value === "") {
-    setFilteredStores(storeData);
-  } else {
-    const filtered = storeData.filter((store) =>
-      store.storeName.toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredStores(filtered);
-  }
-};
+    if (value === "") {
+      setFilteredStores(storeData);
+    } else {
+      const filtered = storeData.filter((store) =>
+        store.storeName.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredStores(filtered);
+    }
+  };
 
   return (
     <div>
@@ -294,10 +312,8 @@ const fetchDownloadData = (totalCount, deviceType, Str) => {
   const userToken1 = sessionStorage.getItem("authToken");
   axios
     .get(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}&deviceType=${deviceType}&startDate=2020-01-01&toDate=${
-        new Date().toISOString().split("T")[0]
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/prospects/findAllSelled?page=${0}&limit=${totalCount}&deviceType=${deviceType}&startDate=2020-01-01&toDate=${new Date().toISOString().split("T")[0]
       }&store=${Str}`,
       {
         headers: {
@@ -344,7 +360,8 @@ const SubLeadsCompleted = ({
   setSearchTerm,
   handleSearch,
   filteredStores,
-  categories
+  categories,
+  ...props
 }) => {
   return (
     <div className="overflow-y-hidden">
@@ -379,7 +396,8 @@ const SubLeadsCompleted = ({
         setSearchTerm={setSearchTerm}
         setDeviceType={setDeviceType}
         categories={categories}
-        tableData={tableData}/>
+        tableData={tableData}
+        storeData={storeData} />
       <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
         <div className={`${styles.search_bar_wrap}`}>
           <input
@@ -410,22 +428,20 @@ const SubLeadsCompleted = ({
         <button
           onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
-          className={`mx-2 px-4 py-2 rounded-lg ${
-            currentPage === 0
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-primary text-white cursor-pointer"
-          }`}
+          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === 0
+            ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+            : "bg-primary text-white cursor-pointer"
+            }`}
         >
           Previous
         </button>
         <button
           onClick={() => setCurrentPage(currentPage + 1)}
           disabled={currentPage === maxPages - 1}
-          className={`mx-2 px-4 py-2 rounded-lg ${
-            currentPage === maxPages - 1
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-primary text-white cursor-pointer"
-          }`}
+          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === maxPages - 1
+            ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+            : "bg-primary text-white cursor-pointer"
+            }`}
         >
           Next
         </button>
@@ -433,8 +449,8 @@ const SubLeadsCompleted = ({
     </div>
   );
 };
-const SubLeadsCompletedBtns = ({ handleFromDateChange,fromDate, totalCount, deviceType, selStoreId, toDate, handleToDateChange, setStoreDrop,
-  storeDrop, searchTerm, handleSearch, filteredStores, handleStoreChange, setSearchTerm, setDeviceType, categories, tableData}) => {
+const SubLeadsCompletedBtns = ({ handleFromDateChange, fromDate, totalCount, deviceType, selStoreId, toDate, handleToDateChange, setStoreDrop,
+  storeDrop, searchTerm, handleSearch, filteredStores, handleStoreChange, setSearchTerm, setDeviceType, categories, tableData, storeData }) => {
 
   const handleBulkDownloadReceipts = () => {
     if (!fromDate || !toDate) {
@@ -467,131 +483,133 @@ const SubLeadsCompletedBtns = ({ handleFromDateChange,fromDate, totalCount, devi
         />
       );
       html2pdf()
-      .set({
-        margin: 10,
-        filename: `purchase_receipt_${index + 1}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, logging: false },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        pagebreak: { mode: ["css", "legacy"] }, // Ensure page breaks work
-      })
-      .from(printElement)
-      .save();
+        .set({
+          margin: 10,
+          filename: `purchase_receipt_${index + 1}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, logging: false },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["css", "legacy"] }, // Ensure page breaks work
+        })
+        .from(printElement)
+        .save();
     });
   };
 
   return (
     <div className="flex gap-2 items-center justify-center outline-none mt-5 w-[100%]">
-    <div className="flex gap-4">
-      <button
-        className={`${styles.bulkdown_button}`}
-        onClick={() =>
-          fetchDownloadData(totalCount, deviceType, selStoreId)
-        }
-      >
-        <FaDownload /> Bulk Download
-      </button>
-      <div className="mt-2 ml-4">
+      <div className="flex gap-4">
         <button
           className={`${styles.bulkdown_button}`}
-          onClick={handleBulkDownloadReceipts}
+          onClick={() =>
+            fetchDownloadData(totalCount, deviceType, selStoreId)
+          }
         >
-          <FaDownload /> Download Receipts
+          <FaDownload /> Bulk Download
         </button>
-      </div>
-    </div>
-    <div className="[bg-[#F5F4F9]">
-      <DatePicker
-        selected={fromDate}
-        onChange={handleFromDateChange}
-        dateFormat="yyyy-MM-dd"
-        className={` mt-1 py-[6px] border px-[15px]  rounded-md`}
-        placeholderText="Select from date"
-      />
-    </div>
-    <div>
-      <DatePicker
-        selected={toDate}
-        dateFormat="yyyy-MM-dd"
-        onChange={handleToDateChange}
-        className="mt-1 py-[6px] px-[15px]  border rounded-md"
-        placeholderText="Select to date"
-      />
-    </div>
-    <div className="w-[250px] relative">
-      <div
-        className={`${styless.filter_button}`}
-        onClick={() => setStoreDrop(!storeDrop)}
-      >
-        <p className="truncate">
-          {searchTerm === "" ? "Select Store" : searchTerm}
-        </p>
-        <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
-      </div>
-      {storeDrop && (
-        <div className="absolute w-full bg-white shadow-md">
-          <input
-            placeholder="Search store..."
-            type="text"
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-full   p-2   border-b border-gray-300"
-          />
-          <div
-            className={`overflow-y-scroll   max-h-[200px]   ${styless.filter_drop}`}
+        <div className="mt-2 ml-4">
+          <button
+            className={`${styles.bulkdown_button}`}
+            onClick={handleBulkDownloadReceipts}
           >
-            {filteredStores.length > 0 ? (
-              filteredStores.map((item3, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    handleStoreChange(item3);
-                    setSearchTerm(item3.storeName);
-                    setStoreDrop(false);
-                  }}
-                  className={`  ${styles.filter_option}`}
-                >
-                  <p className=" truncate ">{item3.storeName}</p>
-                </div>
-              ))
-            ) : (
-              <p className="p-2 text-gray-500">No stores found</p>
-            )}
-            <div
-              className={`${styles.filter_option}`}
-              onClick={() => {
-                handleStoreChange({ _id: "", storeName: ALLstore });
-                setSearchTerm(ALLstore);
-              }}
-            >
-              <p className=" truncate ">{ALLstore}</p>
-            </div>
+            <FaDownload /> Download Receipts
+          </button>
+        </div>
+      </div>
+      <div className="[bg-[#F5F4F9]">
+        <DatePicker
+          selected={fromDate}
+          onChange={handleFromDateChange}
+          dateFormat="yyyy-MM-dd"
+          className={` mt-1 py-[6px] border px-[15px]  rounded-md`}
+          placeholderText="Select from date"
+        />
+      </div>
+      <div>
+        <DatePicker
+          selected={toDate}
+          dateFormat="yyyy-MM-dd"
+          onChange={handleToDateChange}
+          className="mt-1 py-[6px] px-[15px]  border rounded-md"
+          placeholderText="Select to date"
+        />
+      </div>
+      {storeData && storeData.length > 1 && (
+        <div className="w-[250px] relative">
+          <div
+            className={`${styless.filter_button}`}
+            onClick={() => setStoreDrop(!storeDrop)}
+          >
+            <p className="truncate">
+              {searchTerm === "" ? "Select Store" : searchTerm}
+            </p>
+            <FaAngleDown size={17} className={`${storeDrop && "rotate-180"}`} />
           </div>
+          {storeDrop && (
+            <div className="absolute w-full bg-white shadow-md">
+              <input
+                placeholder="Search store..."
+                type="text"
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full   p-2   border-b border-gray-300"
+              />
+              <div
+                className={`overflow-y-scroll   max-h-[200px]   ${styless.filter_drop}`}
+              >
+                <div
+                  className={`${styles.filter_option}`}
+                  onClick={() => {
+                    handleStoreChange({ _id: "", storeName: ALLstore });
+                    setSearchTerm(ALLstore);
+                  }}
+                >
+                  <p className=" truncate ">{ALLstore}</p>
+                </div>
+                {filteredStores.length > 0 ? (
+                  filteredStores.map((item3, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        handleStoreChange(item3);
+                        setSearchTerm(item3.storeName);
+                        setStoreDrop(false);
+                      }}
+                      className={`  ${styles.filter_option}`}
+                    >
+                      <p className=" truncate ">{item3.storeName}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="p-2 text-gray-500">No stores found</p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
-    </div>
-    <div className="w-[250px] h-[35px] relative">
-      <select
-        name=""
-        id=""
-        className="bg-primary text-white rounded-lg outline-none px-2 py-1 w-full h-full"
-        onChange={(e) => {
-          setDeviceType(e.target.value);
-        }}
-      >
-        {categories.map((cat) => (
-          <option
-            className="bg-white text-primary font-medium"
-            key={cat?._id}
-            value={cat?.categoryCode}
-          >
-            {cat?.categoryName}
-          </option>
-        ))}
-      </select>
-    </div>
+      <div className="w-[250px] h-[35px] relative">
+        <select
+          name=""
+          id=""
+          className="bg-primary text-white rounded-lg outline-none px-2 py-1 w-full h-full"
+          onChange={(e) => {
+            setDeviceType(e.target.value);
+          }}
+        >
+          {categories.map((cat) => (
+            <option
+              className="bg-white text-primary font-medium"
+              key={cat?._id}
+              value={cat?.categoryCode}
+            >
+              {cat?.categoryName}
+            </option>
+          ))}
+        </select>
+      </div>
 
-  </div>
+    </div>
   );
-  };
+};
 export default LeadsCompleted;

@@ -21,12 +21,11 @@ export const handleDownloadReport = async ({
 
   try {
     const response = await axios.get(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT
       }/api/quoteTracking/dashboard/download`,
       {
         headers: { Authorization: token },
-        params: { dateRange: filters.dateRange, search: debouncedSearch },
+        params: { dateRange: filters.dateRange, search: debouncedSearch, storeId: filters.storeId },
         responseType: 'blob',
       }
     )

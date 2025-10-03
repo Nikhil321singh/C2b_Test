@@ -71,7 +71,7 @@ const QuoteTrackingTable = ({
                   {(currentPage - 1) * limit + index + 1}
                 </td>
                 <td className='px-4 py-2 text-sm text-left md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  {row.userId}
+                  {row.email}
                 </td>
                 <td className='px-4 py-2 text-sm text-left md:px-6 md:py-3 md:text-base whitespace-nowrap'>
                   {row.role}
@@ -98,9 +98,8 @@ const QuoteTrackingTable = ({
                   {row.brand || 'N/A'}
                 </td>
                 <td className='px-4 py-2 text-sm text-left md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  {`RAM: ${row.deviceDetails?.ram || 'N/A'}, ROM: ${
-                    row.deviceDetails?.rom || 'N/A'
-                  }`}
+                  {`RAM: ${row.deviceDetails?.ram || 'N/A'}, ROM: ${row.deviceDetails?.rom || 'N/A'
+                    }`}
                 </td>
                 <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
                   <h
@@ -122,11 +121,10 @@ const QuoteTrackingTable = ({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className={`mx-2 px-4 py-2 rounded-lg ${
-            currentPage === 1
-              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-              : 'bg-primary text-white cursor-pointer'
-          }`}
+          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === 1
+            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+            : 'bg-primary text-white cursor-pointer'
+            }`}
         >
           Previous
         </button>
@@ -136,11 +134,10 @@ const QuoteTrackingTable = ({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className={`mx-2 px-4 py-2 rounded-lg ${
-            currentPage === totalPages
-              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-              : 'bg-primary text-white cursor-pointer'
-          }`}
+          className={`mx-2 px-4 py-2 rounded-lg ${currentPage === totalPages
+            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+            : 'bg-primary text-white cursor-pointer'
+            }`}
         >
           Next
         </button>
