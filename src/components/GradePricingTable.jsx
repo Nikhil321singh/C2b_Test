@@ -20,13 +20,9 @@ const GradePricingTable = ({ deviceCategory, tableData }) => {
     { key: 'E', display: 'E', percentage: '(90.00%)' },
   ]
 
-  // Determine which grade columns have data
+  // Determine which grade columns have data - only show A+ column
   const availableGradeColumns = gradeColumns.filter((column) =>
-    tableData.some(
-      (item) =>
-        item.grades?.[column.key] !== undefined &&
-        item.grades?.[column.key] !== null
-    )
+    column.key === 'A_PLUS'
   )
 
   return (
