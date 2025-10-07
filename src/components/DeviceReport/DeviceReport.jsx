@@ -80,65 +80,86 @@ const renderOption = (option, isSelected, questionIndex, optionIndex) => (
 
 // Main function simplified
 const renderQuestionOptions = (selectedAnswers, rawQuestionsGroup) => {
-  // If no raw questions (quick quote scenario), render answers directly
-  if (!rawQuestionsGroup?.length) {
-    if (!selectedAnswers?.length) {
-      return null
-    }
+  const hasRawQuestions = !!rawQuestionsGroup?.length
+  const hasSelectedAnswers = !!selectedAnswers?.length
 
-    return selectedAnswers.map((answer, index) => {
-      const isYes = answer.key === 'yes'
-
-      return (
-        <div
-          key={index}
-          className='flex flex-row items-center w-full p-3 rounded-lg border'
-          style={{
-            backgroundColor: isYes ? PRIMARY_BG_LIGHTER : 'rgba(107, 114, 128, 0.05)',
-            borderColor: isYes ? PRIMARY_BORDER : 'rgba(107, 114, 128, 0.2)',
-          }}
-        >
-          <LuDot
-            size={20}
-            className='shrink-0'
-            style={{ color: isYes ? PRIMARY_COLOR : '#6B7280' }}
-          />
-          <div className='flex justify-between w-[85%] questionkey'>
-            <p className='text-sm font-medium text-gray-800'>{answer.quetion}</p>
-            <span
-              className='ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase'
-              style={{
-                backgroundColor: isYes ? PRIMARY_BG_LIGHT : 'rgba(107, 114, 128, 0.1)',
-                color: isYes ? PRIMARY_COLOR : '#6B7280',
-              }}
-            >
-              {answer?.key}
-            </span>
-          </div>
-        </div>
-      )
-    })
+  if (!hasRawQuestions) {
+    return renderDirectAnswers(selectedAnswers, hasSelectedAnswers)
   }
 
+  return renderGroupedQuestions(rawQuestionsGroup, selectedAnswers)
+}
+
+// --- Helper: Render direct answers (quick quote scenario) ---
+const renderDirectAnswers = (selectedAnswers, hasSelectedAnswers) => {
+  if (!hasSelectedAnswers) {
+    return null
+  }
+
+  return selectedAnswers.map((answer, index) => renderAnswerItem(answer, index))
+}
+
+// --- Helper: Render single answer item ---
+const renderAnswerItem = (answer, index) => {
+  const isYes = answer.key === 'yes'
+
+  return (
+    <div
+      key={index}
+      className='flex flex-row items-center w-full p-3 rounded-lg border'
+      style={{
+        backgroundColor: isYes
+          ? PRIMARY_BG_LIGHTER
+          : 'rgba(107, 114, 128, 0.05)',
+        borderColor: isYes ? PRIMARY_BORDER : 'rgba(107, 114, 128, 0.2)',
+      }}
+    >
+      <LuDot
+        size={20}
+        className='shrink-0'
+        style={{ color: isYes ? PRIMARY_COLOR : '#6B7280' }}
+      />
+      <div className='flex justify-between w-[85%] questionkey'>
+        <p className='text-sm font-medium text-gray-800'>{answer.quetion}</p>
+        <span
+          className='ml-2 text-xs font-semibold px-2 py-1 rounded-full uppercase'
+          style={{
+            backgroundColor: isYes
+              ? PRIMARY_BG_LIGHT
+              : 'rgba(107, 114, 128, 0.1)',
+            color: isYes ? PRIMARY_COLOR : '#6B7280',
+          }}
+        >
+          {answer?.key}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+// --- Helper: Render grouped question sets ---
+const renderGroupedQuestions = (rawQuestionsGroup, selectedAnswers) => {
   return rawQuestionsGroup
     .map((questionData, questionIndex) => {
       const answer = selectedAnswers[questionIndex]
-
-      if (!questionData.options?.length) {
-        return renderQuestionWithoutOptions(questionData, answer, questionIndex)
-      }
-
-      return questionData.options.map((option, optionIndex) =>
-        renderOption(
-          option,
-          answer?.selected[optionIndex],
-          questionIndex,
-          optionIndex
-        )
-      )
+      return questionData.options?.length
+        ? renderOptionsList(questionData.options, answer, questionIndex)
+        : renderQuestionWithoutOptions(questionData, answer, questionIndex)
     })
     .flat()
     .filter(Boolean)
+}
+
+// --- Helper: Render all options for a given question ---
+const renderOptionsList = (options, answer, questionIndex) => {
+  return options.map((option, optionIndex) =>
+    renderOption(
+      option,
+      answer?.selected?.[optionIndex],
+      questionIndex,
+      optionIndex
+    )
+  )
 }
 
 const DeviceReport = ({ setShowDeviceReport, quoteSaved }) => {
