@@ -947,21 +947,21 @@ const MiddlePart = ({
           </div>}
 
           {currentDomain !== buyback && <div className={`flex gap-2 justify-between ${styles.info_wrap}`}>
-            <Link className="w-[33%]" to={`/orderscreated/${days}`}>
+            <Link className="w-[33%]" to={`/orderscreated/${days || "custom"}`}>
               <OrderStatusBox
                 figures={orderCount}
                 title="Order Created"
                 background="rgb(2, 117, 242)"
               />
             </Link>
-            <Link className="w-[33%]" to={`/orderscompleted/${days}`}>
+            <Link className="w-[33%]" to={`/orderscompleted/${days || "custom"}`}>
               <OrderStatusBox
                 figures={orderSaled}
                 title="Order Completed"
                 background="#E94A4E"
               />
             </Link>
-            <Link className="w-[33%]" to={`/quotescreated/${days}`}>
+            <Link className="w-[33%]" to={`/quotescreated/${days || "custom"}`}>
               <OrderStatusBox
                 figures={quoteCount}
                 title="Quotes Created"
