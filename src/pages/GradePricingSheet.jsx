@@ -20,20 +20,39 @@ const downloadExcelGradePricingSheet = (apiData) => {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
   const formattedData = apiData.map((item) => {
-    return {
+    const baseData = {
       "More Details": item.model?.name,
-      "A+(0.00%)": item.grades?.A_PLUS,
-      "A(10.00%)": item.grades?.A,
-      "B(15.00%)": item.grades?.B,
-      "B-(20.00%)": item.grades?.B_MINUS,
-      "C+(40.00%)": item.grades?.C_PLUS,
-      "C(50.00%)": item.grades?.C,
-      "C-(60.00%)": item.grades?.C_MINUS,
-      "D+(65.00%)": item.grades?.D_PLUS,
-      "D(70.00%)": item.grades?.D,
-      "D-(70.00%)": item.grades?.D_MINUS,
-      "E(90.00%)": item.grades?.E,
+      "A+WARRANTY": item.grades?.A_PLUS,
+      "A": item.grades?.A,
+      "B": item.grades?.B,
+      "B-": item.grades?.B_MINUS,
+      "C+": item.grades?.C_PLUS,
+      "C": item.grades?.C,
+      "C-": item.grades?.C_MINUS,
+      "D+": item.grades?.D_PLUS,
+      "D": item.grades?.D,
+      "D-": item.grades?.D_MINUS,
+      "E": item.grades?.E,
     };
+
+    // Add new format grades if they exist
+    if (item.grades?.A_MINUS !== undefined) {
+      baseData["A-"] = item.grades.A_MINUS;
+    }
+    if (item.grades?.A_MINUS_LIMITED !== undefined) {
+      baseData["A-Limited"] = item.grades.A_MINUS_LIMITED;
+    }
+    if (item.grades?.B_PLUS !== undefined) {
+      baseData["B+"] = item.grades.B_PLUS;
+    }
+    if (item.grades?.B_MINUS_LIMITED !== undefined) {
+      baseData["B-Limited"] = item.grades.B_MINUS_LIMITED;
+    }
+    if (item.grades?.C_MINUS_LIMITED !== undefined) {
+      baseData["C-Limited"] = item.grades.C_MINUS_LIMITED;
+    }
+
+    return baseData;
   });
   const wsGradePricingSheet = XLSX.utils.json_to_sheet(formattedData);
   const wbGradePricingSheet = {

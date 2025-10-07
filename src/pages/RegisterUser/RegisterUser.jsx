@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import styles from "./RegisterUser.module.css";
 import { useNavigate } from "react-router-dom";
 import AdminNavbar from "../../components/Admin_Navbar";
+import BulkUploadModal from "../../components/BulkUploadModal";
+
+
 import SideMenu from "../../components/SideMenu";
 import { BeatLoader } from "react-spinners";
 import axios from "axios";
@@ -18,9 +21,8 @@ const getStore = async () => {
   const token1 = sessionStorage.getItem("authToken");
   const config = {
     method: "get",
-    url: `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/store/findAll?page=0&limit=9999`,
+    url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/store/findAll?page=0&limit=9999`,
     headers: { Authorization: token1 },
   };
   let storeNamesArray = [];
@@ -55,6 +57,8 @@ const initForm = {
 
 const RegisterUser = () => {
   const token = sessionStorage.getItem("authToken");
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
   const [sideMenu, setsideMenu] = useState(false);
   const [isGrest, setIsGrest] = useState(null);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
@@ -63,6 +67,8 @@ const RegisterUser = () => {
   const [failBox, setFailBox] = useState(false);
   const [storeData, setStoreData] = useState([]);
   const [formData, setFormData] = useState(initForm);
+  const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,13 +78,19 @@ const RegisterUser = () => {
     });
   }, [isGrest]);
 
-  const saveStrCmp = async () => {
-    const tempStr = await getStore();
-    setStoreData(tempStr);
+  const fetchAndSetStores = async () => {
+    setIsTableLoaded(true);
+    const stores = await getStore();
+    setStoreData(stores);
+    if (!isSuperAdmin && stores.length === 1) {
+      setFormData(prevData => ({ ...prevData, storeId: stores[0]._id }));
+    }
+    setIsTableLoaded(false);
   };
+
   useEffect(() => {
-    saveStrCmp();
-  }, []);
+    fetchAndSetStores();
+  }, [isSuperAdmin]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -106,9 +118,8 @@ const RegisterUser = () => {
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/userregistry/register`,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/userregistry/register`,
       headers: { Authorization: token },
       data: data,
     };
@@ -133,6 +144,10 @@ const RegisterUser = () => {
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
+      <BulkUploadModal
+        isOpen={isBulkUploadModalOpen}
+        onClose={() => setIsBulkUploadModalOpen(false)}
+      />
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
@@ -141,9 +156,8 @@ const RegisterUser = () => {
       {(sucBox || failBox) && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <div
-            className={`${styles.err_mod_box} ${
-              sucBox ? sucTextColor : failTextColor
-            }`}
+            className={`${styles.err_mod_box} ${sucBox ? sucTextColor : failTextColor
+              }`}
           >
             {sucBox ? (
               <IoIosCheckmarkCircle
@@ -182,9 +196,19 @@ const RegisterUser = () => {
         className="items-center bg-white max-w-[900px] flex py-8 mx-auto mt-4 justify-center flex-col"
       >
         <div className="flex flex-col w-[900px]">
-          <div className="mb-6 flex flex-col gap-2 border-b-2 mr-10 pb-2 ml-10">
-            <p className="text-4xl font-bold">Register User</p>
-            <p className="text-lg">All fields marked with * are required</p>
+          <div className="mb-6  flex flex-col gap-2 border-b-2 pb-2 mr-10 ml-10">
+            <div className="flex items-center gap-6 justify-centerflex-wrap">
+              <p className="text-4xl font-bold">Register User</p>
+              <button
+                onClick={() => setIsBulkUploadModalOpen(true)}
+
+                className="font-medium text-sm text-white px-4 py-2 rounded bg-primary"
+              >
+                Bulk Upload
+              </button>
+            </div>
+
+            <p className="text-lg ">All fields marked with * are required</p>
           </div>
           <div className="flex flex-wrap gap-2 ml-10 mb-10">
             <button
@@ -200,6 +224,7 @@ const RegisterUser = () => {
             handleChange={handleChange}
             setIsGrest={setIsGrest}
             storeData={storeData}
+            isSuperAdmin={isSuperAdmin}
           />
         </div>
       </div>
@@ -209,8 +234,8 @@ const RegisterUser = () => {
 
 export default RegisterUser;
 
-const UserForm = ({ formData, submitHandler, handleChange, storeData }) => {
-    const [showUserPassword, setShowUserPassword] = useState(false);
+const UserForm = ({ formData, submitHandler, handleChange, storeData, isSuperAdmin }) => {
+  const [showUserPassword, setShowUserPassword] = useState(false);
 
   return (
     <form
@@ -298,24 +323,26 @@ const UserForm = ({ formData, submitHandler, handleChange, storeData }) => {
           required
         />
       </label>
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Store Name*</span>
-        <select
-          name="storeId"
-          id="storeId"
-          value={formData.storeId}
-          className="outline-none text-base border-2 p-2 rounded-lg"
-          onChange={handleChange}
-          required
-        >
-          <option value=""> None </option>
-          {storeData.map((item) => (
-            <option key={item._id} value={item._id}>
-              {`${item.storeName}, ${item.region}`}
-            </option>
-          ))}
-        </select>
-      </label>
+      {isSuperAdmin && (
+        <label className="flex flex-col w-[70%] gap-2">
+          <span className="font-medium text-xl">Store Name*</span>
+          <select
+            name="storeId"
+            id="storeId"
+            value={formData.storeId}
+            className="outline-none text-base border-2 p-2 rounded-lg"
+            onChange={handleChange}
+            required
+          >
+            <option value=""> None </option>
+            {storeData.map((item) => (
+              <option key={item._id} value={item._id}>
+                {`${item.storeName}, ${item.region}`}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label className="flex flex-col w-[70%] gap-2">
         <span className="font-medium text-xl">Role*</span>
         <select

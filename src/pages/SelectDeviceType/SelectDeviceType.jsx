@@ -487,17 +487,29 @@ const fetchDataAPI = async (days, fromDateDup, toDateDup, deviceType) => {
   const userToken = sessionStorage.getItem("authToken");
   let response1;
   let response2;
+
+  // Build query parameters properly - only include fromdate/todate if they have values
+  const buildQueryParams = (baseParams) => {
+    const params = new URLSearchParams(baseParams);
+    if (fromDateDup && fromDateDup !== "") {
+      params.set("fromdate", fromDateDup);
+    }
+    if (toDateDup && toDateDup !== "") {
+      params.set("todate", toDateDup);
+    }
+    return params.toString();
+  };
+
   try {
+    const baseParams1 = { time: days, datareq: deviceType };
+    const baseParams2 = { time: days, datareq: deviceType };
+
     response2 = await axios.get(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/user/Dashboard/order/saled?time=${days}&fromdate=${fromDateDup}&todate=${toDateDup}&datareq=${deviceType}`,
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/user/Dashboard/order/saled?${buildQueryParams(baseParams2)}`,
       { headers: { authorization: `${userToken}` } }
     );
     response1 = await axios.get(
-      `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/leadSet/getCount?time=${days}&fromdate=${fromDateDup}&todate=${toDateDup}&datareq=${deviceType}`,
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/leadSet/getCount?${buildQueryParams(baseParams1)}`,
       { headers: { authorization: `${userToken}` } }
     );
   } catch (error) {
@@ -540,7 +552,9 @@ const SelectDeviceType = () => {
 
   function searchCustom() {
     if (fromDateDup !== "" && toDateDup !== "") {
-      setCustomSearch(!cutomSearch);
+      setDays(""); // Clear the predefined time filter to use custom dates
+      setshowFromdate(false); // Close the date picker modal
+      setCustomSearch(!cutomSearch); // Toggle to trigger useEffect
     } else {
       toast.error("Enter both date field");
     }
@@ -611,15 +625,25 @@ const SelectDeviceType = () => {
 
   useEffect(() => {
     fetchData();
-  }, [days, cutomSearch, deviceType]);
+  }, [days, cutomSearch, deviceType, fromDateDup, toDateDup]);
 
   useEffect(() => {
     const fetchtop = async () => {
       try {
+        // Build query parameters properly - only include fromdate/todate if they have values
+        const params = new URLSearchParams({
+          time: days || "",
+          deviceType: deviceType
+        });
+        if (fromDateDup && fromDateDup !== "") {
+          params.set("fromdate", fromDateDup);
+        }
+        if (toDateDup && toDateDup !== "") {
+          params.set("todate", toDateDup);
+        }
+
         const response = await axios.get(
-          `${
-            import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/user/Dashboard/get/top/sellingModels?time=${days}&deviceType=${deviceType}`,
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/user/Dashboard/get/top/sellingModels?${params.toString()}`,
           { headers: { authorization: `${token}` } }
         );
         const updatedData = await response.data.map((item) => ({
@@ -633,7 +657,7 @@ const SelectDeviceType = () => {
       }
     };
     fetchtop();
-  }, [days, deviceType]);
+  }, [days, deviceType, fromDateDup, toDateDup]);
 
   const handlepick = (e) => {
     if (e.target.value === "Custom") {
@@ -643,6 +667,11 @@ const SelectDeviceType = () => {
       console.log("days", e.target.value);
       setDays(e.target.value);
       setshowFromdate(false);
+      // Clear custom dates when selecting predefined filter
+      setFromDateDup("");
+      setToDateDup("");
+      setFromDate("");
+      setToDate("");
     }
   };
 
