@@ -11,6 +11,7 @@ export const usePriceForm = () => {
   const [phoneRight, setPhoneRight] = useState(null)
   const [phoneTop, setPhoneTop] = useState(null)
   const [phoneBottom, setPhoneBottom] = useState(null)
+  const [signatureFile, setSignatureFile] = useState(null); // <-- Added new signature file state
   const [aadharNumber, setAadharNumber] = useState('')
   const [imeinumber, setImeiNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -69,6 +70,8 @@ export const usePriceForm = () => {
     setPhoneTop,
     phoneBottom,
     setPhoneBottom,
+    signatureFile,     //Added new signatureFile
+    setSignatureFile,  //Added new signature state function
     aadharNumber,
     setAadharNumber,
     imeinumber,

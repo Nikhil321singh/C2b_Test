@@ -14,12 +14,19 @@ export const useFileUpload = (token, imeinumber) => {
     [FILE_KEYS.PHONE_RIGHT]: { status: UPLOAD_STATUS.PENDING, progress: 0 },
     [FILE_KEYS.PHONE_TOP]: { status: UPLOAD_STATUS.PENDING, progress: 0 },
     [FILE_KEYS.PHONE_BOTTOM]: { status: UPLOAD_STATUS.PENDING, progress: 0 },
+    [FILE_KEYS.SIGNATURE]: { status: UPLOAD_STATUS.PENDING, progress: 0 }, // <-- Added new signature
   })
 
   const uploadIndividualFile = async (fileToUpload, fileName, fileType, fileKey) => {
     if (!fileToUpload || !imeinumber) {
       toast.error('Please enter IMEI number first')
       return
+    }
+
+    // Added check for signature
+    if (!imeinumber && fileKey === FILE_KEYS.SIGNATURE) {
+      toast.error('Please enter IMEI number before saving signature');
+      return;
     }
 
     // Update status to uploading
