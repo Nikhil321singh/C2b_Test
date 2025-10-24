@@ -1,79 +1,88 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { getStatusIcon } from "../../utils/priceUtils";
+import { getStatusIcon } from "../../utils/priceUtils.jsx";
 import { FILE_KEYS, UPLOAD_STATUS } from "../../constants/priceConstants";
+import toast from "react-hot-toast";
 
 /**
  * Utility to convert base64 data URL to a File object
  */
 const dataURLtoFile = (dataurl, filename) => {
   if (!dataurl) return null;
+
   const arr = dataurl.split(",");
   if (arr.length < 2) return null;
 
   const mimeMatch = arr[0].match(/:(.*?);/);
   if (!mimeMatch) return null;
 
-  const mime = mimeMatch[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
+  const mime = mimeMatch[1]; //get the file type
+  const bstr = atob(arr[1]); //atob() decodes base64 into a binary string,
+  const u8arr = new Uint8Array(bstr.length);
 
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
+  //Each character in the binary string is converted to its numeric byte value.
+  for (let i = 0; i < bstr.length; i++) {
+    u8arr[i] = bstr.charCodeAt(i);
   }
 
   return new File([u8arr], filename, { type: mime });
 };
 
 const DigitalSignatureField = ({
-  signatureFile, // The File object itself, from usePriceForm
-  setSignatureFile, // The setter from usePriceForm
-  uploadStatus, // The uploadStatus object from useFileUpload
-  uploadIndividualFile, // The upload function from useFileUpload
-  imeinumber, // The IMEI number
-  prod, // Product info
+  signatureFile,
+  setSignatureFile,
+  uploadStatus,
+  uploadIndividualFile,
+  imeinumber,
+  prod,
 }) => {
-  const [isDrawing, setIsDrawing] = useState(!signatureFile); // Show pad if no file
+  const [isDrawing, setIsDrawing] = useState(!signatureFile); //show the signature pad if no file
+  const [showPlaceholder, setShowPlaceholder] = useState(true);
   const sigPadRef = useRef(null);
+  const containerRef = useRef(null);
   const sigStatus = uploadStatus[FILE_KEYS.SIGNATURE]?.status;
+  const sectionNumber = (prod?.[0]?.phoneBillSno || 5) + 1; //match the section number
+
+  useEffect(() => {
+    if (isDrawing && sigPadRef.current && containerRef.current) {
+      const container = containerRef.current;
+      const canvas = sigPadRef.current.getCanvas();
+      canvas.width = container.offsetWidth;
+      canvas.height = container.offsetHeight;
+    }
+  }, [isDrawing]);
 
   const handleClear = () => {
-    sigPadRef.current.clear();
+    sigPadRef.current?.clear();
+    setShowPlaceholder(true);
+  };
+
+  const handleBegin = () => {
+    setShowPlaceholder(false);
   };
 
   const handleSaveSignature = () => {
-    if (sigPadRef.current.isEmpty()) {
-      // You can replace this with a toast notification
-      alert("Please provide a signature first.");
+    if (sigPadRef.current?.isEmpty()) {
+      toast.error("Please provide a signature first.");
       return;
     }
 
     if (!imeinumber) {
-      // You can replace this with a toast notification
-      alert("Please enter the IMEI number before saving the signature.");
+      toast.error("Please enter the IMEI number before saving the signature.");
       return;
     }
 
-    // Get the signature as a base64 string
     const dataUrl = sigPadRef.current.getTrimmedCanvas().toDataURL("image/png");
-
-    // Create the file name
     const fileName = `${imeinumber}-signature`;
     const fullFileName = `${fileName}.png`;
-
-    // Convert to File object
     const newSigFile = dataURLtoFile(dataUrl, fullFileName);
 
     if (newSigFile) {
-      // 1. Set the file in the main form state
       setSignatureFile(newSigFile);
-      // 2. Hide the drawing pad
       setIsDrawing(false);
-      // 3. Immediately trigger the upload
       uploadIndividualFile(
         newSigFile,
-        fileName, // The name without IMEI prefix, as your hook adds it
+        fileName,
         newSigFile.type,
         FILE_KEYS.SIGNATURE
       );
@@ -81,45 +90,51 @@ const DigitalSignatureField = ({
   };
 
   const handleResign = () => {
-    setSignatureFile(null); // Clear the file from the main form state
-    setIsDrawing(true); // Show the drawing pad again
-    // Note: useFileUpload hook should be updated to reset status on setFile(null) if needed
-    // For now, it will just show as "pending" if re-uploaded
+    setSignatureFile(null);
+    setIsDrawing(true);
+    setShowPlaceholder(true);
   };
 
-  // Determine section number, default to 5 if not found
-  const sectionNumber = (prod?.[0]?.phoneBillSno || 4) + 1;
-
   return (
-    <div className="flex flex-col eminumber mt-[4px]">
+    <div className="flex flex-col adharcard mt-[10px]">
       <div className="flex gap-1 two">
         <p className="text-base font-medium">{sectionNumber}.</p>
-        <p className="text-base font-medium three">
-          Digital Signature Required
-          <span className="text-red-500">*</span>
-        </p>
+        <div className="flex items-center">
+          <p className="text-base font-medium three">
+            Digital Signature Required
+            <span className="text-red-500">*</span>
+          </p>
+        </div>
       </div>
-      <p className="ml-[19px] text-sm text-gray-600">
+      <p className="mt-2 text-sm text-gray-600 ml-[19px]">
         Please sign to confirm your Aadhaar verification and consent.
       </p>
 
-      <div className="flex flex-col items-center gap-2 mt-2 ml-[19px]">
+      {/* --- Box Wrapper --- */}
+      <div className="flex justify-start ml-3 inputAADHAR">
         {isDrawing ? (
-          <>
-            {/* This div wrapper mimics the PDF snap's red outline */}
-            <div className="border-2 border-primary rounded-lg w-full max-w-sm">
-              <SignatureCanvas
-                ref={sigPadRef}
-                penColor="black"
-                canvasProps={{
-                  width: 300,
-                  height: 150,
-                  className: "sigCanvas w-full",
-                }}
-              />
+          <div className="flex flex-col w-[40vw]">
+            <div className="p-1 mt-4 border-2 rounded-lg h-[15vh] w-full relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
+              <div
+                ref={containerRef}
+                className="bg-gray-100 w-full h-full relative flex items-center justify-center"
+              >
+                {showPlaceholder && (
+                  <p className="absolute text-gray-400 text-lg pointer-events-none select-none">
+                    Sign Here
+                  </p>
+                )}
+                <SignatureCanvas
+                  ref={sigPadRef}
+                  penColor="black"
+                  onBegin={handleBegin}
+                  canvasProps={{
+                    className: "absolute top-0 left-0",
+                  }}
+                />
+              </div>
             </div>
-            {/* Buttons as per PDF snap */}
-            <div className="flex justify-between w-full max-w-sm gap-4">
+            <div className="flex justify-between w-full gap-4 mt-3">
               <button
                 type="button"
                 className="px-4 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg flex-1"
@@ -135,31 +150,35 @@ const DigitalSignatureField = ({
                 Save Signature
               </button>
             </div>
-          </>
+          </div>
         ) : (
-          <>
-            {/* Saved state: Show thumbnail and status */}
-            <div className="relative p-2 border-2 border-gray-300 rounded-lg w-full max-w-sm h-[150px] flex flex-col items-center justify-center">
-              <p className="font-semibold text-green-600">Signature Captured</p>
+          // saved state
+          <div className="flex flex-col w-[40vw] mt-4">
+            <div className="flex items-center gap-3">
               {signatureFile && (
                 <img
                   src={URL.createObjectURL(signatureFile)}
                   alt="Signature Thumbnail"
-                  className="h-[80px] w-full object-contain my-1"
+                  className="h-[80px] object-contain"
                 />
               )}
-              <div className="absolute top-1 right-1">
-                {getStatusIcon(sigStatus)}
+              <div className="flex flex-col items-start gap-2">
+                <div className="flex items-center gap-2">
+                  {getStatusIcon(sigStatus)}
+                  <span className="text-sm font-medium text-green-600">
+                    Signature Saved
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="px-4 py-1 text-sm font-bold text-gray-700 bg-gray-200 rounded-lg"
+                  onClick={handleResign}
+                >
+                  Re-sign
+                </button>
               </div>
-              <button
-                type="button"
-                className="px-4 py-1 mt-1 text-sm font-bold text-gray-700 bg-gray-200 rounded-lg"
-                onClick={handleResign}
-              >
-                Re-sign
-              </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
