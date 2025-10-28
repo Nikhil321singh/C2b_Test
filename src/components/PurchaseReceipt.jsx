@@ -173,8 +173,8 @@ const PurchaseReceipt = ({
             <p className="text-xl font-bold my-4 mx-auto">TERMS & CONDITIONS</p>
           </div>
           <div className="w-full">
-            {/* START: Updated T&Cs [cite: 207-243] */}
-            <div className="pl-5 text-left leading-normal">
+            {/*Updated T&Cs */}
+            <div className="text-left leading-normal">
               <div className="mb-2">
                 1. RADICAL AFTERMARKET SERVICES PRIVATE LIMITED ("Grest"), a
                 company incorporated under the provisions of the Companies Act,
@@ -304,7 +304,7 @@ const PurchaseReceipt = ({
                 Gurugram, Haryana only.
               </div>
             </div>
-            {/* END: Updated T&Cs */}
+            {/* END */}
           </div>
           <div className="w-full text-right mt-8">
             <p className="font-bold">SIGNATURES</p>
