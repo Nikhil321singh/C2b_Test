@@ -8,8 +8,13 @@ import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io'
 import CouponForm from '../components/CouponForm'
 import toast from 'react-hot-toast'
 
+const FIELD_PRICE_RANGE_MIN = 'devicePriceRange.min'
+const FIELD_PRICE_RANGE_MAX = 'devicePriceRange.max'
+
 const formatDateForInput = (dateString) => {
-  if (!dateString) return ''
+  if (!dateString) {
+    return ''
+  }
   try {
     return new Date(dateString).toISOString().split('T')[0]
   } catch (e) {
@@ -40,8 +45,8 @@ const validateForm = (formData, isEditMode) => {
   } else if (Number(formData.discountValue) <= 0) {
     errors.discountValue = 'Discount value must be greater than zero.'
   }
-  const minPrice = Number(formData['devicePriceRange.min'])
-  const maxPriceInput = formData['devicePriceRange.max']
+  const minPrice = Number(formData[FIELD_PRICE_RANGE_MIN])
+  const maxPriceInput = formData[FIELD_PRICE_RANGE_MAX]
   if (minPrice < 0) {
     errors.priceRange = 'Minimum price cannot be negative.'
   } else if (maxPriceInput && Number(maxPriceInput) <= minPrice) {
@@ -93,8 +98,8 @@ const getStores = async (token) => {
 const initForm = {
   couponCode: '',
   storeId: '',
-  'devicePriceRange.min': '0',
-  'devicePriceRange.max': '',
+  [FIELD_PRICE_RANGE_MIN]: '0',
+  [FIELD_PRICE_RANGE_MAX]: '',
   discountType: 'Fixed',
   discountValue: '',
   validFrom: '',
@@ -153,8 +158,8 @@ const CreateCoupon = () => {
               : coupon.devicePriceRange.max
           setFormData({
             ...coupon,
-            'devicePriceRange.min': coupon.devicePriceRange.min,
-            'devicePriceRange.max': maxPrice,
+            [FIELD_PRICE_RANGE_MIN]: coupon.devicePriceRange.min,
+            [FIELD_PRICE_RANGE_MAX]: maxPrice,
             validFrom: formatDateForInput(coupon.validFrom),
             validTo: formatDateForInput(coupon.validTo),
           })
@@ -238,9 +243,9 @@ const CreateCoupon = () => {
         couponCode: formData.couponCode.trim().toUpperCase(),
         storeId: formData.storeId,
         devicePriceRange: {
-          min: Number(formData['devicePriceRange.min']),
-          max: formData['devicePriceRange.max']
-            ? Number(formData['devicePriceRange.max'])
+          min: Number(formData[FIELD_PRICE_RANGE_MIN]),
+          max: formData[FIELD_PRICE_RANGE_MAX]
+            ? Number(formData[FIELD_PRICE_RANGE_MAX])
             : Infinity,
         },
         discountType: formData.discountType,

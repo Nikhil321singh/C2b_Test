@@ -20,6 +20,53 @@ const useDebounce = (value, delay) => {
   return debouncedValue
 }
 
+const ConfirmationModal = ({ isOpen, couponCode, onConfirm, onCancel }) => {
+  if (!isOpen) {
+    return null
+  }
+
+  return (
+    <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+      <div className='bg-white w-1/2 max-w-lg rounded-lg flex flex-col justify-center items-center p-6 gap-5 text-primary shadow-xl'>
+        <IoMdInformationCircle size={80} />
+        <h6 className='text-3xl font-bold'>Confirmation!</h6>
+        <p className='text-lg font-medium text-slate-500 text-center'>
+          {`Are you sure you want to delete coupon "${couponCode || ''}"?`}
+        </p>
+        <div className='flex flex-row gap-4 mt-4'>
+          <button
+            onClick={onConfirm}
+            className='px-8 py-2 rounded-lg bg-primary text-white
+                    font-semibold hover:bg-opacity-90 transition-colors'
+          >
+            Yes, Delete
+          </button>
+          <button
+            onClick={onCancel}
+            className='px-8 py-2 rounded-lg bg-white text-primary
+                    border border-primary font-semibold
+                    hover:bg-gray-100 transition-colors'
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const LoadingOverlay = ({ isLoading }) => {
+  if (!isLoading) {
+    return null
+  }
+
+  return (
+    <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+      <BeatLoader color='var(--primary-color)' loading={isLoading} size={15} />
+    </div>
+  )
+}
+
 const CouponDetails = () => {
   const token = sessionStorage.getItem('authToken')
   const [data, setData] = useState([])
@@ -74,8 +121,10 @@ const CouponDetails = () => {
   )
 
   useEffect(() => {
-    if (token) fetchData(pagination.currentPage)
-  }, [fetchData, pagination.currentPage])
+    if (token) {
+      fetchData(pagination.currentPage)
+    }
+  }, [fetchData, pagination.currentPage, token])
 
   const handleFilterChange = (key, value) => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }))
@@ -207,55 +256,14 @@ const CouponDetails = () => {
         </div>
       </div>
 
-      {confirmModal.isOpen && (
-        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
-          <div className='bg-white w-1/2 max-w-lg rounded-lg flex flex-col justify-center items-center p-6 gap-5 text-primary shadow-xl'>
-            <IoMdInformationCircle size={80} />
-            <h6 className='text-3xl font-bold'>Confirmation!</h6>
-            <p className='text-lg font-medium text-slate-500 text-center'>
-              {`Are you sure you want to delete coupon "${
-                confirmModal.item?.couponCode || ''
-              }"?`}
-            </p>
-            <div className='flex flex-row gap-4 mt-4'>
-              <button
-                onClick={() => handleDeleteConfirm(confirmModal.item._id)}
-                className='px-8 py-2 rounded-lg bg-primary text-white
-                                    font-semibold hover:bg-opacity-90 transition-colors'
-              >
-                Yes, Delete
-              </button>
-              <button
-                onClick={() => setConfirmModal({ isOpen: false, item: null })}
-                className='px-8 py-2 rounded-lg bg-white text-primary
-                                    border border-primary font-semibold
-                                    hover:bg-gray-100 transition-colors'
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        couponCode={confirmModal.item?.couponCode}
+        onConfirm={() => handleDeleteConfirm(confirmModal.item._id)}
+        onCancel={() => setConfirmModal({ isOpen: false, item: null })}
+      />
 
-      {/* ADD the Edit Modal */}
-      {editModal.isOpen && (
-        <CouponEditModal
-          couponData={editModal.coupon}
-          onUpdate={handleUpdateConfirm}
-          onClose={() => setEditModal({ isOpen: false, coupon: null })}
-          isLoading={editLoading}
-        />
-      )}
-      {isLoading && (
-        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
-          <BeatLoader
-            color='var(--primary-color)'
-            loading={isLoading}
-            size={15}
-          />
-        </div>
-      )}
+      <LoadingOverlay isLoading={isLoading} />
 
       <CouponTable
         data={data}

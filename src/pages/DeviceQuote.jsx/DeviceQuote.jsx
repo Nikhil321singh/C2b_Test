@@ -164,7 +164,9 @@ const DeviceQuote = () => {
   }
 
   const handleApplyCoupon = () => {
-    if (!eligibleCoupon) return
+    if (!eligibleCoupon) {
+      return
+    }
     setIsCouponApplied(true)
     toast.success(`Coupon "${eligibleCoupon.couponCode}" applied!`)
   }
