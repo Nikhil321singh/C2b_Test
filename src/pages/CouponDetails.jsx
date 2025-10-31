@@ -72,8 +72,6 @@ const CouponDetails = () => {
   const [data, setData] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [sideMenu, setSideMenu] = useState(false)
-  const [editModal, setEditModal] = useState({ isOpen: false, coupon: null })
-  const [editLoading, setEditLoading] = useState(false)
   const [filters, setFilters] = useState({
     search: '',
     storeName: '',
@@ -167,46 +165,6 @@ const CouponDetails = () => {
     }
   }
 
-  const handleEditRequest = (couponData) => {
-    setEditModal({ isOpen: true, coupon: couponData })
-  }
-
-  const handleUpdateConfirm = async (couponId, updatedData) => {
-    setEditLoading(true)
-    const payload = {
-      devicePriceRange: {
-        min: Number(updatedData['devicePriceRange.min']),
-        max: updatedData['devicePriceRange.max']
-          ? Number(updatedData['devicePriceRange.max'])
-          : Infinity,
-      },
-      discountType: updatedData.discountType,
-      discountValue: Number(updatedData.discountValue),
-      validFrom: updatedData.validFrom,
-      validTo: updatedData.validTo,
-      status: updatedData.status,
-    }
-
-    try {
-      const updateEndpoint = `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/coupons/update/${couponId}`
-      await axios.put(updateEndpoint, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      toast.success('Coupon updated successfully!')
-      setEditModal({ isOpen: false, coupon: null })
-      fetchData(pagination.currentPage)
-    } catch (error) {
-      const errorMessage = `Update failed: ${
-        error.response?.data?.message || 'An error occurred.'
-      }`
-      toast.error(errorMessage)
-    } finally {
-      setEditLoading(false)
-    }
-  }
-
   const handleStatusToggle = async (couponId, currentStatus) => {
     const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active'
     const toastId = toast.loading(`Setting status to ${newStatus}...`)
@@ -273,7 +231,6 @@ const CouponDetails = () => {
         setStoreValue={(value) => handleFilterChange('storeName', value)}
         onSearch={() => fetchData(1)}
         onClear={handleClear}
-        onEdit={handleEditRequest}
         onDelete={handleDeleteRequest}
         pagination={pagination}
         onStatusToggle={handleStatusToggle}

@@ -10,6 +10,57 @@ import toast from 'react-hot-toast'
 
 const FIELD_PRICE_RANGE_MIN = 'devicePriceRange.min'
 const FIELD_PRICE_RANGE_MAX = 'devicePriceRange.max'
+const PAGE_TITLE_CREATE = 'Create Coupon'
+const PAGE_TITLE_EDIT = 'Edit Coupon'
+
+const LoadingSpinner = ({ isLoading }) => {
+  if (!isLoading) {
+    return null
+  }
+  return (
+    <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+      <BeatLoader color='var(--primary-color)' loading={isLoading} size={15} />
+    </div>
+  )
+}
+
+const ResultModal = ({ isOpen, isSuccess, message, onClose }) => {
+  if (!isOpen) {
+    return null
+  }
+  return (
+    <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+      <div
+        className={`bg-white w-1/2 rounded-lg flex flex-col justify-center items-center p-5 gap-5 ${
+          isSuccess ? 'text-green-500' : 'text-primary'
+        }`}
+      >
+        {isSuccess ? (
+          <IoIosCheckmarkCircle size={90} />
+        ) : (
+          <IoIosCloseCircle size={90} />
+        )}
+        <h6 className='text-3xl font-bold'>
+          {isSuccess ? 'Success!' : 'Error!'}
+        </h6>
+        <p className='text-lg font-medium text-slate-500 text-center'>
+          {message}
+        </p>
+        <button
+          onClick={onClose}
+          className={`shadow-md px-8 py-2 mt-2 rounded-lg text-lg font-medium
+              transition-all duration-500 ease-in-out cursor-pointer hover:shadow-lg ${
+                isSuccess
+                  ? 'bg-green-500 text-white'
+                  : 'text-white bg-primary'
+              }`}
+        >
+          Okay
+        </button>
+      </div>
+    </div>
+  )
+}
 
 const formatDateForInput = (dateString) => {
   if (!dateString) {
@@ -30,42 +81,83 @@ const getStorePrefix = (storeName = '') => {
     .toUpperCase()
 }
 
+const validateCouponCode = (couponCode) => {
+  if (!couponCode.trim()) {
+    return 'Coupon Code is required.'
+  }
+  if (/\s/.test(couponCode)) {
+    return 'Coupon Code cannot contain spaces.'
+  }
+  return null
+}
+
+const validateDiscountValue = (discountValue) => {
+  if (!discountValue) {
+    return 'Discount value is required.'
+  }
+  if (Number(discountValue) <= 0) {
+    return 'Discount value must be greater than zero.'
+  }
+  return null
+}
+
+const validatePriceRange = (minPrice, maxPriceInput) => {
+  if (minPrice < 0) {
+    return 'Minimum price cannot be negative.'
+  }
+  if (maxPriceInput && Number(maxPriceInput) <= minPrice) {
+    return 'Maximum price must be greater than minimum price.'
+  }
+  return null
+}
+
+const validateDates = (validFrom, validTo, isEditMode) => {
+  if (!validFrom || !validTo) {
+    return 'Both "Valid From" and "Valid To" dates are required.'
+  }
+  const fromDate = new Date(validFrom)
+  const toDate = new Date(validTo)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  if (toDate < fromDate) {
+    return '"Valid To" date cannot be before "Valid From" date.'
+  }
+  if (!isEditMode && toDate < today) {
+    return 'The coupon validity period cannot end in the past.'
+  }
+  return null
+}
+
 const validateForm = (formData, isEditMode) => {
   const errors = {}
-  if (!formData.couponCode.trim()) {
-    errors.couponCode = 'Coupon Code is required.'
-  } else if (/\s/.test(formData.couponCode)) {
-    errors.couponCode = 'Coupon Code cannot contain spaces.'
+
+  const couponCodeError = validateCouponCode(formData.couponCode)
+  if (couponCodeError) {
+    errors.couponCode = couponCodeError
   }
+
   if (!formData.storeId) {
     errors.storeId = 'A store must be selected.'
   }
-  if (!formData.discountValue) {
-    errors.discountValue = 'Discount value is required.'
-  } else if (Number(formData.discountValue) <= 0) {
-    errors.discountValue = 'Discount value must be greater than zero.'
+
+  const discountError = validateDiscountValue(formData.discountValue)
+  if (discountError) {
+    errors.discountValue = discountError
   }
+
   const minPrice = Number(formData[FIELD_PRICE_RANGE_MIN])
   const maxPriceInput = formData[FIELD_PRICE_RANGE_MAX]
-  if (minPrice < 0) {
-    errors.priceRange = 'Minimum price cannot be negative.'
-  } else if (maxPriceInput && Number(maxPriceInput) <= minPrice) {
-    errors.priceRange = 'Maximum price must be greater than minimum price.'
+  const priceRangeError = validatePriceRange(minPrice, maxPriceInput)
+  if (priceRangeError) {
+    errors.priceRange = priceRangeError
   }
-  if (!formData.validFrom || !formData.validTo) {
-    errors.dates = 'Both "Valid From" and "Valid To" dates are required.'
-  } else {
-    const fromDate = new Date(formData.validFrom)
-    const toDate = new Date(formData.validTo)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    if (toDate < fromDate) {
-      errors.dates = '"Valid To" date cannot be before "Valid From" date.'
-    }
-    if (!isEditMode && toDate < today) {
-      errors.dates = 'The coupon validity period cannot end in the past.'
-    }
+
+  const datesError = validateDates(formData.validFrom, formData.validTo, isEditMode)
+  if (datesError) {
+    errors.dates = datesError
   }
+
   return errors
 }
 
@@ -120,7 +212,7 @@ const CreateCoupon = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const [isCodeManuallyChanged, setIsCodeManuallyChanged] = useState(false)
-  const [pageTitle, setPageTitle] = useState('Create Coupon')
+  const [pageTitle, setPageTitle] = useState(PAGE_TITLE_CREATE)
   const [sideMenu, setSideMenu] = useState(false)
 
   useEffect(() => {
@@ -140,7 +232,7 @@ const CreateCoupon = () => {
       return
     }
     setIsLoading(true)
-    setPageTitle('Edit Coupon')
+    setPageTitle(PAGE_TITLE_EDIT)
     const fetchCouponData = async () => {
       try {
         const endpoint = `${
@@ -302,48 +394,14 @@ const CreateCoupon = () => {
         <SideMenu setsideMenu={setSideMenu} sideMenu={sideMenu} />
       </div>
 
-      {isLoading && (
-        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
-          <BeatLoader
-            color='var(--primary-color)'
-            loading={isLoading}
-            size={15}
-          />
-        </div>
-      )}
+      <LoadingSpinner isLoading={isLoading} />
 
-      {isModalOpen && (
-        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
-          <div
-            className={`bg-white w-1/2 rounded-lg flex flex-col justify-center items-center p-5 gap-5 ${
-              isSuccessModal ? 'text-green-500' : 'text-primary'
-            }`}
-          >
-            {isSuccessModal ? (
-              <IoIosCheckmarkCircle size={90} />
-            ) : (
-              <IoIosCloseCircle size={90} />
-            )}
-            <h6 className='text-3xl font-bold'>
-              {isSuccessModal ? 'Success!' : 'Error!'}
-            </h6>
-            <p className='text-lg font-medium text-slate-500 text-center'>
-              {modalMessage}
-            </p>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className={`shadow-md px-8 py-2 mt-2 rounded-lg text-lg font-medium
-                                transition-all duration-500 ease-in-out cursor-pointer hover:shadow-lg ${
-                                  isSuccessModal
-                                    ? 'bg-green-500 text-white'
-                                    : 'text-white bg-primary'
-                                }`}
-            >
-              Okay
-            </button>
-          </div>
-        </div>
-      )}
+      <ResultModal
+        isOpen={isModalOpen}
+        isSuccess={isSuccessModal}
+        message={modalMessage}
+        onClose={() => setIsModalOpen(false)}
+      />
 
       <div
         style={{
