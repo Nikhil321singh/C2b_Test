@@ -12,6 +12,7 @@ const FIELD_PRICE_RANGE_MIN = 'devicePriceRange.min'
 const FIELD_PRICE_RANGE_MAX = 'devicePriceRange.max'
 const PAGE_TITLE_CREATE = 'Create Coupon'
 const PAGE_TITLE_EDIT = 'Edit Coupon'
+const ROUTE_COUPON_DETAILS = '/coupondetails'
 
 const LoadingSpinner = ({ isLoading }) => {
   if (!isLoading) {
@@ -50,9 +51,7 @@ const ResultModal = ({ isOpen, isSuccess, message, onClose }) => {
           onClick={onClose}
           className={`shadow-md px-8 py-2 mt-2 rounded-lg text-lg font-medium
               transition-all duration-500 ease-in-out cursor-pointer hover:shadow-lg ${
-                isSuccess
-                  ? 'bg-green-500 text-white'
-                  : 'text-white bg-primary'
+                isSuccess ? 'bg-green-500 text-white' : 'text-white bg-primary'
               }`}
         >
           Okay
@@ -60,6 +59,77 @@ const ResultModal = ({ isOpen, isSuccess, message, onClose }) => {
       </div>
     </div>
   )
+}
+
+const PageHeader = ({ pageTitle, navigate }) => (
+  <div className='flex flex-col w-full px-10'>
+    <div className='mb-6 flex flex-col gap-2 border-b-2 pb-2'>
+      <div className='flex items-center gap-6'>
+        <p className='text-4xl font-bold'>{pageTitle}</p>
+      </div>
+      <p className='text-lg'>All fields marked with * are required</p>
+    </div>
+    <div className='flex flex-wrap gap-2 mb-10'>
+      <button
+        onClick={() => navigate(ROUTE_COUPON_DETAILS)}
+        className='font-medium text-sm text-white p-3 rounded
+            bg-primary shadow-sm hover:shadow-md transition-shadow'
+      >
+        View Details
+      </button>
+    </div>
+  </div>
+)
+
+const FormContainer = ({ children }) => (
+  <div
+    style={{
+      boxShadow:
+        'rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px',
+    }}
+    className='items-center bg-white max-w-4xl flex py-8 mx-auto mt-4 justify-center flex-col'
+  >
+    {children}
+  </div>
+)
+
+const useCouponAutoGenerate = (
+  isEditMode,
+  isCodeManuallyChanged,
+  formData,
+  storeData,
+  setFormData
+) => {
+  useEffect(() => {
+    if (
+      !isEditMode &&
+      !isCodeManuallyChanged &&
+      formData.discountValue &&
+      formData.storeId
+    ) {
+      const selectedStore = storeData.find(
+        (store) => store._id === formData.storeId
+      )
+      if (!selectedStore) {
+        return
+      }
+      const storePrefix = getStorePrefix(selectedStore.storeName)
+      const value = formData.discountValue
+      const typeSuffix = formData.discountType === 'Percentage' ? 'P' : ''
+      const baseCode = `SW${value}${typeSuffix}`
+      const generatedCode = `${storePrefix}-${baseCode}`.toUpperCase()
+      setFormData((prev) => ({ ...prev, couponCode: generatedCode }))
+    }
+  }, [
+    formData.discountValue,
+    formData.discountType,
+    formData.storeId,
+    isCodeManuallyChanged,
+    storeData,
+    isEditMode,
+    setFormData,
+    formData,
+  ])
 }
 
 const formatDateForInput = (dateString) => {
@@ -153,7 +223,11 @@ const validateForm = (formData, isEditMode) => {
     errors.priceRange = priceRangeError
   }
 
-  const datesError = validateDates(formData.validFrom, formData.validTo, isEditMode)
+  const datesError = validateDates(
+    formData.validFrom,
+    formData.validTo,
+    isEditMode
+  )
   if (datesError) {
     errors.dates = datesError
   }
@@ -260,7 +334,7 @@ const CreateCoupon = () => {
         }
       } catch (error) {
         toast.error('Could not load coupon data for editing.')
-        navigate('/coupondetails')
+        navigate(ROUTE_COUPON_DETAILS)
       } finally {
         setIsLoading(false)
       }
@@ -268,34 +342,13 @@ const CreateCoupon = () => {
     fetchCouponData()
   }, [id, isEditMode, token, navigate])
 
-  useEffect(() => {
-    if (
-      !isEditMode &&
-      !isCodeManuallyChanged &&
-      formData.discountValue &&
-      formData.storeId
-    ) {
-      const selectedStore = storeData.find(
-        (store) => store._id === formData.storeId
-      )
-      if (!selectedStore) {
-        return
-      }
-      const storePrefix = getStorePrefix(selectedStore.storeName)
-      const value = formData.discountValue
-      const typeSuffix = formData.discountType === 'Percentage' ? 'P' : ''
-      const baseCode = `SW${value}${typeSuffix}`
-      const generatedCode = `${storePrefix}-${baseCode}`.toUpperCase()
-      setFormData((prev) => ({ ...prev, couponCode: generatedCode }))
-    }
-  }, [
-    formData.discountValue,
-    formData.discountType,
-    formData.storeId,
-    isCodeManuallyChanged,
-    storeData,
+  useCouponAutoGenerate(
     isEditMode,
-  ])
+    isCodeManuallyChanged,
+    formData,
+    storeData,
+    setFormData
+  )
 
   const handleChange = useCallback(
     (e) => {
@@ -367,7 +420,7 @@ const CreateCoupon = () => {
         setIsSuccessModal(true)
         setIsModalOpen(true)
         if (isEditMode) {
-          setTimeout(() => navigate('/coupondetails'), 1500)
+          setTimeout(() => navigate(ROUTE_COUPON_DETAILS), 1500)
         } else {
           setFormData(initForm)
           setFormErrors({})
@@ -403,29 +456,9 @@ const CreateCoupon = () => {
         onClose={() => setIsModalOpen(false)}
       />
 
-      <div
-        style={{
-          boxShadow:
-            'rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px',
-        }}
-        className='items-center bg-white max-w-4xl flex py-8 mx-auto mt-4 justify-center flex-col'
-      >
-        <div className='flex flex-col w-full px-10'>
-          <div className='mb-6 flex flex-col gap-2 border-b-2 pb-2'>
-            <div className='flex items-center gap-6'>
-              <p className='text-4xl font-bold'>{pageTitle}</p>
-            </div>
-            <p className='text-lg'>All fields marked with * are required</p>
-          </div>
-          <div className='flex flex-wrap gap-2 mb-10'>
-            <button
-              onClick={() => navigate('/coupondetails')}
-              className='font-medium text-sm text-white p-3 rounded
-                                bg-primary shadow-sm hover:shadow-md transition-shadow'
-            >
-              View Details
-            </button>
-          </div>
+      <FormContainer>
+        <PageHeader pageTitle={pageTitle} navigate={navigate} />
+        <div className='w-full px-10'>
           <CouponForm
             formData={formData}
             submitHandler={submitHandler}
@@ -435,7 +468,7 @@ const CreateCoupon = () => {
             formType={isEditMode ? 'update' : 'create'}
           />
         </div>
-      </div>
+      </FormContainer>
     </div>
   )
 }
