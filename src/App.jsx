@@ -57,6 +57,8 @@ import Orders from './pages/Orders/Orders'
 import BulkUploadHistory from './pages/BulkUploadHistory'
 import QuoteTrackingDashboard from './pages/QuoteTrackingDashboard'
 import ThankYou from './pages/ThankYou'
+import CreateCoupon from './pages/CreateCoupon'
+import CouponDetails from './pages/CouponDetails'
 
 function App() {
   return (
@@ -210,6 +212,9 @@ function App() {
                   path='/quotetrackingdashboard'
                   element={<QuoteTrackingDashboard />}
                 ></Route>
+                <Route path='/createcoupon' element={<CreateCoupon />}></Route>
+                <Route path='/editcoupon/:id' element={<CreateCoupon />}></Route>
+                <Route path='/coupondetails' element={<CouponDetails />}></Route>
               </Routes>
             </Router>
             <Toaster

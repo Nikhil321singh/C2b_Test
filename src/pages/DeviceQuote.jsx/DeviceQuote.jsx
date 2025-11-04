@@ -10,6 +10,7 @@ import DeviceReport from '../../components/DeviceReport/DeviceReport'
 import ProfileBox from '../../components/ProfileBox/ProfileBox'
 import apple_watch from '../../assets/apple_watch.png'
 import { setResponseData } from '../../store/slices/responseSlice'
+import axios from 'axios'
 
 const currentDomain = window.location.origin
 const DEFAULT_LOGO = '/Grest_Logo.jpg'
@@ -21,19 +22,39 @@ const buyback = import.meta.env.VITE_BUYBACK_URL
 const switchKart = import.meta.env.VITE_SWITCHKART_URL
 const deviceTypePage = '/selectdevicetype'
 
-const calculateDisplayPrice = ({ quoteSaved, savedBonus, Price, bonus }) => {
+const calculateDisplayPrice = ({
+  quoteSaved,
+  savedBonus,
+  Price,
+  bonus,
+  appliedCoupon,
+}) => {
   const basePrice = Number(Price)
   const bonusValue = Number(bonus) || 0
   const savedBonusValue = Number(savedBonus) || 0
+  const couponDiscount = appliedCoupon
+    ? Number(appliedCoupon.calculatedDiscount) || 0
+    : 0
 
   if (quoteSaved) {
     if (savedBonus) {
-      return basePrice + bonusValue - savedBonusValue
+      return basePrice + bonusValue - savedBonusValue + couponDiscount
     }
-    return basePrice + bonusValue
+    return basePrice + bonusValue + couponDiscount
   }
 
-  return basePrice
+  return basePrice + couponDiscount
+}
+
+const getDeviceDisplayName = (deviceModalInfo) => {
+  const models = deviceModalInfo.models
+  const isCTG1 = models?.type === 'CTG1'
+  if (!isCTG1) {
+    return models?.name
+  }
+  const ram = models?.config?.RAM
+  const storage = models?.config?.storage
+  return `${models?.name}(${ram}/${storage})`
 }
 
 const DeviceQuote = () => {
@@ -60,6 +81,14 @@ const DeviceQuote = () => {
   const [termsChecked, setTermsChecked] = useState(false)
   const hasShownError = useRef(false)
 
+  // Coupon and Bonus toggle states
+  const [mode, setMode] = useState('bonus') // 'bonus' or 'coupon'
+  const [eligibleCoupon, setEligibleCoupon] = useState(null)
+  const [isCouponApplied, setIsCouponApplied] = useState(false)
+  const [isLoadingCoupon, setIsLoadingCoupon] = useState(true)
+  const leadId = sessionStorage.getItem('LeadId')
+  const token = sessionStorage.getItem('authToken')
+
   const ResponseData = useSelector((state) => state.responseData)
   const Price = useSelector((state) => state.responseData.price)
   const uniqueCode = useSelector((state) => state.responseData.uniqueCode)
@@ -70,12 +99,82 @@ const DeviceQuote = () => {
     setBonus(savedBonus || null)
   }, [uniqueCode, savedBonus])
 
+  // Calculate final bonus for current mode
+  const calculateFinalBonus = () => {
+    if (mode === 'bonus') {
+      return Number(bonus) || 0
+    } else if (mode === 'coupon' && isCouponApplied && eligibleCoupon) {
+      return eligibleCoupon.discountType === 'Fixed'
+        ? eligibleCoupon.discountValue
+        : Math.round((Number(Price) * eligibleCoupon.discountValue) / 100)
+    }
+    return 0
+  }
+
   const displayPrice = calculateDisplayPrice({
     quoteSaved,
     savedBonus,
     Price,
-    bonus,
+    bonus: calculateFinalBonus(),
+    appliedCoupon: null,
   })
+
+  // Fetch eligible coupon when component mounts
+  useEffect(() => {
+    const fetchCoupon = async () => {
+      if (!leadId || !token) {
+        setIsLoadingCoupon(false)
+        return
+      }
+      try {
+        const response = await axios.get(
+          `${
+            import.meta.env.VITE_REACT_APP_ENDPOINT
+          }/api/coupons/find-eligible/${leadId}`,
+          {
+            headers: { Authorization: token },
+          }
+        )
+        const coupon = response?.data?.data
+        setEligibleCoupon(coupon)
+        if (coupon && coupon.couponCode) {
+          sessionStorage.setItem('eligibleCouponCode', coupon.couponCode)
+        }
+      } catch (error) {
+        console.error(
+          '❌ Error fetching coupon:',
+          error?.response?.data || error.message
+        )
+        setEligibleCoupon(null)
+      } finally {
+        setIsLoadingCoupon(false)
+      }
+    }
+    fetchCoupon()
+  }, [leadId, token])
+
+  // Mode switching and coupon functions
+  const handleModeSwitch = (newMode) => {
+    setMode(newMode)
+    if (newMode === 'bonus') {
+      setIsCouponApplied(false)
+    } else if (newMode === 'coupon') {
+      setBonus(null) // Clear bonus when switching to coupon mode
+    }
+  }
+
+  const handleApplyCoupon = () => {
+    if (!eligibleCoupon) {
+      return
+    }
+    setIsCouponApplied(true)
+    toast.success(`Coupon "${eligibleCoupon.couponCode}" applied!`)
+  }
+
+  const handleRemoveCoupon = () => {
+    setIsCouponApplied(false)
+    toast.success('Coupon removed.')
+  }
 
   useEffect(() => {
     if (
@@ -93,7 +192,7 @@ const DeviceQuote = () => {
     const resData = {
       grade: ResponseData.grade,
       price: Number(ResponseData.price),
-      bonus: Number(bonus),
+      bonus: calculateFinalBonus(),
       uniqueCode: ResponseData.uniqueCode,
       id: ResponseData.id,
     }
@@ -136,6 +235,13 @@ const DeviceQuote = () => {
               setBonus={setBonus}
               exactQuoteValue={exactQuoteValue}
               showDeviceReportHandler={showDeviceReportHandler}
+              mode={mode}
+              handleModeSwitch={handleModeSwitch}
+              eligibleCoupon={eligibleCoupon}
+              isCouponApplied={isCouponApplied}
+              isLoadingCoupon={isLoadingCoupon}
+              handleApplyCoupon={handleApplyCoupon}
+              handleRemoveCoupon={handleRemoveCoupon}
             />
           </div>
           <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2'>
@@ -153,6 +259,7 @@ const DeviceQuote = () => {
               exactQuoteValue={exactQuoteValue}
               termsChecked={termsChecked}
               continueOTPHandler={continueOTPHandler}
+              finalBonus={calculateFinalBonus()}
             />
           </div>
         </>
@@ -232,6 +339,13 @@ const QuoteCard = ({
   setBonus,
   exactQuoteValue,
   showDeviceReportHandler,
+  mode,
+  handleModeSwitch,
+  eligibleCoupon,
+  isCouponApplied,
+  isLoadingCoupon,
+  handleApplyCoupon,
+  handleRemoveCoupon,
 }) => (
   <div
     className={`${styles.QuoteCardShadow} rounded-md p-4 w-full max-w-[600px]`}
@@ -246,11 +360,7 @@ const QuoteCard = ({
       </div>
       <div className='flex flex-col gap-[2px]'>
         <p className='font-medium text-gray-700'>
-          {`${deviceModalInfo.models?.name}${
-            deviceModalInfo.models?.type === 'CTG1'
-              ? `(${deviceModalInfo.models?.config?.RAM}/${deviceModalInfo.models?.config?.storage})`
-              : ''
-          }`}
+          {getDeviceDisplayName(deviceModalInfo)}
         </p>
         <p className='text-primary font-semibold'>
           ₹{Math.round(displayPrice).toLocaleString('en-IN')}
@@ -269,18 +379,55 @@ const QuoteCard = ({
     {quoteSaved === false &&
       exactQuoteValue === 'true' &&
       currentDomain !== buyback && (
-        <BonusInput bonus={bonus} setBonus={setBonus} />
+        <CouponBonusToggle
+          mode={mode}
+          bonus={bonus}
+          setBonus={setBonus}
+          eligibleCoupon={eligibleCoupon}
+          isCouponApplied={isCouponApplied}
+          isLoadingCoupon={isLoadingCoupon}
+          handleApplyCoupon={handleApplyCoupon}
+          handleRemoveCoupon={handleRemoveCoupon}
+        />
       )}
 
     <div className='mx-1 my-4 border-b-2 border-gray-400 border-dashed'></div>
 
     <div className='flex items-center justify-between'>
-      <p
-        className='text-gray-700 text-[17px] underline font-medium cursor-pointer'
-        onClick={showDeviceReportHandler}
-      >
-        Device Report
-      </p>
+      <div className='flex items-center gap-4'>
+        <p
+          className='text-gray-700 text-[17px] underline font-medium cursor-pointer'
+          onClick={showDeviceReportHandler}
+        >
+          Device Report
+        </p>
+        {quoteSaved === false &&
+          exactQuoteValue === 'true' &&
+          currentDomain !== buyback && (
+            <div className='flex gap-2'>
+              <button
+                className={`text-sm font-medium px-3 py-1 rounded ${
+                  mode === 'coupon'
+                    ? 'bg-primary text-white'
+                    : 'text-primary border border-primary'
+                }`}
+                onClick={() => handleModeSwitch('coupon')}
+              >
+                Coupon code
+              </button>
+              <button
+                className={`text-sm font-medium px-3 py-1 rounded ${
+                  mode === 'bonus'
+                    ? 'bg-primary text-white'
+                    : 'text-primary border border-primary'
+                }`}
+                onClick={() => handleModeSwitch('bonus')}
+              >
+                Bonus amount
+              </button>
+            </div>
+          )}
+      </div>
       {quoteSaved === false && (
         <button
           className='text-primary border-2 border-primary text-sm font-medium p-2 rounded-md'
@@ -290,6 +437,30 @@ const QuoteCard = ({
         </button>
       )}
     </div>
+  </div>
+)
+
+const CouponBonusToggle = ({
+  mode,
+  bonus,
+  setBonus,
+  eligibleCoupon,
+  isCouponApplied,
+  isLoadingCoupon,
+  handleApplyCoupon,
+  handleRemoveCoupon,
+}) => (
+  <div className='px-2 my-2'>
+    {mode === 'bonus' && <BonusInput bonus={bonus} setBonus={setBonus} />}
+    {mode === 'coupon' && (
+      <CouponDisplay
+        eligibleCoupon={eligibleCoupon}
+        isCouponApplied={isCouponApplied}
+        isLoadingCoupon={isLoadingCoupon}
+        handleApplyCoupon={handleApplyCoupon}
+        handleRemoveCoupon={handleRemoveCoupon}
+      />
+    )}
   </div>
 )
 
@@ -322,6 +493,67 @@ const BonusInput = ({ bonus, setBonus }) => (
   </div>
 )
 
+const CouponDisplay = ({
+  eligibleCoupon,
+  isCouponApplied,
+  isLoadingCoupon,
+  handleApplyCoupon,
+  handleRemoveCoupon,
+}) => {
+  if (isLoadingCoupon) {
+    return (
+      <div className='px-2 my-3 h-12 flex items-center justify-center'>
+        <div className='flex items-center justify-center'>
+          <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-primary'></div>
+          <span className='ml-2 text-sm text-gray-600'>Loading coupon...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (!eligibleCoupon) {
+    return (
+      <div className='px-2 my-3 h-12 flex items-center justify-center'>
+        <div className='w-full p-2 text-center bg-gray-100 border border-gray-300 rounded-md'>
+          <p className='text-sm font-medium text-gray-600'>
+            No coupons available for this device.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const discountText =
+    eligibleCoupon.discountType === 'Fixed'
+      ? `₹${eligibleCoupon.discountValue}`
+      : `${eligibleCoupon.discountValue}%`
+
+  return (
+    <div className='px-2 my-3 h-12 flex items-center justify-center'>
+      <div className='flex items-center justify-between w-full p-2 bg-green-100 border border-green-400 rounded-md'>
+        <p className='text-sm font-medium text-green-800'>
+          Eligible: {eligibleCoupon.couponCode} ({discountText})
+        </p>
+        {!isCouponApplied ? (
+          <button
+            onClick={handleApplyCoupon}
+            className='px-3 py-1 text-xs font-semibold text-white bg-primary rounded-md'
+          >
+            Apply
+          </button>
+        ) : (
+          <button
+            onClick={handleRemoveCoupon}
+            className='px-3 py-1 text-xs font-semibold text-white bg-red-600 rounded-md'
+          >
+            Remove
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 const SubDeviceQuote = ({
   savedBonus,
   Price,
@@ -330,6 +562,7 @@ const SubDeviceQuote = ({
   exactQuoteValue,
   termsChecked,
   continueOTPHandler,
+  finalBonus,
 }) => {
   const navigate = useNavigate()
   const [countdown, setCountdown] = useState(10) // 10 seconds countdown
@@ -349,7 +582,7 @@ const SubDeviceQuote = ({
   return (
     <div className='flex items-center justify-between gap-2'>
       <div className='flex flex-col w-1/2 text-xl font-medium'>
-        <p>₹{Math.round(Number(Price) + Number(bonus))}</p>
+        <p>₹{Math.round(Number(Price) + finalBonus)}</p>
       </div>
       {quoteSaved === false && exactQuoteValue === 'true' && (
         <div

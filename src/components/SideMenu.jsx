@@ -71,6 +71,11 @@ function SideMenu({ setsideMenu, sideMenu }) {
     navigate('/quotetrackingdashboard')
   }
 
+  const handleCouponManagement = () => {
+    setsideMenu(!sideMenu)
+    navigate('/coupondetails')
+  }
+
   const handleLogout = () => {
     localStorage.clear()
     sessionStorage.clear()
@@ -97,6 +102,7 @@ function SideMenu({ setsideMenu, sideMenu }) {
           adminDashboard={adminDashboard}
           handleBulkUploadHistory={handleBulkUploadHistory}
           handleQuoteTracking={handleQuoteTracking}
+          handleCouponManagement={handleCouponManagement}
           handleLogout={handleLogout}
         />
       )}
@@ -223,6 +229,7 @@ const SuperAdminProfile = ({
   handleLogout,
   handleBulkUploadHistory,
   handleQuoteTracking,
+  handleCouponManagement,
 }) => {
   return (
     <div
@@ -281,6 +288,12 @@ const SuperAdminProfile = ({
           onClick={handleQuoteTracking}
         >
           Quote Tracking
+        </li>
+        <li
+          className='text-[20px] font-[300] cursor-pointer'
+          onClick={handleCouponManagement}
+        >
+          Coupon Management
         </li>
         <li
           className='text-[20px] font-[300] cursor-pointer '
