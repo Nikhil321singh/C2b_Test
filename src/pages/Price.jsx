@@ -17,7 +17,8 @@ const Price = () => {
 
   // Use custom hooks
   const formState = usePriceForm()
-  const { uploadStatus, handleFileChange, uploadAllImages, isLoading } = usePriceUpload(formState)
+  const { uploadStatus, handleFileChange, uploadAllImages, isLoading } =
+    usePriceUpload(formState)
 
   const {
     imeinumber,
@@ -27,7 +28,7 @@ const Price = () => {
     phoneRight,
     phoneTop,
     phoneBottom,
-    handleCameraButtonClick
+    handleCameraButtonClick,
   } = formState
 
   return (
