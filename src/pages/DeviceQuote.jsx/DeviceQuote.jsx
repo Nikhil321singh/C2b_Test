@@ -393,8 +393,8 @@ const QuoteCard = ({
 
     <div className='mx-1 my-4 border-b-2 border-gray-400 border-dashed'></div>
 
-    <div className='flex items-center justify-between'>
-      <div className='flex items-center gap-4'>
+    <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3'>
+      <div className='flex flex-col sm:flex-row sm:items-center gap-4'>
         <p
           className='text-gray-700 text-[17px] underline font-medium cursor-pointer'
           onClick={showDeviceReportHandler}
@@ -428,14 +428,16 @@ const QuoteCard = ({
             </div>
           )}
       </div>
-      {quoteSaved === false && (
-        <button
-          className='text-primary border-2 border-primary text-sm font-medium p-2 rounded-md'
-          onClick={toggleModal}
-        >
-          Save Quote
-        </button>
-      )}
+      {quoteSaved === false &&
+        exactQuoteValue === 'true' &&
+        currentDomain !== buyback && (
+          <button
+            className='text-sm font-medium px-3 py-1 rounded text-primary border border-primary lg:ml-auto'
+            onClick={toggleModal}
+          >
+            Save Quote
+          </button>
+        )}
     </div>
   </div>
 )
