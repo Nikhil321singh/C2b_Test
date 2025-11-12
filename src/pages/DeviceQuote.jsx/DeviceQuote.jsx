@@ -244,7 +244,7 @@ const DeviceQuote = () => {
               handleRemoveCoupon={handleRemoveCoupon}
             />
           </div>
-          <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2'>
+          <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2 bg-white'>
             {quoteSaved === false && exactQuoteValue === 'true' && (
               <TermsCheckbox
                 termsChecked={termsChecked}
@@ -404,9 +404,9 @@ const QuoteCard = ({
         {quoteSaved === false &&
           exactQuoteValue === 'true' &&
           currentDomain !== buyback && (
-            <div className='flex flex-wrap items-center gap-2'>
+            <div className='flex flex-nowrap items-center gap-2'>
               <button
-                className={`text-sm font-medium px-3 py-1 rounded ${
+                className={`text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded whitespace-nowrap ${
                   mode === 'coupon'
                     ? 'bg-primary text-white'
                     : 'text-primary border border-primary'
@@ -416,7 +416,7 @@ const QuoteCard = ({
                 Coupon code
               </button>
               <button
-                className={`text-sm font-medium px-3 py-1 rounded ${
+                className={`text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded whitespace-nowrap ${
                   mode === 'bonus'
                     ? 'bg-primary text-white'
                     : 'text-primary border border-primary'
@@ -426,7 +426,7 @@ const QuoteCard = ({
                 Bonus amount
               </button>
               <button
-                className='text-sm font-medium px-3 py-1 rounded text-primary border border-primary sm:hidden'
+                className='text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded text-primary border border-primary whitespace-nowrap sm:hidden'
                 onClick={toggleModal}
               >
                 Save Quote
