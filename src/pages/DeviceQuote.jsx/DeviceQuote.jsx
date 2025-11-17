@@ -244,7 +244,7 @@ const DeviceQuote = () => {
               handleRemoveCoupon={handleRemoveCoupon}
             />
           </div>
-          <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2'>
+          <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2 bg-white'>
             {quoteSaved === false && exactQuoteValue === 'true' && (
               <TermsCheckbox
                 termsChecked={termsChecked}
@@ -394,7 +394,7 @@ const QuoteCard = ({
     <div className='mx-1 my-4 border-b-2 border-gray-400 border-dashed'></div>
 
     <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3'>
-      <div className='flex flex-col sm:flex-row sm:items-center gap-4'>
+      <div className='flex flex-col sm:flex-row sm:items-center gap-4 flex-1'>
         <p
           className='text-gray-700 text-[17px] underline font-medium cursor-pointer'
           onClick={showDeviceReportHandler}
@@ -404,9 +404,9 @@ const QuoteCard = ({
         {quoteSaved === false &&
           exactQuoteValue === 'true' &&
           currentDomain !== buyback && (
-            <div className='flex gap-2'>
+            <div className='flex flex-nowrap items-center gap-2'>
               <button
-                className={`text-sm font-medium px-3 py-1 rounded ${
+                className={`text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded whitespace-nowrap ${
                   mode === 'coupon'
                     ? 'bg-primary text-white'
                     : 'text-primary border border-primary'
@@ -416,7 +416,7 @@ const QuoteCard = ({
                 Coupon code
               </button>
               <button
-                className={`text-sm font-medium px-3 py-1 rounded ${
+                className={`text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded whitespace-nowrap ${
                   mode === 'bonus'
                     ? 'bg-primary text-white'
                     : 'text-primary border border-primary'
@@ -425,6 +425,12 @@ const QuoteCard = ({
               >
                 Bonus amount
               </button>
+              <button
+                className='text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded text-primary border border-primary whitespace-nowrap sm:hidden'
+                onClick={toggleModal}
+              >
+                Save Quote
+              </button>
             </div>
           )}
       </div>
@@ -432,7 +438,7 @@ const QuoteCard = ({
         exactQuoteValue === 'true' &&
         currentDomain !== buyback && (
           <button
-            className='text-sm font-medium px-3 py-1 rounded text-primary border border-primary lg:ml-auto'
+            className='hidden sm:block text-sm font-medium px-3 py-1 rounded text-primary border border-primary lg:ml-auto'
             onClick={toggleModal}
           >
             Save Quote
@@ -468,12 +474,12 @@ const CouponBonusToggle = ({
 
 const BonusInput = ({ bonus, setBonus }) => (
   <div className='flex flex-row items-center justify-between px-2 my-2'>
-    <div className='w-[40%] font-medium text-gray-700'>
+    <div className='w-[50%] font-medium text-gray-700 text-sm sm:text-base'>
       {currentDomain === switchKart && 'SwitchKart'} Bonus Amount :
     </div>
-    <div className='rounded-md bg-[#f6f6f6] py-2 w-[55%] border-2 border-primary flex flex-col items-center justify-center'>
+    <div className='rounded-md bg-[#f6f6f6] py-1 sm:py-2 w-[45%]  border-2 border-primary flex flex-col items-center justify-center'>
       <input
-        className='bg-transparent outline-none my-auto text-center font-medium text-primary'
+        className='bg-transparent outline-none my-auto text-center font-medium text-primary text-xs sm:text-base w-full px-1'
         name='bonus'
         id='bonus'
         type='number'
