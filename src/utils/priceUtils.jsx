@@ -31,10 +31,16 @@ export const fileUploader = async (authToken, file, fileName, fileType) => {
     )
     if (resURL?.data?.url) {
       const presignedUrl = resURL.data.url
+      // Create a new axios instance without default headers for S3 upload
       const result = await axios.put(presignedUrl, file, {
         headers: {
           'Content-Type': fileType,
         },
+        // Don't send authorization header to S3 - presigned URL already contains auth
+        transformRequest: [(data, headers) => {
+          delete headers.Authorization
+          return data
+        }],
       })
       console.log('File uploaded successfully:', result)
     }

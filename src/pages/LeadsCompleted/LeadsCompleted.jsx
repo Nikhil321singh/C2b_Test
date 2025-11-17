@@ -116,6 +116,7 @@ const LeadsCompleted = () => {
   const [deviceType, setDeviceType] = useState('CTG1')
   const userToken = sessionStorage.getItem('authToken')
   const [loading, setLoading] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [sideMenu, setsideMenu] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
   const [tableData, setTableData] = useState([])
@@ -278,6 +279,8 @@ const LeadsCompleted = () => {
     <div>
       <SubLeadsCompleted
         loading={loading}
+        downloading={downloading}
+        setDownloading={setDownloading}
         setsideMenu={setsideMenu}
         sideMenu={sideMenu}
         totalCount={totalCount}
@@ -313,8 +316,9 @@ const LeadsCompleted = () => {
   )
 }
 
-const fetchDownloadData = (totalCount, deviceType, Str) => {
+const fetchDownloadData = (totalCount, deviceType, Str, setDownloading) => {
   const userToken1 = sessionStorage.getItem('authToken')
+  setDownloading(true)
   axios
     .get(
       `${
@@ -330,14 +334,18 @@ const fetchDownloadData = (totalCount, deviceType, Str) => {
     )
     .then((res) => {
       downloadExcelLeadsompleted(res.data.data)
+      setDownloading(false)
     })
     .catch((err) => {
       console.log(err)
+      setDownloading(false)
     })
 }
 
 const SubLeadsCompleted = ({
   loading,
+  downloading,
+  setDownloading,
   setsideMenu,
   sideMenu,
   totalCount,
@@ -405,6 +413,8 @@ const SubLeadsCompleted = ({
         categories={categories}
         tableData={tableData}
         storeData={storeData}
+        setDownloading={setDownloading}
+        downloading={downloading}
       />
       <div className='flex gap-2 items-center justify-center outline-none mt-5 w-[100%]'>
         <div className={`${styles.search_bar_wrap}`}>
@@ -478,6 +488,8 @@ const SubLeadsCompletedBtns = ({
   categories,
   tableData,
   storeData,
+  setDownloading,
+  downloading,
 }) => {
   const handleBulkDownloadReceipts = () => {
     if (!fromDate || !toDate) {
@@ -529,9 +541,25 @@ const SubLeadsCompletedBtns = ({
       <div className='flex gap-4'>
         <button
           className={`${styles.bulkdown_button}`}
-          onClick={() => fetchDownloadData(totalCount, deviceType, selStoreId)}
+          onClick={() =>
+            fetchDownloadData(
+              totalCount,
+              deviceType,
+              selStoreId,
+              setDownloading
+            )
+          }
+          disabled={downloading}
         >
-          <FaDownload /> Bulk Download
+          {downloading ? (
+            <>
+              <BeatLoader color='white' size={8} /> Downloading...
+            </>
+          ) : (
+            <>
+              <FaDownload /> Bulk Download
+            </>
+          )}
         </button>
         <div className='mt-2 ml-4'>
           <button
