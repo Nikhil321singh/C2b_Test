@@ -17,8 +17,13 @@ const Price = () => {
 
   // Use custom hooks
   const formState = usePriceForm()
-  const { uploadStatus, handleFileChange, uploadAllImages, isLoading } =
-    usePriceUpload(formState)
+  const {
+    uploadStatus,
+    handleFileChange,
+    uploadAllImages,
+    isLoading,
+    uploadIndividualFile,
+  } = usePriceUpload(formState)
 
   const {
     imeinumber,
@@ -28,7 +33,7 @@ const Price = () => {
     phoneRight,
     phoneTop,
     phoneBottom,
-    isAadharVerified,
+    signatureFile, //add signature file
     handleCameraButtonClick,
   } = formState
 
@@ -48,14 +53,10 @@ const Price = () => {
           uploadStatus={uploadStatus}
           handleFileChange={handleFileChange}
           handleCameraButtonClick={handleCameraButtonClick}
+          uploadIndividualFile={uploadIndividualFile} //added for file uploads
         />
       </div>
       <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 '>
-        {!isAadharVerified && (
-          <p className='text-center text-sm text-red-500'>
-            Please verify your Aadhar number to continue
-          </p>
-        )}
         <div
           onClick={() => uploadAllImages(navigate)}
           className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
@@ -66,7 +67,7 @@ const Price = () => {
             !phoneRight ||
             !phoneTop ||
             !phoneBottom ||
-            !isAadharVerified
+            !signatureFile //check signature
               ? 'cursor-not-allowed bg-gray-400'
               : pink
           }`}

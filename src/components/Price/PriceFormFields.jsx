@@ -1,15 +1,18 @@
-import React from 'react'
-import ImeiField from './ImeiField'
-import AadharNumberField from './AadharNumberField'
-import AdharField from './AdharField'
-import PhoneBill from './PhoneBill'
-import PhonePhotos1 from './PhonePhotos1'
+import React from "react";
+import ImeiField from "./ImeiField";
+import AadharNumberField from "./AadharNumberField";
+import AdharField from "./AdharField";
+import PhoneBill from "./PhoneBill";
+import PhonePhotos1 from "./PhonePhotos1";
+import DigitalSignatureField from "./DigitalSignatureField";
+
 
 const PriceFormFields = ({
   formState,
   uploadStatus,
   handleFileChange,
-  handleCameraButtonClick
+  handleCameraButtonClick,
+  uploadIndividualFile
 }) => {
   const {
     file,
@@ -30,6 +33,8 @@ const PriceFormFields = ({
     setPhoneLeft,
     phoneRight,
     setPhoneRight,
+    signatureFile, // new signature state
+    setSignatureFile, // <-- new signature state set function
     aadharNumber,
     setAadharNumber,
     imeinumber,
@@ -46,11 +51,11 @@ const PriceFormFields = ({
     phoneBottomRef,
     phoneTopRef,
     phoneLeftRef,
-    phoneRightRef
-  } = formState
+    phoneRightRef,
+  } = formState;
 
   return (
-    <div className='flex flex-col'>
+    <div className="flex flex-col">
       <ImeiField
         setImeiNumber={setImeiNumber}
         imeinumber={imeinumber}
@@ -110,8 +115,17 @@ const PriceFormFields = ({
         prod={prod}
         uploadStatus={uploadStatus}
       />
+      {/* Added New Signature Filed */}
+      <DigitalSignatureField
+        signatureFile={signatureFile}
+        setSignatureFile={setSignatureFile}
+        uploadStatus={uploadStatus}
+        uploadIndividualFile={uploadIndividualFile}
+        imeinumber={imeinumber}
+        prod={prod}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default PriceFormFields
+export default PriceFormFields;
