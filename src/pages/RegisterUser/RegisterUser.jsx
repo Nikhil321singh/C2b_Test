@@ -1,109 +1,157 @@
-import React, { useEffect, useState } from "react";
-import styles from "./RegisterUser.module.css";
-import { useNavigate } from "react-router-dom";
-import AdminNavbar from "../../components/Admin_Navbar";
-import BulkUploadModal from "../../components/BulkUploadModal";
+import React, { useEffect, useState } from 'react'
+import styles from './RegisterUser.module.css'
+import { useNavigate } from 'react-router-dom'
+import AdminNavbar from '../../components/Admin_Navbar'
+import BulkUploadModal from '../../components/BulkUploadModal'
 
+import SideMenu from '../../components/SideMenu'
+import { BeatLoader } from 'react-spinners'
+import axios from 'axios'
+import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io'
+import { IoEye, IoEyeOffSharp } from 'react-icons/io5'
 
-import SideMenu from "../../components/SideMenu";
-import { BeatLoader } from "react-spinners";
-import axios from "axios";
-import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
-import { IoEye, IoEyeOffSharp } from "react-icons/io5";
-
-const sucTextColor = "text-green-500";
-const failTextColor = "text-primary";
-const defaultRoles = ["Super Admin", "Admin Manager", "Technician"];
+const sucTextColor = 'text-green-500'
+const failTextColor = 'text-primary'
+const defaultRoles = ['Super Admin', 'Admin Manager', 'Technician']
 const role = import.meta.env.VITE_REACT_APP_ROLES
-  ? import.meta.env.VITE_REACT_APP_ROLES.split(",").map(item => item.trim())
-  : defaultRoles;
+  ? import.meta.env.VITE_REACT_APP_ROLES.split(',').map((item) => item.trim())
+  : defaultRoles
 const getStore = async () => {
-  const token1 = sessionStorage.getItem("authToken");
+  const token1 = sessionStorage.getItem('authToken')
   const config = {
-    method: "get",
-    url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=0&limit=9999`,
+    method: 'get',
+    url: `${
+      import.meta.env.VITE_REACT_APP_ENDPOINT
+    }/api/store/findAll?page=0&limit=9999`,
     headers: { Authorization: token1 },
-  };
-  let storeNamesArray = [];
+  }
+  let storeNamesArray = []
   await axios
     .request(config)
     .then((response) => {
-      console.log(response.data.result);
+      console.log(response.data.result)
       storeNamesArray = response.data.result.map((store) => ({
         storeName: store.storeName,
         _id: store._id,
         region: store.region,
-      }));
+      }))
     })
     .catch((error) => {
-      console.log(error);
-    });
-  return storeNamesArray;
-};
-
+      console.log(error)
+    })
+  return storeNamesArray
+}
 
 const initForm = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  password: "",
-  phoneNumber: "",
-  role: "",
-  storeId: "",
-  city: "",
-  address: "",
-};
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  phoneNumber: '',
+  role: '',
+  storeId: '',
+  city: '',
+  address: '',
+}
 
 const RegisterUser = () => {
-  const token = sessionStorage.getItem("authToken");
-  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-  const isSuperAdmin = LoggedInUser?.role === 'Super Admin';
-  const [sideMenu, setsideMenu] = useState(false);
-  const [isGrest, setIsGrest] = useState(null);
-  const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
-  const [sucBox, setSucBox] = useState(false);
-  const [failBox, setFailBox] = useState(false);
-  const [storeData, setStoreData] = useState([]);
-  const [formData, setFormData] = useState(initForm);
-  const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
+  const token = sessionStorage.getItem('authToken')
+  const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin'
+  const [sideMenu, setsideMenu] = useState(false)
+  const [isGrest, setIsGrest] = useState(null)
+  const [isTableLoaded, setIsTableLoaded] = useState(false)
+  const [errMsg, setErrMsg] = useState('')
+  const [sucBox, setSucBox] = useState(false)
+  const [failBox, setFailBox] = useState(false)
+  const [storeData, setStoreData] = useState([])
+  const [formData, setFormData] = useState(initForm)
+  const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false)
+  const [isValid, setIsValid] = useState(false)
+  const [passwordFocus, setPasswordFocus] = useState(false)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     setFormData({
       ...formData,
-      grestMember: isGrest === "yes",
-    });
-  }, [isGrest]);
+      grestMember: isGrest === 'yes',
+    })
+  }, [isGrest])
 
   const fetchAndSetStores = async () => {
-    setIsTableLoaded(true);
-    const stores = await getStore();
-    setStoreData(stores);
+    setIsTableLoaded(true)
+    const stores = await getStore()
+    setStoreData(stores)
     if (!isSuperAdmin && stores.length === 1) {
-      setFormData(prevData => ({ ...prevData, storeId: stores[0]._id }));
+      setFormData((prevData) => ({ ...prevData, storeId: stores[0]._id }))
     }
-    setIsTableLoaded(false);
-  };
+    setIsTableLoaded(false)
+  }
 
   useEffect(() => {
-    fetchAndSetStores();
-  }, [isSuperAdmin]);
+    fetchAndSetStores()
+  }, [isSuperAdmin])
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
+    const { name, value, type, checked } = e.target
+    const newValue = type === 'checkbox' ? checked : value
     setFormData({
       ...formData,
       [name]: newValue,
-    });
-  };
+    })
+  }
+
+  const passwordValidation = () => {
+    const lCaseRegex = /[a-z]/
+    const uCaseRegex = /[A-Z]/
+    const numRegex = /\d/
+    const spCharRegex = /[@$!%*?&]/
+
+    if (formData.password.length === 0) {
+      setErrMsg('')
+      setIsValid(false)
+      return
+    }
+
+    if (formData.password.length < 8) {
+      setErrMsg('Password Size Must Be More Than 8 Characters')
+      setIsValid(false)
+      return
+    }
+
+    if (!lCaseRegex.test(formData.password)) {
+      setErrMsg('Password Must Contain a Lower Case Letter')
+      setIsValid(false)
+      return
+    }
+    if (!uCaseRegex.test(formData.password)) {
+      setErrMsg('Password Must Contain a Upper Case Letter')
+      setIsValid(false)
+      return
+    }
+    if (!numRegex.test(formData.password)) {
+      setErrMsg('Password Must Contain a Number')
+      setIsValid(false)
+      return
+    }
+    if (!spCharRegex.test(formData.password)) {
+      setErrMsg('Password Must Contain a Speacial Char [@$!%*?&]')
+      setIsValid(false)
+      return
+    }
+
+    setIsValid(true)
+    setErrMsg('')
+  }
+
+  useEffect(() => {
+    passwordValidation()
+  }, [formData.password, passwordFocus])
 
   const submitHandler = (event) => {
-    event.preventDefault();
-    setIsTableLoaded(true);
+    event.preventDefault()
+    setIsTableLoaded(true)
     const data = {
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -114,33 +162,34 @@ const RegisterUser = () => {
       storeId: formData.storeId,
       city: formData.city,
       address: formData.address,
-    };
+    }
     const config = {
-      method: "post",
+      method: 'post',
       maxBodyLength: Infinity,
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/userregistry/register`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/userregistry/register`,
       headers: { Authorization: token },
       data: data,
-    };
+    }
     axios
       .request(config)
       .then((response) => {
-        setErrMsg("Successfully added new user");
-        setSucBox(true);
-        setIsTableLoaded(false);
-        navigate("/registeruserdetails");
+        setErrMsg('Successfully added new user')
+        setSucBox(true)
+        setIsTableLoaded(false)
+        navigate('/registeruserdetails')
       })
       .catch((error) => {
-        console.log(error);
-        setErrMsg("Failed to add new user, " + error.response.data.msg);
-        setFailBox(true);
-        setIsTableLoaded(false);
-      });
-  };
+        console.log(error)
+        setErrMsg('Failed to add new user, ' + error.response.data.msg)
+        setFailBox(true)
+        setIsTableLoaded(false)
+      })
+  }
   return (
-    <div className="min-h-screen  pb-8 bg-[#F5F4F9]">
-      <div className="navbar">
+    <div className='min-h-screen  pb-8 bg-[#F5F4F9]'>
+      <div className='navbar'>
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
@@ -149,15 +198,20 @@ const RegisterUser = () => {
         onClose={() => setIsBulkUploadModalOpen(false)}
       />
       {isTableLoaded && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
+        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+          <BeatLoader
+            color='var(--primary-color)'
+            loading={isTableLoaded}
+            size={15}
+          />
         </div>
       )}
       {(sucBox || failBox) && (
-        <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
           <div
-            className={`${styles.err_mod_box} ${sucBox ? sucTextColor : failTextColor
-              }`}
+            className={`${styles.err_mod_box} ${
+              sucBox ? sucTextColor : failTextColor
+            }`}
           >
             {sucBox ? (
               <IoIosCheckmarkCircle
@@ -171,16 +225,16 @@ const RegisterUser = () => {
               />
             )}
             <h6 className={sucBox ? sucTextColor : failTextColor}>
-              {sucBox ? "Success!" : "Error!"}
+              {sucBox ? 'Success!' : 'Error!'}
             </h6>
-            <p className="text-slate-500">{errMsg}</p>
+            <p className='text-slate-500'>{errMsg}</p>
             <button
               onClick={() => {
-                setSucBox(false);
-                setFailBox(false);
+                setSucBox(false)
+                setFailBox(false)
               }}
               className={
-                sucBox ? "bg-green-500 text-white" : "text-white bg-primary"
+                sucBox ? 'bg-green-500 text-white' : 'text-white bg-primary'
               }
             >
               Okay
@@ -191,29 +245,28 @@ const RegisterUser = () => {
       <div
         style={{
           boxShadow:
-            "rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px",
+            'rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px',
         }}
-        className="items-center bg-white max-w-[900px] flex py-8 mx-auto mt-4 justify-center flex-col"
+        className='items-center bg-white max-w-[900px] flex py-8 mx-auto mt-4 justify-center flex-col'
       >
-        <div className="flex flex-col w-[900px]">
-          <div className="mb-6  flex flex-col gap-2 border-b-2 pb-2 mr-10 ml-10">
-            <div className="flex items-center gap-6 justify-centerflex-wrap">
-              <p className="text-4xl font-bold">Register User</p>
+        <div className='flex flex-col w-[900px]'>
+          <div className='mb-6  flex flex-col gap-2 border-b-2 pb-2 mr-10 ml-10'>
+            <div className='flex items-center gap-6 justify-centerflex-wrap'>
+              <p className='text-4xl font-bold'>Register User</p>
               <button
                 onClick={() => setIsBulkUploadModalOpen(true)}
-
-                className="font-medium text-sm text-white px-4 py-2 rounded bg-primary"
+                className='font-medium text-sm text-white px-4 py-2 rounded bg-primary'
               >
                 Bulk Upload
               </button>
             </div>
 
-            <p className="text-lg ">All fields marked with * are required</p>
+            <p className='text-lg '>All fields marked with * are required</p>
           </div>
-          <div className="flex flex-wrap gap-2 ml-10 mb-10">
+          <div className='flex flex-wrap gap-2 ml-10 mb-10'>
             <button
-              onClick={() => navigate("/registeruserdetails")}
-              className="font-medium text-sm text-white p-3 rounded bg-primary"
+              onClick={() => navigate('/registeruserdetails')}
+              className='font-medium text-sm text-white p-3 rounded bg-primary'
             >
               View Details
             </button>
@@ -225,116 +278,140 @@ const RegisterUser = () => {
             setIsGrest={setIsGrest}
             storeData={storeData}
             isSuperAdmin={isSuperAdmin}
+            errMsg={errMsg}
+            isValid={isValid}
+            setPasswordFocus={setPasswordFocus}
           />
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default RegisterUser;
+export default RegisterUser
 
-const UserForm = ({ formData, submitHandler, handleChange, storeData, isSuperAdmin }) => {
-  const [showUserPassword, setShowUserPassword] = useState(false);
+const UserForm = ({
+  formData,
+  submitHandler,
+  handleChange,
+  storeData,
+  isSuperAdmin,
+  errMsg,
+  isValid,
+  setPasswordFocus,
+}) => {
+  const [showUserPassword, setShowUserPassword] = useState(false)
 
   return (
     <form
-      className="ml-10 flex flex-col gap-4"
+      className='ml-10 flex flex-col gap-4'
       onSubmit={submitHandler}
-      autoComplete="off"
+      autoComplete='off'
     >
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">First name*</span>
+      <label className='flex flex-col w-[70%] gap-2'>
+        <span className='font-medium text-xl'>First name*</span>
         <input
-          name="firstName"
-          id="firstName"
-          placeholder="Enter first name"
+          name='firstName'
+          id='firstName'
+          placeholder='Enter first name'
           value={formData.firstName}
           onChange={handleChange}
-          className="border-2 px-2 py-2 rounded-lg outline-none"
-          type="text"
+          className='border-2 px-2 py-2 rounded-lg outline-none'
+          type='text'
           required
         />
       </label>
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Last name</span>
+      <label className='flex flex-col w-[70%] gap-2'>
+        <span className='font-medium text-xl'>Last name</span>
         <input
-          name="lastName"
-          id="lastName"
-          placeholder="Enter last name"
+          name='lastName'
+          id='lastName'
+          placeholder='Enter last name'
           value={formData.lastName}
           onChange={handleChange}
-          className="border-2 px-2 py-2 rounded-lg outline-none"
-          type="text"
+          className='border-2 px-2 py-2 rounded-lg outline-none'
+          type='text'
         />
       </label>
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Email*</span>
+      <label className='flex flex-col w-[70%] gap-2'>
+        <span className='font-medium text-xl'>Email*</span>
         <input
-          name="email"
-          id="email"
+          name='email'
+          id='email'
           minLength={6}
-          placeholder="Enter your email address"
-          value={formData.email || ""}
+          placeholder='Enter your email address'
+          value={formData.email || ''}
           onChange={handleChange}
-          className="border-2 px-2 py-2 rounded-lg  outline-none "
-          type="email"
-          autoComplete="off"
+          className='border-2 px-2 py-2 rounded-lg  outline-none '
+          type='email'
+          autoComplete='off'
           required
         />
       </label>
       <div>
-        <label className="font-medium text-xl" htmlFor="password">
+        <label className='font-medium text-xl' htmlFor='password'>
           Password*
         </label>
-        <div className="flex flex-col relative input w-[70%] gap-2">
+        <div className='flex flex-col relative input w-[70%] gap-2'>
           <input
-            name="password"
-            id="password"
-            minLength={6}
-            placeholder="Enter new password (min. 6 characters)"
-            value={formData.password || ""}
+            name='password'
+            id='password'
+            minLength={8}
+            maxLength={20}
+            placeholder='Enter new password (min. 8 characters)'
+            value={formData.password || ''}
             onChange={handleChange}
-            className="border-2 px-2 py-2 rounded-lg  outline-none "
-            type={showUserPassword ? "text" : "password"}
-            autoComplete="off"
+            onFocus={() => setPasswordFocus(true)}
+            onBlur={() => setPasswordFocus(false)}
+            className='border-2 px-2 py-2 rounded-lg  outline-none '
+            type={showUserPassword ? 'text' : 'password'}
+            autoComplete='off'
             required
           />
           <span
             onClick={() => setShowUserPassword(!showUserPassword)}
-            className="absolute transform -translate-y-1/2 cursor-pointer right-2 top-6"
+            className='absolute transform -translate-y-1/2 cursor-pointer right-2 top-6'
           >
             {!showUserPassword ? <IoEyeOffSharp /> : <IoEye />}
           </span>
         </div>
+        {formData.password && (
+          <p
+            className={`${
+              isValid ? 'text-primary' : 'text-red-600'
+            } text-sm mt-1`}
+          >
+            {errMsg}
+          </p>
+        )}
       </div>
-      <label className="flex flex-col w-[70%] gap-2 ">
-        <span className="font-medium text-xl">Mobile Number*</span>
+      <label className='flex flex-col w-[70%] gap-2 '>
+        <span className='font-medium text-xl'>Mobile Number*</span>
         <input
-          name="phoneNumber"
-          id="phoneNumber"
+          name='phoneNumber'
+          id='phoneNumber'
           minLength={10}
-          placeholder="Enter 10-digit mobile number"
+          placeholder='Enter 10-digit mobile number'
           value={formData.phoneNumber}
           onChange={handleChange}
-          className="border-2 px-2 py-2 rounded-lg  outline-none"
+          className='border-2 px-2 py-2 rounded-lg  outline-none'
           maxLength={10}
-          type="tel"
+          type='tel'
           required
         />
       </label>
       {isSuperAdmin && (
-        <label className="flex flex-col w-[70%] gap-2">
-          <span className="font-medium text-xl">Store Name*</span>
+        <label className='flex flex-col w-[70%] gap-2'>
+          <span className='font-medium text-xl'>Store Name*</span>
           <select
-            name="storeId"
-            id="storeId"
+            name='storeId'
+            id='storeId'
             value={formData.storeId}
-            className="outline-none text-base border-2 p-2 rounded-lg"
+            className='outline-none text-base border-2 p-2 rounded-lg'
             onChange={handleChange}
             required
           >
-            <option value=""> None </option>
+            <option value=''> None </option>
             {storeData.map((item) => (
               <option key={item._id} value={item._id}>
                 {`${item.storeName}, ${item.region}`}
@@ -343,17 +420,17 @@ const UserForm = ({ formData, submitHandler, handleChange, storeData, isSuperAdm
           </select>
         </label>
       )}
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Role*</span>
+      <label className='flex flex-col w-[70%] gap-2'>
+        <span className='font-medium text-xl'>Role*</span>
         <select
-          id="role"
-          name="role"
+          id='role'
+          name='role'
           value={formData.role}
-          className="outline-none text-base border-2 px-2 py-2 rounded-lg"
+          className='outline-none text-base border-2 px-2 py-2 rounded-lg'
           onChange={handleChange}
           required
         >
-          <option value="">None</option>
+          <option value=''>None</option>
           {role.map((item) => (
             <option key={item} value={item}>
               {item}
@@ -361,38 +438,38 @@ const UserForm = ({ formData, submitHandler, handleChange, storeData, isSuperAdm
           ))}
         </select>
       </label>
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">City</span>
+      <label className='flex flex-col w-[70%] gap-2'>
+        <span className='font-medium text-xl'>City</span>
         <input
-          name="city"
-          id="city"
-          placeholder="Enter your city name"
+          name='city'
+          id='city'
+          placeholder='Enter your city name'
           value={formData.city}
           onChange={handleChange}
-          className="border-2 px-2 py-2 rounded-lg  outline-none"
-          type="text"
+          className='border-2 px-2 py-2 rounded-lg  outline-none'
+          type='text'
         />
       </label>
-      <label className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Adddress</span>
+      <label className='flex flex-col w-[70%] gap-2'>
+        <span className='font-medium text-xl'>Adddress</span>
         <input
-          name="address"
-          id="address"
-          placeholder="Enter your full address"
+          name='address'
+          id='address'
+          placeholder='Enter your full address'
           value={formData.address}
           onChange={handleChange}
-          className="border-2 px-2 py-2 rounded-lg  outline-none"
-          type="text"
+          className='border-2 px-2 py-2 rounded-lg  outline-none'
+          type='text'
         />
       </label>
-      <div className="mt-8">
+      <div className='mt-8'>
         <button
-          type="submit"
-          className="font-medium text-sm text-white p-3 rounded bg-primary"
+          type='submit'
+          className='font-medium text-sm text-white p-3 rounded bg-primary'
         >
           Submit Form
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
