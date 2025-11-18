@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { toast } from 'react-hot-toast'
 import { AADHAR_LENGTH } from '../../constants/priceConstants'
 import { createDigilockerKYCRequest } from '../../services/digilockerService'
 import {
@@ -79,17 +80,30 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber, isVerified, setIsVer
           console.log('Digilocker SDK Response:', sdkResponse)
           setIsVerifying(false)
 
-          if (sdkResponse.hasOwnProperty('error_code')) {
-            setError('Verification failed. Please try again.')
+          // Check for errors in the response
+          if (sdkResponse.hasOwnProperty('error_code') || sdkResponse.message === 'failed') {
+            const errorMessage = sdkResponse.message || 'Verification failed. Please try again.'
+            setError(errorMessage)
+            toast.error(errorMessage)
             console.error('Error in Digilocker process:', sdkResponse)
-          } else {
+          }
+          // Check for successful verification
+          else if (sdkResponse.message === 'success' || !sdkResponse.hasOwnProperty('error_code')) {
             setError('')
             setIsVerified(true)
-            console.log('Verification completed successfully')
+            toast.success('Aadhar verified successfully!')
+            console.log('Verification completed successfully', sdkResponse)
           }
         },
         event_listener: function (event) {
           console.log('Digilocker Event:', event.event)
+
+          // Handle specific events
+          if (event.event === 'success') {
+            console.log('Verification success event received')
+          } else if (event.event === 'failure') {
+            toast.error('Verification failed')
+          }
         },
       })
 
@@ -109,7 +123,9 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber, isVerified, setIsVer
       submitDigilockerKYC(digio, entityId, identifier, accessToken)
     } catch (err) {
       console.error('Verification error:', err)
-      setError('Failed to initiate verification. Please try again.')
+      const errorMessage = err.response?.data?.message || 'Failed to initiate verification. Please try again.'
+      setError(errorMessage)
+      toast.error(errorMessage)
       setIsVerifying(false)
     }
   }

@@ -14,6 +14,7 @@ export const usePriceForm = () => {
   const [signatureFile, setSignatureFile] = useState(null) // Added new signature file state
   const [customerPhoto, setCustomerPhoto] = useState(null) // Added new customer photo
   const [aadharNumber, setAadharNumber] = useState('')
+  const [isAadharVerified, setIsAadharVerified] = useState(false) // Aadhar verification status
   const [imeinumber, setImeiNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBillRequired, setIsBillRequired] = useState(false)
@@ -79,13 +80,13 @@ export const usePriceForm = () => {
     setCustomerPhoto, //Added new customerPhoto state
     aadharNumber,
     setAadharNumber,
+    isAadharVerified, //Added Aadhar verification status
+    setIsAadharVerified, //Added Aadhar verification status setter
     imeinumber,
     setImeiNumber,
     isLoading,
     setIsLoading,
     isBillRequired,
-    isAadharVerified,
-    setIsAadharVerified,
 
     // Refs
     fileInputRef,
