@@ -8,10 +8,11 @@ const UploadSummary = ({
 }) => {
   const stats = [
     { label: 'Total Records', value: uploadResult.total, color: 'gray' },
-    { label: 'Succeeded', value: uploadResult.succeeded, color: 'green' },
-    { label: 'Failed', value: uploadResult.failed, color: 'red' },
+    { label: 'Succeeded', value: uploadResult.succeededCount, color: 'green' },
+    { label: 'Failed', value: uploadResult.failedCount, color: 'red' },
   ]
-
+  console.log(uploadResult)
+  console.log(stats)
   return (
     <>
       <h3 className='text-xl font-semibold text-gray-700 mb-4'>
@@ -26,7 +27,7 @@ const UploadSummary = ({
         ))}
       </div>
 
-      {uploadResult.failed > 0 && (
+      {uploadResult.failedCount > 0 && (
         <div className='flex flex-col items-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
           <p className='text-gray-700 mb-3 text-center'>
             Some records failed. Download the file with errors, fix them, and
