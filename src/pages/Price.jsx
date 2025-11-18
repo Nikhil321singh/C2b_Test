@@ -28,6 +28,7 @@ const Price = () => {
     phoneRight,
     phoneTop,
     phoneBottom,
+    isAadharVerified,
     handleCameraButtonClick,
   } = formState
 
@@ -50,6 +51,11 @@ const Price = () => {
         />
       </div>
       <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 '>
+        {!isAadharVerified && (
+          <p className='text-center text-sm text-red-500'>
+            Please verify your Aadhar number to continue
+          </p>
+        )}
         <div
           onClick={() => uploadAllImages(navigate)}
           className={` relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
@@ -59,7 +65,8 @@ const Price = () => {
             !phoneLeft ||
             !phoneRight ||
             !phoneTop ||
-            !phoneBottom
+            !phoneBottom ||
+            !isAadharVerified
               ? 'cursor-not-allowed bg-gray-400'
               : pink
           }`}

@@ -387,9 +387,9 @@ const OrdersCard = ({
       </div>
 
       <div className='flex items-center gap-2 p-2 border-b-2 border-gray-300 border-dashed'>
-        <div className='w-[20%]'>
+        <div className='w-[20%] max-h-[80px] flex items-center'>
           <img
-            className='w-[100%] h-[60px]'
+            className='w-full h-auto max-h-[80px] object-contain'
             src={deviceSelected === 'Watch' ? watch : phonePhoto}
             alt='device image'
           />

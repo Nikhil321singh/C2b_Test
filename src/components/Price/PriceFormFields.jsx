@@ -35,6 +35,8 @@ const PriceFormFields = ({
     imeinumber,
     setImeiNumber,
     isBillRequired,
+    isAadharVerified,
+    setIsAadharVerified,
     prod,
     fileInputRef,
     idproofBackRef,
@@ -57,6 +59,8 @@ const PriceFormFields = ({
       <AadharNumberField
         setAadharNumber={setAadharNumber}
         aadharNumber={aadharNumber}
+        isVerified={isAadharVerified}
+        setIsVerified={setIsAadharVerified}
         prod={prod}
       />
       <AdharField

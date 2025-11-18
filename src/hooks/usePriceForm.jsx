@@ -15,6 +15,7 @@ export const usePriceForm = () => {
   const [imeinumber, setImeiNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBillRequired, setIsBillRequired] = useState(false)
+  const [isAadharVerified, setIsAadharVerified] = useState(false)
 
   // Refs
   const fileInputRef = useRef(null)
@@ -76,6 +77,8 @@ export const usePriceForm = () => {
     isLoading,
     setIsLoading,
     isBillRequired,
+    isAadharVerified,
+    setIsAadharVerified,
 
     // Refs
     fileInputRef,
