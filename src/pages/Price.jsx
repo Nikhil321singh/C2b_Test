@@ -34,6 +34,7 @@ const Price = () => {
     phoneTop,
     phoneBottom,
     signatureFile, //add signature file
+    customerPhoto, //add customer photo state
     handleCameraButtonClick,
   } = formState
 
@@ -67,7 +68,8 @@ const Price = () => {
             !phoneRight ||
             !phoneTop ||
             !phoneBottom ||
-            !signatureFile //check signature
+            !signatureFile || //check signature
+            !customerPhoto // check customer photo
               ? 'cursor-not-allowed bg-gray-400'
               : pink
           }`}

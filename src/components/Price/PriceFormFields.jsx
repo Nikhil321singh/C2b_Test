@@ -5,6 +5,7 @@ import AdharField from "./AdharField";
 import PhoneBill from "./PhoneBill";
 import PhonePhotos1 from "./PhonePhotos1";
 import DigitalSignatureField from "./DigitalSignatureField";
+import CustomerPhotoField from "./CustomerPhotoField";
 
 
 const PriceFormFields = ({
@@ -35,6 +36,8 @@ const PriceFormFields = ({
     setPhoneRight,
     signatureFile, // new signature state
     setSignatureFile, // <-- new signature state set function
+    customerPhoto,
+    setCustomerPhoto,
     aadharNumber,
     setAadharNumber,
     imeinumber,
@@ -52,6 +55,7 @@ const PriceFormFields = ({
     phoneTopRef,
     phoneLeftRef,
     phoneRightRef,
+    customerPhotoRef
   } = formState;
 
   return (
@@ -123,6 +127,17 @@ const PriceFormFields = ({
         uploadIndividualFile={uploadIndividualFile}
         imeinumber={imeinumber}
         prod={prod}
+      />
+      {/* 7. Customer Photo Field */}
+      <CustomerPhotoField
+        customerPhoto={customerPhoto}
+        setCustomerPhoto={setCustomerPhoto}
+        uploadStatus={uploadStatus}
+        uploadIndividualFile={uploadIndividualFile}
+        imeinumber={imeinumber}
+        prod={prod}
+        fileInputRef={customerPhotoRef} // Pass the specific ref
+        handleCameraButtonClick={handleCameraButtonClick}
       />
     </div>
   );

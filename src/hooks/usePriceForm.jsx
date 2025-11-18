@@ -11,12 +11,12 @@ export const usePriceForm = () => {
   const [phoneRight, setPhoneRight] = useState(null)
   const [phoneTop, setPhoneTop] = useState(null)
   const [phoneBottom, setPhoneBottom] = useState(null)
-  const [signatureFile, setSignatureFile] = useState(null); // <-- Added new signature file state
+  const [signatureFile, setSignatureFile] = useState(null) // Added new signature file state
+  const [customerPhoto, setCustomerPhoto] = useState(null) // Added new customer photo
   const [aadharNumber, setAadharNumber] = useState('')
   const [imeinumber, setImeiNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBillRequired, setIsBillRequired] = useState(false)
-  const [isAadharVerified, setIsAadharVerified] = useState(false)
 
   // Refs
   const fileInputRef = useRef(null)
@@ -28,6 +28,7 @@ export const usePriceForm = () => {
   const phoneRightRef = useRef(null)
   const phoneTopRef = useRef(null)
   const phoneBottomRef = useRef(null)
+  const customerPhotoRef = useRef(null)
 
   // Get session data
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem('responsedatadata'))
@@ -45,10 +46,11 @@ export const usePriceForm = () => {
   }, [])
 
   const handleCameraButtonClick = (ref) => {
-    if (!ref.current) {
-      return
+    if (ref && ref.current) {
+      ref.current.click()
+    } else {
+      console.error('Camera button click failed: ref is not valid', ref)
     }
-    ref.current.click()
   }
 
   return {
@@ -71,8 +73,10 @@ export const usePriceForm = () => {
     setPhoneTop,
     phoneBottom,
     setPhoneBottom,
-    signatureFile,     //Added new signatureFile
-    setSignatureFile,  //Added new signature state function
+    signatureFile, //Added new signatureFile
+    setSignatureFile, //Added new signature state function
+    customerPhoto, //Added new customerPhoto
+    setCustomerPhoto, //Added new customerPhoto state
     aadharNumber,
     setAadharNumber,
     imeinumber,
@@ -93,6 +97,7 @@ export const usePriceForm = () => {
     phoneRightRef,
     phoneTopRef,
     phoneBottomRef,
+    customerPhotoRef,
 
     // Session data
     leadsubmitDATA,
@@ -101,6 +106,6 @@ export const usePriceForm = () => {
     prod,
 
     // Handlers
-    handleCameraButtonClick
+    handleCameraButtonClick,
   }
 }
