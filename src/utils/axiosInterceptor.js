@@ -73,12 +73,12 @@ const handleResponseError = (error) => {
 
     // Handle 403 Forbidden
     if (status === 403) {
-      const message = data?.message || 'Access denied. Insufficient permissions.';
+      const message = data?.msg || data?.message || 'Access denied. Insufficient permissions.';
       showToastOnce('403', message, {
         duration: 4000,
         position: 'top-center',
       });
-      return Promise.reject(new Error(message));
+      return Promise.reject(error);
     }
 
     // Handle 429 Too Many Requests

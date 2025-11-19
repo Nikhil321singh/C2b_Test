@@ -28,6 +28,15 @@ const ChangePassword = () => {
   const [showUserPassword2, setShowUserPassword2] = useState(false)
   const [errMsg, setErrMsg] = useState('')
   const navigate = useNavigate()
+
+  // Load user's email from session on mount (read-only for display)
+  useEffect(() => {
+    const profile = JSON.parse(sessionStorage.getItem('profile'))
+    if (profile?.email) {
+      setUserEmail(profile.email)
+    }
+  }, [])
+
   const handlePasswordChange = (event) => {
     setPassword(event.target.value)
   }
@@ -45,6 +54,7 @@ const ChangePassword = () => {
     const spCharRegex = /[@$!%*?&]/
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
+    // Validate email format
     if (!emailRegex.test(userEmail)) {
       setErrMsg('Please Enter a Valid Email')
       setIsValid(false)
@@ -108,7 +118,7 @@ const ChangePassword = () => {
   useEffect(() => {
     passwordValidation()
     console.log(isValid)
-  }, [userEmail, newPassword, confPassword, newFocus, confFocus])
+  }, [newPassword, confPassword, newFocus, confFocus, userEmail])
   const handleSubmit = async (event) => {
     event.preventDefault()
     setIsLoading(true)
@@ -165,10 +175,10 @@ const ChangePassword = () => {
       <div className='outer'>
         <PasswordChange
           isValid={isValid}
-          userEmail={userEmail}
           password={password}
           newPassword={newPassword}
           errMsg={errMsg}
+          userEmail={userEmail}
           setConfPassword={setConfPassword}
           setNewFocus={setNewFocus}
           setConfFocus={setConfFocus}
@@ -188,11 +198,11 @@ const ChangePassword = () => {
 
 const PasswordChange = ({
   isValid,
-  userEmail,
   password,
   newPassword,
   confPassword,
   errMsg,
+  userEmail,
   setConfPassword,
   setNewFocus,
   setConfFocus,
@@ -239,14 +249,15 @@ const PasswordChange = ({
             >
               <input type='hidden' name='remember' value='true' />
               <div className='flex flex-col gap-4'>
-                <div className='input'>
+                <div className='relative input'>
                   <MdOutlineMailLock size={25} style={iconStyles} />
                   <input
-                    id='email'
+                    id='email-address'
                     name='email'
                     type='email'
+                    autoComplete='email'
                     required
-                    placeholder='Enter Email'
+                    placeholder='Email Address'
                     value={userEmail}
                     onChange={handleEmailChange}
                   />
