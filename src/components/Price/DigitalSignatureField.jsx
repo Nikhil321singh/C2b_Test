@@ -2,33 +2,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import SignatureCanvas from 'react-signature-canvas'
 import { getStatusIcon } from '../../utils/priceUtils.jsx'
 import { FILE_KEYS } from '../../constants/priceConstants'
+import { dataURLtoFile } from '../../utils/fileUtils'
 import toast from 'react-hot-toast'
-
-const dataURLtoFile = (dataurl, filename) => {
-  if (!dataurl) {
-    return null
-  }
-
-  const arr = dataurl.split(',')
-  if (arr.length < 2) {
-    return null
-  }
-
-  const mimeMatch = arr[0].match(/:(.*?);/)
-  if (!mimeMatch) {
-    return null
-  }
-
-  const mime = mimeMatch[1]
-  const bstr = atob(arr[1])
-  const u8arr = new Uint8Array(bstr.length)
-
-  for (let i = 0; i < bstr.length; i++) {
-    u8arr[i] = bstr.charCodeAt(i)
-  }
-
-  return new File([u8arr], filename, { type: mime })
-}
 
 const validateIMEI = (imeinumber) => {
   if (!imeinumber) {
