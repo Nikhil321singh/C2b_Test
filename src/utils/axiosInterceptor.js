@@ -1,6 +1,9 @@
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
+// Constants
+const TOAST_POSITION = 'top-center'
+
 // Track active toasts to prevent duplicates
 const activeToasts = {
   401: null,
@@ -51,7 +54,7 @@ const handleLogout = (message) => {
   // Show toast notification (only once)
   showToastOnce('401', message, {
     duration: 3000,
-    position: 'top-center',
+    position: TOAST_POSITION,
   })
 
   // Redirect to login page after short delay
@@ -79,7 +82,7 @@ const handleResponseError = (error) => {
         data?.message || data?.msg || 'Access denied. Insufficient permissions.'
       showToastOnce('403', message, {
         duration: 4000,
-        position: 'top-center',
+        position: TOAST_POSITION,
       })
       return Promise.reject(new Error(message))
     }
@@ -90,7 +93,7 @@ const handleResponseError = (error) => {
         data?.message || 'Too many requests. Please try again later.'
       showToastOnce('429', message, {
         duration: 5000,
-        position: 'top-center',
+        position: TOAST_POSITION,
       })
       return Promise.reject(new Error(message))
     }
@@ -98,10 +101,12 @@ const handleResponseError = (error) => {
 
   // Handle network errors
   if (!error.response) {
-    showToastOnce('network', 'Network error. Please check your connection.', {
+    const message = 'Network error. Please check your connection.'
+    showToastOnce('network', message, {
       duration: 4000,
-      position: 'top-center',
+      position: TOAST_POSITION,
     })
+    return Promise.reject(new Error(message))
   }
 
   return Promise.reject(error)
