@@ -102,76 +102,62 @@ const DigitalSignatureField = ({
     setShowPlaceholder(true)
   }
 
-  const renderContent = () => {
-    if (isDrawing) {
-      return (
-        <>
-          <div className='p-1 border-2 rounded-lg h-[15vh] w-full relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
-            <div
-              ref={containerRef}
-              className='bg-gray-100 w-full h-full relative flex items-center justify-center'
-            >
-              {showPlaceholder && (
-                <p className='absolute text-gray-400 text-lg pointer-events-none select-none'>
-                  Sign Here
-                </p>
-              )}
+  if (isDrawing) {
+    return (
+      <div className='flex flex-col adharcard mt-[10px]'>
+        <div className='flex gap-1 two'>
+          <p className='text-base font-medium'>{sectionNumber}.</p>
+          <div className='flex items-center'>
+            <p className='text-base font-medium three'>
+              Digital Signature Required <span className='text-red-500'>*</span>
+            </p>
+          </div>
+        </div>
 
-              <SignatureCanvas
-                ref={sigPadRef}
-                penColor='black'
-                onBegin={handleBegin}
-                canvasProps={{ className: 'absolute top-0 left-0' }}
-              />
+        <p className='mt-2 text-sm text-gray-600 ml-[19px]'>
+          Please sign to confirm your Aadhaar verification and consent.
+        </p>
+
+        <div className='flex justify-start ml-3 inputAADHAR'>
+          <div className='flex flex-col w-[100vw] md:w-[40vw] mt-4'>
+            <div className='p-1 border-2 rounded-lg h-[15vh] w-full relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
+              <div
+                ref={containerRef}
+                className='bg-gray-100 w-full h-full relative flex items-center justify-center'
+              >
+                {showPlaceholder && (
+                  <p className='absolute text-gray-400 text-lg pointer-events-none select-none'>
+                    Sign Here
+                  </p>
+                )}
+
+                <SignatureCanvas
+                  ref={sigPadRef}
+                  penColor='black'
+                  onBegin={handleBegin}
+                  canvasProps={{ className: 'absolute top-0 left-0' }}
+                />
+              </div>
+            </div>
+
+            <div className='flex justify-between w-full gap-4 mt-3'>
+              <button
+                type='button'
+                className='px-4 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg flex-1'
+                onClick={handleClear}
+              >
+                Clear Signature
+              </button>
+
+              <button
+                type='button'
+                className='px-4 py-2 font-bold text-white rounded-lg bg-primary flex-1'
+                onClick={handleSaveSignature}
+              >
+                Save Signature
+              </button>
             </div>
           </div>
-
-          <div className='flex justify-between w-full gap-4 mt-3'>
-            <button
-              type='button'
-              className='px-4 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg flex-1'
-              onClick={handleClear}
-            >
-              Clear Signature
-            </button>
-
-            <button
-              type='button'
-              className='px-4 py-2 font-bold text-white rounded-lg bg-primary flex-1'
-              onClick={handleSaveSignature}
-            >
-              Save Signature
-            </button>
-          </div>
-        </>
-      )
-    }
-
-    return (
-      <div className='flex items-center gap-3'>
-        {signatureFile && (
-          <img
-            src={URL.createObjectURL(signatureFile)}
-            alt='Signature Thumbnail'
-            className='h-[80px] object-contain'
-          />
-        )}
-
-        <div className='flex flex-col items-start gap-2'>
-          <div className='flex items-center gap-2'>
-            {getStatusIcon(sigStatus)}
-            <span className='text-sm font-medium text-green-600'>
-              Signature Saved
-            </span>
-          </div>
-
-          <button
-            type='button'
-            className='px-4 py-1 text-sm font-bold text-gray-700 bg-gray-200 rounded-lg'
-            onClick={handleResign}
-          >
-            Re-sign
-          </button>
         </div>
       </div>
     )
@@ -193,9 +179,33 @@ const DigitalSignatureField = ({
       </p>
 
       <div className='flex justify-start ml-3 inputAADHAR'>
-        {/* Inlined the previous SignatureContainer to remove duplication */}
         <div className='flex flex-col w-[100vw] md:w-[40vw] mt-4'>
-          {renderContent()}
+          <div className='flex items-center gap-3'>
+            {signatureFile && (
+              <img
+                src={URL.createObjectURL(signatureFile)}
+                alt='Signature Thumbnail'
+                className='h-[80px] object-contain'
+              />
+            )}
+
+            <div className='flex flex-col items-start gap-2'>
+              <div className='flex items-center gap-2'>
+                {getStatusIcon(sigStatus)}
+                <span className='text-sm font-medium text-green-600'>
+                  Signature Saved
+                </span>
+              </div>
+
+              <button
+                type='button'
+                className='px-4 py-1 text-sm font-bold text-gray-700 bg-gray-200 rounded-lg'
+                onClick={handleResign}
+              >
+                Re-sign
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
