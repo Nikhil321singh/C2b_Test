@@ -5,13 +5,19 @@ import { FILE_KEYS } from '../../constants/priceConstants'
 import toast from 'react-hot-toast'
 
 const dataURLtoFile = (dataurl, filename) => {
-  if (!dataurl) return null
+  if (!dataurl) {
+    return null
+  }
 
   const arr = dataurl.split(',')
-  if (arr.length < 2) return null
+  if (arr.length < 2) {
+    return null
+  }
 
   const mimeMatch = arr[0].match(/:(.*?);/)
-  if (!mimeMatch) return null
+  if (!mimeMatch) {
+    return null
+  }
 
   const mime = mimeMatch[1]
   const bstr = atob(arr[1])

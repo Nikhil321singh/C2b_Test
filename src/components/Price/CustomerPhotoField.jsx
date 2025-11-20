@@ -12,13 +12,19 @@ const videoConstraints = {
 }
 
 const dataURLtoFile = (dataurl, filename) => {
-  if (!dataurl) return null
+  if (!dataurl) {
+    return null
+  }
 
   const arr = dataurl.split(',')
-  if (arr.length < 2) return null
+  if (arr.length < 2) {
+    return null
+  }
 
   const mimeMatch = arr[0].match(/:(.*?);/)
-  if (!mimeMatch) return null
+  if (!mimeMatch) {
+    return null
+  }
 
   const mime = mimeMatch[1]
   const bstr = atob(arr[1])
@@ -77,7 +83,9 @@ const CustomerPhotoField = ({
   const onFileSelect = (e) => {
     if (!imeinumber) {
       toast.error('Please enter IMEI number first')
-      if (fileInputRef.current) fileInputRef.current.value = null
+      if (fileInputRef.current) {
+        fileInputRef.current.value = null
+      }
       return
     }
 
@@ -85,13 +93,17 @@ const CustomerPhotoField = ({
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
         toast.error('File size should not exceed 2MB')
-        fileInputRef.current.value = null
+        if (fileInputRef.current) {
+          fileInputRef.current.value = null
+        }
         return
       }
 
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
         toast.error('Please upload a JPG or PNG image')
-        fileInputRef.current.value = null
+        if (fileInputRef.current) {
+          fileInputRef.current.value = null
+        }
         return
       }
 
@@ -108,7 +120,9 @@ const CustomerPhotoField = ({
   const clearPhoto = () => {
     setCustomerPhoto(null)
     setShowWebcam(false)
-    if (fileInputRef.current) fileInputRef.current.value = null
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null
+    }
   }
 
   const sectionNumber = (prod?.[0]?.phoneBillSno || 6) + 1
@@ -130,7 +144,9 @@ const CustomerPhotoField = ({
           <button
             type='button'
             className='px-4 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg'
-            onClick={() => setShowWebcam(false)}
+            onClick={() => {
+              setShowWebcam(false)
+            }}
           >
             Cancel
           </button>
@@ -180,7 +196,9 @@ const CustomerPhotoField = ({
             type='button'
             title='Capture with webcam'
             className='flex flex-col items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100'
-            onClick={() => setShowWebcam(true)}
+            onClick={() => {
+              setShowWebcam(true)
+            }}
           >
             <FaCamera className='text-3xl' />
             <span className='text-xs'>Capture</span>
@@ -190,7 +208,9 @@ const CustomerPhotoField = ({
             type='button'
             title='Upload from device'
             className='flex flex-col items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100'
-            onClick={() => handleCameraButtonClick(fileInputRef)}
+            onClick={() => {
+              handleCameraButtonClick(fileInputRef)
+            }}
           >
             <FaCamera className='text-3xl' />
             <span className='text-xs'>Upload</span>
