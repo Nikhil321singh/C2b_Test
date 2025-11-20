@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import styles from './RegisterUser.module.css'
 import { useNavigate } from 'react-router-dom'
 import AdminNavbar from '../../components/Admin_Navbar'
 import BulkUploadModal from '../../components/BulkUploadModal'
