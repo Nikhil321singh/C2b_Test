@@ -101,7 +101,7 @@ const downloadExcelCustomerTable = (apiData) => {
   saveAs(file, 'Leads_Created.xlsx')
 }
 
-const fetchDownloadDataCustomerTable = async (
+const fetchDownloadData = async (
   toDateDup,
   fromDateDup,
   search,
@@ -141,7 +141,7 @@ const TopFilterBar = ({
   loadTable,
   handleSearchClear,
   downloading,
-  fetchDownloadDataCustomerTable,
+  fetchDownloadData,
   toDateDup,
   fromDateDup,
   selStoreId,
@@ -188,7 +188,7 @@ const TopFilterBar = ({
       <button
         disabled={downloading}
         onClick={() =>
-          fetchDownloadDataCustomerTable(
+          fetchDownloadData(
             toDateDup,
             fromDateDup,
             search,
@@ -397,7 +397,7 @@ const CustomerTable = () => {
         loadTable={loadTable}
         handleSearchClear={handleSearchClear}
         downloading={downloading}
-        fetchDownloadDataCustomerTable={fetchDownloadDataCustomerTable}
+        fetchDownloadData={fetchDownloadData}
         toDateDup={toDateDup}
         fromDateDup={fromDateDup}
         selStoreId={selStoreId}
