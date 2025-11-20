@@ -141,7 +141,7 @@ const TopFilterBar = ({
   loadTable,
   handleSearchClear,
   downloading,
-  fetchDownloadData,
+  onDownload,
   toDateDup,
   fromDateDup,
   selStoreId,
@@ -188,7 +188,7 @@ const TopFilterBar = ({
       <button
         disabled={downloading}
         onClick={() =>
-          fetchDownloadData(
+          onDownload(
             toDateDup,
             fromDateDup,
             search,
@@ -397,7 +397,7 @@ const CustomerTable = () => {
         loadTable={loadTable}
         handleSearchClear={handleSearchClear}
         downloading={downloading}
-        fetchDownloadData={fetchDownloadData}
+        onDownload={fetchDownloadData}
         toDateDup={toDateDup}
         fromDateDup={fromDateDup}
         selStoreId={selStoreId}
