@@ -192,61 +192,63 @@ const CustomerPhotoField = ({
     resetFileInput(fileInputRef)
   }
 
-  // Determine content based on state
-  let content
-  if (showWebcam) {
-    content = (
-      <div className='w-[100vw] md:w-[40vw] gap-2'>
-        <div className='p-1 border-2 border-primary rounded-lg shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
-          <Webcam
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat='image/jpeg'
-            videoConstraints={VIDEO_CONSTRAINTS}
-            mirrored
-          />
-        </div>
-        <div className='flex gap-4 mt-2'>
-          <SmallButton onClick={() => setShowWebcam(false)}>Cancel</SmallButton>
-          <SmallButton onClick={capture}>Take Snapshot</SmallButton>
+  const renderWebcamView = () => (
+    <div className='w-[100vw] md:w-[40vw] gap-2'>
+      <div className='p-1 border-2 border-primary rounded-lg shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
+        <Webcam
+          audio={false}
+          ref={webcamRef}
+          screenshotFormat='image/jpeg'
+          videoConstraints={VIDEO_CONSTRAINTS}
+          mirrored
+        />
+      </div>
+      <div className='flex gap-4 mt-2'>
+        <SmallButton onClick={() => setShowWebcam(false)}>Cancel</SmallButton>
+        <SmallButton onClick={capture}>Take Snapshot</SmallButton>
+      </div>
+    </div>
+  )
+
+  const renderPhotoPreview = () => (
+    <PhotoContainer>
+      <div className='relative'>
+        <img
+          className='w-full h-[60px] object-contain'
+          src={previewUrl}
+          alt='Customer Photo'
+        />
+        <div className='absolute top-1 right-1'>
+          {getStatusIcon(photoStatus)}
         </div>
       </div>
-    )
-  } else if (customerPhoto) {
-    content = (
-      <PhotoContainer>
-        <div className='relative'>
-          <img
-            className='w-full h-[60px] object-contain'
-            src={previewUrl}
-            alt='Customer Photo'
-          />
-          <div className='absolute top-1 right-1'>
-            {getStatusIcon(photoStatus)}
-          </div>
-        </div>
-        <SmallButton onClick={clearPhoto}>Retake / Re-upload</SmallButton>
-      </PhotoContainer>
-    )
-  } else {
-    content = (
-      <PhotoContainer>
-        <div className='flex items-center justify-center gap-4 h-[60px]'>
-          <ActionButton
-            Icon={FaCamera}
-            onClick={() => setShowWebcam(true)}
-            label='Capture'
-            title='Capture with webcam'
-          />
-          <ActionButton
-            Icon={FaCamera}
-            onClick={() => handleCameraButtonClick(fileInputRef)}
-            label='Upload'
-            title='Upload from device'
-          />
-        </div>
-      </PhotoContainer>
-    )
+      <SmallButton onClick={clearPhoto}>Retake / Re-upload</SmallButton>
+    </PhotoContainer>
+  )
+
+  const renderUploadButtons = () => (
+    <PhotoContainer>
+      <div className='flex items-center justify-center gap-4 h-[60px]'>
+        <ActionButton
+          Icon={FaCamera}
+          onClick={() => setShowWebcam(true)}
+          label='Capture'
+          title='Capture with webcam'
+        />
+        <ActionButton
+          Icon={FaCamera}
+          onClick={() => handleCameraButtonClick(fileInputRef)}
+          label='Upload'
+          title='Upload from device'
+        />
+      </div>
+    </PhotoContainer>
+  )
+
+  const getContent = () => {
+    if (showWebcam) return renderWebcamView()
+    if (customerPhoto) return renderPhotoPreview()
+    return renderUploadButtons()
   }
 
   return (
@@ -273,7 +275,7 @@ const CustomerPhotoField = ({
           style={{ display: 'none' }}
           ref={fileInputRef}
         />
-        {content}
+        {getContent()}
       </div>
     </div>
   )
