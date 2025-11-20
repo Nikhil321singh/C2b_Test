@@ -37,7 +37,7 @@ const PhonePhotos1 = ({
       setMethod: setPhoneFront,
       fileName: 'phoneFront',
       fileKey: 'phoneFront',
-      statusKey: 'phoneFront'
+      statusKey: 'phoneFront',
     },
     {
       title: `${prod[0]?.categoryName} Back`,
@@ -46,7 +46,7 @@ const PhonePhotos1 = ({
       setMethod: setPhoneBack,
       fileName: 'phoneBack',
       fileKey: 'phoneBack',
-      statusKey: 'phoneBack'
+      statusKey: 'phoneBack',
     },
     {
       title: `${prod[0]?.categoryName} Left Side`,
@@ -55,7 +55,7 @@ const PhonePhotos1 = ({
       setMethod: setPhoneLeft,
       fileName: 'phoneLeft',
       fileKey: 'phoneLeft',
-      statusKey: 'phoneLeft'
+      statusKey: 'phoneLeft',
     },
     {
       title: `${prod[0]?.categoryName} Right Side`,
@@ -64,7 +64,7 @@ const PhonePhotos1 = ({
       setMethod: setPhoneRight,
       fileName: 'phoneRight',
       fileKey: 'phoneRight',
-      statusKey: 'phoneRight'
+      statusKey: 'phoneRight',
     },
     {
       title: `${prod[0]?.categoryName} Top Side`,
@@ -73,7 +73,7 @@ const PhonePhotos1 = ({
       setMethod: setPhoneTop,
       fileName: 'phoneTop',
       fileKey: 'phoneTop',
-      statusKey: 'phoneTop'
+      statusKey: 'phoneTop',
     },
     {
       title: `${prod[0]?.categoryName} Bottom Side`,
@@ -82,8 +82,8 @@ const PhonePhotos1 = ({
       setMethod: setPhoneBottom,
       fileName: 'phoneBottom',
       fileKey: 'phoneBottom',
-      statusKey: 'phoneBottom'
-    }
+      statusKey: 'phoneBottom',
+    },
   ]
 
   return (
@@ -104,7 +104,7 @@ const PhonePhotos1 = ({
       <p className='mt-2 text-sm text-primary'>
         Note: Image size should not exceed 2MB
       </p>
-      <div className='flex flex-wrap inputAADHAR justify-evenly'>
+      <div className='grid grid-cols-2 gap-3 inputAADHAR'>
         {photoUploadConfigs.map((config, index) => (
           <PhotoUploadBox
             key={index}
