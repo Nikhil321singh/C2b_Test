@@ -192,96 +192,60 @@ const CustomerPhotoField = ({
     resetFileInput(fileInputRef)
   }
 
-  // Single render path with no duplicated JSX blocks
+  // Determine content based on state
+  let content
   if (showWebcam) {
-    return (
-      <div className='flex flex-col adharcard mt-[10px]'>
-        <div className='flex gap-1 two'>
-          <p className='text-base font-medium'>{sectionNumber}.</p>
-          <div className='flex items-center'>
-            <p className='text-base font-medium three'>
-              Upload Your Photo (Mandatory){' '}
-              <span className='text-red-500'>*</span>
-            </p>
-          </div>
-        </div>
-
-        <p className='mt-2 text-sm text-primary ml-[19px]'>
-          Note: Image size should not exceed {MAX_FILE_SIZE / 1024 / 1024}MB
-        </p>
-
-        <div className='flex justify-start ml-3 inputAADHAR'>
-          <input
-            type='file'
-            accept={INPUT_ACCEPT}
-            onChange={onFileSelect}
-            style={{ display: 'none' }}
-            ref={fileInputRef}
+    content = (
+      <div className='w-[100vw] md:w-[40vw] gap-2'>
+        <div className='p-1 border-2 border-primary rounded-lg shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
+          <Webcam
+            audio={false}
+            ref={webcamRef}
+            screenshotFormat='image/jpeg'
+            videoConstraints={VIDEO_CONSTRAINTS}
+            mirrored
           />
-          <div className='w-[100vw] md:w-[40vw] gap-2'>
-            <div className='p-1 border-2 border-primary rounded-lg shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
-              <Webcam
-                audio={false}
-                ref={webcamRef}
-                screenshotFormat='image/jpeg'
-                videoConstraints={VIDEO_CONSTRAINTS}
-                mirrored
-              />
-            </div>
-
-            <div className='flex gap-4 mt-2'>
-              <SmallButton onClick={() => setShowWebcam(false)}>
-                Cancel
-              </SmallButton>
-              <SmallButton onClick={capture}>Take Snapshot</SmallButton>
-            </div>
-          </div>
+        </div>
+        <div className='flex gap-4 mt-2'>
+          <SmallButton onClick={() => setShowWebcam(false)}>Cancel</SmallButton>
+          <SmallButton onClick={capture}>Take Snapshot</SmallButton>
         </div>
       </div>
     )
-  }
-
-  if (customerPhoto) {
-    return (
-      <div className='flex flex-col adharcard mt-[10px]'>
-        <div className='flex gap-1 two'>
-          <p className='text-base font-medium'>{sectionNumber}.</p>
-          <div className='flex items-center'>
-            <p className='text-base font-medium three'>
-              Upload Your Photo (Mandatory){' '}
-              <span className='text-red-500'>*</span>
-            </p>
+  } else if (customerPhoto) {
+    content = (
+      <PhotoContainer>
+        <div className='relative'>
+          <img
+            className='w-full h-[60px] object-contain'
+            src={previewUrl}
+            alt='Customer Photo'
+          />
+          <div className='absolute top-1 right-1'>
+            {getStatusIcon(photoStatus)}
           </div>
         </div>
-
-        <p className='mt-2 text-sm text-primary ml-[19px]'>
-          Note: Image size should not exceed {MAX_FILE_SIZE / 1024 / 1024}MB
-        </p>
-
-        <div className='flex justify-start ml-3 inputAADHAR'>
-          <input
-            type='file'
-            accept={INPUT_ACCEPT}
-            onChange={onFileSelect}
-            style={{ display: 'none' }}
-            ref={fileInputRef}
+        <SmallButton onClick={clearPhoto}>Retake / Re-upload</SmallButton>
+      </PhotoContainer>
+    )
+  } else {
+    content = (
+      <PhotoContainer>
+        <div className='flex items-center justify-center gap-4 h-[60px]'>
+          <ActionButton
+            Icon={FaCamera}
+            onClick={() => setShowWebcam(true)}
+            label='Capture'
+            title='Capture with webcam'
           />
-          <PhotoContainer>
-            <div className='relative'>
-              <img
-                className='w-full h-[60px] object-contain'
-                src={previewUrl}
-                alt='Customer Photo'
-              />
-              <div className='absolute top-1 right-1'>
-                {getStatusIcon(photoStatus)}
-              </div>
-            </div>
-
-            <SmallButton onClick={clearPhoto}>Retake / Re-upload</SmallButton>
-          </PhotoContainer>
+          <ActionButton
+            Icon={FaCamera}
+            onClick={() => handleCameraButtonClick(fileInputRef)}
+            label='Upload'
+            title='Upload from device'
+          />
         </div>
-      </div>
+      </PhotoContainer>
     )
   }
 
@@ -309,22 +273,7 @@ const CustomerPhotoField = ({
           style={{ display: 'none' }}
           ref={fileInputRef}
         />
-        <PhotoContainer>
-          <div className='flex items-center justify-center gap-4 h-[60px]'>
-            <ActionButton
-              Icon={FaCamera}
-              onClick={() => setShowWebcam(true)}
-              label='Capture'
-              title='Capture with webcam'
-            />
-            <ActionButton
-              Icon={FaCamera}
-              onClick={() => handleCameraButtonClick(fileInputRef)}
-              label='Upload'
-              title='Upload from device'
-            />
-          </div>
-        </PhotoContainer>
+        {content}
       </div>
     </div>
   )
