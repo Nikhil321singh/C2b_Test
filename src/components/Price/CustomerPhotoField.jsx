@@ -95,12 +95,16 @@ const CustomerPhotoField = ({
       if (file.size > 2 * 1024 * 1024) {
         // 2MB
         toast.error('File size should not exceed 2MB')
-        if (fileInputRef.current) fileInputRef.current.value = null
+        if (fileInputRef.current) {
+          fileInputRef.current.value = null
+        }
         return
       }
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
         toast.error('Please upload a JPG or PNG image')
-        if (fileInputRef.current) fileInputRef.current.value = null
+        if (fileInputRef.current) {
+          fileInputRef.current.value = null
+        }
         return
       }
 

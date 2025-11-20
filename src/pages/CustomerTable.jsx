@@ -13,7 +13,7 @@ import * as XLSX from 'xlsx'
 import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
 import styless from '../pages/QuotesCreatedAdmin/QuotesCreatedAdmin.module.css'
-const ALLstore = 'All Stores'
+const ALL_STORES = 'All Stores'
 const iniDate = '2023-01-01'
 
 const getStore = async () => {
@@ -68,7 +68,6 @@ const fetchDownloadDataCustomerTable = (
       setDownloading(false)
     })
 }
-const allStore = 'All Stores'
 
 const downloadExcelCustomerTable = (apiData) => {
   const fileType =
@@ -135,7 +134,7 @@ const CustomerTable = () => {
     new Date().toISOString().split('T')[0]
   )
   const [storeDrop, setStoreDrop] = useState(false)
-  const [storeName, setStoreName] = useState(allStore)
+  const [storeName, setStoreName] = useState(ALL_STORES)
   const [selStoreId, setSelStoreId] = useState('')
   const [storeData, setStoreData] = useState([])
   const [filFlag, setFilFlag] = useState(false)
@@ -171,7 +170,7 @@ const CustomerTable = () => {
   }
   const handleSearchClear = () => {
     setSearch('')
-    setStoreName(allStore)
+    setStoreName(ALL_STORES)
     setSelStoreId('')
     setFromDate('')
     setFromDateDup(iniDate)
@@ -222,7 +221,7 @@ const CustomerTable = () => {
   useEffect(() => {
     if (
       search === '' &&
-      storeName === ALLstore &&
+      storeName === ALL_STORES &&
       selStoreId === '' &&
       fromDateDup === iniDate
     ) {
@@ -322,7 +321,7 @@ const CustomerTable = () => {
               }}
             >
               <p className='truncate'>
-                {storeName === allStore ? 'Select Store' : storeName}
+                {storeName === ALL_STORES ? 'Select Store' : storeName}
               </p>
               <FaAngleDown
                 size={17}
@@ -344,11 +343,11 @@ const CustomerTable = () => {
                   <div
                     className={`${styles.filter_option}`}
                     onClick={() => {
-                      handleStoreChange({ _id: '', storeName: ALLstore })
-                      setSearchTerm(ALLstore)
+                      handleStoreChange({ _id: '', storeName: ALL_STORES })
+                      setSearchTerm(ALL_STORES)
                     }}
                   >
-                    <p className='truncate'>{ALLstore}</p>
+                    <p className='truncate'>{ALL_STORES}</p>
                   </div>
                   {filteredStores.length > 0 ? (
                     filteredStores.map((item, index) => (
