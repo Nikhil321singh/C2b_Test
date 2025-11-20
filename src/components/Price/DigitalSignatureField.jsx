@@ -99,81 +99,80 @@ const DigitalSignatureField = ({
     setShowPlaceholder(true)
   }
 
-  /** ----- Drawing UI ----- */
-  const renderSignatureCanvas = () =>
-    isDrawing && (
-      <SignatureContainer>
-        <div className='p-1 border-2 rounded-lg h-[15vh] w-full relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
-          <div
-            ref={containerRef}
-            className='bg-gray-100 w-full h-full relative flex items-center justify-center'
-          >
-            {showPlaceholder && (
-              <p className='absolute text-gray-400 text-lg pointer-events-none select-none'>
-                Sign Here
-              </p>
-            )}
-            <SignatureCanvas
-              ref={sigPadRef}
-              penColor='black'
-              onBegin={handleBegin}
-              canvasProps={{ className: 'absolute top-0 left-0' }}
-            />
-          </div>
-        </div>
+  const renderContent = () => {
+    if (isDrawing) {
+      return (
+        <>
+          <div className='p-1 border-2 rounded-lg h-[15vh] w-full relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
+            <div
+              ref={containerRef}
+              className='bg-gray-100 w-full h-full relative flex items-center justify-center'
+            >
+              {showPlaceholder && (
+                <p className='absolute text-gray-400 text-lg pointer-events-none select-none'>
+                  Sign Here
+                </p>
+              )}
 
-        <div className='flex justify-between w-full gap-4 mt-3'>
-          <button
-            type='button'
-            className='px-4 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg flex-1'
-            onClick={handleClear}
-          >
-            Clear Signature
-          </button>
-
-          <button
-            type='button'
-            className='px-4 py-2 font-bold text-white rounded-lg bg-primary flex-1'
-            onClick={handleSaveSignature}
-          >
-            Save Signature
-          </button>
-        </div>
-      </SignatureContainer>
-    )
-
-  /** ----- Preview UI ----- */
-  const renderSignaturePreview = () =>
-    !isDrawing && (
-      <SignatureContainer>
-        <div className='flex items-center gap-3'>
-          {signatureFile && (
-            <img
-              src={URL.createObjectURL(signatureFile)}
-              alt='Signature Thumbnail'
-              className='h-[80px] object-contain'
-            />
-          )}
-
-          <div className='flex flex-col items-start gap-2'>
-            <div className='flex items-center gap-2'>
-              {getStatusIcon(sigStatus)}
-              <span className='text-sm font-medium text-green-600'>
-                Signature Saved
-              </span>
+              <SignatureCanvas
+                ref={sigPadRef}
+                penColor='black'
+                onBegin={handleBegin}
+                canvasProps={{ className: 'absolute top-0 left-0' }}
+              />
             </div>
+          </div>
+
+          <div className='flex justify-between w-full gap-4 mt-3'>
+            <button
+              type='button'
+              className='px-4 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg flex-1'
+              onClick={handleClear}
+            >
+              Clear Signature
+            </button>
 
             <button
               type='button'
-              className='px-4 py-1 text-sm font-bold text-gray-700 bg-gray-200 rounded-lg'
-              onClick={handleResign}
+              className='px-4 py-2 font-bold text-white rounded-lg bg-primary flex-1'
+              onClick={handleSaveSignature}
             >
-              Re-sign
+              Save Signature
             </button>
           </div>
+        </>
+      )
+    }
+
+    return (
+      <div className='flex items-center gap-3'>
+        {signatureFile && (
+          <img
+            src={URL.createObjectURL(signatureFile)}
+            alt='Signature Thumbnail'
+            className='h-[80px] object-contain'
+          />
+        )}
+
+        <div className='flex flex-col items-start gap-2'>
+          <div className='flex items-center gap-2'>
+            {getStatusIcon(sigStatus)}
+            <span className='text-sm font-medium text-green-600'>
+              Signature Saved
+            </span>
+          </div>
+
+          <button
+            type='button'
+            className='px-4 py-1 text-sm font-bold text-gray-700 bg-gray-200 rounded-lg'
+            onClick={handleResign}
+          >
+            Re-sign
+          </button>
         </div>
-      </SignatureContainer>
+      </div>
     )
+  }
 
   return (
     <div className='flex flex-col adharcard mt-[10px]'>
@@ -190,10 +189,8 @@ const DigitalSignatureField = ({
         Please sign to confirm your Aadhaar verification and consent.
       </p>
 
-      {/* Box Wrapper */}
       <div className='flex justify-start ml-3 inputAADHAR'>
-        {renderSignatureCanvas()}
-        {renderSignaturePreview()}
+        <SignatureContainer>{renderContent()}</SignatureContainer>
       </div>
     </div>
   )
