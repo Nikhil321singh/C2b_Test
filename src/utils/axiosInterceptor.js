@@ -12,24 +12,21 @@ const activeToasts = {
   network: null,
 }
 
-// Track if we've already started redirecting
+// Track if a redirect is already happening
 let isRedirecting = false
 
-// Helper function to show toast only once per error type
+// Helper: show toast once per key
 const showToastOnce = (key, message, options) => {
-  // If this toast is already showing, don't show another
   if (activeToasts[key]) {
     console.log(`[Toast Blocked] Duplicate ${key} toast prevented`)
-    return
+    return null
   }
 
   console.log(`[Toast Shown] ${key}: ${message}`)
 
-  // Show the toast and store its ID
   const toastId = toast.error(message, {
     ...options,
     onClose: () => {
-      // Clear the active toast when it closes
       console.log(`[Toast Closed] ${key} toast closed, tracking cleared`)
       activeToasts[key] = null
     },
@@ -39,44 +36,44 @@ const showToastOnce = (key, message, options) => {
   return toastId
 }
 
-// Helper function to handle logout
+// Helper: logout handler
 const handleLogout = (message) => {
   if (isRedirecting) {
-    return // Prevent duplicate redirects
+    return null
   }
+
   isRedirecting = true
 
-  // Clear session storage
   sessionStorage.removeItem('authToken')
   sessionStorage.removeItem('userProfile')
   sessionStorage.removeItem('role')
 
-  // Show toast notification (only once)
   showToastOnce('401', message, {
     duration: 3000,
     position: TOAST_POSITION,
   })
 
-  // Redirect to login page after short delay
   setTimeout(() => {
     isRedirecting = false
     window.location.href = '/'
   }, 1500)
+
+  return null
 }
 
-// Response error handler (shared between all axios instances)
+// Centralized API error handler
 const handleResponseError = (error) => {
   if (error.response) {
     const { status, data } = error.response
 
-    // Handle 401 Unauthorized - Session expired
+    // 401 Unauthorized
     if (status === 401) {
       const message = data?.message || 'Session expired. Please login again.'
       handleLogout(message)
       return Promise.reject(new Error(message))
     }
 
-    // Handle 403 Forbidden
+    // 403 Forbidden
     if (status === 403) {
       const message =
         data?.message || data?.msg || 'Access denied. Insufficient permissions.'
@@ -87,7 +84,7 @@ const handleResponseError = (error) => {
       return Promise.reject(new Error(message))
     }
 
-    // Handle 429 Too Many Requests
+    // 429 Too Many Requests
     if (status === 429) {
       const message =
         data?.message || 'Too many requests. Please try again later.'
@@ -99,7 +96,7 @@ const handleResponseError = (error) => {
     }
   }
 
-  // Handle network errors
+  // Network error
   if (!error.response) {
     const message = 'Network error. Please check your connection.'
     showToastOnce('network', message, {
@@ -112,7 +109,7 @@ const handleResponseError = (error) => {
   return Promise.reject(error)
 }
 
-// Request interceptor (shared)
+// Request interceptor
 const handleRequest = (config) => {
   const token = sessionStorage.getItem('authToken')
   if (token) {
@@ -121,42 +118,40 @@ const handleRequest = (config) => {
   return config
 }
 
-// Track if global interceptors have been set up
+// Track if global interceptors are already added
 let globalInterceptorsSetup = false
 
-// Setup interceptors for the default axios instance (global)
+// Install global axios interceptors
 export const setupGlobalInterceptors = () => {
   if (globalInterceptorsSetup) {
     console.log('[Axios] Global interceptors already setup, skipping')
-    return
+    return null
   }
 
   console.log('[Axios] Setting up global interceptors')
   globalInterceptorsSetup = true
 
-  // Remove any existing interceptors to avoid duplicates
   axios.interceptors.request.handlers = []
   axios.interceptors.response.handlers = []
 
-  // Add request interceptor
   axios.interceptors.request.use(handleRequest, (error) =>
     Promise.reject(error)
   )
-
-  // Add response interceptor
   axios.interceptors.response.use((response) => response, handleResponseError)
+
+  return null
 }
 
-// Create custom axios instance with interceptors
+// Custom axios instance
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_REACT_APP_ENDPOINT,
   timeout: 30000,
 })
 
-// Add interceptors to custom instance
 axiosInstance.interceptors.request.use(handleRequest, (error) =>
   Promise.reject(error)
 )
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   handleResponseError
