@@ -3,6 +3,7 @@ import Webcam from 'react-webcam'
 import { FaCamera } from 'react-icons/fa'
 import { getStatusIcon } from '../../utils/priceUtils.jsx'
 import { FILE_KEYS } from '../../constants/priceConstants'
+import { dataURLtoFile } from '../../utils/fileUtils'
 import toast from 'react-hot-toast'
 
 const FILE_NAME = 'customerPhoto'
@@ -22,31 +23,6 @@ const ACTION_BUTTON_CLASSES =
   'flex flex-col items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100'
 const SMALL_BTN_CLASSES =
   'px-2 py-0 mt-1 text-sm text-gray-700 bg-gray-200 rounded-lg'
-
-// Convert dataURL to a File object
-const dataURLtoFile = (dataurl, filename) => {
-  if (!dataurl) {
-    return null
-  }
-
-  const arr = dataurl.split(',')
-  if (arr.length < 2) {
-    return null
-  }
-
-  const mimeMatch = arr[0].match(/:(.*?);/)
-  if (!mimeMatch) {
-    return null
-  }
-
-  const mime = mimeMatch[1]
-  const bstr = atob(arr[1])
-  const u8arr = new Uint8Array(bstr.length)
-  for (let i = 0; i < bstr.length; i++) {
-    u8arr[i] = bstr.charCodeAt(i)
-  }
-  return new File([u8arr], filename, { type: mime })
-}
 
 const resetFileInput = (fileInputRef) => {
   if (fileInputRef?.current) {
@@ -136,7 +112,7 @@ const CustomerPhotoField = ({
   useEffect(() => {
     if (!customerPhoto) {
       setPreviewUrl(null)
-      return
+      return undefined
     }
     const url = URL.createObjectURL(customerPhoto)
     setPreviewUrl(url)
@@ -246,8 +222,12 @@ const CustomerPhotoField = ({
   )
 
   const getContent = () => {
-    if (showWebcam) return renderWebcamView()
-    if (customerPhoto) return renderPhotoPreview()
+    if (showWebcam) {
+      return renderWebcamView()
+    }
+    if (customerPhoto) {
+      return renderPhotoPreview()
+    }
     return renderUploadButtons()
   }
 
