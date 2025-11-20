@@ -16,7 +16,6 @@ const AadharNumberField = ({
 }) => {
   const [error, setError] = useState(true)
   const [isVerifying, setIsVerifying] = useState(false)
-  const [digioInstance, setDigioInstance] = useState(null)
   const pink = 'bg-primary'
 
   const otpData = localStorage.getItem('otpData')
@@ -119,8 +118,6 @@ const AadharNumberField = ({
         },
       })
 
-      setDigioInstance(digio)
-
       // Step 4: Submit to Digilocker with entity_id, identifier, and access_token
       const entityId = response.access_token.entity_id
       const identifier = response.customer_identifier
@@ -144,6 +141,28 @@ const AadharNumberField = ({
     }
   }
 
+  // Determine button class based on verification state
+  const getButtonClass = () => {
+    if (isVerified) {
+      return 'bg-green-500 cursor-not-allowed'
+    }
+    if (!error && !isVerifying) {
+      return pink
+    }
+    return 'bg-gray-400 cursor-not-allowed'
+  }
+
+  // Determine button text based on verification state
+  const getButtonText = () => {
+    if (isVerified) {
+      return 'Verified'
+    }
+    if (isVerifying) {
+      return 'Verifying...'
+    }
+    return 'Verify'
+  }
+
   return (
     <div className='flex flex-col eminumber mt-[4px]'>
       <div className='flex gap-1 two'>
@@ -165,17 +184,11 @@ const AadharNumberField = ({
           disabled={isVerified}
         />
         <button
-          className={`px-4 py-2 font-bold text-white rounded ${
-            isVerified
-              ? 'bg-green-500 cursor-not-allowed'
-              : !error && !isVerifying
-              ? pink
-              : 'bg-gray-400 cursor-not-allowed'
-          }`}
+          className={`px-4 py-2 font-bold text-white rounded ${getButtonClass()}`}
           onClick={handleVerify}
           disabled={!!error || isVerifying || isVerified}
         >
-          {isVerified ? 'Verified' : isVerifying ? 'Verifying...' : 'Verify'}
+          {getButtonText()}
         </button>
       </div>
       {error && typeof error === 'string' && (
