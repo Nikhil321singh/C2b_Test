@@ -13,6 +13,7 @@ import * as XLSX from 'xlsx'
 import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
 import styless from '../pages/QuotesCreatedAdmin/QuotesCreatedAdmin.module.css'
+import { saveAs } from 'file-saver' // make sure file-saver is installed
 
 const ALL_STORES = 'All Stores'
 const iniDate = '2023-01-01'
@@ -134,6 +135,169 @@ const filterStores = (stores, keyword) =>
       )
     : stores
 
+const TopFilterBar = ({
+  search,
+  setSearch,
+  loadTable,
+  handleSearchClear,
+  downloading,
+  fetchDownloadDataCustomerTable,
+  toDateDup,
+  fromDateDup,
+  selStoreId,
+  totalCount,
+  setDownloading,
+
+  fromDate,
+  setFromDate,
+  toDate,
+  setToDate,
+  setFromDateDup,
+  setToDateDup,
+
+  storeData,
+  storeDrop,
+  setStoreDrop,
+  storeName,
+  setStoreName,
+  setSelStoreId,
+  searchTerm,
+  setSearchTerm,
+  filteredStores,
+  handleSearchStore,
+}) => {
+  return (
+    <div className='flex gap-2 items-center justify-center mt-5'>
+      {/* Search */}
+      <div className={styles.search_bar_wrap}>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className='text-sm'
+          placeholder='Search...'
+        />
+        <IoMdSearch size={25} onClick={loadTable} />
+      </div>
+
+      {/* Refresh */}
+      <div className={styles.icons_box}>
+        <IoRefresh size={25} onClick={handleSearchClear} />
+      </div>
+
+      {/* Download */}
+      <button
+        disabled={downloading}
+        onClick={() =>
+          fetchDownloadDataCustomerTable(
+            toDateDup,
+            fromDateDup,
+            search,
+            selStoreId,
+            totalCount,
+            setDownloading
+          )
+        }
+        className={styles.bulkdown_button}
+      >
+        {downloading ? (
+          <>
+            <BeatLoader color='white' size={8} /> Downloading...
+          </>
+        ) : (
+          <>
+            <FaDownload /> Bulk Download
+          </>
+        )}
+      </button>
+
+      {/* From date */}
+      <DatePicker
+        selected={fromDate}
+        onChange={(d) => {
+          setFromDate(d)
+          setFromDateDup(formatDate(d))
+        }}
+        dateFormat='yyyy-MM-dd'
+        className='py-[6px] px-[15px] border rounded-md'
+        placeholderText='Select from date'
+      />
+
+      {/* To date */}
+      <DatePicker
+        selected={toDate}
+        onChange={(d) => {
+          setToDate(d)
+          setToDateDup(formatDate(d))
+        }}
+        dateFormat='yyyy-MM-dd'
+        className='py-[6px] px-[15px] border rounded-md'
+        placeholderText='Select to date'
+      />
+
+      {/* Store Dropdown */}
+      {storeData.length > 1 && (
+        <div className='relative w-[250px]'>
+          <div
+            className={styless.filter_button}
+            onClick={() => setStoreDrop(!storeDrop)}
+          >
+            <p className='truncate'>
+              {storeName === ALL_STORES ? 'Select Store' : storeName}
+            </p>
+            <FaAngleDown size={17} className={storeDrop ? 'rotate-180' : ''} />
+          </div>
+
+          {storeDrop && (
+            <div className='absolute w-full bg-white shadow-md'>
+              <input
+                value={searchTerm}
+                onChange={handleSearchStore}
+                className='w-full p-2 border-b'
+                placeholder='Search store...'
+              />
+
+              <div
+                className={`${styless.filter_drop} max-h-[200px] overflow-y-scroll`}
+              >
+                <div
+                  className={styles.filter_option}
+                  onClick={() => {
+                    setSelStoreId('')
+                    setStoreName(ALL_STORES)
+                    setSearchTerm('')
+                    setStoreDrop(false)
+                  }}
+                >
+                  {ALL_STORES}
+                </div>
+
+                {filteredStores.length ? (
+                  filteredStores.map((s, i) => (
+                    <div
+                      key={i}
+                      className={styles.filter_option}
+                      onClick={() => {
+                        setSelStoreId(s._id)
+                        setStoreName(s.storeName)
+                        setSearchTerm(s.storeName)
+                        setStoreDrop(false)
+                      }}
+                    >
+                      {s.storeName}
+                    </div>
+                  ))
+                ) : (
+                  <p className='p-2 text-gray-500'>No stores found</p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 const CustomerTable = () => {
   const [tableDataDup, setTableDataDup] = useState([])
   const [loading, setLoading] = useState(false)
@@ -226,138 +390,36 @@ const CustomerTable = () => {
       <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       <NavigateListing />
 
-      {/* TOP FILTER BAR */}
-      <div className='flex gap-2 items-center justify-center mt-5'>
-        {/* Search */}
-        <div className={styles.search_bar_wrap}>
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className='text-sm'
-            placeholder='Search...'
-          />
-          <IoMdSearch size={25} onClick={loadTable} />
-        </div>
-
-        {/* Refresh */}
-        <div className={styles.icons_box}>
-          <IoRefresh size={25} onClick={handleSearchClear} />
-        </div>
-
-        {/* Download */}
-        <button
-          disabled={downloading}
-          onClick={() =>
-            fetchDownloadDataCustomerTable(
-              toDateDup,
-              fromDateDup,
-              search,
-              selStoreId,
-              totalCount,
-              setDownloading
-            )
-          }
-          className={styles.bulkdown_button}
-        >
-          {downloading ? (
-            <>
-              <BeatLoader color='white' size={8} /> Downloading...
-            </>
-          ) : (
-            <>
-              <FaDownload /> Bulk Download
-            </>
-          )}
-        </button>
-
-        {/* From date */}
-        <DatePicker
-          selected={fromDate}
-          onChange={(d) => {
-            setFromDate(d)
-            setFromDateDup(formatDate(d))
-          }}
-          dateFormat='yyyy-MM-dd'
-          className='py-[6px] px-[15px] border rounded-md'
-          placeholderText='Select from date'
-        />
-
-        {/* To date */}
-        <DatePicker
-          selected={toDate}
-          onChange={(d) => {
-            setToDate(d)
-            setToDateDup(formatDate(d))
-          }}
-          dateFormat='yyyy-MM-dd'
-          className='py-[6px] px-[15px] border rounded-md'
-          placeholderText='Select to date'
-        />
-
-        {/* Store Dropdown */}
-        {storeData.length > 1 && (
-          <div className='relative w-[250px]'>
-            <div
-              className={styless.filter_button}
-              onClick={() => setStoreDrop(!storeDrop)}
-            >
-              <p className='truncate'>
-                {storeName === ALL_STORES ? 'Select Store' : storeName}
-              </p>
-              <FaAngleDown
-                size={17}
-                className={storeDrop ? 'rotate-180' : ''}
-              />
-            </div>
-
-            {storeDrop && (
-              <div className='absolute w-full bg-white shadow-md'>
-                <input
-                  value={searchTerm}
-                  onChange={handleSearchStore}
-                  className='w-full p-2 border-b'
-                  placeholder='Search store...'
-                />
-
-                <div
-                  className={`${styless.filter_drop} max-h-[200px] overflow-y-scroll`}
-                >
-                  <div
-                    className={styles.filter_option}
-                    onClick={() => {
-                      setSelStoreId('')
-                      setStoreName(ALL_STORES)
-                      setSearchTerm('')
-                      setStoreDrop(false)
-                    }}
-                  >
-                    {ALL_STORES}
-                  </div>
-
-                  {filteredStores.length ? (
-                    filteredStores.map((s, i) => (
-                      <div
-                        key={i}
-                        className={styles.filter_option}
-                        onClick={() => {
-                          setSelStoreId(s._id)
-                          setStoreName(s.storeName)
-                          setSearchTerm(s.storeName)
-                          setStoreDrop(false)
-                        }}
-                      >
-                        {s.storeName}
-                      </div>
-                    ))
-                  ) : (
-                    <p className='p-2 text-gray-500'>No stores found</p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      {/* TOP FILTER BAR (now component) */}
+      <TopFilterBar
+        search={search}
+        setSearch={setSearch}
+        loadTable={loadTable}
+        handleSearchClear={handleSearchClear}
+        downloading={downloading}
+        fetchDownloadDataCustomerTable={fetchDownloadDataCustomerTable}
+        toDateDup={toDateDup}
+        fromDateDup={fromDateDup}
+        selStoreId={selStoreId}
+        totalCount={totalCount}
+        setDownloading={setDownloading}
+        fromDate={fromDate}
+        setFromDate={setFromDate}
+        toDate={toDate}
+        setToDate={setToDate}
+        setFromDateDup={setFromDateDup}
+        setToDateDup={setToDateDup}
+        storeData={storeData}
+        storeDrop={storeDrop}
+        setStoreDrop={setStoreDrop}
+        storeName={storeName}
+        setStoreName={setStoreName}
+        setSelStoreId={setSelStoreId}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        filteredStores={filteredStores}
+        handleSearchStore={handleSearchStore}
+      />
 
       <UserTable data={tableDataDup} />
 
