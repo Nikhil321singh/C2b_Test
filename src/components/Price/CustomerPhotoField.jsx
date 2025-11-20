@@ -37,6 +37,22 @@ const dataURLtoFile = (dataurl, filename) => {
   return new File([u8arr], filename, { type: mime })
 }
 
+// --- FIX 1: duplicated code removed by helper ---
+const resetFileInput = (fileInputRef) => {
+  if (fileInputRef?.current) {
+    fileInputRef.current.value = null
+  }
+}
+
+const validateIMEI = (imeinumber, fileInputRef) => {
+  if (!imeinumber) {
+    toast.error('Please enter IMEI number first')
+    resetFileInput(fileInputRef)
+    return false
+  }
+  return true
+}
+
 const PhotoContainer = ({ children }) => (
   <div className='p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[100vw] md:w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
     <p className='font-semibold text-center'>Customer Photo</p>
@@ -59,12 +75,11 @@ const CustomerPhotoField = ({
   const photoStatus = uploadStatus[FILE_KEYS.CUSTOMER_PHOTO]?.status
 
   const capture = useCallback(() => {
-    if (!imeinumber) {
-      toast.error('Please enter IMEI number first')
+    if (!validateIMEI(imeinumber, fileInputRef)) {
       return
     }
 
-    const imageSrc = webcamRef.current.getScreenshot()
+    const imageSrc = webcamRef.current?.getScreenshot()
     if (!imageSrc) {
       toast.error('Could not capture photo. Please try again.')
       return
@@ -78,14 +93,10 @@ const CustomerPhotoField = ({
       setShowWebcam(false)
       uploadIndividualFile(file, fileName, file.type, FILE_KEYS.CUSTOMER_PHOTO)
     }
-  }, [webcamRef, setCustomerPhoto, imeinumber, uploadIndividualFile])
+  }, [imeinumber, uploadIndividualFile, setCustomerPhoto])
 
   const onFileSelect = (e) => {
-    if (!imeinumber) {
-      toast.error('Please enter IMEI number first')
-      if (fileInputRef.current) {
-        fileInputRef.current.value = null
-      }
+    if (!validateIMEI(imeinumber, fileInputRef)) {
       return
     }
 
@@ -93,17 +104,13 @@ const CustomerPhotoField = ({
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
         toast.error('File size should not exceed 2MB')
-        if (fileInputRef.current) {
-          fileInputRef.current.value = null
-        }
+        resetFileInput(fileInputRef)
         return
       }
 
       if (!['image/jpeg', 'image/png'].includes(file.type)) {
         toast.error('Please upload a JPG or PNG image')
-        if (fileInputRef.current) {
-          fileInputRef.current.value = null
-        }
+        resetFileInput(fileInputRef)
         return
       }
 
@@ -120,9 +127,7 @@ const CustomerPhotoField = ({
   const clearPhoto = () => {
     setCustomerPhoto(null)
     setShowWebcam(false)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = null
-    }
+    resetFileInput(fileInputRef)
   }
 
   const sectionNumber = (prod?.[0]?.phoneBillSno || 6) + 1
@@ -144,9 +149,7 @@ const CustomerPhotoField = ({
           <button
             type='button'
             className='px-4 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg'
-            onClick={() => {
-              setShowWebcam(false)
-            }}
+            onClick={() => setShowWebcam(false)}
           >
             Cancel
           </button>
@@ -196,9 +199,7 @@ const CustomerPhotoField = ({
             type='button'
             title='Capture with webcam'
             className='flex flex-col items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100'
-            onClick={() => {
-              setShowWebcam(true)
-            }}
+            onClick={() => setShowWebcam(true)}
           >
             <FaCamera className='text-3xl' />
             <span className='text-xs'>Capture</span>
@@ -208,9 +209,7 @@ const CustomerPhotoField = ({
             type='button'
             title='Upload from device'
             className='flex flex-col items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100'
-            onClick={() => {
-              handleCameraButtonClick(fileInputRef)
-            }}
+            onClick={() => handleCameraButtonClick(fileInputRef)}
           >
             <FaCamera className='text-3xl' />
             <span className='text-xs'>Upload</span>

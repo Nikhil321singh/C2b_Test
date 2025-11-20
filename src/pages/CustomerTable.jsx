@@ -13,126 +13,34 @@ import * as XLSX from 'xlsx'
 import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
 import styless from '../pages/QuotesCreatedAdmin/QuotesCreatedAdmin.module.css'
+
 const ALL_STORES = 'All Stores'
 const iniDate = '2023-01-01'
+const salesPageSize = 10
 
 const getStore = async () => {
   const token = sessionStorage.getItem('authToken')
-  const config = {
-    method: 'get',
-    url: `${
-      import.meta.env.VITE_REACT_APP_ENDPOINT
-    }/api/store/findAll?page=0&limit=9999`,
-    headers: { Authorization: token },
-  }
-  let storeNamesArray = []
-  await axios
-    .request(config)
-    .then((response) => {
-      console.log(response.data.result)
-      storeNamesArray = response.data.result.map((store1) => ({
-        storeName: store1.storeName,
-        _id: store1._id,
-      }))
-      console.log(storeNamesArray)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-  return storeNamesArray
-}
-
-const fetchDownloadDataCustomerTable = (
-  toDateDup,
-  fromDateDup,
-  search,
-  selStoreId,
-  totalCount,
-  setDownloading
-) => {
-  const userToken = sessionStorage.getItem('authToken')
-  setDownloading(true)
-  axios
-    .get(
+  try {
+    const res = await axios.get(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll/ordercreated?page=0&limit=${
-        totalCount || 9999
-      }&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
-      { headers: { authorization: userToken } }
+      }/api/store/findAll?page=0&limit=9999`,
+      { headers: { Authorization: token } }
     )
-    .then((res) => {
-      downloadExcelCustomerTable(res.data.data.orderData.data)
-      setDownloading(false)
-    })
-    .catch((err) => {
-      console.log(err)
-      setDownloading(false)
-    })
-}
-
-const downloadExcelCustomerTable = (apiData) => {
-  const fileType =
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
-  const fileEx = '.xlsx'
-
-  const formatData = apiData.map((element) => {
-    let index = 1
-    console.log(element?.lead?.QNA[0])
-    let questionsKeys = ''
-    if (element?.lead?.QNA?.[0] && typeof element.lead.QNA[0] === 'object') {
-      for (const group in element.lead.QNA[0]) {
-        if (Array.isArray(element.lead.QNA[0][group])) {
-          element.lead.QNA[0][group].forEach((qna) => {
-            questionsKeys += `${index}. ${qna?.quetion} - ${qna?.key}\n`
-            index++
-          })
-        }
-      }
-    }
-    return {
-      'Date Created': new Date(element?.createdAt).toLocaleDateString('en-IN'),
-      'User Name': element?.user?.name,
-      category: element?.categoryInfo?.categoryName,
-      'Product Name': element?.lead?.model?.name,
-      Variant: element?.lead?.storage,
-      Price: element?.lead?.actualPrice,
-      'Final Price Offered to Customer': element?.lead?.price,
-      'Unique Id': element?.lead?.uniqueCode,
-      'Customer Name': element?.lead?.name,
-      'Phone Number': element?.lead?.phoneNumber,
-      'Email Id': element?.lead?.emailId,
-      'Question/Ans': questionsKeys,
-    }
-  })
-
-  const wsCustomerTable = XLSX.utils.json_to_sheet(formatData)
-  const wbCustomerTable = {
-    Sheets: { data: wsCustomerTable },
-    SheetNames: ['data'],
+    return res.data.result.map((s) => ({ storeName: s.storeName, _id: s._id }))
+  } catch (err) {
+    console.log(err)
+    return []
   }
-  const excelBufferCustomerTable = XLSX.write(wbCustomerTable, {
-    bookType: 'xlsx',
-    type: 'array',
-  })
-
-  const dataFileCustomerTable = new Blob([excelBufferCustomerTable], {
-    type: fileType,
-  })
-  saveAs(dataFileCustomerTable, 'Leads_Created' + fileEx)
 }
 
-// --- Helper: format date ---
-const formatDate = (date) => {
-  if (!date) {
-    return ''
-  }
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-    .toISOString()
-    .split('T')[0]
-}
+const formatDate = (date) =>
+  date
+    ? new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .split('T')[0]
+    : ''
 
-// --- Helper: fetch table data from API ---
 const fetchTableData = async ({
   page,
   limit,
@@ -142,53 +50,126 @@ const fetchTableData = async ({
   storeId,
 }) => {
   const userToken = sessionStorage.getItem('authToken')
-
-  const url = `${
-    import.meta.env.VITE_REACT_APP_ENDPOINT
-  }/api/prospects/findAll/ordercreated?page=${page}&limit=${limit}&todate=${toDate}&fromdate=${fromDate}&search=${search}&store=${storeId}`
-
-  return axios.get(url, { headers: { authorization: userToken } })
-}
-
-// --- Helper: filter stores ---
-const filterStores = (stores, keyword) => {
-  if (!keyword) {
-    return stores
-  }
-  return stores.filter((s) =>
-    s.storeName.toLowerCase().includes(keyword.toLowerCase())
+  return axios.get(
+    `${
+      import.meta.env.VITE_REACT_APP_ENDPOINT
+    }/api/prospects/findAll/ordercreated?page=${page}&limit=${limit}&todate=${toDate}&fromdate=${fromDate}&search=${search}&store=${storeId}`,
+    { headers: { authorization: userToken } }
   )
 }
 
-const salesPageSize = 10
+const formatDownloadData = (apiData) =>
+  apiData.map((ele) => {
+    let index = 1
+    let questions = ''
+
+    if (ele?.lead?.QNA?.[0] && typeof ele.lead.QNA[0] === 'object') {
+      for (const grp in ele.lead.QNA[0]) {
+        if (Array.isArray(ele.lead.QNA[0][grp])) {
+          ele.lead.QNA[0][grp].forEach((q) => {
+            questions += `${index}. ${q?.quetion} - ${q?.key}\n`
+            index++
+          })
+        }
+      }
+    }
+
+    return {
+      'Date Created': new Date(ele?.createdAt).toLocaleDateString('en-IN'),
+      'User Name': ele?.user?.name,
+      category: ele?.categoryInfo?.categoryName,
+      'Product Name': ele?.lead?.model?.name,
+      Variant: ele?.lead?.storage,
+      Price: ele?.lead?.actualPrice,
+      'Final Price Offered to Customer': ele?.lead?.price,
+      'Unique Id': ele?.lead?.uniqueCode,
+      'Customer Name': ele?.lead?.name,
+      'Phone Number': ele?.lead?.phoneNumber,
+      'Email Id': ele?.lead?.emailId,
+      'Question/Ans': questions,
+    }
+  })
+
+const downloadExcelCustomerTable = (apiData) => {
+  const ws = XLSX.utils.json_to_sheet(formatDownloadData(apiData))
+  const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+  const file = new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8',
+  })
+  saveAs(file, 'Leads_Created.xlsx')
+}
+
+const fetchDownloadDataCustomerTable = async (
+  toDateDup,
+  fromDateDup,
+  search,
+  selStoreId,
+  totalCount,
+  setDownloading
+) => {
+  setDownloading(true)
+  const userToken = sessionStorage.getItem('authToken')
+
+  try {
+    const res = await axios.get(
+      `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/prospects/findAll/ordercreated?page=0&limit=${
+        totalCount || 9999
+      }&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
+      { headers: { authorization: userToken } }
+    )
+    downloadExcelCustomerTable(res.data.data.orderData.data)
+  } catch (err) {
+    console.log(err)
+  }
+  setDownloading(false)
+}
+
+const filterStores = (stores, keyword) =>
+  keyword
+    ? stores.filter((s) =>
+        s.storeName.toLowerCase().includes(keyword.toLowerCase())
+      )
+    : stores
 
 const CustomerTable = () => {
   const [tableDataDup, setTableDataDup] = useState([])
   const [loading, setLoading] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [sideMenu, setsideMenu] = useState(false)
+
   const [search, setSearch] = useState('')
   const [fromDate, setFromDate] = useState('')
-  const [fromDateDup, setFromDateDup] = useState(iniDate)
   const [toDate, setToDate] = useState('')
+
+  const [fromDateDup, setFromDateDup] = useState(iniDate)
   const [toDateDup, setToDateDup] = useState(
     new Date().toISOString().split('T')[0]
   )
+
   const [storeDrop, setStoreDrop] = useState(false)
   const [storeName, setStoreName] = useState(ALL_STORES)
   const [selStoreId, setSelStoreId] = useState('')
   const [storeData, setStoreData] = useState([])
-  const [filFlag, setFilFlag] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filteredStores, setFilteredStores] = useState(storeData)
+  const [filteredStores, setFilteredStores] = useState([])
+
   const [currentPage, setCurrentPage] = useState(0)
   const [maxPages, setMaxPages] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
 
+  /* Load stores */
   useEffect(() => {
-    myordercretad()
-  }, [toDate, fromDate, selStoreId, filFlag, currentPage])
-  async function myordercretad() {
+    getStore().then((data) => {
+      setStoreData(data)
+      setFilteredStores(data)
+    })
+  }, [])
+
+  /* Fetch table data */
+  const loadTable = async () => {
     setLoading(true)
     try {
       const res = await fetchTableData({
@@ -200,18 +181,21 @@ const CustomerTable = () => {
         storeId: selStoreId,
       })
 
-      setTableDataDup(res.data.data.orderData.data)
-
-      const total = res.data.data.orderData.count || 0
-      setTotalCount(total)
-      setMaxPages(Math.ceil(total / salesPageSize))
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setLoading(false)
+      const r = res.data.data.orderData
+      setTableDataDup(r.data)
+      setTotalCount(r.count || 0)
+      setMaxPages(Math.ceil((r.count || 0) / salesPageSize))
+    } catch (err) {
+      console.log(err)
     }
+    setLoading(false)
   }
 
+  useEffect(() => {
+    loadTable()
+  }, [toDate, fromDate, selStoreId, currentPage])
+
+  /* Search clear */
   const handleSearchClear = () => {
     setSearch('')
     setStoreName(ALL_STORES)
@@ -220,82 +204,49 @@ const CustomerTable = () => {
     setFromDateDup(iniDate)
     setToDate('')
     setToDateDup(new Date().toISOString().split('T')[0])
-    setFilFlag(!filFlag)
-  }
-  const handleFromDateChange = (date) => {
-    setFromDate(date)
-    setFromDateDup(formatDate(date))
+    loadTable()
   }
 
-  const handleToDateChange = (date) => {
-    setToDate(date)
-    setToDateDup(formatDate(date))
-  }
-
-  const handleStoreChange = (value) => {
-    setStoreDrop(false)
-    setSelStoreId(value._id)
-    setStoreName(value.storeName)
-  }
-
-  const saveStore = async () => {
-    const temparr = await getStore()
-    setStoreData(temparr)
-  }
-
-  useEffect(() => {
-    saveStore()
-  }, [])
-
-  useEffect(() => {
-    if (
-      search === '' &&
-      storeName === ALL_STORES &&
-      selStoreId === '' &&
-      fromDateDup === iniDate
-    ) {
-      myordercretad()
-    }
-  }, [search, storeName, selStoreId, fromDateDup])
-
-  const handleSearch = (e) => {
-    const value = e.target.value
-    setSearchTerm(value)
-    setFilteredStores(filterStores(storeData, value))
+  /* Store dropdown search */
+  const handleSearchStore = (e) => {
+    const v = e.target.value
+    setSearchTerm(v)
+    setFilteredStores(filterStores(storeData, v))
   }
 
   return (
     <div>
       {loading && (
-        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 text-primary'>
-          <BeatLoader
-            color='var(--primary-color)'
-            loading={loading}
-            size={15}
-          />
+        <div className='fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50'>
+          <BeatLoader color='var(--primary-color)' size={15} />
         </div>
       )}
-      <div className='navbar'>
-        <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
-        <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
-      </div>
+
+      <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
+      <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       <NavigateListing />
-      <div className='flex gap-2 items-center justify-center outline-none mt-5 w-[100%]'>
-        <div className={`${styles.search_bar_wrap}`}>
+
+      {/* TOP FILTER BAR */}
+      <div className='flex gap-2 items-center justify-center mt-5'>
+        {/* Search */}
+        <div className={styles.search_bar_wrap}>
           <input
+            value={search}
             onChange={(e) => setSearch(e.target.value)}
             className='text-sm'
-            type='text'
             placeholder='Search...'
-            value={search}
           />
-          <IoMdSearch size={25} onClick={() => myordercretad()} />
+          <IoMdSearch size={25} onClick={loadTable} />
         </div>
+
+        {/* Refresh */}
         <div className={styles.icons_box}>
-          <IoRefresh onClick={handleSearchClear} className='' size={25} />
+          <IoRefresh size={25} onClick={handleSearchClear} />
         </div>
+
+        {/* Download */}
         <button
-          className={`${styles.bulkdown_button}`}
+          disabled={downloading}
           onClick={() =>
             fetchDownloadDataCustomerTable(
               toDateDup,
@@ -306,7 +257,7 @@ const CustomerTable = () => {
               setDownloading
             )
           }
-          disabled={downloading}
+          className={styles.bulkdown_button}
         >
           {downloading ? (
             <>
@@ -318,73 +269,84 @@ const CustomerTable = () => {
             </>
           )}
         </button>
-        <div className='[bg-[#F5F4F9]'>
-          <DatePicker
-            selected={fromDate}
-            onChange={handleFromDateChange}
-            dateFormat='yyyy-MM-dd'
-            className={` mt-1 py-[6px] px-[15px] border rounded-md`}
-            placeholderText='Select from date'
-          />
-        </div>
-        <div>
-          <DatePicker
-            selected={toDate}
-            onChange={handleToDateChange}
-            dateFormat='yyyy-MM-dd'
-            className='mt-1 py-[6px] px-[15px]  border rounded-md'
-            placeholderText='Select to date'
-          />
-        </div>
-        {storeData && storeData.length > 1 && (
+
+        {/* From date */}
+        <DatePicker
+          selected={fromDate}
+          onChange={(d) => {
+            setFromDate(d)
+            setFromDateDup(formatDate(d))
+          }}
+          dateFormat='yyyy-MM-dd'
+          className='py-[6px] px-[15px] border rounded-md'
+          placeholderText='Select from date'
+        />
+
+        {/* To date */}
+        <DatePicker
+          selected={toDate}
+          onChange={(d) => {
+            setToDate(d)
+            setToDateDup(formatDate(d))
+          }}
+          dateFormat='yyyy-MM-dd'
+          className='py-[6px] px-[15px] border rounded-md'
+          placeholderText='Select to date'
+        />
+
+        {/* Store Dropdown */}
+        {storeData.length > 1 && (
           <div className='relative w-[250px]'>
             <div
-              className={`${styless.filter_button}`}
-              onClick={() => {
-                setStoreDrop(!storeDrop)
-              }}
+              className={styless.filter_button}
+              onClick={() => setStoreDrop(!storeDrop)}
             >
               <p className='truncate'>
                 {storeName === ALL_STORES ? 'Select Store' : storeName}
               </p>
               <FaAngleDown
                 size={17}
-                className={`${storeDrop && 'rotate-180'}`}
+                className={storeDrop ? 'rotate-180' : ''}
               />
             </div>
+
             {storeDrop && (
               <div className='absolute w-full bg-white shadow-md'>
                 <input
-                  type='text'
                   value={searchTerm}
-                  onChange={handleSearch}
-                  className='w-full p-2 border-b border-gray-300'
+                  onChange={handleSearchStore}
+                  className='w-full p-2 border-b'
                   placeholder='Search store...'
                 />
+
                 <div
-                  className={`overflow-y-scroll max-h-[200px] ${styless.filter_drop}`}
+                  className={`${styless.filter_drop} max-h-[200px] overflow-y-scroll`}
                 >
                   <div
-                    className={`${styles.filter_option}`}
+                    className={styles.filter_option}
                     onClick={() => {
-                      handleStoreChange({ _id: '', storeName: ALL_STORES })
-                      setSearchTerm(ALL_STORES)
+                      setSelStoreId('')
+                      setStoreName(ALL_STORES)
+                      setSearchTerm('')
+                      setStoreDrop(false)
                     }}
                   >
-                    <p className='truncate'>{ALL_STORES}</p>
+                    {ALL_STORES}
                   </div>
-                  {filteredStores.length > 0 ? (
-                    filteredStores.map((item, index) => (
+
+                  {filteredStores.length ? (
+                    filteredStores.map((s, i) => (
                       <div
-                        key={index}
+                        key={i}
+                        className={styles.filter_option}
                         onClick={() => {
-                          handleStoreChange(item)
-                          setSearchTerm(item.storeName)
+                          setSelStoreId(s._id)
+                          setStoreName(s.storeName)
+                          setSearchTerm(s.storeName)
                           setStoreDrop(false)
                         }}
-                        className={`${styles.filter_option}`}
                       >
-                        <p className='truncate'>{item.storeName}</p>
+                        {s.storeName}
                       </div>
                     ))
                   ) : (
@@ -396,26 +358,30 @@ const CustomerTable = () => {
           </div>
         )}
       </div>
+
       <UserTable data={tableDataDup} />
-      <div className='flex justify-center mt-0 mb-4'>
+
+      {/* Pagination */}
+      <div className='flex justify-center my-4'>
         <button
-          onClick={() => setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
+          onClick={() => setCurrentPage((p) => p - 1)}
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
               ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-              : 'bg-primary text-white cursor-pointer'
+              : 'bg-primary text-white'
           }`}
         >
           Previous
         </button>
+
         <button
-          onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={currentPage >= maxPages - 1 || maxPages === 0}
+          disabled={currentPage >= maxPages - 1}
+          onClick={() => setCurrentPage((p) => p + 1)}
           className={`mx-2 px-4 py-2 rounded-lg ${
-            currentPage >= maxPages - 1 || maxPages === 0
+            currentPage >= maxPages - 1
               ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-              : 'bg-primary text-white cursor-pointer'
+              : 'bg-primary text-white'
           }`}
         >
           Next

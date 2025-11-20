@@ -38,7 +38,9 @@ const showToastOnce = (key, message, options) => {
 
 // Helper: logout handler (void function now)
 const handleLogout = (message) => {
-  if (isRedirecting) return
+  if (isRedirecting) {
+    return
+  }
 
   isRedirecting = true
 
