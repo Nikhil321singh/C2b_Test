@@ -36,11 +36,9 @@ const showToastOnce = (key, message, options) => {
   return toastId
 }
 
-// Helper: logout handler
+// Helper: logout handler (void function now)
 const handleLogout = (message) => {
-  if (isRedirecting) {
-    return null
-  }
+  if (isRedirecting) return
 
   isRedirecting = true
 
@@ -57,8 +55,6 @@ const handleLogout = (message) => {
     isRedirecting = false
     window.location.href = '/'
   }, 1500)
-
-  return null
 }
 
 // Centralized API error handler
@@ -121,11 +117,11 @@ const handleRequest = (config) => {
 // Track if global interceptors are already added
 let globalInterceptorsSetup = false
 
-// Install global axios interceptors
+// Install global axios interceptors (void function now)
 export const setupGlobalInterceptors = () => {
   if (globalInterceptorsSetup) {
     console.log('[Axios] Global interceptors already setup, skipping')
-    return null
+    return
   }
 
   console.log('[Axios] Setting up global interceptors')
@@ -138,8 +134,6 @@ export const setupGlobalInterceptors = () => {
     Promise.reject(error)
   )
   axios.interceptors.response.use((response) => response, handleResponseError)
-
-  return null
 }
 
 // Custom axios instance

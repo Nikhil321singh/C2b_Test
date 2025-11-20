@@ -124,7 +124,9 @@ const downloadExcelCustomerTable = (apiData) => {
 
 // --- Helper: format date ---
 const formatDate = (date) => {
-  if (!date) return ''
+  if (!date) {
+    return ''
+  }
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()
     .split('T')[0]
@@ -150,7 +152,9 @@ const fetchTableData = async ({
 
 // --- Helper: filter stores ---
 const filterStores = (stores, keyword) => {
-  if (!keyword) return stores
+  if (!keyword) {
+    return stores
+  }
   return stores.filter((s) =>
     s.storeName.toLowerCase().includes(keyword.toLowerCase())
   )
