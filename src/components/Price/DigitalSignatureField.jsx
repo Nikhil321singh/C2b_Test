@@ -38,10 +38,6 @@ const validateIMEI = (imeinumber) => {
   return true
 }
 
-const SignatureContainer = ({ children }) => (
-  <div className='flex flex-col w-[100vw] md:w-[40vw] mt-4'>{children}</div>
-)
-
 const DigitalSignatureField = ({
   signatureFile,
   setSignatureFile,
@@ -197,7 +193,10 @@ const DigitalSignatureField = ({
       </p>
 
       <div className='flex justify-start ml-3 inputAADHAR'>
-        <SignatureContainer>{renderContent()}</SignatureContainer>
+        {/* Inlined the previous SignatureContainer to remove duplication */}
+        <div className='flex flex-col w-[100vw] md:w-[40vw] mt-4'>
+          {renderContent()}
+        </div>
       </div>
     </div>
   )
