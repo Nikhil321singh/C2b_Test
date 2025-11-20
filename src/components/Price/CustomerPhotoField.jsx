@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react'
 import Webcam from 'react-webcam'
 import { FaCamera } from 'react-icons/fa'
 import { getStatusIcon } from '../../utils/priceUtils.jsx'
-import { FILE_KEYS, UPLOAD_STATUS } from '../../constants/priceConstants'
+import { FILE_KEYS } from '../../constants/priceConstants'
 import toast from 'react-hot-toast'
 
 const videoConstraints = {
@@ -15,13 +15,19 @@ const videoConstraints = {
  * Utility to convert base64 data URL to a File object
  */
 const dataURLtoFile = (dataurl, filename) => {
-  if (!dataurl) return null
+  if (!dataurl) {
+    return null
+  }
 
   const arr = dataurl.split(',')
-  if (arr.length < 2) return null
+  if (arr.length < 2) {
+    return null
+  }
 
   const mimeMatch = arr[0].match(/:(.*?);/)
-  if (!mimeMatch) return null
+  if (!mimeMatch) {
+    return null
+  }
 
   const mime = mimeMatch[1] //get the file type
   const bstr = atob(arr[1]) //atob() decodes base64 into a binary string,
@@ -119,6 +125,106 @@ const CustomerPhotoField = ({
 
   const sectionNumber = (prod?.[0]?.phoneBillSno || 6) + 1
 
+  // Render webcam capture interface
+  const renderWebcamCapture = () => {
+    if (!showWebcam) {
+      return null
+    }
+
+    return (
+      <div className='w-[100vw] md:w-[40vw] gap-2'>
+        <div className='p-1 border-2 border-primary rounded-lg shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
+          <Webcam
+            audio={false}
+            ref={webcamRef}
+            screenshotFormat='image/jpeg'
+            videoConstraints={videoConstraints}
+            mirrored={true}
+          />
+        </div>
+        <div className='flex gap-4 mt-2'>
+          <button
+            type='button'
+            className='px-4 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg'
+            onClick={() => setShowWebcam(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type='button'
+            className='px-4 py-2 font-bold text-white rounded-lg bg-primary'
+            onClick={capture}
+          >
+            Take Snapshot
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Render captured photo preview
+  const renderPhotoPreview = () => {
+    if (showWebcam || !customerPhoto) {
+      return null
+    }
+
+    return (
+      <div className='p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[100vw] md:w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
+        <p className='font-semibold text-center'>Customer Photo</p>
+        <div className='relative'>
+          <img
+            className='w-full h-[60px] object-contain'
+            src={URL.createObjectURL(customerPhoto)}
+            alt='Customer Photo'
+          />
+          <div className='absolute top-1 right-1'>
+            {getStatusIcon(photoStatus)}
+          </div>
+        </div>
+        <button
+          type='button'
+          className='px-2 py-0 mt-1 text-sm text-gray-700 bg-gray-200 rounded-lg'
+          onClick={clearPhoto}
+        >
+          Retake / Re-upload
+        </button>
+      </div>
+    )
+  }
+
+  // Render upload options
+  const renderUploadOptions = () => {
+    if (showWebcam || customerPhoto) {
+      return null
+    }
+
+    return (
+      <div className='p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[100vw] md:w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
+        <p className='font-semibold text-center'>Customer Photo</p>
+        <div className='flex items-center justify-center gap-4 h-[60px]'>
+          <button
+            type='button'
+            title='Capture with webcam'
+            className='flex flex-col items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100'
+            onClick={() => setShowWebcam(true)}
+          >
+            <FaCamera className='text-3xl' />
+            <span className='text-xs'>Capture</span>
+          </button>
+          <button
+            type='button'
+            title='Upload from device'
+            className='flex flex-col items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100'
+            onClick={() => handleCameraButtonClick(fileInputRef)}
+          >
+            <FaCamera className='text-3xl' />
+            <span className='text-xs'>Upload</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className='flex flex-col adharcard mt-[10px]'>
       {/* --- Title Section --- */}
@@ -145,86 +251,9 @@ const CustomerPhotoField = ({
           ref={fileInputRef}
         />
 
-        {showWebcam && (
-          <div className='w-[100vw] md:w-[40vw] gap-2'>
-            <div className='p-1 border-2 border-primary rounded-lg shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
-              <Webcam
-                audio={false}
-                ref={webcamRef}
-                screenshotFormat='image/jpeg'
-                videoConstraints={videoConstraints}
-                mirrored={true}
-              />
-            </div>
-            <div className='flex gap-4 mt-2'>
-              <button
-                type='button'
-                className='px-4 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg'
-                onClick={() => setShowWebcam(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type='button'
-                className='px-4 py-2 font-bold text-white rounded-lg bg-primary'
-                onClick={capture}
-              >
-                Take Snapshot
-              </button>
-            </div>
-          </div>
-        )}
-
-        {!showWebcam && customerPhoto && (
-          <div className='p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[100vw] md:w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
-            <p className='font-semibold text-center'>Customer Photo</p>
-            <div className='relative'>
-              <img
-                className='w-full h-[60px] object-contain'
-                src={URL.createObjectURL(customerPhoto)}
-                alt='Customer Photo'
-              />
-              <div className='absolute top-1 right-1'>
-                {getStatusIcon(photoStatus)}
-              </div>
-            </div>
-            <button
-              type='button'
-              className='px-2 py-0 mt-1 text-sm text-gray-700 bg-gray-200 rounded-lg'
-              onClick={clearPhoto}
-            >
-              Retake / Re-upload
-            </button>
-          </div>
-        )}
-
-        {/* PENDING (Show options)
-         */}
-        {!showWebcam && !customerPhoto && (
-          <div className='p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[100vw] md:w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
-            <p className='font-semibold text-center'>Customer Photo</p>
-            <div className='flex items-center justify-center gap-4 h-[60px]'>
-              <button
-                type='button'
-                title='Capture with webcam'
-                className='flex flex-col items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100'
-                onClick={() => setShowWebcam(true)}
-              >
-                <FaCamera className='text-3xl' />
-                <span className='text-xs'>Capture</span>
-              </button>
-              <button
-                type='button'
-                title='Upload from device'
-                className='flex flex-col items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100'
-                onClick={() => handleCameraButtonClick(fileInputRef)}
-              >
-                <FaCamera className='text-3xl' />
-                <span className='text-xs'>Upload</span>
-              </button>
-            </div>
-          </div>
-        )}
+        {renderWebcamCapture()}
+        {renderPhotoPreview()}
+        {renderUploadOptions()}
       </div>
     </div>
   )

@@ -2,7 +2,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 
 // Track active toasts to prevent duplicates
-let activeToasts = {
+const activeToasts = {
   401: null,
   403: null,
   429: null,
@@ -38,7 +38,9 @@ const showToastOnce = (key, message, options) => {
 
 // Helper function to handle logout
 const handleLogout = (message) => {
-  if (isRedirecting) return // Prevent duplicate redirects
+  if (isRedirecting) {
+    return // Prevent duplicate redirects
+  }
   isRedirecting = true
 
   // Clear session storage

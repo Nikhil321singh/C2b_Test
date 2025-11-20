@@ -167,7 +167,7 @@ const QuotesCreatedAdmin = () => {
   const handleSearchClear = () => {
     setSearchValue('')
     setStoreId('')
-    setStoreName('All Stores')
+    setStoreName(ALLstore)
     setToDate('')
     setToDateDup(new Date().toISOString().split('T')[0])
     setFromDate('')
