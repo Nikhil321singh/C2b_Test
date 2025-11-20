@@ -148,16 +148,6 @@ const ChangePassword = () => {
     } catch (err) {
       console.error('Password change failed:', err)
       setIsLoading(false)
-
-      // Show error message
-      const errorMsg =
-        err.response?.data?.msg ||
-        'Failed to change password. Please try again.'
-      toast.error(errorMsg, {
-        duration: 4000,
-        position: 'top-center',
-      })
-      setErrMsg(errorMsg)
     }
   }
   return (
