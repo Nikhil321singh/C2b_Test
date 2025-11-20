@@ -8,7 +8,12 @@ import {
   submitDigilockerKYC,
 } from '../../utils/digilockerSDK'
 
-const AadharNumberField = ({ aadharNumber, setAadharNumber, isVerified, setIsVerified }) => {
+const AadharNumberField = ({
+  aadharNumber,
+  setAadharNumber,
+  isVerified,
+  setIsVerified,
+}) => {
   const [error, setError] = useState(true)
   const [isVerifying, setIsVerifying] = useState(false)
   const [digioInstance, setDigioInstance] = useState(null)
@@ -62,8 +67,8 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber, isVerified, setIsVer
       const kycData = {
         customer_identifier: otpData.email,
         customer_name: otpData.name,
-        template_name: 'AADHAAR',
-        notify_customer: true,
+        template_name: import.meta.env.VITE_DIGIO_TEMPLATE_NAME,
+        notify_customer: false,
         expire_in_days: 10,
         generate_access_token: true,
         reference_id: '1234',
@@ -81,14 +86,21 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber, isVerified, setIsVer
           setIsVerifying(false)
 
           // Check for errors in the response
-          if (sdkResponse.hasOwnProperty('error_code') || sdkResponse.message === 'failed') {
-            const errorMessage = sdkResponse.message || 'Verification failed. Please try again.'
+          if (
+            sdkResponse.hasOwnProperty('error_code') ||
+            sdkResponse.message === 'failed'
+          ) {
+            const errorMessage =
+              sdkResponse.message || 'Verification failed. Please try again.'
             setError(errorMessage)
             toast.error(errorMessage)
             console.error('Error in Digilocker process:', sdkResponse)
           }
           // Check for successful verification
-          else if (sdkResponse.message === 'success' || !sdkResponse.hasOwnProperty('error_code')) {
+          else if (
+            sdkResponse.message === 'success' ||
+            !sdkResponse.hasOwnProperty('error_code')
+          ) {
             setError('')
             setIsVerified(true)
             toast.success('Aadhar verified successfully!')
@@ -123,7 +135,9 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber, isVerified, setIsVer
       submitDigilockerKYC(digio, entityId, identifier, accessToken)
     } catch (err) {
       console.error('Verification error:', err)
-      const errorMessage = err.response?.data?.message || 'Failed to initiate verification. Please try again.'
+      const errorMessage =
+        err.response?.data?.message ||
+        'Failed to initiate verification. Please try again.'
       setError(errorMessage)
       toast.error(errorMessage)
       setIsVerifying(false)
@@ -164,7 +178,9 @@ const AadharNumberField = ({ aadharNumber, setAadharNumber, isVerified, setIsVer
           {isVerified ? 'Verified' : isVerifying ? 'Verifying...' : 'Verify'}
         </button>
       </div>
-      {error && typeof error === 'string' && <p className='text-primary mt-2 text-sm'>{error}</p>}
+      {error && typeof error === 'string' && (
+        <p className='text-primary mt-2 text-sm'>{error}</p>
+      )}
     </div>
   )
 }
