@@ -56,7 +56,9 @@ const fetchDownloadDataCustomerTable = (
     .get(
       `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/prospects/findAll/ordercreated?page=0&limit=${totalCount || 9999}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
+      }/api/prospects/findAll/ordercreated?page=0&limit=${
+        totalCount || 9999
+      }&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
       { headers: { authorization: userToken } }
     )
     .then((res) => {
@@ -120,7 +122,42 @@ const downloadExcelCustomerTable = (apiData) => {
   saveAs(dataFileCustomerTable, 'Leads_Created' + fileEx)
 }
 
+// --- Helper: format date ---
+const formatDate = (date) => {
+  if (!date) return ''
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split('T')[0]
+}
+
+// --- Helper: fetch table data from API ---
+const fetchTableData = async ({
+  page,
+  limit,
+  toDate,
+  fromDate,
+  search,
+  storeId,
+}) => {
+  const userToken = sessionStorage.getItem('authToken')
+
+  const url = `${
+    import.meta.env.VITE_REACT_APP_ENDPOINT
+  }/api/prospects/findAll/ordercreated?page=${page}&limit=${limit}&todate=${toDate}&fromdate=${fromDate}&search=${search}&store=${storeId}`
+
+  return axios.get(url, { headers: { authorization: userToken } })
+}
+
+// --- Helper: filter stores ---
+const filterStores = (stores, keyword) => {
+  if (!keyword) return stores
+  return stores.filter((s) =>
+    s.storeName.toLowerCase().includes(keyword.toLowerCase())
+  )
+}
+
 const salesPageSize = 10
+
 const CustomerTable = () => {
   const [tableDataDup, setTableDataDup] = useState([])
   const [loading, setLoading] = useState(false)
@@ -147,27 +184,30 @@ const CustomerTable = () => {
   useEffect(() => {
     myordercretad()
   }, [toDate, fromDate, selStoreId, filFlag, currentPage])
-  function myordercretad() {
+  async function myordercretad() {
     setLoading(true)
-    const userToken = sessionStorage.getItem('authToken')
-    axios
-      .get(
-        `${
-          import.meta.env.VITE_REACT_APP_ENDPOINT
-        }/api/prospects/findAll/ordercreated?page=${currentPage}&limit=${salesPageSize}&todate=${toDateDup}&fromdate=${fromDateDup}&search=${search}&store=${selStoreId}`,
-        { headers: { authorization: userToken } }
-      )
-      .then((res) => {
-        setTableDataDup(res.data.data.orderData.data)
-        const total = res.data.data.orderData.count || 0
-        setTotalCount(total)
-        setMaxPages(Math.ceil(total / salesPageSize))
-        setLoading(false)
+    try {
+      const res = await fetchTableData({
+        page: currentPage,
+        limit: salesPageSize,
+        toDate: toDateDup,
+        fromDate: fromDateDup,
+        search,
+        storeId: selStoreId,
       })
-      .catch((err) => {
-        setLoading(false)
-      })
+
+      setTableDataDup(res.data.data.orderData.data)
+
+      const total = res.data.data.orderData.count || 0
+      setTotalCount(total)
+      setMaxPages(Math.ceil(total / salesPageSize))
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
   }
+
   const handleSearchClear = () => {
     setSearch('')
     setStoreName(ALL_STORES)
@@ -179,45 +219,30 @@ const CustomerTable = () => {
     setFilFlag(!filFlag)
   }
   const handleFromDateChange = (date) => {
-    if (date !== null) {
-      setFromDate(date)
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split('T')[0]
-      setFromDateDup(formattedDate)
-    } else if (date == null) {
-      setFromDate('')
-      setFromDateDup('')
-    }
+    setFromDate(date)
+    setFromDateDup(formatDate(date))
   }
+
   const handleToDateChange = (date) => {
-    if (date !== null) {
-      setToDate(date)
-      const formattedDate = new Date(
-        date.getTime() - date.getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .split('T')[0]
-      setToDateDup(formattedDate)
-    } else if (date == null) {
-      setToDate('')
-      setToDateDup('')
-    }
+    setToDate(date)
+    setToDateDup(formatDate(date))
   }
+
   const handleStoreChange = (value) => {
     setStoreDrop(false)
     setSelStoreId(value._id)
     setStoreName(value.storeName)
   }
+
   const saveStore = async () => {
     const temparr = await getStore()
     setStoreData(temparr)
   }
+
   useEffect(() => {
     saveStore()
   }, [])
+
   useEffect(() => {
     if (
       search === '' &&
@@ -228,18 +253,13 @@ const CustomerTable = () => {
       myordercretad()
     }
   }, [search, storeName, selStoreId, fromDateDup])
+
   const handleSearch = (e) => {
     const value = e.target.value
     setSearchTerm(value)
-    if (value === '') {
-      setFilteredStores(storeData)
-    } else {
-      const filtered = storeData.filter((store) =>
-        store.storeName.toLowerCase().includes(value.toLowerCase())
-      )
-      setFilteredStores(filtered)
-    }
+    setFilteredStores(filterStores(storeData, value))
   }
+
   return (
     <div>
       {loading && (
@@ -286,7 +306,7 @@ const CustomerTable = () => {
         >
           {downloading ? (
             <>
-              <BeatLoader color="white" size={8} /> Downloading...
+              <BeatLoader color='white' size={8} /> Downloading...
             </>
           ) : (
             <>
