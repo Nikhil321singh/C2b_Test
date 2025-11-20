@@ -30,6 +30,14 @@ const dataURLtoFile = (dataurl, filename) => {
   return new File([u8arr], filename, { type: mime })
 }
 
+const validateIMEI = (imeinumber) => {
+  if (!imeinumber) {
+    toast.error('Please enter the IMEI number before saving the signature.')
+    return false
+  }
+  return true
+}
+
 const SignatureContainer = ({ children }) => (
   <div className='flex flex-col w-[100vw] md:w-[40vw] mt-4'>{children}</div>
 )
@@ -67,12 +75,12 @@ const DigitalSignatureField = ({
   const handleBegin = () => setShowPlaceholder(false)
 
   const handleSaveSignature = () => {
-    if (sigPadRef.current?.isEmpty()) {
-      toast.error('Please provide a signature first.')
+    if (!validateIMEI(imeinumber)) {
       return
     }
-    if (!imeinumber) {
-      toast.error('Please enter the IMEI number before saving the signature.')
+
+    if (sigPadRef.current?.isEmpty()) {
+      toast.error('Please provide a signature first.')
       return
     }
 
@@ -83,7 +91,6 @@ const DigitalSignatureField = ({
     if (newSigFile) {
       setSignatureFile(newSigFile)
       setIsDrawing(false)
-
       uploadIndividualFile(
         newSigFile,
         fileName,
