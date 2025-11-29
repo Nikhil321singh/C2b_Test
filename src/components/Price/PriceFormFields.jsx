@@ -1,15 +1,19 @@
-import React from 'react'
-import ImeiField from './ImeiField'
-import AadharNumberField from './AadharNumberField'
-import AdharField from './AdharField'
-import PhoneBill from './PhoneBill'
-import PhonePhotos1 from './PhonePhotos1'
+import React from "react";
+import ImeiField from "./ImeiField";
+import AadharNumberField from "./AadharNumberField";
+import AdharField from "./AdharField";
+import PhoneBill from "./PhoneBill";
+import PhonePhotos1 from "./PhonePhotos1";
+import DigitalSignatureField from "./DigitalSignatureField";
+import CustomerPhotoField from "./CustomerPhotoField";
+
 
 const PriceFormFields = ({
   formState,
   uploadStatus,
   handleFileChange,
-  handleCameraButtonClick
+  handleCameraButtonClick,
+  uploadIndividualFile
 }) => {
   const {
     file,
@@ -30,11 +34,17 @@ const PriceFormFields = ({
     setPhoneLeft,
     phoneRight,
     setPhoneRight,
+    signatureFile, // new signature state
+    setSignatureFile, // <-- new signature state set function
+    customerPhoto,
+    setCustomerPhoto,
     aadharNumber,
     setAadharNumber,
     imeinumber,
     setImeiNumber,
     isBillRequired,
+    isAadharVerified,
+    setIsAadharVerified,
     prod,
     fileInputRef,
     idproofBackRef,
@@ -44,11 +54,12 @@ const PriceFormFields = ({
     phoneBottomRef,
     phoneTopRef,
     phoneLeftRef,
-    phoneRightRef
-  } = formState
+    phoneRightRef,
+    customerPhotoRef
+  } = formState;
 
   return (
-    <div className='flex flex-col'>
+    <div className="flex flex-col">
       <ImeiField
         setImeiNumber={setImeiNumber}
         imeinumber={imeinumber}
@@ -57,6 +68,8 @@ const PriceFormFields = ({
       <AadharNumberField
         setAadharNumber={setAadharNumber}
         aadharNumber={aadharNumber}
+        isVerified={isAadharVerified}
+        setIsVerified={setIsAadharVerified}
         prod={prod}
       />
       <AdharField
@@ -106,8 +119,28 @@ const PriceFormFields = ({
         prod={prod}
         uploadStatus={uploadStatus}
       />
+      {/* Added New Signature Filed */}
+      <DigitalSignatureField
+        signatureFile={signatureFile}
+        setSignatureFile={setSignatureFile}
+        uploadStatus={uploadStatus}
+        uploadIndividualFile={uploadIndividualFile}
+        imeinumber={imeinumber}
+        prod={prod}
+      />
+      {/* 7. Customer Photo Field */}
+      <CustomerPhotoField
+        customerPhoto={customerPhoto}
+        setCustomerPhoto={setCustomerPhoto}
+        uploadStatus={uploadStatus}
+        uploadIndividualFile={uploadIndividualFile}
+        imeinumber={imeinumber}
+        prod={prod}
+        fileInputRef={customerPhotoRef} // Pass the specific ref
+        handleCameraButtonClick={handleCameraButtonClick}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default PriceFormFields
+export default PriceFormFields;

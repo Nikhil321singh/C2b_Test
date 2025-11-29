@@ -19,7 +19,9 @@ export const FILE_KEYS = {
   PHONE_LEFT: 'phoneLeft',
   PHONE_RIGHT: 'phoneRight',
   PHONE_TOP: 'phoneTop',
-  PHONE_BOTTOM: 'phoneBottom'
+  PHONE_BOTTOM: 'phoneBottom',
+  SIGNATURE: 'signature', // <-- Added new signature key
+  CUSTOMER_PHOTO:'customerPhoto'
 }
 
 export const GREST_LOGO = window.location.origin === import.meta.env.VITE_BUYBACK_URL
