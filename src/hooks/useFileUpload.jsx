@@ -2,6 +2,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { FILE_KEYS, UPLOAD_STATUS } from '../constants/priceConstants'
 import { fileUploader } from '../utils/priceUtils.jsx'
+import { compressImage } from '../utils/imageCompression'
 
 export const useFileUpload = (token, imeinumber) => {
   const [uploadStatus, setUploadStatus] = useState({
@@ -17,7 +18,12 @@ export const useFileUpload = (token, imeinumber) => {
     [FILE_KEYS.SIGNATURE]: { status: UPLOAD_STATUS.PENDING, progress: 0 }, // <-- Added new signature
   })
 
-  const uploadIndividualFile = async (fileToUpload, fileName, fileType, fileKey) => {
+  const uploadIndividualFile = async (
+    fileToUpload,
+    fileName,
+    fileType,
+    fileKey
+  ) => {
     if (!fileToUpload || !imeinumber) {
       toast.error('Please enter IMEI number first')
       return
@@ -25,8 +31,8 @@ export const useFileUpload = (token, imeinumber) => {
 
     // Added check for signature
     if (!imeinumber && fileKey === FILE_KEYS.SIGNATURE) {
-      toast.error('Please enter IMEI number before saving signature');
-      return;
+      toast.error('Please enter IMEI number before saving signature')
+      return
     }
 
     // Update status to uploading
@@ -36,8 +42,22 @@ export const useFileUpload = (token, imeinumber) => {
     }))
 
     try {
+      // Compress image before upload if it's an image file
+      let fileToProcess = fileToUpload
+      if (fileToUpload.type.startsWith('image/')) {
+        const originalSize = (fileToUpload.size / (1024 * 1024)).toFixed(2)
+        fileToProcess = await compressImage(fileToUpload, {
+          maxWidth: 1920,
+          maxHeight: 1920,
+          quality: 0.8,
+          maxSizeMB: 1,
+        })
+        const compressedSize = (fileToProcess.size / (1024 * 1024)).toFixed(2)
+        console.log(`Image compressed: ${originalSize}MB → ${compressedSize}MB`)
+      }
+
       const fullFileName = `${imeinumber}-${fileName}`
-      await fileUploader(token, fileToUpload, fullFileName, fileType)
+      await fileUploader(token, fileToProcess, fullFileName, fileType)
 
       // Update status to success
       setUploadStatus((prev) => ({
@@ -72,6 +92,6 @@ export const useFileUpload = (token, imeinumber) => {
     uploadStatus,
     setUploadStatus,
     uploadIndividualFile,
-    handleFileChange
+    handleFileChange,
   }
 }
