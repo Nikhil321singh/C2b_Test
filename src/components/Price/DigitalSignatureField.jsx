@@ -56,7 +56,10 @@ const DigitalSignatureField = ({
     }
 
     const dataUrl = sigPadRef.current.getTrimmedCanvas().toDataURL('image/png')
-    const fileName = `${imeinumber}-signature`
+
+    sessionStorage.setItem('signatureBase64', dataUrl)
+
+    const fileName = `signature`
     const newSigFile = dataURLtoFile(dataUrl, `${fileName}.png`)
 
     if (newSigFile) {
@@ -116,32 +119,34 @@ const DigitalSignatureField = ({
     </>
   )
 
-  const renderSignaturePreview = () => (
-    <div className='flex items-center gap-3'>
-      {signatureFile && (
-        <img
-          src={URL.createObjectURL(signatureFile)}
-          alt='Signature Thumbnail'
-          className='h-[80px] object-contain'
-        />
-      )}
-      <div className='flex flex-col items-start gap-2'>
-        <div className='flex items-center gap-2'>
-          {getStatusIcon(sigStatus)}
-          <span className='text-sm font-medium text-green-600'>
-            Signature Saved
-          </span>
+  const renderSignaturePreview = () => {
+    return (
+      <div className='flex items-center gap-3'>
+        {signatureFile && (
+          <img
+            src={URL.createObjectURL(signatureFile)}
+            alt='Signature Thumbnail'
+            className='h-[80px] object-contain'
+          />
+        )}
+        <div className='flex flex-col items-start gap-2'>
+          <div className='flex items-center gap-2'>
+            {getStatusIcon(sigStatus)}
+            <span className='text-sm font-medium text-green-600'>
+              Signature Saved
+            </span>
+          </div>
+          <button
+            type='button'
+            className='px-4 py-1 text-sm font-bold text-gray-700 bg-gray-200 rounded-lg'
+            onClick={handleResign}
+          >
+            Re-sign
+          </button>
         </div>
-        <button
-          type='button'
-          className='px-4 py-1 text-sm font-bold text-gray-700 bg-gray-200 rounded-lg'
-          onClick={handleResign}
-        >
-          Re-sign
-        </button>
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div className='flex flex-col adharcard mt-[10px]'>

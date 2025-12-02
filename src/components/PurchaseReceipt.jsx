@@ -168,7 +168,7 @@ const IndemnityBond = ({
   </>
 )
 
-const TermsAndConditions = () => (
+const TermsAndConditions = ({ signatureUrl }) => (
   <div className='page-break'>
     <div className='terms-conditions mt-32'>
       <div className='text-center mt-2'>
@@ -207,7 +207,23 @@ const TermsAndConditions = () => (
       </div>
       <div className='w-full text-right mt-8'>
         <p className='font-bold'>SIGNATURES</p>
-        <p className='font-bold mt-16'>(SELLER)</p>
+        {signatureUrl && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: '16px',
+            }}
+          >
+            <img
+              src={signatureUrl}
+              alt='Seller Signature'
+              style={{ height: '60px', width: 'auto', objectFit: 'contain' }}
+              crossOrigin='anonymous'
+            />
+          </div>
+        )}
+        <p className='font-bold mt-4'>(SELLER)</p>
       </div>
     </div>
   </div>
@@ -229,6 +245,7 @@ const PurchaseReceipt = ({
   region,
   address,
   price,
+  signatureUrl,
 }) => {
   const WEBSITE_SHORT_NAME =
     currentDomain === import.meta.env.VITE_BUYBACK_URL
@@ -274,7 +291,7 @@ const PurchaseReceipt = ({
         formattedDate={formattedDate}
         WEBSITE_SHORT_NAME={WEBSITE_SHORT_NAME}
       />
-      <TermsAndConditions />
+      <TermsAndConditions signatureUrl={signatureUrl} />
     </div>
   )
 }

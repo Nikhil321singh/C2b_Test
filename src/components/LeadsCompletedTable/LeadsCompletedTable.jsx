@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { FaFilePdf } from 'react-icons/fa'
 import ReactDOMServer from 'react-dom/server'
 import html2pdf from 'html2pdf.js'
+import axios from 'axios'
 import CustomerImageDetails from '../CustomerImageDetails'
 import CustomerFormDetails from '../CustomerFormDetails'
 import PurchaseReceipt from '../PurchaseReceipt'
@@ -27,7 +28,7 @@ const LeadsCompletedTable = ({ data }) => {
     setShowImageModal(false)
   }
 
-  function hanldlejsx_pdf(index) {
+  async function hanldlejsx_pdf(index) {
     console.log('store is', data[index]?.store?.storeName)
     const dateString = data[index]?.updatedAt
     const formattedDate = new Date(dateString).toLocaleDateString('en-IN', {
@@ -35,6 +36,28 @@ const LeadsCompletedTable = ({ data }) => {
       month: 'short',
       year: 'numeric',
     })
+
+    const signatureUrl = data[index]?.documentId?.signature
+    let signatureBase64 = null
+
+    // Fetch signature as base64 from backend proxy
+    if (signatureUrl) {
+      try {
+        const token = sessionStorage.getItem('authToken')
+        const response = await axios.get(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/proxy-image`,
+          {
+            params: { url: signatureUrl },
+            headers: { Authorization: token },
+          }
+        )
+        signatureBase64 = response.data.base64
+        console.log('Signature fetched as base64 successfully')
+      } catch (error) {
+        console.error('Error fetching signature as base64:', error)
+      }
+    }
+
     const printElement = ReactDOMServer.renderToString(
       <PurchaseReceipt
         phoneNumber={data[index]?.phoneNumber}
@@ -52,8 +75,10 @@ const LeadsCompletedTable = ({ data }) => {
         storage={data[index]?.storage}
         RAM={data[index]?.ram}
         formattedDate={formattedDate}
+        signatureUrl={signatureBase64 || signatureUrl}
       />
     )
+
     html2pdf()
       .set({
         margin: 10,
@@ -61,7 +86,7 @@ const LeadsCompletedTable = ({ data }) => {
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, logging: false },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] }, // Ensure page breaks work
+        pagebreak: { mode: ['css', 'legacy'] },
       })
       .from(printElement)
       .save()
