@@ -167,7 +167,7 @@ const LeadsCompletedTable = ({ data }) => {
     setShowImageModal(false)
   }
 
-  const hanldlejsx_pdf = async (index) => {
+  const handleGeneratePdf = async (index) => {
     console.log('store is', data[index]?.store?.storeName)
     const dateString = data[index]?.updatedAt
     const formattedDate = new Date(dateString).toLocaleDateString('en-IN', {
@@ -217,7 +217,7 @@ const LeadsCompletedTable = ({ data }) => {
               index={index}
               onDetailsClick={handleDetailsClick}
               onImageClick={handleImageModal}
-              onPDFClick={hanldlejsx_pdf}
+              onPDFClick={handleGeneratePdf}
             />
           ))}
         </tbody>
