@@ -1,15 +1,35 @@
-/**
- * Compresses an image file before upload
- * @param {File} file - The image file to compress
- * @param {Object} options - Compression options
- * @returns {Promise<File>} - Compressed image file
- */
+const processBlobResult = (blob, file, options, resolve, reject) => {
+  if (!blob) {
+    reject(new Error('Canvas to Blob conversion failed'))
+    return
+  }
+
+  const compressedSizeMB = blob.size / (1024 * 1024)
+
+  // If still too large, reduce quality further
+  if (compressedSizeMB > options.maxSizeMB && options.quality > 0.5) {
+    const newQuality = options.quality - 0.1
+    compressImage(file, { ...options, quality: newQuality })
+      .then(resolve)
+      .catch(reject)
+    return
+  }
+
+  // Create new file from blob
+  const compressedFile = new File([blob], file.name, {
+    type: file.type,
+    lastModified: Date.now(),
+  })
+
+  resolve(compressedFile)
+}
+
 export const compressImage = async (file, options = {}) => {
   const {
     maxWidth = 1920,
     maxHeight = 1920,
     quality = 0.8,
-    maxSizeMB = 1
+    maxSizeMB = 1,
   } = options
 
   // If file is not an image, return as is
@@ -42,32 +62,14 @@ export const compressImage = async (file, options = {}) => {
 
         // Convert canvas to blob
         canvas.toBlob(
-          (blob) => {
-            if (!blob) {
-              reject(new Error('Canvas to Blob conversion failed'))
-              return
-            }
-
-            // Check if compressed size is acceptable
-            const compressedSizeMB = blob.size / (1024 * 1024)
-
-            // If still too large, reduce quality further
-            if (compressedSizeMB > maxSizeMB && quality > 0.5) {
-              const newQuality = quality - 0.1
-              compressImage(file, { ...options, quality: newQuality })
-                .then(resolve)
-                .catch(reject)
-              return
-            }
-
-            // Create new file from blob
-            const compressedFile = new File([blob], file.name, {
-              type: file.type,
-              lastModified: Date.now()
-            })
-
-            resolve(compressedFile)
-          },
+          (blob) =>
+            processBlobResult(
+              blob,
+              file,
+              { maxWidth, maxHeight, quality, maxSizeMB },
+              resolve,
+              reject
+            ),
           file.type,
           quality
         )
