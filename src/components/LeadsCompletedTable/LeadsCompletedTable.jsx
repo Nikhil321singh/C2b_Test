@@ -7,6 +7,145 @@ import CustomerImageDetails from '../CustomerImageDetails'
 import CustomerFormDetails from '../CustomerFormDetails'
 import PurchaseReceipt from '../PurchaseReceipt'
 
+const getUserName = (val) => {
+  if (val?.userId?.firstName) {
+    return `${val?.userId?.firstName} ${
+      val.userId.lastName ? val?.userId?.lastName : ''
+    }`
+  } else {
+    return val?.userId?.name
+  }
+}
+
+const getStorage = (val) => {
+  if (val?.modelId?.type === 'CTG1') {
+    return `${
+      val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
+    }`
+  } else {
+    return '-'
+  }
+}
+
+const fetchSignatureAsBase64 = async (signatureUrl) => {
+  try {
+    const token = sessionStorage.getItem('authToken')
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/proxy-image`,
+      {
+        params: { url: signatureUrl },
+        headers: { Authorization: token },
+      }
+    )
+    console.log('Signature fetched as base64 successfully')
+    return response.data.base64
+  } catch (error) {
+    console.error('Error fetching signature as base64:', error)
+    return null
+  }
+}
+
+const generatePDF = (printElement) => {
+  html2pdf()
+    .set({
+      margin: 10,
+      filename: 'purchase_receipt.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] },
+    })
+    .from(printElement)
+    .save()
+}
+
+const TableHeader = () => (
+  <thead className='bg-primary text-white'>
+    <tr className='align-top'>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Date</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Username</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Category</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Product Name</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Variant</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Price</th>
+      <th className='p-2 text-sm md:p-3 md:text-base min-w-[160px]'>
+        Final Price Offered to Customer
+      </th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>IMEI No.</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Unique Id</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Customer Name</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Customer Mobile</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Customer Email</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>More Details</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Images</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Reciept</th>
+    </tr>
+  </thead>
+)
+
+const TableRow = ({ val, index, onDetailsClick, onImageClick, onPDFClick }) => (
+  <tr className={index % 2 === 0 ? 'bg-gray-200' : ''}>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {new Date(val?.createdAt).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {getUserName(val)}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {val?.categoryInfo?.categoryName}
+    </td>
+    <td className='p-2 min-w-[200px] text-sm text-center md:p-3 md:text-base'>
+      {val?.modelId?.name}
+    </td>
+    <td className='p-2 min-w-[150px] text-sm text-center md:p-3 md:text-base'>
+      {getStorage(val)}
+    </td>
+    <td className='p-2 min-w-[150px] text-sm text-center md:p-3 md:text-base'>
+      {val?.actualPrice}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {val?.price}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {val?.documentId?.IMEI}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {val?.uniqueCode}
+    </td>
+    <td className='p-2 text-sm min-w-[150px] text-center md:p-3 md:text-base'>
+      {val?.name}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base min-w-[160px]'>
+      {val?.phoneNumber}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {val?.emailId}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <p onClick={() => onDetailsClick(val)} className='cursor-pointer '>
+        Details
+      </p>
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <p onClick={() => onImageClick(index)} className='cursor-pointer'>
+        Click to open
+      </p>
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <FaFilePdf
+        size={32}
+        color='red'
+        onClick={() => onPDFClick(index)}
+        className='cursor-pointer'
+      />
+    </td>
+  </tr>
+)
+
 const LeadsCompletedTable = ({ data }) => {
   const [showModal, setShowModal] = useState(false)
   const [showImageModal, setShowImageModal] = useState(false)
@@ -28,7 +167,7 @@ const LeadsCompletedTable = ({ data }) => {
     setShowImageModal(false)
   }
 
-  async function hanldlejsx_pdf(index) {
+  const hanldlejsx_pdf = async (index) => {
     console.log('store is', data[index]?.store?.storeName)
     const dateString = data[index]?.updatedAt
     const formattedDate = new Date(dateString).toLocaleDateString('en-IN', {
@@ -38,25 +177,9 @@ const LeadsCompletedTable = ({ data }) => {
     })
 
     const signatureUrl = data[index]?.documentId?.signature
-    let signatureBase64 = null
-
-    // Fetch signature as base64 from backend proxy
-    if (signatureUrl) {
-      try {
-        const token = sessionStorage.getItem('authToken')
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/proxy-image`,
-          {
-            params: { url: signatureUrl },
-            headers: { Authorization: token },
-          }
-        )
-        signatureBase64 = response.data.base64
-        console.log('Signature fetched as base64 successfully')
-      } catch (error) {
-        console.error('Error fetching signature as base64:', error)
-      }
-    }
+    const signatureBase64 = signatureUrl
+      ? await fetchSignatureAsBase64(signatureUrl)
+      : null
 
     const printElement = ReactDOMServer.renderToString(
       <PurchaseReceipt
@@ -79,130 +202,23 @@ const LeadsCompletedTable = ({ data }) => {
       />
     )
 
-    html2pdf()
-      .set({
-        margin: 10,
-        filename: 'purchase_receipt.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] },
-      })
-      .from(printElement)
-      .save()
+    generatePDF(printElement)
   }
 
-  const getUserName = (val) => {
-    if (val?.userId?.firstName) {
-      return `${val?.userId?.firstName} ${
-        val.userId.lastName ? val?.userId?.lastName : ''
-      }`
-    } else {
-      return val?.userId?.name
-    }
-  }
-
-  const getStorage = (val) => {
-    if (val?.modelId?.type === 'CTG1') {
-      return `${
-        val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
-      }`
-    } else {
-      return '-'
-    }
-  }
   return (
     <div className='m-2 overflow-x-auto md:m-5'>
       <table className='w-full border border-primary'>
-        <thead className='bg-primary text-white'>
-          <tr className='align-top'>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Date</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Username</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Category</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Product Name</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Variant</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Price</th>
-            <th className='p-2 text-sm md:p-3 md:text-base min-w-[160px]'>
-              Final Price Offered to Customer
-            </th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>IMEI No.</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Unique Id</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Customer Name</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Customer Mobile</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Customer Email</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>More Details</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Images</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Reciept</th>
-          </tr>
-        </thead>
+        <TableHeader />
         <tbody>
           {data.map((val, index) => (
-            <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                {new Date(val?.createdAt).toLocaleDateString('en-IN', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })}
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                {getUserName(val)}
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                {val?.categoryInfo?.categoryName}
-              </td>
-              <td className='p-2 min-w-[200px] text-sm text-center md:p-3 md:text-base'>
-                {val?.modelId?.name}
-              </td>
-              <td className='p-2 min-w-[150px] text-sm text-center md:p-3 md:text-base'>
-                {getStorage(val)}
-              </td>
-              <td className='p-2 min-w-[150px] text-sm text-center md:p-3 md:text-base'>
-                {val?.actualPrice}
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                {val?.price}
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                {val?.documentId?.IMEI}
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                {val?.uniqueCode}
-              </td>
-              <td className='p-2 text-sm min-w-[150px] text-center md:p-3 md:text-base'>
-                {val?.name}
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base min-w-[160px]'>
-                {val?.phoneNumber}
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                {val?.emailId}
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                <p
-                  onClick={() => handleDetailsClick(val)}
-                  className='cursor-pointer '
-                >
-                  Details
-                </p>
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                <p
-                  onClick={() => handleImageModal(index)}
-                  className='cursor-pointer'
-                >
-                  Click to open
-                </p>
-              </td>
-              <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                <FaFilePdf
-                  size={32}
-                  color='red'
-                  onClick={() => hanldlejsx_pdf(index)}
-                  className='cursor-pointer'
-                />
-              </td>
-            </tr>
+            <TableRow
+              key={index}
+              val={val}
+              index={index}
+              onDetailsClick={handleDetailsClick}
+              onImageClick={handleImageModal}
+              onPDFClick={hanldlejsx_pdf}
+            />
           ))}
         </tbody>
       </table>
