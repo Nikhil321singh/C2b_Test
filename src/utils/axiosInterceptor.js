@@ -61,6 +61,11 @@ const handleLogout = (message) => {
 
 // Centralized API error handler
 const handleResponseError = (error) => {
+  // Check if this request should skip interceptor toast
+  if (error.config?.headers?.['X-Skip-Interceptor'] === 'true') {
+    return Promise.reject(error)
+  }
+
   if (error.response) {
     const { status, data } = error.response
 
