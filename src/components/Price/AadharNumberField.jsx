@@ -176,7 +176,7 @@ const AadharNumberField = ({
       <div className='flex items-center gap-4 mt-2 ml-[19px]'>
         <input
           type='text'
-          className='w-auto p-2 border-2 border-gray-300 rounded'
+          className='w-auto p-2 border-2 border-gray-300 rounded outline-none'
           value={aadharNumber}
           placeholder='Aadhar no.'
           onChange={handleChange}

@@ -48,7 +48,7 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod }) => {
           <div className='flex items-center p-2 border-2 border-gray-300 rounded'>
             <input
               type='text'
-              className='w-auto'
+              className='w-auto outline-none'
               value={imeinumber}
               placeholder='IMEI no./Serial no.'
               onChange={handleChange}
