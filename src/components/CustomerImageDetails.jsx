@@ -84,6 +84,16 @@ const CustomerImageDetails = ({ imageData, closeModal }) => {
               addToZip={addToZip}
             />
             <ImageContainer
+              title='CEIR Photo'
+              imgSrc={
+                imageData?.documentId?.ceir
+                  ? `${imageData.documentId.ceir}?t=${Date.now()}`
+                  : imageData?.documentId?.ceir
+              }
+              altText='Customer Photo'
+              addToZip={addToZip}
+            />
+            <ImageContainer
               title='Phone Front Side'
               imgSrc={front}
               altText='Phone Front'

@@ -89,7 +89,7 @@ const PhonePhotos1 = ({
   return (
     <div className='flex flex-col adharcard mt-[10px] '>
       <div className='flex gap-1 two'>
-        <p className='text-base font-medium'>5.</p>
+        <p className='text-base font-medium'>6.</p>
         <div className='flex items-center'>
           <p className='text-base font-medium three'>
             {`Upload Your ${prod[0]?.categoryName}'s Images`}{' '}

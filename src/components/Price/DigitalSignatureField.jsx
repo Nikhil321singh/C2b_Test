@@ -27,16 +27,29 @@ const DigitalSignatureField = ({
   const sigPadRef = useRef(null)
   const containerRef = useRef(null)
   const sigStatus = uploadStatus[FILE_KEYS.SIGNATURE]?.status
-  const sectionNumber = (prod?.[0]?.phoneBillSno || 5) + 1
+  const sectionNumber = (prod?.[0]?.phoneBillSno || 6) + 1
 
   useEffect(() => {
     if (isDrawing && sigPadRef.current && containerRef.current) {
-      const container = containerRef.current
-      const canvas = sigPadRef.current.getCanvas()
-      canvas.width = container.offsetWidth
-      canvas.height = container.offsetHeight
+      // Delay canvas initialization to ensure proper dimensions
+      const initCanvas = () => {
+        const container = containerRef.current
+        const canvas = sigPadRef.current?.getCanvas()
+        if (container && canvas) {
+          canvas.width = container.offsetWidth
+          canvas.height = container.offsetHeight
+          // Force canvas re-render
+          sigPadRef.current.clear()
+        }
+      }
+
+      // Initialize immediately and after a short delay
+      initCanvas()
+      const timeoutId = setTimeout(initCanvas, 100)
+
+      return () => clearTimeout(timeoutId)
     }
-  }, [isDrawing])
+  }, [isDrawing, imeinumber])
 
   const handleClear = () => {
     sigPadRef.current?.clear()
@@ -86,6 +99,7 @@ const DigitalSignatureField = ({
         <div
           ref={containerRef}
           className='bg-gray-100 w-full h-full relative flex items-center justify-center'
+          style={{ touchAction: 'none' }}
         >
           {showPlaceholder && (
             <p className='absolute text-gray-400 text-lg pointer-events-none select-none'>
@@ -96,7 +110,10 @@ const DigitalSignatureField = ({
             ref={sigPadRef}
             penColor='black'
             onBegin={handleBegin}
-            canvasProps={{ className: 'absolute top-0 left-0' }}
+            canvasProps={{
+              className: 'absolute top-0 left-0 w-full h-full',
+              style: { touchAction: 'none' },
+            }}
           />
         </div>
       </div>

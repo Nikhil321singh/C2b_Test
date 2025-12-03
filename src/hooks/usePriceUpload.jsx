@@ -17,6 +17,7 @@ export const usePriceUpload = (formState) => {
     phoneTop,
     phoneBottom,
     signatureFile,  // new signature state
+    ceirImage,  // new CEIR image state
     aadharNumber,
     imeinumber,
     isBillRequired,
@@ -46,6 +47,7 @@ export const usePriceUpload = (formState) => {
       phoneBill,
       isBillRequired,
       signatureFile, // add signature state to validation
+      ceirImage, // add CEIR image state to validation
     }
 
     if (!validateFormData(formData)) {
@@ -56,6 +58,7 @@ export const usePriceUpload = (formState) => {
     // Get required files and check upload status
     const requiredFiles = getRequiredFiles(isBillRequired)
     requiredFiles.push(FILE_KEYS.SIGNATURE); // Add signature to required files
+    requiredFiles.push(FILE_KEYS.CEIR); // Add CEIR to required files
 
     const failedUploads = getFailedUploads(requiredFiles, uploadStatus)
 
@@ -71,7 +74,8 @@ export const usePriceUpload = (formState) => {
         phoneRight,
         phoneTop,
         phoneBottom,
-        signatureFile // add signature state for retry
+        signatureFile, // add signature state for retry
+        ceirImage // add CEIR image state for retry
       }
 
       const stillHasFailures = await retryFailedUploads(

@@ -13,6 +13,7 @@ export const usePriceForm = () => {
   const [phoneBottom, setPhoneBottom] = useState(null)
   const [signatureFile, setSignatureFile] = useState(null) // Added new signature file state
   const [customerPhoto, setCustomerPhoto] = useState(null) // Added new customer photo
+  const [ceirImage, setCeirImage] = useState(null) // Added new CEIR image state
   const [aadharNumber, setAadharNumber] = useState('')
   const [isAadharVerified, setIsAadharVerified] = useState(false) // Aadhar verification status
   const [imeinumber, setImeiNumber] = useState('')
@@ -30,6 +31,7 @@ export const usePriceForm = () => {
   const phoneTopRef = useRef(null)
   const phoneBottomRef = useRef(null)
   const customerPhotoRef = useRef(null)
+  const ceirImageRef = useRef(null)
 
   // Get session data
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem('responsedatadata'))
@@ -78,6 +80,8 @@ export const usePriceForm = () => {
     setSignatureFile, //Added new signature state function
     customerPhoto, //Added new customerPhoto
     setCustomerPhoto, //Added new customerPhoto state
+    ceirImage, //Added new CEIR image
+    setCeirImage, //Added new CEIR image state
     aadharNumber,
     setAadharNumber,
     isAadharVerified, //Added Aadhar verification status
@@ -99,6 +103,7 @@ export const usePriceForm = () => {
     phoneTopRef,
     phoneBottomRef,
     customerPhotoRef,
+    ceirImageRef,
 
     // Session data
     leadsubmitDATA,

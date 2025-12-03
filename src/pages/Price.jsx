@@ -35,6 +35,7 @@ const Price = () => {
     phoneBottom,
     signatureFile, //add signature file
     customerPhoto, //add customer photo state
+    ceirImage, //add CEIR image state
     isAadharVerified,
     handleCameraButtonClick,
   } = formState
@@ -80,6 +81,7 @@ const Price = () => {
             !phoneBottom ||
             !signatureFile || //check signature
             !customerPhoto || // check customer photo
+            !ceirImage || // check CEIR image
             !isAadharVerified // check aadhar verification
               ? 'cursor-not-allowed bg-gray-400'
               : pink

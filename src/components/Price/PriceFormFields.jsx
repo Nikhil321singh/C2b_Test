@@ -1,19 +1,19 @@
-import React from "react";
-import ImeiField from "./ImeiField";
-import AadharNumberField from "./AadharNumberField";
-import AdharField from "./AdharField";
-import PhoneBill from "./PhoneBill";
-import PhonePhotos1 from "./PhonePhotos1";
-import DigitalSignatureField from "./DigitalSignatureField";
-import CustomerPhotoField from "./CustomerPhotoField";
-
+import React from 'react'
+import ImeiField from './ImeiField'
+import AadharNumberField from './AadharNumberField'
+import AdharField from './AdharField'
+import PhoneBill from './PhoneBill'
+import CeirField from './CeirField'
+import PhonePhotos1 from './PhonePhotos1'
+import DigitalSignatureField from './DigitalSignatureField'
+import CustomerPhotoField from './CustomerPhotoField'
 
 const PriceFormFields = ({
   formState,
   uploadStatus,
   handleFileChange,
   handleCameraButtonClick,
-  uploadIndividualFile
+  uploadIndividualFile,
 }) => {
   const {
     file,
@@ -38,6 +38,8 @@ const PriceFormFields = ({
     setSignatureFile, // <-- new signature state set function
     customerPhoto,
     setCustomerPhoto,
+    ceirImage, // new CEIR image state
+    setCeirImage, // <-- new CEIR image state set function
     aadharNumber,
     setAadharNumber,
     imeinumber,
@@ -55,11 +57,12 @@ const PriceFormFields = ({
     phoneTopRef,
     phoneLeftRef,
     phoneRightRef,
-    customerPhotoRef
-  } = formState;
+    customerPhotoRef,
+    ceirImageRef,
+  } = formState
 
   return (
-    <div className="flex flex-col">
+    <div className='flex flex-col'>
       <ImeiField
         setImeiNumber={setImeiNumber}
         imeinumber={imeinumber}
@@ -84,17 +87,27 @@ const PriceFormFields = ({
         prod={prod}
         uploadStatus={uploadStatus}
       />
-      <PhoneBill
-        handleChange={handleFileChange}
-        setPhoneBill={setPhoneBill}
-        phoneBackRef={phoneBackRef}
-        handleCameraButtonClick={handleCameraButtonClick}
-        phoneBillRef={phoneBillRef}
-        phoneBill={phoneBill}
-        isBillRequired={isBillRequired}
-        prod={prod}
-        uploadStatus={uploadStatus}
-      />
+      <div className='grid grid-cols-2 gap-3'>
+        <PhoneBill
+          handleChange={handleFileChange}
+          setPhoneBill={setPhoneBill}
+          phoneBackRef={phoneBackRef}
+          handleCameraButtonClick={handleCameraButtonClick}
+          phoneBillRef={phoneBillRef}
+          phoneBill={phoneBill}
+          isBillRequired={isBillRequired}
+          prod={prod}
+          uploadStatus={uploadStatus}
+        />
+        <CeirField
+          handleChange={handleFileChange}
+          setCeirImage={setCeirImage}
+          handleCameraButtonClick={handleCameraButtonClick}
+          ceirImageRef={ceirImageRef}
+          ceirImage={ceirImage}
+          uploadStatus={uploadStatus}
+        />
+      </div>
       <PhonePhotos1
         handleCameraButtonClick={handleCameraButtonClick}
         handleChange={handleFileChange}
@@ -140,7 +153,7 @@ const PriceFormFields = ({
         handleCameraButtonClick={handleCameraButtonClick}
       />
     </div>
-  );
-};
+  )
+}
 
-export default PriceFormFields;
+export default PriceFormFields

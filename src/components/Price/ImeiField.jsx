@@ -4,7 +4,7 @@ import { IMEI_LENGTH } from '../../constants/priceConstants'
 import Scanner from '../Scanner'
 
 const ImeiField = ({ imeinumber, setImeiNumber, prod }) => {
-  const [error, setError] = useState(true)
+  const [error, setError] = useState('')
   const [isScanOpen, setIsScanOpen] = useState(false)
   const pink = 'bg-primary'
 
@@ -24,6 +24,11 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod }) => {
     const value = e.target.value
     setImeiNumber(value)
     validateImeiNumber(value)
+
+    // Auto-blur on mobile when IMEI is complete (15 digits)
+    if (value.length === IMEI_LENGTH && /^\d{15}$/.test(value)) {
+      e.target.blur()
+    }
   }
 
   const handleVerify = () => {

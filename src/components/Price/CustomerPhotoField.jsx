@@ -55,12 +55,7 @@ const isValidImageFile = (file) => {
   return { ok: true }
 }
 
-// compute section number consistently
-const getSectionNumber = (prod) => (prod?.[0]?.phoneBillSno || 6) + 1
-
-/* =========================
-   SMALL UI COMPONENTS
-   ========================= */
+const getSectionNumber = (prod) => (prod?.[0]?.phoneBillSno || 7) + 1
 
 const PhotoContainer = ({ title = 'Customer Photo', children }) => (
   <div className={PHOTO_CONTAINER_CLASSES}>
