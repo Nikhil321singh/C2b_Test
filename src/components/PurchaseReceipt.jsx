@@ -144,6 +144,7 @@ const IndemnityBond = ({
   storeName,
   formattedDate,
   WEBSITE_SHORT_NAME,
+  signatureUrl,
 }) => (
   <>
     <div className='flex flex-col items-center'>
@@ -163,7 +164,26 @@ const IndemnityBond = ({
       <p className='mt-4'>
         <span> Scheme Title: Buyback</span>
       </p>
-      <p className='font-bold mt-16 mb-2'>Seller Name and Sign</p>
+      <div className='w-full text-right mt-8'>
+        <p className='font-bold'>SIGNATURES</p>
+        {signatureUrl && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: '16px',
+            }}
+          >
+            <img
+              src={signatureUrl}
+              alt='Seller Signature'
+              style={{ height: '60px', width: 'auto', objectFit: 'contain' }}
+              crossOrigin='anonymous'
+            />
+          </div>
+        )}
+        <p className='font-bold mt-4'>Seller Name and Sign</p>
+      </div>
     </div>
   </>
 )
@@ -290,6 +310,7 @@ const PurchaseReceipt = ({
         storeName={storeName}
         formattedDate={formattedDate}
         WEBSITE_SHORT_NAME={WEBSITE_SHORT_NAME}
+        signatureUrl={signatureUrl}
       />
       <TermsAndConditions signatureUrl={signatureUrl} />
     </div>

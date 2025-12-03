@@ -16,6 +16,7 @@ import { Capacitor } from '@capacitor/core'
 import { Share } from '@capacitor/share'
 import { Filesystem, Directory } from '@capacitor/filesystem'
 import { FileOpener } from '@awesome-cordova-plugins/file-opener'
+import { fetchSignatureAsBase64 } from '../../utils/fetchSignatureAsBase64'
 
 const purchaseReceiptTitle = 'Purchase Receipt'
 const herePurchaseReceipt = 'Here is your purchase receipt'
@@ -76,9 +77,9 @@ async function hanldlejsx_pdf(item) {
   window._isSharing = true
 
   try {
-    const printElement = buildPrintElement(item)
-    const pdf = html2pdf().set(getPdfOptions()).from(printElement)
-    const blob = await pdf.outputPdf('blob')
+    const printElement = await buildPrintElement(item)
+    const pdf = html2pdf().set(getPdfOptions()).from(printElement).toPdf()
+    const blob = await pdf.output('blob')
     const fileName = `purchase_receipt_${Date.now()}.pdf`
 
     // Check if running in Capacitor (native app) or browser
@@ -108,12 +109,16 @@ async function hanldlejsx_pdf(item) {
   }
 }
 
-function buildPrintElement(item) {
+async function buildPrintElement(item) {
   const formattedDate = new Date(item.updatedAt).toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
+  const signatureUrl = item?.doc?.signature
+  const signatureBase64 = signatureUrl
+    ? await fetchSignatureAsBase64(signatureUrl)
+    : null
 
   return ReactDOMServer.renderToString(
     <PurchaseReceipt
@@ -132,6 +137,7 @@ function buildPrintElement(item) {
       RAM={item.model.config?.RAM}
       formattedDate={formattedDate}
       price={item.price}
+      signatureUrl={signatureBase64 || signatureUrl}
     />
   )
 }

@@ -15,6 +15,7 @@ import { IoRefresh } from 'react-icons/io5'
 import ReactDOMServer from 'react-dom/server'
 import html2pdf from 'html2pdf.js'
 import PurchaseReceipt from '../../components/PurchaseReceipt'
+import { fetchSignatureAsBase64 } from '../../utils/fetchSignatureAsBase64'
 const pageLimit = 10
 const ALLstore = 'All Stores'
 const iniDate = '2023-01-01'
@@ -496,13 +497,20 @@ const SubLeadsCompletedBtns = ({
       alert('Please select and search valid date range Leads.')
       return
     }
-    tableData.forEach((item, index) => {
+    tableData.forEach(async (item, index) => {
+      console.log(item)
+
       const dateString = item?.updatedAt
       const formattedDate = new Date(dateString).toLocaleDateString('en-IN', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
       })
+      const signatureUrl = item?.documentId?.signature
+      const signatureBase64 = signatureUrl
+        ? await fetchSignatureAsBase64(signatureUrl)
+        : null
+
       const printElement = ReactDOMServer.renderToString(
         <PurchaseReceipt
           phoneNumber={item?.phoneNumber}
@@ -520,6 +528,7 @@ const SubLeadsCompletedBtns = ({
           RAM={item?.ram}
           formattedDate={formattedDate}
           price={item?.price}
+          signatureUrl={signatureBase64 || signatureUrl}
         />
       )
       html2pdf()
