@@ -31,7 +31,7 @@ const DigitalSignatureField = ({
 
   useEffect(() => {
     if (!isDrawing || !sigPadRef.current || !containerRef.current) {
-      return () => {} // <-- Sonar wants consistent return type
+      return () => {}
     }
 
     const initCanvas = () => {
