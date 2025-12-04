@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 
 const InputNumber = () => {
   const otpVerification = useSelector((state) => state.otpVerification)
-  return <Price />
+  return otpVerification.otpVerified ? <Price /> : <OTPpage />
 }
 
 export default InputNumber
