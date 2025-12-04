@@ -30,25 +30,27 @@ const DigitalSignatureField = ({
   const sectionNumber = (prod?.[0]?.phoneBillSno || 6) + 1
 
   useEffect(() => {
-    if (isDrawing && sigPadRef.current && containerRef.current) {
-      // Delay canvas initialization to ensure proper dimensions
-      const initCanvas = () => {
-        const container = containerRef.current
-        const canvas = sigPadRef.current?.getCanvas()
-        if (container && canvas) {
-          canvas.width = container.offsetWidth
-          canvas.height = container.offsetHeight
-          // Force canvas re-render
-          sigPadRef.current.clear()
-        }
-      }
-
-      // Initialize immediately and after a short delay
-      initCanvas()
-      const timeoutId = setTimeout(initCanvas, 100)
-
-      return () => clearTimeout(timeoutId)
+    if (!isDrawing || !sigPadRef.current || !containerRef.current) {
+      return
     }
+
+    // Delay canvas initialization to ensure proper dimensions
+    const initCanvas = () => {
+      const container = containerRef.current
+      const canvas = sigPadRef.current?.getCanvas()
+      if (container && canvas) {
+        canvas.width = container.offsetWidth
+        canvas.height = container.offsetHeight
+        // Force canvas re-render
+        sigPadRef.current.clear()
+      }
+    }
+
+    // Initialize immediately and after a short delay
+    initCanvas()
+    const timeoutId = setTimeout(initCanvas, 100)
+
+    return () => clearTimeout(timeoutId)
   }, [isDrawing, imeinumber])
 
   const handleClear = () => {

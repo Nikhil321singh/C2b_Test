@@ -156,9 +156,7 @@ const LeadsCompleted = () => {
         }
       )
       setCategories(data.data)
-    } catch (err) {
-      console.log(err)
-    }
+    } catch (err) {}
   }
   function getSalesData() {
     setLoading(true)
