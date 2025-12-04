@@ -31,22 +31,20 @@ const DigitalSignatureField = ({
 
   useEffect(() => {
     if (!isDrawing || !sigPadRef.current || !containerRef.current) {
-      return undefined
+      return () => {} // <-- Sonar wants consistent return type
     }
 
-    // Delay canvas initialization to ensure proper dimensions
     const initCanvas = () => {
       const container = containerRef.current
       const canvas = sigPadRef.current?.getCanvas()
+
       if (container && canvas) {
         canvas.width = container.offsetWidth
         canvas.height = container.offsetHeight
-        // Force canvas re-render
         sigPadRef.current.clear()
       }
     }
 
-    // Initialize immediately and after a short delay
     initCanvas()
     const timeoutId = setTimeout(initCanvas, 100)
 
