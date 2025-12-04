@@ -144,6 +144,7 @@ const IndemnityBond = ({
   storeName,
   formattedDate,
   WEBSITE_SHORT_NAME,
+  signatureUrl,
 }) => (
   <>
     <div className='flex flex-col items-center'>
@@ -163,12 +164,32 @@ const IndemnityBond = ({
       <p className='mt-4'>
         <span> Scheme Title: Buyback</span>
       </p>
-      <p className='font-bold mt-16 mb-2'>Seller Name and Sign</p>
+      <div className='w-full text-right mt-4'>
+        <p className='font-bold'>SIGNATURES</p>
+        {signatureUrl && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: '10px',
+            }}
+          >
+            <img
+              src={signatureUrl}
+              alt='Seller Signature'
+              style={{ height: '60px', width: 'auto', objectFit: 'contain' }}
+              crossOrigin='anonymous'
+            />
+          </div>
+        )}
+        <p className='mt-2'>{name}</p>
+        <p className='font-bold mt-2'>Seller Name and Sign</p>
+      </div>
     </div>
   </>
 )
 
-const TermsAndConditions = () => (
+const TermsAndConditions = ({ signatureUrl, name }) => (
   <div className='page-break'>
     <div className='terms-conditions mt-32'>
       <div className='text-center mt-2'>
@@ -207,7 +228,24 @@ const TermsAndConditions = () => (
       </div>
       <div className='w-full text-right mt-8'>
         <p className='font-bold'>SIGNATURES</p>
-        <p className='font-bold mt-16'>(SELLER)</p>
+        {signatureUrl && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: '16px',
+            }}
+          >
+            <img
+              src={signatureUrl}
+              alt='Seller Signature'
+              style={{ height: '60px', width: 'auto', objectFit: 'contain' }}
+              crossOrigin='anonymous'
+            />
+          </div>
+        )}
+        <p className='mt-4'>{name}</p>
+        <p className='font-bold mt-2'>(SELLER)</p>
       </div>
     </div>
   </div>
@@ -229,6 +267,7 @@ const PurchaseReceipt = ({
   region,
   address,
   price,
+  signatureUrl,
 }) => {
   const WEBSITE_SHORT_NAME =
     currentDomain === import.meta.env.VITE_BUYBACK_URL
@@ -273,8 +312,9 @@ const PurchaseReceipt = ({
         storeName={storeName}
         formattedDate={formattedDate}
         WEBSITE_SHORT_NAME={WEBSITE_SHORT_NAME}
+        signatureUrl={signatureUrl}
       />
-      <TermsAndConditions />
+      <TermsAndConditions signatureUrl={signatureUrl} name={name} />
     </div>
   )
 }

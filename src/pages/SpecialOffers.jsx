@@ -197,7 +197,7 @@ const SpecialOffers = () => {
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/discounts/applyDiscount`,
         finalPayload,
-        { headers: { authorization: userToken } }
+        { headers: { authorization: userToken, 'X-Skip-Interceptor': 'true' } }
       )
       .then((res) => {
         const newPrice = res.data.data.price + discountAvailable

@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import axiosInstance from '../utils/axiosInterceptor'
 
 function SideMenu({ setsideMenu, sideMenu }) {
   const navigate = useNavigate()
@@ -76,11 +77,19 @@ function SideMenu({ setsideMenu, sideMenu }) {
     navigate('/coupondetails')
   }
 
-  const handleLogout = () => {
-    localStorage.clear()
-    sessionStorage.clear()
-
-    navigate('/')
+  const handleLogout = async () => {
+    try {
+      // Call backend logout endpoint to invalidate session
+      await axiosInstance.post('/api/userregistry/logout')
+    } catch (error) {
+      console.error('Logout API error:', error)
+      // Continue with logout even if API call fails
+    } finally {
+      // Clear all client-side data
+      localStorage.clear()
+      sessionStorage.clear()
+      navigate('/')
+    }
   }
   return (
     <>

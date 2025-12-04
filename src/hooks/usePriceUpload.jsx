@@ -3,6 +3,7 @@ import { validateFormData, getRequiredFiles, getFailedUploads } from '../utils/v
 import { submitFormData } from '../utils/formSubmissionUtils'
 import { retryFailedUploads } from '../utils/retryUtils'
 import toast from 'react-hot-toast'
+import { FILE_KEYS } from '../constants/priceConstants'
 
 export const usePriceUpload = (formState) => {
   const {
@@ -15,6 +16,8 @@ export const usePriceUpload = (formState) => {
     phoneRight,
     phoneTop,
     phoneBottom,
+    signatureFile,  // new signature state
+    ceirImage,  // new CEIR image state
     aadharNumber,
     imeinumber,
     isBillRequired,
@@ -42,7 +45,9 @@ export const usePriceUpload = (formState) => {
       phoneTop,
       phoneBottom,
       phoneBill,
-      isBillRequired
+      isBillRequired,
+      signatureFile, // add signature state to validation
+      ceirImage, // add CEIR image state to validation
     }
 
     if (!validateFormData(formData)) {
@@ -52,6 +57,9 @@ export const usePriceUpload = (formState) => {
 
     // Get required files and check upload status
     const requiredFiles = getRequiredFiles(isBillRequired)
+    requiredFiles.push(FILE_KEYS.SIGNATURE); // Add signature to required files
+    requiredFiles.push(FILE_KEYS.CEIR); // Add CEIR to required files
+
     const failedUploads = getFailedUploads(requiredFiles, uploadStatus)
 
     if (failedUploads.length > 0) {
@@ -65,7 +73,9 @@ export const usePriceUpload = (formState) => {
         phoneLeft,
         phoneRight,
         phoneTop,
-        phoneBottom
+        phoneBottom,
+        signatureFile, // add signature state for retry
+        ceirImage // add CEIR image state for retry
       }
 
       const stillHasFailures = await retryFailedUploads(

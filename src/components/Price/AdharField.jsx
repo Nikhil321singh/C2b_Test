@@ -26,7 +26,7 @@ const AdharField = ({
       <p className='mt-2 text-sm text-primary'>
         Note: Image size should not exceed 2MB
       </p>
-      <div className='flex inputAADHAR justify-evenly'>
+      <div className='grid grid-cols-2 gap-3 inputAADHAR'>
         <div className='p-1 mt-4 text-center border-2 justify-between rounded-lg h-[15vh] w-[40vw] relative border-primary shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]'>
           <p className='font-semibold text-center'>Adhaar(Front)</p>
           <input

@@ -15,6 +15,7 @@ import { IoRefresh } from 'react-icons/io5'
 import ReactDOMServer from 'react-dom/server'
 import html2pdf from 'html2pdf.js'
 import PurchaseReceipt from '../../components/PurchaseReceipt'
+import { fetchSignatureAsBase64 } from '../../utils/fetchSignatureAsBase64'
 const pageLimit = 10
 const ALLstore = 'All Stores'
 const iniDate = '2023-01-01'
@@ -116,6 +117,7 @@ const LeadsCompleted = () => {
   const [deviceType, setDeviceType] = useState('CTG1')
   const userToken = sessionStorage.getItem('authToken')
   const [loading, setLoading] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [sideMenu, setsideMenu] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
   const [tableData, setTableData] = useState([])
@@ -154,9 +156,7 @@ const LeadsCompleted = () => {
         }
       )
       setCategories(data.data)
-    } catch (err) {
-      console.log(err)
-    }
+    } catch (err) {}
   }
   function getSalesData() {
     setLoading(true)
@@ -275,46 +275,47 @@ const LeadsCompleted = () => {
   }
 
   return (
-    <div>
-      <SubLeadsCompleted
-        loading={loading}
-        setsideMenu={setsideMenu}
-        sideMenu={sideMenu}
-        totalCount={totalCount}
-        fromDate={fromDate}
-        handleFromDateChange={handleFromDateChange}
-        toDate={toDate}
-        handleToDateChange={handleToDateChange}
-        tableData={tableData}
-        setCurrentPage={setCurrentPage}
-        currentPage={currentPage}
-        maxPages={maxPages}
-        search={search}
-        setSearch={setSearch}
-        search1={search1}
-        setSearch1={setSearch1}
-        storeDrop={storeDrop}
-        setStoreDrop={setStoreDrop}
-        storeName={storeName}
-        storeData={storeData}
-        handleSearchClear={handleSearchClear}
-        handleStoreChange={handleStoreChange}
-        getSalesData={getSalesData}
-        deviceType={deviceType}
-        setDeviceType={setDeviceType}
-        selStoreId={selStoreId}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        handleSearch={handleSearch}
-        filteredStores={filteredStores}
-        categories={categories}
-      />
-    </div>
+    <SubLeadsCompleted
+      loading={loading}
+      downloading={downloading}
+      setDownloading={setDownloading}
+      setsideMenu={setsideMenu}
+      sideMenu={sideMenu}
+      totalCount={totalCount}
+      fromDate={fromDate}
+      handleFromDateChange={handleFromDateChange}
+      toDate={toDate}
+      handleToDateChange={handleToDateChange}
+      tableData={tableData}
+      setCurrentPage={setCurrentPage}
+      currentPage={currentPage}
+      maxPages={maxPages}
+      search={search}
+      setSearch={setSearch}
+      search1={search1}
+      setSearch1={setSearch1}
+      storeDrop={storeDrop}
+      setStoreDrop={setStoreDrop}
+      storeName={storeName}
+      storeData={storeData}
+      handleSearchClear={handleSearchClear}
+      handleStoreChange={handleStoreChange}
+      getSalesData={getSalesData}
+      deviceType={deviceType}
+      setDeviceType={setDeviceType}
+      selStoreId={selStoreId}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      handleSearch={handleSearch}
+      filteredStores={filteredStores}
+      categories={categories}
+    />
   )
 }
 
-const fetchDownloadData = (totalCount, deviceType, Str) => {
+const fetchDownloadData = (totalCount, deviceType, Str, setDownloading) => {
   const userToken1 = sessionStorage.getItem('authToken')
+  setDownloading(true)
   axios
     .get(
       `${
@@ -330,14 +331,18 @@ const fetchDownloadData = (totalCount, deviceType, Str) => {
     )
     .then((res) => {
       downloadExcelLeadsompleted(res.data.data)
+      setDownloading(false)
     })
     .catch((err) => {
       console.log(err)
+      setDownloading(false)
     })
 }
 
 const SubLeadsCompleted = ({
   loading,
+  downloading,
+  setDownloading,
   setsideMenu,
   sideMenu,
   totalCount,
@@ -405,6 +410,8 @@ const SubLeadsCompleted = ({
         categories={categories}
         tableData={tableData}
         storeData={storeData}
+        setDownloading={setDownloading}
+        downloading={downloading}
       />
       <div className='flex gap-2 items-center justify-center outline-none mt-5 w-[100%]'>
         <div className={`${styles.search_bar_wrap}`}>
@@ -478,19 +485,26 @@ const SubLeadsCompletedBtns = ({
   categories,
   tableData,
   storeData,
+  setDownloading,
+  downloading,
 }) => {
   const handleBulkDownloadReceipts = () => {
     if (!fromDate || !toDate) {
       alert('Please select and search valid date range Leads.')
       return
     }
-    tableData.forEach((item, index) => {
+    tableData.forEach(async (item, index) => {
       const dateString = item?.updatedAt
       const formattedDate = new Date(dateString).toLocaleDateString('en-IN', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
       })
+      const signatureUrl = item?.documentId?.signature
+      const signatureBase64 = signatureUrl
+        ? await fetchSignatureAsBase64(signatureUrl)
+        : null
+
       const printElement = ReactDOMServer.renderToString(
         <PurchaseReceipt
           phoneNumber={item?.phoneNumber}
@@ -508,6 +522,7 @@ const SubLeadsCompletedBtns = ({
           RAM={item?.ram}
           formattedDate={formattedDate}
           price={item?.price}
+          signatureUrl={signatureBase64 || signatureUrl}
         />
       )
       html2pdf()
@@ -529,9 +544,25 @@ const SubLeadsCompletedBtns = ({
       <div className='flex gap-4'>
         <button
           className={`${styles.bulkdown_button}`}
-          onClick={() => fetchDownloadData(totalCount, deviceType, selStoreId)}
+          onClick={() =>
+            fetchDownloadData(
+              totalCount,
+              deviceType,
+              selStoreId,
+              setDownloading
+            )
+          }
+          disabled={downloading}
         >
-          <FaDownload /> Bulk Download
+          {downloading ? (
+            <>
+              <BeatLoader color='white' size={8} /> Downloading...
+            </>
+          ) : (
+            <>
+              <FaDownload /> Bulk Download
+            </>
+          )}
         </button>
         <div className='mt-2 ml-4'>
           <button
