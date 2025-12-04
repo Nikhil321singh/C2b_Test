@@ -164,14 +164,14 @@ const IndemnityBond = ({
       <p className='mt-4'>
         <span> Scheme Title: Buyback</span>
       </p>
-      <div className='w-full text-right mt-8'>
+      <div className='w-full text-right mt-4'>
         <p className='font-bold'>SIGNATURES</p>
         {signatureUrl && (
           <div
             style={{
               display: 'flex',
               justifyContent: 'flex-end',
-              marginTop: '16px',
+              marginTop: '10px',
             }}
           >
             <img
@@ -182,13 +182,14 @@ const IndemnityBond = ({
             />
           </div>
         )}
-        <p className='font-bold mt-4'>Seller Name and Sign</p>
+        <p className='mt-2'>{name}</p>
+        <p className='font-bold mt-2'>Seller Name and Sign</p>
       </div>
     </div>
   </>
 )
 
-const TermsAndConditions = ({ signatureUrl }) => (
+const TermsAndConditions = ({ signatureUrl, name }) => (
   <div className='page-break'>
     <div className='terms-conditions mt-32'>
       <div className='text-center mt-2'>
@@ -243,7 +244,8 @@ const TermsAndConditions = ({ signatureUrl }) => (
             />
           </div>
         )}
-        <p className='font-bold mt-4'>(SELLER)</p>
+        <p className='mt-4'>{name}</p>
+        <p className='font-bold mt-2'>(SELLER)</p>
       </div>
     </div>
   </div>
@@ -312,7 +314,7 @@ const PurchaseReceipt = ({
         WEBSITE_SHORT_NAME={WEBSITE_SHORT_NAME}
         signatureUrl={signatureUrl}
       />
-      <TermsAndConditions signatureUrl={signatureUrl} />
+      <TermsAndConditions signatureUrl={signatureUrl} name={name} />
     </div>
   )
 }

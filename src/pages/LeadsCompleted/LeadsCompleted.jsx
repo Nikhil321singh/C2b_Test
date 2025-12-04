@@ -494,8 +494,6 @@ const SubLeadsCompletedBtns = ({
       return
     }
     tableData.forEach(async (item, index) => {
-      console.log(item)
-
       const dateString = item?.updatedAt
       const formattedDate = new Date(dateString).toLocaleDateString('en-IN', {
         day: 'numeric',

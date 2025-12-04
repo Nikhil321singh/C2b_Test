@@ -50,7 +50,9 @@ const DigitalSignatureField = ({
     initCanvas()
     const timeoutId = setTimeout(initCanvas, 100)
 
-    return () => clearTimeout(timeoutId)
+    return () => {
+      clearTimeout(timeoutId)
+    }
   }, [isDrawing, imeinumber])
 
   const handleClear = () => {
