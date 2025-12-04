@@ -31,7 +31,7 @@ const DigitalSignatureField = ({
 
   useEffect(() => {
     if (!isDrawing || !sigPadRef.current || !containerRef.current) {
-      return
+      return undefined
     }
 
     // Delay canvas initialization to ensure proper dimensions
