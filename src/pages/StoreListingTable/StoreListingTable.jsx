@@ -29,8 +29,6 @@ const downloadExcel = (dataDown, curPage) => {
   const formattedData = dataDown.map((item) => {
     return {
       'Date Created': new Date(item.createdAt).toLocaleDateString('en-GB'),
-      'Company Name': item?.companyId?.name || 'N/A',
-      'Company Code': item?.companyId?.companyCode || 'N/A',
       'Store Name': item?.storeName,
       'Store Unique Id': item?.uniqueId,
       'Store Email': item.email,
@@ -571,7 +569,6 @@ const StoreTable = ({
           <thead className='bg-primary text-white'>
             <tr>
               <th className='text-sm p-2 md:p-3 md:text-base'>Action</th>
-              <th className='text-sm p-2 md:p-3 md:text-base'>Company Name</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Store Name</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Unique Id</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Email</th>
@@ -602,14 +599,6 @@ const StoreTable = ({
                       Delete
                     </button>
                   </div>
-                </td>
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                  {val?.companyId?.name || 'N/A'}
-                  {val?.companyId?.companyCode && (
-                    <div className='text-xs text-gray-500'>
-                      ({val?.companyId?.companyCode})
-                    </div>
-                  )}
                 </td>
                 <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {val?.storeName}
