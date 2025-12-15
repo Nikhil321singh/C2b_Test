@@ -45,20 +45,28 @@ const downloadExcel = (dataDown, curPage) => {
   saveAs(dataFile, `Stores_Data_${curPage}${fileExtension}`)
 }
 
-const sampleDownloadHandler = async () => {
-  try {
-    const response = await fetch(
-      `${window.location.origin}/sample-file-store.xlsx`
-    )
-    if (!response.ok) {
-      throw new Error('Failed to fetch sample file')
+const sampleDownloadHandler = () => {
+  const fileType =
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+  const fileExtension = '.xlsx'
+
+  // Create sample data structure matching the exact format from public folder
+  const sampleData = [
+    {
+      'storeName': '',
+      'region': '',
+      'email': '',
+      'uniqueId': '',
+      'contactNumber': '',
+      'address': ''
     }
-    const blob = await response.blob()
-    saveAs(blob, 'storelisting-sample-file-store.xlsx')
-  } catch (error) {
-    console.error('Error downloading sample file:', error)
-    alert('Failed to download sample file. Please contact support.')
-  }
+  ]
+
+  const ws = XLSX.utils.json_to_sheet(sampleData)
+  const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+  const dataFile = new Blob([excelBuffer], { type: fileType })
+  saveAs(dataFile, `storelisting-sample-file-store${fileExtension}`)
 }
 
 const StoreListingTable = () => {
