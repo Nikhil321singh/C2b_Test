@@ -14,6 +14,9 @@ const UserForm = ({
   errMsg,
   isValid,
   setPasswordFocus,
+  companies = [],
+  stores = [],
+  setFormData,
 }) => {
   const [showUserPassword, setShowUserPassword] = useState(false)
 
@@ -115,24 +118,58 @@ const UserForm = ({
           required
         />
       </label>
+      <label className='flex flex-col w-[70%] gap-2'>
+        <span className='font-medium text-xl'>Company*</span>
+        <select
+          id='companyId'
+          name='companyId'
+          value={formData.companyId}
+          className='outline-none text-base border-2 px-2 py-2 rounded-lg'
+          onChange={handleChange}
+          required
+        >
+          <option value=''>Select Company</option>
+          {companies.map((company) => (
+            <option key={company._id} value={company._id}>
+              {company.name} ({company.companyCode})
+            </option>
+          ))}
+        </select>
+      </label>
       {isSuperAdmin && (
         <label className='flex flex-col w-[70%] gap-2'>
           <span className='font-medium text-xl'>Store Name*</span>
           <select
-            name='storeId'
-            id='storeId'
-            value={formData.storeId}
+            name='assignedStores'
+            id='assignedStores'
+            value={formData.assignedStores}
             className='outline-none text-base border-2 p-2 rounded-lg'
-            onChange={handleChange}
+            onChange={(e) => {
+              const selected = Array.from(e.target.selectedOptions).map(
+                (option) => option.value
+              )
+              setFormData({ ...formData, assignedStores: selected })
+            }}
             required
           >
-            <option value=''> None </option>
-            {storeData.map((item) => (
-              <option key={item._id} value={item._id}>
-                {`${item.storeName}, ${item.region}`}
+            <option value=''>Select Store</option>
+            {stores.length === 0 ? (
+              <option value='' disabled>
+                {formData.companyId
+                  ? 'No stores available for this company'
+                  : 'Please select a company first'}
               </option>
-            ))}
+            ) : (
+              stores.map((store) => (
+                <option key={store._id} value={store._id}>
+                  {store.storeName} - {store.region}
+                </option>
+              ))
+            )}
           </select>
+          <p className='text-sm text-gray-500'>
+            Hold Ctrl (Windows) or Cmd (Mac) to select multiple stores
+          </p>
         </label>
       )}
       <label className='flex flex-col w-[70%] gap-2'>
@@ -153,6 +190,7 @@ const UserForm = ({
           ))}
         </select>
       </label>
+
       <label className='flex flex-col w-[70%] gap-2'>
         <span className='font-medium text-xl'>City</span>
         <input

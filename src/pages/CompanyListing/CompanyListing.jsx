@@ -9,54 +9,122 @@ const CompanyListing = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [companyName, setCompanyName] = useState("");
-  const [uniqueId, setUniqueId] = useState("");
-  const [companyCode, setCompnayCode] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [address, setAddress] = useState("");
   const [gstNumber, setGstNumber] = useState("");
   const [panNumber, setPanNumber] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [generatedCompanyCode, setGeneratedCompanyCode] = useState("");
   const navigate = useNavigate();
   const handleFileUpload = (e) => {
     const files = e.target.files;
     setAttachedFiles((prevFiles) => [...prevFiles, ...Array.from(files)]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-
-    formData.append("companyName", companyName);
-    formData.append("uniqueId", uniqueId);
-    formData.append("companyCode", companyCode);
-    formData.append("contactNumber", contactNumber);
-    formData.append("address", address);
-    formData.append("gstNumber", gstNumber);
-    formData.append("panNumber", panNumber);
-    formData.append("remarks", remarks);
-    attachedFiles.forEach((file, index) => {
-      formData.append("files", file, `file-${index}`);
-    });
-
     const userToken = sessionStorage.getItem("authToken");
-    axios
-      .post(
+
+    try {
+      // Step 1: Upload files to S3 using presigned URLs
+      const uploadedDocuments = [];
+
+      if (attachedFiles.length > 0) {
+        toast.loading("Uploading documents...");
+
+        for (const file of attachedFiles) {
+          try {
+            // Generate unique file name with timestamp
+            const timestamp = Date.now();
+            const fileName = `${timestamp}_${file.name}`;
+
+            // Get presigned URL from backend
+            const presignedUrlResponse = await axios.get(
+              `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`,
+              {
+                params: {
+                  fileName: fileName,
+                  fileType: file.type,
+                },
+                headers: { Authorization: userToken },
+              }
+            );
+
+            if (presignedUrlResponse?.data?.url) {
+              const presignedUrl = presignedUrlResponse.data.url;
+
+              // Upload file directly to S3 using presigned URL
+              await axios.put(presignedUrl, file, {
+                headers: {
+                  "Content-Type": file.type,
+                },
+                transformRequest: [(data, headers) => {
+                  delete headers.Authorization;
+                  return data;
+                }],
+              });
+
+              // Extract the public S3 URL (remove query params from presigned URL)
+              const s3Url = presignedUrl.split("?")[0];
+
+              uploadedDocuments.push({
+                fileName: file.name,
+                fileUrl: s3Url,
+                fileType: file.type,
+                uploadedAt: new Date().toISOString(),
+              });
+            }
+          } catch (uploadError) {
+            console.error("File upload error:", uploadError);
+            toast.error(`Failed to upload ${file.name}`);
+          }
+        }
+
+        toast.dismiss();
+      }
+
+      // Step 2: Create company with uploaded file URLs
+      const payload = {
+        name: companyName,
+        contactNumber: contactNumber,
+        address: address,
+        gstNumber: gstNumber.toUpperCase(),
+        panNumber: panNumber.toUpperCase(),
+        remarks: remarks,
+        attachedDocuments: uploadedDocuments,
+      };
+
+      const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/create`,
-        formData,
+        payload,
         {
           headers: {
-            Authorization: `${userToken}`,
+            Authorization: userToken,
+            "Content-Type": "application/json",
           },
         }
-      )
-      .then((res) => {
-        console.log("res is ", res);
-        toast.success("Company Added");
+      );
+
+      console.log("res is ", response);
+      toast.success("Company Added Successfully!");
+
+      if (response.data.result && response.data.result.companyCode) {
+        setGeneratedCompanyCode(response.data.result.companyCode);
+        setShowSuccess(true);
+      }
+
+      setTimeout(() => {
         navigate("/companylistingdetails");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      }, 3000);
+    } catch (err) {
+      console.log(err);
+      if (err.response && err.response.data && err.response.data.errors) {
+        err.response.data.errors.forEach((error) => toast.error(error));
+      } else {
+        toast.error(err.response?.data?.message || "Failed to create company");
+      }
+    }
   };
   return (
     <div>
@@ -85,6 +153,17 @@ const CompanyListing = () => {
               View Detail
             </Link>
           </div>
+
+          {showSuccess && generatedCompanyCode && (
+            <div className="ml-10 mr-10 mb-6 p-4 bg-green-100 border-2 border-green-500 rounded-lg">
+              <p className="text-green-800 font-semibold">✓ Company Created Successfully!</p>
+              <p className="text-green-700 mt-2">
+                Generated Company Code: <span className="font-bold">{generatedCompanyCode}</span>
+              </p>
+              <p className="text-green-600 text-sm mt-1">Redirecting to company details...</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="ml-10 flex flex-col gap-4">
             <div className="flex flex-col w-[70%] gap-2">
               <span className="font-medium text-xl">Name*</span>
@@ -94,26 +173,6 @@ const CompanyListing = () => {
                 value={companyName}
                 required={true}
                 onChange={(e) => setCompanyName(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Unique Id*</span>
-              <input
-                className="border-2 px-2 py-2 rounded-lg  outline-none "
-                type="text"
-                value={uniqueId}
-                required={true}
-                onChange={(e) => setUniqueId(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Company Code*</span>
-              <input
-                className="border-2 px-2 py-2 rounded-lg  outline-none "
-                type="text"
-                value={companyCode}
-                required={true}
-                onChange={(e) => setCompnayCode(e.target.value)}
               />
             </div>
             <div className="flex flex-col w-[70%] gap-2">

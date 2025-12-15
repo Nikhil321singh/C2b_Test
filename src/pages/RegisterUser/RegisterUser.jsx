@@ -17,9 +17,10 @@ const initForm = {
   password: '',
   phoneNumber: '',
   role: '',
-  storeId: '',
+  assignedStores: [],
   city: '',
   address: '',
+  companyId: '',
 }
 
 const RegisterUser = () => {
@@ -32,6 +33,8 @@ const RegisterUser = () => {
   const [formData, setFormData] = useState(initForm)
   const [modal, setModal] = useState({ open: false, success: false, msg: '' })
   const [passwordValid, setPasswordValid] = useState(false)
+  const [companies, setCompanies] = useState([])
+  const [stores, setStores] = useState([])
 
   const navigate = useNavigate()
 
@@ -41,6 +44,49 @@ const RegisterUser = () => {
   // password validation hook
   const [errMsg, setErrMsg] = useState('')
   usePasswordValidation(formData.password, setPasswordValid, setErrMsg)
+
+  // Fetch companies on mount
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/findAll`,
+          { headers: { Authorization: token } }
+        )
+        setCompanies(response.data.result || [])
+      } catch (error) {
+        console.error('Error fetching companies:', error)
+      }
+    }
+    fetchCompanies()
+  }, [token])
+
+  console.log(formData)
+
+  // Fetch stores when companyId changes
+  useEffect(() => {
+    const fetchStoresByCompany = async () => {
+      if (formData.companyId) {
+        setStores([])
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll`,
+            {
+              headers: { Authorization: token },
+              params: { companyId: formData.companyId },
+            }
+          )
+          setStores(response.data.result || [])
+        } catch (error) {
+          console.error('Error fetching stores:', error)
+          setStores([])
+        }
+      } else {
+        setStores([])
+      }
+    }
+    fetchStoresByCompany()
+  }, [formData.companyId])
 
   useEffect(() => {
     setFormData((prev) => ({ ...prev, grestMember: isGrest === 'yes' }))
@@ -54,10 +100,25 @@ const RegisterUser = () => {
   const submitHandler = (event) => {
     event.preventDefault()
 
+    // Validate required fields
+    if (!formData.companyId) {
+      setModal({
+        open: true,
+        success: false,
+        msg: 'Please select a company',
+      })
+      return
+    }
+
+    const payload = {
+      ...formData,
+      companyId: formData.companyId,
+    }
+
     axios
       .post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/userregistry/register`,
-        formData,
+        payload,
         { headers: { Authorization: token } }
       )
       .then(() => {
@@ -142,6 +203,9 @@ const RegisterUser = () => {
             errMsg={errMsg}
             isValid={passwordValid}
             setIsGrest={setIsGrest}
+            companies={companies}
+            stores={stores}
+            setFormData={setFormData}
           />
         </div>
       </div>
