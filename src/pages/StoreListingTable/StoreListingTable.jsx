@@ -47,11 +47,17 @@ const downloadExcel = (dataDown, curPage) => {
 
 const sampleDownloadHandler = async () => {
   try {
-    const response = await fetch('/sample-file-store.xlsx')
+    const response = await fetch(
+      `${window.location.origin}/sample-file-store.xlsx`
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch sample file')
+    }
     const blob = await response.blob()
     saveAs(blob, 'storelisting-sample-file-store.xlsx')
   } catch (error) {
     console.error('Error downloading sample file:', error)
+    alert('Failed to download sample file. Please contact support.')
   }
 }
 
