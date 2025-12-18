@@ -81,14 +81,26 @@ const downloadExcelLeadsompleted = (apiData) => {
       }
     }
 
+    // Filter device report to show only selected issues
+    let deviceReportSummary = 'N/A'
+    if (item.deviceReport && typeof item.deviceReport === 'object') {
+      const selectedIssues = Object.entries(item.deviceReport)
+        .filter(([key, value]) => value === true || value === 'Yes' || value === 'true')
+        .map(([key]) => key)
+      deviceReportSummary = selectedIssues.length > 0 ? selectedIssues.join(', ') : 'No Issues'
+    }
+
     return {
       'Date Created': new Date(item?.updatedAt).toLocaleDateString('en-IN'),
+      'Company Name': item.companyId?.name || item.store?.companyId?.name || 'N/A',
+      'Purchase Grade': item.purchaseGrade || 'N/A',
       'Store user Mobile No.': item.phoneNumber,
       'User Email': item.userId?.email,
       'Customer Mobile No.': item.phoneNumber,
       'Customer Name': item.name,
       Product: item.modelId?.name,
       Variant: getVariant(item),
+      'Device Issues': deviceReportSummary,
       Price: item.actualPrice,
       'Final Price Offered to Customer': item?.price,
       'Order Id': item?.uniqueCode,

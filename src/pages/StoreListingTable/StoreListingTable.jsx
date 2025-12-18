@@ -29,6 +29,8 @@ const downloadExcel = (dataDown, curPage) => {
   const formattedData = dataDown.map((item) => {
     return {
       'Date Created': new Date(item.createdAt).toLocaleDateString('en-GB'),
+      'Company Name': item?.companyId?.name || 'N/A',
+      'Company ID': item?.companyId?.companyCode || 'N/A',
       'Store Name': item?.storeName,
       'Store Unique Id': item?.uniqueId,
       'Store Email': item.email,
@@ -73,9 +75,11 @@ const StoreListingTable = () => {
   const token = sessionStorage.getItem('authToken')
   const navigate = useNavigate()
   const [data, setData] = useState([])
+  const [companies, setCompanies] = useState([])
   const [isTableLoaded, setIsTableLoaded] = useState(false)
   const [storeEditData, setStoreEditData] = useState()
   const [searchValue, setSearchValue] = useState('')
+  const [companyFilter, setCompanyFilter] = useState('')
   const [editBoxOpen, setEditBoxOpen] = useState(false)
   const [editSuccess, setEditSuccess] = useState(false)
   const [curPage, setCurPage] = useState(0)
@@ -88,11 +92,15 @@ const StoreListingTable = () => {
 
   const getData = () => {
     setIsTableLoaded(true)
+    let url = `${
+      import.meta.env.VITE_REACT_APP_ENDPOINT
+    }/api/store/findAll?page=${curPage}&limit=10`
+    if (companyFilter) {
+      url += `&companyId=${companyFilter}`
+    }
     const config = {
       method: 'get',
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/store/findAll?page=${curPage}&limit=10`,
+      url: url,
       headers: { Authorization: token },
     }
     axios
@@ -107,6 +115,22 @@ const StoreListingTable = () => {
         setErrMsg('Failed to load data')
         setFailBox(true)
         setIsTableLoaded(false)
+      })
+  }
+
+  const getCompanies = () => {
+    const config = {
+      method: 'get',
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/findAll`,
+      headers: { Authorization: token },
+    }
+    axios
+      .request(config)
+      .then((response) => {
+        setCompanies(response.data.result || [])
+      })
+      .catch((error) => {
+        console.log('Failed to load companies:', error)
       })
   }
 
@@ -164,10 +188,15 @@ const StoreListingTable = () => {
 
   useEffect(() => {
     getData()
-  }, [curPage])
+  }, [curPage, companyFilter])
+
+  useEffect(() => {
+    getCompanies()
+  }, [])
 
   const handleSearchClear = () => {
     setSearchValue('')
+    setCompanyFilter('')
     getData()
   }
 
@@ -195,8 +224,8 @@ const StoreListingTable = () => {
         getData={getData}
         getDataBySearch={getDataBySearch}
       />
-      <div className='m-4 w-full flex flex-col gap-4 items-center'>
-        <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-6 gap-2 w-full items-center justify-center mr-10'>
+      <div className='my-4 px-2 w-full flex flex-col gap-4 items-center'>
+        <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-6 gap-2 w-full items-center justify-center'>
           <button
             className={`${styles.bulkdown_button} w-full`}
             onClick={() => navigate('/storelisting')}
@@ -248,7 +277,7 @@ const StoreListingTable = () => {
 
           {/* Refresh button for larger screens only */}
           <div
-            className={`${styles.icons_box} hidden md:flex items-center w-full`}
+            className={`${styles.icons_box} hidden md:flex items-center justify-center`}
           >
             <IoRefresh
               onClick={handleSearchClear}
@@ -263,6 +292,25 @@ const StoreListingTable = () => {
           >
             <FaDownload /> Bulk Download
           </button>
+        </div>
+
+        {/* Company Filter - Moved to separate row */}
+        <div className='flex gap-2 items-center max-w-md'>
+          <label className='text-sm font-medium whitespace-nowrap'>
+            Filter by Company:
+          </label>
+          <select
+            value={companyFilter}
+            onChange={(e) => setCompanyFilter(e.target.value)}
+            className='text-sm bg-transparent border border-gray-300 rounded px-3 py-2 w-64'
+          >
+            <option value=''>All Companies</option>
+            {companies.map((company) => (
+              <option key={company._id} value={company._id}>
+                {company.name} ({company.companyCode})
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -571,6 +619,7 @@ const StoreTable = ({
               <th className='text-sm p-2 md:p-3 md:text-base'>Action</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Store Name</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Unique Id</th>
+              <th className='text-sm p-2 md:p-3 md:text-base'>Company Name</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Email</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Phone Number</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Region</th>
@@ -607,6 +656,9 @@ const StoreTable = ({
                   {val?.uniqueId}
                 </td>
                 <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  {val?.companyId?.name || 'N/A'}
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {val?.email}
                 </td>
                 <td className='p-2 text-sm text-center md:p-3 md:text-base'>
@@ -623,7 +675,7 @@ const StoreTable = ({
           </tbody>
         </table>
       </div>
-      <div className='flex flex-row justify-center items-center gap-2 mb-5'>
+      <div className='flex flex-row justify-center items-center gap-2 pb-8'>
         <button
           className={`${styles.view_btn} text-lg px-6 py-2`}
           onClick={prevHandler}

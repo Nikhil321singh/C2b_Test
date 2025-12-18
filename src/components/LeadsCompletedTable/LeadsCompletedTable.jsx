@@ -45,6 +45,8 @@ const TableHeader = () => (
   <thead className='bg-primary text-white'>
     <tr className='align-top'>
       <th className='p-2 text-sm md:p-3 md:text-base'>Date</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Company Name</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Purchase Grade</th>
       <th className='p-2 text-sm md:p-3 md:text-base'>Username</th>
       <th className='p-2 text-sm md:p-3 md:text-base'>Category</th>
       <th className='p-2 text-sm md:p-3 md:text-base'>Product Name</th>
@@ -73,6 +75,14 @@ const TableRow = ({ val, index, onDetailsClick, onImageClick, onPDFClick }) => (
         month: '2-digit',
         year: 'numeric',
       })}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {val?.companyId?.name || val?.store?.companyId?.name || 'N/A'}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <span className={`px-2 py-1 rounded ${val?.purchaseGrade ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
+        {val?.purchaseGrade || 'N/A'}
+      </span>
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
       {getUserName(val)}

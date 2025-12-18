@@ -47,6 +47,9 @@ const QuickQuote = () => {
   const qnaQuick = useSelector((state) => state.qnaQuick)
   const [isLoading, setIsLoading] = useState(false)
   const profile = useUserProfile()
+  const [stores, setStores] = useState([])
+  const [selectedStoreId, setSelectedStoreId] = useState('')
+  const [storeError, setStoreError] = useState('')
 
   const backHandler = () => {
     navigate('/selectmodel')
@@ -58,8 +61,9 @@ const QuickQuote = () => {
     const userToken = sessionStorage.getItem('authToken')
     const fetchData = async () => {
       try {
-        const apiUrl = `${import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/questionnaires/findAll?page=0&limit=31`
+        const apiUrl = `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/questionnaires/findAll?page=0&limit=31`
 
         const response = await axios.get(apiUrl, {
           headers: {
@@ -67,20 +71,20 @@ const QuickQuote = () => {
           },
         })
 
-          ;[
-            'Core',
-            'Cosmetics',
-            'Display',
-            'Functional_major',
-            'Functional_minor',
-            'Warranty',
-          ].forEach((group) => {
-            const answers = response.data.data
-              .filter((question) => question.group === group)
-              .slice(0, group !== 'Warranty' ? 2 : undefined)
+        ;[
+          'Core',
+          'Cosmetics',
+          'Display',
+          'Functional_major',
+          'Functional_minor',
+          'Warranty',
+        ].forEach((group) => {
+          const answers = response.data.data
+            .filter((question) => question.group === group)
+            .slice(0, group !== 'Warranty' ? 2 : undefined)
 
-            Dispatch({ type: 'SET_GROUP_ANSWERS', group, answers })
-          })
+          Dispatch({ type: 'SET_GROUP_ANSWERS', group, answers })
+        })
 
         const newPopulateAnswers = response.data.data.map((ele) => ele.default)
 
@@ -94,20 +98,20 @@ const QuickQuote = () => {
             }
           })
           setAnswersQUICK(newAnswers)
-            ;[
-              'Core',
-              'Cosmetics',
-              'Display',
-              'Functional_major',
-              'Functional_minor',
-              'Warranty',
-            ].forEach((group) => {
-              const answers = newAnswers.filter(
-                (question) => question.group === group
-              )
+          ;[
+            'Core',
+            'Cosmetics',
+            'Display',
+            'Functional_major',
+            'Functional_minor',
+            'Warranty',
+          ].forEach((group) => {
+            const answers = newAnswers.filter(
+              (question) => question.group === group
+            )
 
-              dispatch(setGroupAnswerss({ group, answers }))
-            })
+            dispatch(setGroupAnswerss({ group, answers }))
+          })
         }
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -121,41 +125,94 @@ const QuickQuote = () => {
     }
   }, [])
 
-  const handlesubmit = async () => {
-    setIsLoading(true)
-    const token = sessionStorage.getItem('authToken')
-    let id = sessionStorage.getItem('dataModel')
-    id = JSON.parse(id)
+  // Fetch stores for the logged-in user
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const token = sessionStorage.getItem('authToken')
+        const response = await axios.get(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll`,
+          { headers: { Authorization: token } }
+        )
 
-    const finalPayload = {
-      QNA: qnaQuick,
-      phoneNumber: '123456789',
-      modelId: id?.models?._id,
-      storage: id?.models?.config?.storage,
-      ram: id?.models?.config?.RAM,
-      aadharNumber: '1234567890',
-      name: profile?.name,
-    }
-    const { data } = await axios.post(
-      `${import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/questionnaires/calculatePrice`,
-      finalPayload,
-      {
-        headers: {
-          Authorization: `${token}`,
-        },
+        const storeList = response.data.result || []
+        setStores(storeList)
+
+        // Auto-select if only one store available
+        if (storeList.length === 1) {
+          setSelectedStoreId(storeList[0]._id)
+        }
+
+        // Try to get previously selected store from session
+        const savedStoreId = sessionStorage.getItem('selectedQuickQuoteStoreId')
+        if (savedStoreId && storeList.find((s) => s._id === savedStoreId)) {
+          setSelectedStoreId(savedStoreId)
+        }
+      } catch (error) {
+        console.error('Failed to fetch stores:', error)
+        setStoreError('Failed to load stores. Please refresh the page.')
       }
-    )
-    await logQuickQuoteAttempt(data.data, id, token)
-    sessionStorage.setItem('LeadId', data.data.id)
-    sessionStorage.setItem(
-      'responsedatadata',
-      JSON.stringify({ ...data.data, bonus: 0 })
-    )
-    sessionStorage.setItem('ExactQuote', false)
-    dispatch(setResponseData({ ...data.data, bonus: 0 }))
-    setIsLoading(false)
-    navigate('/devicequote')
+    }
+
+    fetchStores()
+  }, [])
+
+  const handlesubmit = async () => {
+    // Validate store selection
+    if (!selectedStoreId) {
+      setStoreError('Please select a store before submitting')
+      return
+    }
+
+    setIsLoading(true)
+    setStoreError('')
+
+    try {
+      const token = sessionStorage.getItem('authToken')
+      let id = sessionStorage.getItem('dataModel')
+      id = JSON.parse(id)
+
+      const finalPayload = {
+        QNA: qnaQuick,
+        phoneNumber: '123456789',
+        modelId: id?.models?._id,
+        storage: id?.models?.config?.storage,
+        ram: id?.models?.config?.RAM,
+        aadharNumber: '1234567890',
+        name: profile?.name,
+        storeId: selectedStoreId, // Added store selection
+      }
+
+      const { data } = await axios.post(
+        `${
+          import.meta.env.VITE_REACT_APP_ENDPOINT
+        }/api/questionnaires/calculatePrice`,
+        finalPayload,
+        {
+          headers: {
+            Authorization: `${token}`,
+          },
+        }
+      )
+
+      // Save selected store for future reference
+      sessionStorage.setItem('selectedQuickQuoteStoreId', selectedStoreId)
+
+      await logQuickQuoteAttempt(data.data, id, token)
+      sessionStorage.setItem('LeadId', data.data.id)
+      sessionStorage.setItem(
+        'responsedatadata',
+        JSON.stringify({ ...data.data, bonus: 0 })
+      )
+      sessionStorage.setItem('ExactQuote', false)
+      dispatch(setResponseData({ ...data.data, bonus: 0 }))
+      setIsLoading(false)
+      navigate('/devicequote')
+    } catch (error) {
+      console.error('Error submitting quick quote:', error)
+      setStoreError('Failed to submit. Please try again.')
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -194,6 +251,38 @@ const QuickQuote = () => {
             Tell us more about your device?
           </div>
           <div className='underline'></div>
+
+          {/* Store Selection Dropdown */}
+          <div className='mb-6 mt-4'>
+            <label className='block text-sm font-medium mb-2 text-gray-700'>
+              Select Store <span className='text-red-500'>*</span>
+            </label>
+            <select
+              value={selectedStoreId}
+              onChange={(e) => {
+                setSelectedStoreId(e.target.value)
+                setStoreError('')
+              }}
+              className={`w-full p-3 border rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary ${
+                storeError ? 'border-red-500' : 'border-gray-300'
+              }`}
+              required
+            >
+              <option value=''>-- Select a store --</option>
+              {stores.map((store) => (
+                <option key={store._id} value={store._id}>
+                  {store.storeName} {store.region ? `- ${store.region}` : ''}
+                </option>
+              ))}
+            </select>
+            {storeError && (
+              <p className='text-red-500 text-sm mt-1'>{storeError}</p>
+            )}
+            {stores.length === 0 && !storeError && (
+              <p className='text-gray-500 text-sm mt-1'>No stores available</p>
+            )}
+          </div>
+
           <QuestionList
             QQState={QQState}
             core={core}
