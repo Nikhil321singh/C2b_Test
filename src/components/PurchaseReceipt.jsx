@@ -6,15 +6,19 @@ const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
 const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 
 // Helper functions
-const maskPhoneNumber = (phNumber) => {
+const maskPhoneNumber = (phNumber, storeName) => {
+  if (storeName === "Coimbatore-11 (Sundarapuram) (SMPL)") {
+    return phNumber;
+  }
+
   const visibleLength = Math.ceil(phNumber?.length * 0.25);
   const maskedSection = phNumber?.slice(0, phNumber.length - visibleLength);
   const visibleSection = phNumber?.slice(phNumber?.length - visibleLength);
   return `${maskedSection.replace(/./g, "x")}${visibleSection}`;
 };
 
-const maskEmail = (email) => {
-  if (email === "Grest@MG_BS02") {
+const maskEmail = (email, storeName) => {
+  if (storeName === "Coimbatore-11 (Sundarapuram) (SMPL)") {
     return email;
   }
   if (!email) return "";
@@ -74,6 +78,7 @@ const TransactionInfo = ({
   phoneNumber,
   emailId,
   aadharNumber,
+  storeName,
 }) => (
   <div className="flex items-center mt-4 justify-between mx-auto">
     <div className="w-[30%]">
@@ -89,28 +94,14 @@ const TransactionInfo = ({
         <span className="font-bold"> Purchased From: {name}</span>
       </p>
       <p></p>
-      <span> Contact: {maskPhoneNumber(phoneNumber)}</span>
+      <span> Contact: {maskPhoneNumber(phoneNumber, storeName)}</span>
       <p>
-        <span> Mail: {maskEmail(emailId)}</span>
+        <span> Mail: {maskEmail(emailId, storeName)}</span>
       </p>
-      <p>
+      <div className="flex flex-wrap items-center gap-1">
         <span> Aadhar No.: {aadharNumber}</span>
-      </p>
-      <div className="flex items-center gap-1 mt-1">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="w-4 h-4 text-green-600"
-        >
-          <path
-            fillRule="evenodd"
-            d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-            clipRule="evenodd"
-          />
-        </svg>
-        <span className="text-xs text-green-700 font-semibold">
-          Verified by aadhar OTP
+        <span className="flex items-center text-xs text-green-700 font-bold">
+          ( Verified by aadhar OTP )
         </span>
       </div>
     </div>
@@ -318,6 +309,7 @@ const PurchaseReceipt = ({
         phoneNumber={phoneNumber}
         emailId={emailId}
         aadharNumber={aadharNumber}
+        storeName={storeName}
       />
       <ItemDetails
         phoneName={phoneName}
