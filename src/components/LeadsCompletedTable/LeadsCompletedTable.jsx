@@ -76,12 +76,12 @@ const TableRow = ({ val, index, onDetailsClick, onImageClick, onPDFClick }) => (
         year: 'numeric',
       })}
     </td>
-    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-      {val?.companyId?.name || val?.store?.companyId?.name || 'N/A'}
+    <td className='p-2 min-w-[150px] text-sm text-center md:p-3 md:text-base'>
+      {val?.companyInfo?.name || 'N/A'}
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-      <span className={`px-2 py-1 rounded ${val?.purchaseGrade ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
-        {val?.purchaseGrade || 'N/A'}
+      <span className='p-2 text-sm text-center md:p-3 md:text-base'>
+        {val?.gradeId?.grade || 'N/A'}
       </span>
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
