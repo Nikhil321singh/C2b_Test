@@ -269,18 +269,20 @@ const StoreListingTable = () => {
 }
 export default StoreListingTable
 
-const useStoreDelete = (
-  utoken,
-  searchValue,
-  getData,
-  getDataBySearch,
-  setIsTableLoaded,
-  setConfBox,
-  setErrMsg,
-  setSucBox,
-  setFailBox
-) => {
-  const deleteHandler = (storeID) => {
+const useStoreDelete = (params) => {
+  const {
+    utoken,
+    searchValue,
+    getData,
+    getDataBySearch,
+    setIsTableLoaded,
+    setConfBox,
+    setErrMsg,
+    setSucBox,
+    setFailBox,
+  } = params
+
+  return (storeID) => {
     setIsTableLoaded(true)
     setConfBox(false)
     const config = {
@@ -312,7 +314,6 @@ const useStoreDelete = (
         setIsTableLoaded(false)
       })
   }
-  return deleteHandler
 }
 
 const useBulkUpload = (
@@ -508,7 +509,7 @@ const ExtComps = ({
   const utoken = sessionStorage.getItem('authToken')
   const [sideMenu, setsideMenu] = useState(false)
 
-  const deleteHandler = useStoreDelete(
+  const deleteHandler = useStoreDelete({
     utoken,
     searchValue,
     getData,
@@ -517,8 +518,8 @@ const ExtComps = ({
     setConfBox,
     setErrMsg,
     setSucBox,
-    setFailBox
-  )
+    setFailBox,
+  })
 
   const { handleBulkSubmit, handleExcelFileChange } = useBulkUpload(
     utoken,
