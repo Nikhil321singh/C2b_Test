@@ -391,11 +391,16 @@ const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
             <th className='p-2 text-sm md:p-3 md:text-base'>Action</th>
             <th className='p-2 text-sm md:p-3 md:text-base'>Name</th>
             <th className='p-2 text-sm md:p-3 md:text-base'>Email</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Phone Number</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Company Name</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Company Code</th>
+            <th className='p-2 min-w-[140px] text-sm md:p-3 md:text-base'>
+              Phone Number
+            </th>
+            <th className='p-2 min-w-[140px] text-sm md:p-3 md:text-base'>
+              Company Name
+            </th>
+            <th className='p-2 min-w-[140px] text-sm md:p-3 md:text-base'>
+              Company Code
+            </th>
             <th className='p-2 text-sm md:p-3 md:text-base'>Role</th>
-            <th className='p-2 text-sm md:p-3 md:text-base'>Assigned Stores</th>
             <th className='p-2 text-sm md:p-3 md:text-base'>Store Name</th>
             <th className='p-2 text-sm md:p-3 md:text-base'>Region</th>
             <th className='p-2 text-sm md:p-3 md:text-base'>Address</th>
@@ -443,7 +448,7 @@ const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
                 </td>
 
                 {/* COMPANY */}
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                <td className='p-2 min-w-[200px] text-sm text-center md:p-3 md:text-base'>
                   {val?.companyData?.name || 'N/A'}
                 </td>
 
@@ -455,17 +460,6 @@ const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
                 {/* ROLE */}
                 <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {val?.role}
-                </td>
-
-                {/* ASSIGNED STORE COUNT */}
-                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                  {hasMultiple ? (
-                    <span>{val.assignedStoresData.length} store(s)</span>
-                  ) : hasSingle ? (
-                    <span>1 store</span>
-                  ) : (
-                    'N/A'
-                  )}
                 </td>
 
                 {/* STORE NAME */}

@@ -18,6 +18,7 @@ const initForm = {
   phoneNumber: '',
   role: '',
   assignedStores: [],
+  storeId: '',
   city: '',
   address: '',
   companyId: '',
@@ -94,7 +95,18 @@ const RegisterUser = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value })
+
+    // Clear store fields when role changes
+    if (name === 'role') {
+      setFormData({
+        ...formData,
+        [name]: type === 'checkbox' ? checked : value,
+        assignedStores: [],
+        storeId: '',
+      })
+    } else {
+      setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value })
+    }
   }
 
   const submitHandler = (event) => {
@@ -113,6 +125,16 @@ const RegisterUser = () => {
     const payload = {
       ...formData,
       companyId: formData.companyId,
+    }
+
+    // Remove store fields based on role
+    if (formData.role === 'Admin Manager') {
+      delete payload.storeId
+    } else if (formData.role === 'Super Admin' || formData.role === 'Company Admin') {
+      delete payload.storeId
+      delete payload.assignedStores
+    } else {
+      delete payload.assignedStores
     }
 
     axios

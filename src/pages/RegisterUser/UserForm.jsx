@@ -136,7 +136,25 @@ const UserForm = ({
           ))}
         </select>
       </label>
-      {isSuperAdmin && (
+      <label className='flex flex-col w-[70%] gap-2'>
+        <span className='font-medium text-xl'>Role*</span>
+        <select
+          id='role'
+          name='role'
+          value={formData.role}
+          className='outline-none text-base border-2 px-2 py-2 rounded-lg'
+          onChange={handleChange}
+          required
+        >
+          <option value=''>None</option>
+          {role.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+      </label>
+      {isSuperAdmin && formData.role === 'Admin Manager' && (
         <label className='flex flex-col w-[70%] gap-2'>
           <span className='font-medium text-xl'>Store Name*</span>
           <select
@@ -150,6 +168,7 @@ const UserForm = ({
               )
               setFormData({ ...formData, assignedStores: selected })
             }}
+            multiple
             required
           >
             <option value=''>Select Store</option>
@@ -172,24 +191,38 @@ const UserForm = ({
           </p>
         </label>
       )}
-      <label className='flex flex-col w-[70%] gap-2'>
-        <span className='font-medium text-xl'>Role*</span>
-        <select
-          id='role'
-          name='role'
-          value={formData.role}
-          className='outline-none text-base border-2 px-2 py-2 rounded-lg'
-          onChange={handleChange}
-          required
-        >
-          <option value=''>None</option>
-          {role.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-      </label>
+      {isSuperAdmin &&
+        formData.role &&
+        formData.role !== 'Admin Manager' &&
+        formData.role !== 'Super Admin' &&
+        formData.role !== 'Company Admin' && (
+          <label className='flex flex-col w-[70%] gap-2'>
+            <span className='font-medium text-xl'>Store Name*</span>
+            <select
+              name='storeId'
+              id='storeId'
+              value={formData.storeId}
+              className='outline-none text-base border-2 p-2 rounded-lg'
+              onChange={handleChange}
+              required
+            >
+              <option value=''>Select Store</option>
+              {stores.length === 0 ? (
+                <option value='' disabled>
+                  {formData.companyId
+                    ? 'No stores available for this company'
+                    : 'Please select a company first'}
+                </option>
+              ) : (
+                stores.map((store) => (
+                  <option key={store._id} value={store._id}>
+                    {store.storeName} - {store.region}
+                  </option>
+                ))
+              )}
+            </select>
+          </label>
+        )}
 
       <label className='flex flex-col w-[70%] gap-2'>
         <span className='font-medium text-xl'>City</span>
