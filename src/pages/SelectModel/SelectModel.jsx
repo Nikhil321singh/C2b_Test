@@ -49,8 +49,12 @@ const SelectModel = () => {
           const num = parseFloat(size)
           const unit = size.toUpperCase()
           // Convert to MB for comparison
-          if (unit.includes('TB')) return num * 1024 * 1024
-          if (unit.includes('GB')) return num * 1024
+          if (unit.includes('TB')) {
+            return num * 1024 * 1024
+          }
+          if (unit.includes('GB')) {
+            return num * 1024
+          }
           return num
         }
 
