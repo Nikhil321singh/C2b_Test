@@ -14,6 +14,10 @@ const CompanyListing = () => {
   const [gstNumber, setGstNumber] = useState("");
   const [panNumber, setPanNumber] = useState("");
   const [remarks, setRemarks] = useState("");
+
+  const [showPrice, setShowPrice] = useState(false);
+  const [maskInfo, setMaskInfo] = useState(false);
+
   const [showSuccess, setShowSuccess] = useState(false);
   const [generatedCompanyCode, setGeneratedCompanyCode] = useState("");
   const navigate = useNavigate();
@@ -41,7 +45,9 @@ const CompanyListing = () => {
 
             // Get presigned URL from backend
             const presignedUrlResponse = await axios.get(
-              `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`,
+              `${
+                import.meta.env.VITE_REACT_APP_ENDPOINT
+              }/api/s3/get-presigned-url`,
               {
                 params: {
                   fileName: fileName,
@@ -59,10 +65,12 @@ const CompanyListing = () => {
                 headers: {
                   "Content-Type": file.type,
                 },
-                transformRequest: [(data, headers) => {
-                  delete headers.Authorization;
-                  return data;
-                }],
+                transformRequest: [
+                  (data, headers) => {
+                    delete headers.Authorization;
+                    return data;
+                  },
+                ],
               });
 
               // Extract the public S3 URL (remove query params from presigned URL)
@@ -92,6 +100,8 @@ const CompanyListing = () => {
         gstNumber: gstNumber.toUpperCase(),
         panNumber: panNumber.toUpperCase(),
         remarks: remarks,
+        showPrice: showPrice, // Added to payload
+        maskInfo: maskInfo, // Added to payload
         attachedDocuments: uploadedDocuments,
       };
 
@@ -156,11 +166,16 @@ const CompanyListing = () => {
 
           {showSuccess && generatedCompanyCode && (
             <div className="ml-10 mr-10 mb-6 p-4 bg-green-100 border-2 border-green-500 rounded-lg">
-              <p className="text-green-800 font-semibold">✓ Company Created Successfully!</p>
-              <p className="text-green-700 mt-2">
-                Generated Company Code: <span className="font-bold">{generatedCompanyCode}</span>
+              <p className="text-green-800 font-semibold">
+                ✓ Company Created Successfully!
               </p>
-              <p className="text-green-600 text-sm mt-1">Redirecting to company details...</p>
+              <p className="text-green-700 mt-2">
+                Generated Company Code:{" "}
+                <span className="font-bold">{generatedCompanyCode}</span>
+              </p>
+              <p className="text-green-600 text-sm mt-1">
+                Redirecting to company details...
+              </p>
             </div>
           )}
 
@@ -219,6 +234,31 @@ const CompanyListing = () => {
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
               />
+            </div>
+            {/* --- NEW FIELD: Show Price --- */}
+            <div className="flex flex-col w-[70%] gap-2">
+              <span className="font-medium text-xl">Show Price</span>
+              <select
+                className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
+                value={showPrice.toString()}
+                onChange={(e) => setShowPrice(e.target.value === "true")}
+              >
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
+            </div>
+
+            {/* --- NEW FIELD: Mask Info --- */}
+            <div className="flex flex-col w-[70%] gap-2">
+              <span className="font-medium text-xl">Mask Info</span>
+              <select
+                className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
+                value={maskInfo.toString()}
+                onChange={(e) => setMaskInfo(e.target.value === "true")}
+              >
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </select>
             </div>
             <div className="flex flex-col w-[70%] gap-2">
               <span className="font-medium text-xl">Attach Documents</span>
