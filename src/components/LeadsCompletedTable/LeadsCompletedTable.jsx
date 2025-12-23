@@ -46,7 +46,9 @@ const TableHeader = () => (
     <tr className='align-top'>
       <th className='p-2 text-sm md:p-3 md:text-base'>Date</th>
       <th className='p-2 text-sm md:p-3 md:text-base'>Company Name</th>
-      <th className='p-2 text-sm md:p-3 md:text-base'>Purchase Grade</th>
+      <th className='p-2 min-w-[140px] text-sm md:p-3 md:text-base'>
+        Purchase Grade
+      </th>
       <th className='p-2 text-sm md:p-3 md:text-base'>Username</th>
       <th className='p-2 text-sm md:p-3 md:text-base'>Category</th>
       <th className='p-2 text-sm md:p-3 md:text-base'>Product Name</th>
@@ -84,7 +86,7 @@ const TableRow = ({ val, index, onDetailsClick, onImageClick, onPDFClick }) => (
         {val?.gradeId?.grade || 'N/A'}
       </span>
     </td>
-    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+    <td className='p-2 min-w-[140px] text-sm text-center md:p-3 md:text-base'>
       {getUserName(val)}
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
