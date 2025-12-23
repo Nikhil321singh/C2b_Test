@@ -269,31 +269,17 @@ const StoreListingTable = () => {
 }
 export default StoreListingTable
 
-const ExtComps = ({
-  sucBox,
-  errMsg,
-  setSucBox,
-  isTableLoaded,
-  setIsTableLoaded,
-  failBox,
-  setFailBox,
-  confBox,
-  setConfBox,
-  setErrMsg,
-  editBoxOpen,
-  setEditBoxOpen,
-  uploadBox,
-  setUploadBox,
+const useStoreDelete = (
+  utoken,
   searchValue,
-  storeEditData,
-  setEditSuccess,
-  selectedStr,
   getData,
   getDataBySearch,
-}) => {
-  const utoken = sessionStorage.getItem('authToken')
-  const [sideMenu, setsideMenu] = useState(false)
-  const [file, setFile] = useState(null)
+  setIsTableLoaded,
+  setConfBox,
+  setErrMsg,
+  setSucBox,
+  setFailBox
+) => {
   const deleteHandler = (storeID) => {
     setIsTableLoaded(true)
     setConfBox(false)
@@ -326,10 +312,24 @@ const ExtComps = ({
         setIsTableLoaded(false)
       })
   }
+  return deleteHandler
+}
+
+const useBulkUpload = (
+  utoken,
+  getData,
+  setIsTableLoaded,
+  setErrMsg,
+  setSucBox,
+  setFailBox
+) => {
+  const [file, setFile] = useState(null)
+
   const handleExcelFileChange = (e) => {
     const selectedFile = e.target.files[0]
     setFile(selectedFile)
   }
+
   const handleBulkSubmit = async (event) => {
     event.preventDefault()
     setIsTableLoaded(true)
@@ -382,23 +382,29 @@ const ExtComps = ({
       setIsTableLoaded(false)
     }
   }
+
+  return { handleBulkSubmit, handleExcelFileChange }
+}
+
+const ModalComponents = ({
+  sucBox,
+  errMsg,
+  setSucBox,
+  failBox,
+  setFailBox,
+  confBox,
+  setConfBox,
+  setIsTableLoaded,
+  uploadBox,
+  setUploadBox,
+  selectedStr,
+  deleteHandler,
+  handleBulkSubmit,
+  handleExcelFileChange,
+  isTableLoaded,
+}) => {
   return (
     <React.Fragment>
-      {editBoxOpen && (
-        <div className={`${styles.edit_page}`}>
-          <StoreEdit
-            setEditSuccess={setEditSuccess}
-            setEditBoxOpen={setEditBoxOpen}
-            storeData={storeEditData}
-          />
-        </div>
-      )}
-      <div className='flex items-center w-screen border-b-2 py-4 h-16 bg-white HEADER '>
-        <div className='navbar'>
-          <AdminNavbar sideMenu={sideMenu} setsideMenu={setsideMenu} />
-          <SideMenu sideMenu={sideMenu} setsideMenu={setsideMenu} />
-        </div>
-      </div>
       {sucBox && (
         <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
@@ -473,6 +479,90 @@ const ExtComps = ({
           />
         </div>
       )}
+    </React.Fragment>
+  )
+}
+
+const ExtComps = ({
+  sucBox,
+  errMsg,
+  setSucBox,
+  isTableLoaded,
+  setIsTableLoaded,
+  failBox,
+  setFailBox,
+  confBox,
+  setConfBox,
+  setErrMsg,
+  editBoxOpen,
+  setEditBoxOpen,
+  uploadBox,
+  setUploadBox,
+  searchValue,
+  storeEditData,
+  setEditSuccess,
+  selectedStr,
+  getData,
+  getDataBySearch,
+}) => {
+  const utoken = sessionStorage.getItem('authToken')
+  const [sideMenu, setsideMenu] = useState(false)
+
+  const deleteHandler = useStoreDelete(
+    utoken,
+    searchValue,
+    getData,
+    getDataBySearch,
+    setIsTableLoaded,
+    setConfBox,
+    setErrMsg,
+    setSucBox,
+    setFailBox
+  )
+
+  const { handleBulkSubmit, handleExcelFileChange } = useBulkUpload(
+    utoken,
+    getData,
+    setIsTableLoaded,
+    setErrMsg,
+    setSucBox,
+    setFailBox
+  )
+
+  return (
+    <React.Fragment>
+      {editBoxOpen && (
+        <div className={`${styles.edit_page}`}>
+          <StoreEdit
+            setEditSuccess={setEditSuccess}
+            setEditBoxOpen={setEditBoxOpen}
+            storeData={storeEditData}
+          />
+        </div>
+      )}
+      <div className='flex items-center w-screen border-b-2 py-4 h-16 bg-white HEADER '>
+        <div className='navbar'>
+          <AdminNavbar sideMenu={sideMenu} setsideMenu={setsideMenu} />
+          <SideMenu sideMenu={sideMenu} setsideMenu={setsideMenu} />
+        </div>
+      </div>
+      <ModalComponents
+        sucBox={sucBox}
+        errMsg={errMsg}
+        setSucBox={setSucBox}
+        failBox={failBox}
+        setFailBox={setFailBox}
+        confBox={confBox}
+        setConfBox={setConfBox}
+        setIsTableLoaded={setIsTableLoaded}
+        uploadBox={uploadBox}
+        setUploadBox={setUploadBox}
+        selectedStr={selectedStr}
+        deleteHandler={deleteHandler}
+        handleBulkSubmit={handleBulkSubmit}
+        handleExcelFileChange={handleExcelFileChange}
+        isTableLoaded={isTableLoaded}
+      />
     </React.Fragment>
   )
 }
