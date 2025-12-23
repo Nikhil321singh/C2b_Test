@@ -14,6 +14,7 @@ import ProfileBox from '../../components/ProfileBox/ProfileBox'
 import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from 'react-icons/io'
 import { BeatLoader } from 'react-spinners'
 import { IoArrowBack } from 'react-icons/io5'
+import { appleModelOrder } from '../../utils/appleDevice'
 const data = JSON.parse(sessionStorage.getItem('dataModel'))
 
 const DeviceType = sessionStorage.getItem('DeviceType')
@@ -145,52 +146,6 @@ const SelectDevice = () => {
   }
   const isArray = Array.isArray(modelInfo)
 
-  const appleModelOrder = [
-    'Apple iPhone 6',
-    'Apple iPhone 6 Plus',
-    'Apple iPhone 6S',
-    'Apple iPhone 6S Plus',
-    'Apple iPhone SE 1st Generation',
-    'Apple iPhone 7',
-    'Apple iPhone 7 Plus',
-    'Apple iPhone 8',
-    'Apple iPhone 8 Plus',
-    'Apple iPhone X',
-    'Apple iPhone XS',
-    'Apple iPhone XS Max',
-    'Apple iPhone XR',
-    'Apple iPhone 11',
-    'Apple iPhone 11 Pro',
-    'Apple iPhone 11 Pro Max',
-    'Apple iPhone SE 2020',
-    'Apple iPhone 12 Mini',
-    'Apple iPhone 12',
-    'Apple iPhone 12 Pro',
-    'Apple iPhone 12 Pro Max',
-    'Apple iPhone 13 Mini',
-    'Apple iPhone 13',
-    'Apple iPhone 13 Pro',
-    'Apple iPhone 13 Pro Max',
-    'Apple iPhone SE 2022',
-    'Apple iPhone 14',
-    'Apple iPhone 14 Plus',
-    'Apple iPhone 14 Pro',
-    'Apple iPhone 14 Pro Max',
-    'Apple iPhone 15',
-    'Apple iPhone 15 Plus',
-    'Apple iPhone 15 Pro',
-    'Apple iPhone 15 Pro Max',
-    'Apple iPhone 16',
-    'Apple iPhone 16 Plus',
-    'Apple iPhone 16 Pro',
-    'Apple iPhone 16 Pro Max',
-    'Apple iPhone 16e',
-    'Apple iPhone 17',
-    'Apple iPhone 17 Air',
-    'Apple iPhone 17 Pro',
-    'Apple iPhone 17 Pro Max',
-  ]
-
   const sortedModels = isArray
     ? [...modelInfo].sort((a, b) => {
         // Check if this is Apple brand
@@ -206,9 +161,13 @@ const SelectDevice = () => {
             return indexA - indexB
           }
           // If only A is in the order, it comes first
-          if (indexA !== -1) return -1
+          if (indexA !== -1) {
+            return -1
+          }
           // If only B is in the order, it comes first
-          if (indexB !== -1) return 1
+          if (indexB !== -1) {
+            return 1
+          }
         }
 
         // Default numeric sorting for non-Apple or models not in the order

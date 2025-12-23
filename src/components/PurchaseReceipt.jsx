@@ -21,7 +21,9 @@ const maskEmail = (email, storeName) => {
   if (storeName === 'Grest@MG_BS02') {
     return email
   }
-  if (!email) return ''
+  if (!email) {
+    return ''
+  }
 
   const [namee, domain] = email.split('@')
   const visibleLength = Math.ceil(namee?.length * 0.25)

@@ -53,13 +53,13 @@ const sampleDownloadHandler = () => {
   // Create sample data structure matching the exact format from public folder
   const sampleData = [
     {
-      'storeName': '',
-      'region': '',
-      'email': '',
-      'uniqueId': '',
-      'contactNumber': '',
-      'address': ''
-    }
+      storeName: '',
+      region: '',
+      email: '',
+      uniqueId: '',
+      contactNumber: '',
+      address: '',
+    },
   ]
 
   const ws = XLSX.utils.json_to_sheet(sampleData)
@@ -98,12 +98,10 @@ const StoreListingTable = () => {
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data.result)
         setData(response.data.result)
         setIsTableLoaded(false)
       })
       .catch((error) => {
-        console.log(error)
         setErrMsg('Failed to load data')
         setFailBox(true)
         setIsTableLoaded(false)
@@ -203,22 +201,18 @@ const StoreListingTable = () => {
           >
             <IoMdAdd /> Add Store
           </button>
-
           <button
             className={`${styles.bulkdown_button} w-full`}
             onClick={sampleDownloadHandler}
           >
             <FaDownload /> Upload Sample
           </button>
-
           <button
             className={`${styles.bulkdown_button} w-full`}
             onClick={() => setUploadBox(true)}
           >
             <FaUpload /> Bulk Upload
           </button>
-
-          {/* Search bar and Refresh - combined in one row for sm and below */}
           <div className='flex w-full items-center gap-2'>
             <div
               className={`${styles.search_bar_wrap} flex items-center w-full`}
@@ -236,7 +230,6 @@ const StoreListingTable = () => {
                 className='ml-2 cursor-pointer'
               />
             </div>
-            {/* Only show this refresh icon here for small screens */}
             <div className='block md:hidden mr-3'>
               <IoRefresh
                 onClick={handleSearchClear}
@@ -245,8 +238,6 @@ const StoreListingTable = () => {
               />
             </div>
           </div>
-
-          {/* Refresh button for larger screens only */}
           <div
             className={`${styles.icons_box} hidden md:flex items-center w-full`}
           >
@@ -256,7 +247,6 @@ const StoreListingTable = () => {
               className='cursor-pointer'
             />
           </div>
-
           <button
             className={`${styles.bulkdown_button} w-full`}
             onClick={() => downloadExcel(data, curPage)}
@@ -265,7 +255,6 @@ const StoreListingTable = () => {
           </button>
         </div>
       </div>
-
       <StoreTable
         data={data}
         searchValue={searchValue}
