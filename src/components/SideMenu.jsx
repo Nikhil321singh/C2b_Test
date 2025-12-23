@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../utils/axiosInterceptor'
+import { USER_ROLES } from '../constants/roleConstants'
 
 function SideMenu({ setsideMenu, sideMenu }) {
   const navigate = useNavigate()
@@ -9,11 +10,11 @@ function SideMenu({ setsideMenu, sideMenu }) {
 
   const handleHome = () => {
     setsideMenu(!sideMenu)
-    if (profile.role === 'Super Admin') {
+    if (profile.role === USER_ROLES.SUPER_ADMIN || profile.role === USER_ROLES.COMPANY_ADMIN) {
       navigate('/adminmodels')
-    } else if (profile.role === 'Admin Manager') {
+    } else if (profile.role === USER_ROLES.ADMIN_MANAGER) {
       navigate('/customertable')
-    } else if (profile.role === 'Technician') {
+    } else if (profile.role === USER_ROLES.TECHNICIAN) {
       navigate('/devicepickupdashboard')
     }
   }
@@ -94,10 +95,12 @@ function SideMenu({ setsideMenu, sideMenu }) {
   return (
     <>
       {/* //new for change  */}
-      {(profile.role === 'Super Admin' ||
-        profile.role === 'Super_Admin_Unicorn') && (
+      {(profile.role === USER_ROLES.SUPER_ADMIN ||
+        profile.role === USER_ROLES.COMPANY_ADMIN ||
+        profile.role === USER_ROLES.SUPER_ADMIN_UNICORN) && (
         <SuperAdminProfile
           sideMenu={sideMenu}
+          profile={profile}
           handleHome={handleHome}
           handleProfile={handleProfile}
           handleGrade={handleGrade}
@@ -115,8 +118,8 @@ function SideMenu({ setsideMenu, sideMenu }) {
           handleLogout={handleLogout}
         />
       )}
-      {(profile.role === 'Admin Manager' ||
-        profile.role === 'Admin_Manager_Unicorn') && (
+      {(profile.role === USER_ROLES.ADMIN_MANAGER ||
+        profile.role === USER_ROLES.ADMIN_MANAGER_UNICORN) && (
         <div
           className={
             'menu fixed justify-center left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center transition-all duration-950 ease-in ' +
@@ -187,7 +190,7 @@ function SideMenu({ setsideMenu, sideMenu }) {
           </ul>
         </div>
       )}
-      {profile.role === 'Technician' && (
+      {profile.role === USER_ROLES.TECHNICIAN && (
         <div
           className={
             'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-center justify-center transition-all duration-950 ease-in ' +
@@ -224,6 +227,7 @@ export default SideMenu
 
 const SuperAdminProfile = ({
   sideMenu,
+  profile,
   handleHome,
   handleProfile,
   handleGrade,
@@ -240,6 +244,7 @@ const SuperAdminProfile = ({
   handleQuoteTracking,
   handleCouponManagement,
 }) => {
+  const isCompanyAdmin = profile.role === USER_ROLES.COMPANY_ADMIN
   return (
     <div
       className={
@@ -260,80 +265,176 @@ const SuperAdminProfile = ({
         >
           Profile
         </li>
-        <li
-          className='text-[20px] font-[300] cursor-pointer '
-          onClick={handleGrade}
-        >
-          Grade Pricing
-        </li>
-        <li
-          className='text-[20px] font-[300] cursor-pointer '
-          onClick={handleRegister}
-        >
-          Register User
-        </li>
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleGrade}
+          >
+            Grade Pricing
+          </li>
+        )}
+        {isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleRegister}
+          >
+            Register User
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleRegister}
+          >
+            Register User
+          </li>
+        )}
 
-        <li
-          className='text-[20px] font-[300] cursor-pointer '
-          onClick={handleBulkUploadHistory}
-        >
-          Bulk Upload History
-        </li>
+        {isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleBulkUploadHistory}
+          >
+            Bulk Upload History
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleBulkUploadHistory}
+          >
+            Bulk Upload History
+          </li>
+        )}
 
-        <li
-          className='text-[20px] font-[300] cursor-pointer '
-          onClick={handleStoreListing}
-        >
-          Store Listing
-        </li>
-        <li
-          className='text-[20px] font-[300] cursor-pointer '
-          onClick={handleStoreReport}
-        >
-          Store Report
-        </li>
-        <li
-          className='text-[20px] font-[300] cursor-pointer'
-          onClick={handleQuoteTracking}
-        >
-          Quote Tracking
-        </li>
-        <li
-          className='text-[20px] font-[300] cursor-pointer'
-          onClick={handleCouponManagement}
-        >
-          Coupon Management
-        </li>
-        <li
-          className='text-[20px] font-[300] cursor-pointer '
-          onClick={handleTable}
-        >
-          Customer Table
-        </li>
-        <li
-          className='text-[20px] font-[300] cursor-pointer '
-          onClick={handleCompanyListing}
-        >
-          Company Listing
-        </li>
-        <li
-          className='text-[20px] font-[300] cursor-pointer '
-          onClick={handlpickup}
-        >
-          Pickup & Cancel Device
-        </li>
-        <li
-          onClick={handleTechnician}
-          className='text-[20px] cursor-pointer font-[300] '
-        >
-          Technician Report
-        </li>
-        <li
-          className='font-[300] cursor-pointer text-[20px] '
-          onClick={adminDashboard}
-        >
-          Admin Dashboard
-        </li>
+        {isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleStoreListing}
+          >
+            Store Listing
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleStoreListing}
+          >
+            Store Listing
+          </li>
+        )}
+        {isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleStoreReport}
+          >
+            Store Report
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleStoreReport}
+          >
+            Store Report
+          </li>
+        )}
+        {isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer'
+            onClick={handleQuoteTracking}
+          >
+            Quote Tracking
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer'
+            onClick={handleQuoteTracking}
+          >
+            Quote Tracking
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer'
+            onClick={handleCouponManagement}
+          >
+            Coupon Management
+          </li>
+        )}
+        {isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleTable}
+          >
+            Customer Table
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleTable}
+          >
+            Customer Table
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handleCompanyListing}
+          >
+            Company Listing
+          </li>
+        )}
+        {isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handlpickup}
+          >
+            Pickup & Cancel Device
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='text-[20px] font-[300] cursor-pointer '
+            onClick={handlpickup}
+          >
+            Pickup & Cancel Device
+          </li>
+        )}
+        {isCompanyAdmin && (
+          <li
+            onClick={handleTechnician}
+            className='text-[20px] cursor-pointer font-[300] '
+          >
+            Technician Report
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            onClick={handleTechnician}
+            className='text-[20px] cursor-pointer font-[300] '
+          >
+            Technician Report
+          </li>
+        )}
+        {isCompanyAdmin && (
+          <li
+            className='font-[300] cursor-pointer text-[20px] '
+            onClick={adminDashboard}
+          >
+            Admin Dashboard
+          </li>
+        )}
+        {!isCompanyAdmin && (
+          <li
+            className='font-[300] cursor-pointer text-[20px] '
+            onClick={adminDashboard}
+          >
+            Admin Dashboard
+          </li>
+        )}
         <li
           className='text-[20px] font-[300] cursor-pointer '
           onClick={handleLogout}

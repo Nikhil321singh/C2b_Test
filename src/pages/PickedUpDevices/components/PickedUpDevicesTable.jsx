@@ -165,7 +165,9 @@ const PickedUpDevicesTable = ({
   const renderActionCell = (val) => (
     <td className={TABLE_CELL_CENTER}>
       {userRoles[userRole] === 'Store' && renderStoreActions(val)}
-      {(userRole === 'Super Admin' || userRole === 'Admin Manager') && (
+      {(userRole === 'Super Admin' ||
+        userRole === 'Company Admin' ||
+        userRole === 'Admin Manager') && (
         <UserAdminContent
           confHandler={confHandler}
           val={val}
