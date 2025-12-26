@@ -37,6 +37,13 @@ const PickedUpFilter = ({
     setRegion("");
     setStoreName(import.meta.env.VITE_USER_STORE_NAME);
   };
+  // FIX: Added storeData to dependency array
+  // This ensures the dropdown updates when the API data arrives from the parent
+  useEffect(() => {
+    if (storeDrop && searchTerm.trim() === "") {
+      setFilteredStores(storeData);
+    }
+  }, [storeDrop, searchTerm, storeData]);
 
   useEffect(() => {
     if (dateValue === "" && searchValue === "") {
@@ -84,14 +91,29 @@ const PickedUpFilter = ({
 
   const handleStoreChange = (value) => {
     setStoreDrop(false);
-    const filteredStoresTemp2 = allStore?.filter(
-      (store) => store.storeName === value
-    );
-    if (filteredStoresTemp2.length > 0) {
-      const newRegion = filteredStoresTemp2[0].region;
-      setRegion(newRegion);
-      dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
-      setStoreName(value);
+
+    //Logic for "All" selection in Store Dropdown
+    if (value === "") {
+      // If Store is All, Region must also be All
+      setRegion("");
+      setStoreName("");
+
+      // Reset storeData to show all stores (since region filter is removed)
+      const allStoreNames = allStore.map((store) => store.storeName);
+      setStoreData(allStoreNames);
+
+      dispatch(setStoreFilter({ selStore: "", selRegion: "" }));
+    } else {
+      // Existing logic for specific store selection
+      const filteredStoresTemp2 = allStore?.filter(
+        (store) => store.storeName === value
+      );
+      if (filteredStoresTemp2.length > 0) {
+        const newRegion = filteredStoresTemp2[0].region;
+        setRegion(newRegion);
+        dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
+        setStoreName(value);
+      }
     }
   };
 
@@ -148,7 +170,9 @@ const PickedUpFilter = ({
               }}
             >
               {/* Changed label to show "All" if region is empty */}
-              <p className="truncate">{region === "" ? "All Region" : region}</p>
+              <p className="truncate">
+                {region === "" ? "All Region" : region}
+              </p>
               <FaAngleDown
                 size={17}
                 className={`${regionDrop && "rotate-180"}`}
@@ -180,9 +204,9 @@ const PickedUpFilter = ({
               className={`${styles.filter_button} w-full`}
               onClick={() => setStoreDrop(!storeDrop)}
             >
-              {/* "Select Store" is kept as is for empty state */}
+              {/* UPDATED: Show "All" if searchTerm is empty */}
               <p className="  truncate">
-                {searchTerm === "" ? "Select Store" : searchTerm}
+                {searchTerm === "" ? "All Store" : searchTerm}
               </p>
               <FaAngleDown
                 className={`${storeDrop && "rotate-180"}`}
@@ -201,6 +225,18 @@ const PickedUpFilter = ({
                 <div
                   className={`overflow-y-scroll   max-h-[200px] ${styles.filter_drop} w-full`}
                 >
+                  {/* All option at the top of Store Dropdown */}
+                  <div
+                    onClick={() => {
+                      handleStoreChange("");
+                      setSearchTerm("");
+                      setStoreDrop(false);
+                    }}
+                    className={`${styles.filter_option}`}
+                  >
+                    <p className="truncate">All</p>
+                  </div>
+
                   {filteredStores.length > 0 ? (
                     filteredStores.map((item2, index) => (
                       <div

@@ -147,6 +147,7 @@ const LeadsCompletedTable = ({ data }) => {
   const [dataIndex, setDataIndex] = useState(null)
 
   const handleDetailsClick = (value) => {
+    console.log('cvalue',value)
     setQNAData(value.QNA)
     setShowModal(true)
   }

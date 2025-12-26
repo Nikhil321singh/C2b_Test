@@ -59,7 +59,7 @@ const PickedUpDevicesTable = ({
   const [tempRefId, setTempRefId] = useState("");
   const [tempUniqueCode, setTempUniqueCode] = useState("");
   const [tempNewStatus, setTempNewStatus] = useState("");
-  console.log("pickedup data", data);
+
   const viewHandler = (refID) => {
     setViewRef(refID);
     setShowView(true);
