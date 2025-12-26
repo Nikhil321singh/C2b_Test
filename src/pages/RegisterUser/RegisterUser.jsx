@@ -51,7 +51,7 @@ const RegisterUser = () => {
 
   // Set company ID for Company Admin automatically
   useEffect(() => {
-    if (isCompanyAdmin && LoggedInUser?.companyId) {
+    if ((isCompanyAdmin || isAdminManager) && LoggedInUser?.companyId) {
       setFormData((prev) => ({ ...prev, companyId: LoggedInUser.companyId }))
     }
   }, [isCompanyAdmin, LoggedInUser])
@@ -138,7 +138,9 @@ const RegisterUser = () => {
     }
 
     // For Company Admin, ensure their company ID is used
-    const finalCompanyId = isCompanyAdmin ? LoggedInUser.companyId : formData.companyId
+    const finalCompanyId = isCompanyAdmin
+      ? LoggedInUser.companyId
+      : formData.companyId
 
     const payload = {
       ...formData,
@@ -179,7 +181,7 @@ const RegisterUser = () => {
         setModal({
           open: true,
           success: false,
-          msg: 'Failed to add new user, ' + error.response?.data?.msg,
+          msg: error.response?.data?.msg || 'Failed to add new user',
         })
       })
   }
