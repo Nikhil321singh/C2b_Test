@@ -253,7 +253,7 @@ const QuickQuote = () => {
           <div className='underline'></div>
 
           {/* Store Selection Dropdown */}
-          <div className='mb-6 mt-4'>
+          {/* <div className='mb-6 mt-4'>
             <label className='block text-sm font-medium mb-2 text-gray-700'>
               Select Store <span className='text-red-500'>*</span>
             </label>
@@ -281,7 +281,7 @@ const QuickQuote = () => {
             {stores.length === 0 && !storeError && (
               <p className='text-gray-500 text-sm mt-1'>No stores available</p>
             )}
-          </div>
+          </div> */}
 
           <QuestionList
             QQState={QQState}

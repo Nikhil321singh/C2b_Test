@@ -58,8 +58,8 @@ const UserForm = ({
   // Filter roles based on logged-in user
   const getFilteredRoles = () => {
     if (isSuperAdmin) {
-      // Super Admin can see all roles
-      return role
+      // Super Admin can see all roles except Technician
+      return role.filter(r => r !== USER_ROLES.TECHNICIAN)
     } else if (isCompanyAdmin) {
       // Company Admin can only see: Admin Manager, Technician, Sale User
       return role.filter(r =>
