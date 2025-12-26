@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import PendingDevicesTable from '../../../components/PendingDevicesTable/PendingDevicesTable'
-import StatusSelector from './StatusSelector'
-import ModalContainer from './ModalContainer'
-import { useStatusHandlers } from '../hooks/useStatusHandlers'
-import axios from 'axios'
+import React, { useState } from "react";
+import PendingDevicesTable from "../../../components/PendingDevicesTable/PendingDevicesTable";
+import StatusSelector from "./StatusSelector";
+import ModalContainer from "./ModalContainer";
+import { useStatusHandlers } from "../hooks/useStatusHandlers";
+import axios from "axios";
 
 const PDTable = ({
   pendingTableData,
@@ -23,14 +23,15 @@ const PDTable = ({
   setIsTableLoaded,
   setSuccessMod,
   getData,
+  userRole,
 }) => {
-  const token2 = sessionStorage.getItem('authToken')
-  const [showCancelModal, setShowCancelModal] = useState(false)
-  const [showHoldModal, setShowHoldModal] = useState(false)
-  const [showQCDoneModal, setShowQCDoneModal] = useState(false)
+  const token2 = sessionStorage.getItem("authToken");
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showHoldModal, setShowHoldModal] = useState(false);
+  const [showQCDoneModal, setShowQCDoneModal] = useState(false);
   const [showAvailableForPickupModal, setShowAvailableForPickupModal] =
-    useState(false)
-  const [showPendingInQCModal, setShowPendingInQCModal] = useState(false)
+    useState(false);
+  const [showPendingInQCModal, setShowPendingInQCModal] = useState(false);
 
   const statusHandlers = {
     setSelectedIds,
@@ -42,29 +43,29 @@ const PDTable = ({
     setErrorMsg2,
     setSuccessMod,
     setFailMode,
-    getData
-  }
+    getData,
+  };
 
   const {
     showModalForStatus,
     createStatusUpdateConfig,
     handleUpdateSuccess,
     handleUpdateError,
-  } = useStatusHandlers(token2, statusHandlers)
+  } = useStatusHandlers(token2, statusHandlers);
 
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {
-      setErrorMsg('No device selected')
-      setFailMode(true)
-      return
+      setErrorMsg("No device selected");
+      setFailMode(true);
+      return;
     }
-    const newStatus = event.target.value
-    setSelectedStatus(newStatus)
-    setIsTableLoaded(true)
+    const newStatus = event.target.value;
+    setSelectedStatus(newStatus);
+    setIsTableLoaded(true);
 
     const LDIds = pendingTableData
       .filter((obj) => selectedIds.includes(obj._id))
-      .map((obj) => obj._id.toString())
+      .map((obj) => obj._id.toString());
 
     if (
       showModalForStatus(
@@ -76,27 +77,27 @@ const PDTable = ({
         setShowCancelModal
       )
     ) {
-      return
+      return;
     }
 
-    const config = createStatusUpdateConfig(LDIds, newStatus)
+    const config = createStatusUpdateConfig(LDIds, newStatus);
     axios
       .request(config)
       .then((response) => handleUpdateSuccess(response, newStatus))
-      .catch(handleUpdateError)
-    setSelectedStatus('')
-  }
+      .catch(handleUpdateError);
+    setSelectedStatus("");
+  };
 
   const confHandler = () => {
-    setIsTableLoaded(true)
+    setIsTableLoaded(true);
     if (selectedIds.length === 0) {
-      setIsTableLoaded(false)
-      setErrorMsg('No device selected')
-      setFailMode(true)
+      setIsTableLoaded(false);
+      setErrorMsg("No device selected");
+      setFailMode(true);
     } else {
-      setConfMod(true)
+      setConfMod(true);
     }
-  }
+  };
 
   return (
     <React.Fragment>
@@ -107,6 +108,7 @@ const PDTable = ({
         setSelectedRows={setSelectedRows}
         selectedData={selectedData}
         selectedRows={selectedRows}
+        userRole={userRole}
       />
       <StatusSelector
         selectedStatus={selectedStatus}
@@ -138,7 +140,7 @@ const PDTable = ({
         setFailMode={setFailMode}
       />
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default PDTable
+export default PDTable;

@@ -147,6 +147,7 @@ const LeadsCompletedTable = ({ data }) => {
   const [dataIndex, setDataIndex] = useState(null)
 
   const handleDetailsClick = (value) => {
+    console.log('cvalue',value)
     setQNAData(value.QNA)
     setShowModal(true)
   }
@@ -163,12 +164,16 @@ const LeadsCompletedTable = ({ data }) => {
 
   const handleGeneratePdf = async (index) => {
     console.log('store is', data[index]?.store?.storeName)
+    console.log(data[index])
     const dateString = data[index]?.updatedAt
     const formattedDate = new Date(dateString).toLocaleDateString('en-IN', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
     })
+
+    const showPrice = data[index].companyInfo.showPrice;
+    const maskInfo = data[index].companyInfo.maskInfo;
 
     const signatureUrl = data[index]?.documentId?.signature
     const signatureBase64 = signatureUrl
@@ -193,6 +198,8 @@ const LeadsCompletedTable = ({ data }) => {
         RAM={data[index]?.ram}
         formattedDate={formattedDate}
         signatureUrl={signatureBase64 || signatureUrl}
+        showPrice={showPrice}
+        maskInfo={maskInfo}
       />
     )
 
