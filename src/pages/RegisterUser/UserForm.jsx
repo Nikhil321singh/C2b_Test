@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { IoEye, IoEyeOffSharp } from 'react-icons/io5'
+import { FaAngleDown } from 'react-icons/fa6'
+import { USER_ROLES } from '../../constants/roleConstants'
 
 const role = import.meta.env.VITE_REACT_APP_ROLES
   ? import.meta.env.VITE_REACT_APP_ROLES.split(',').map((item) => item.trim())
@@ -11,6 +13,8 @@ const UserForm = ({
   handleChange,
   storeData,
   isSuperAdmin,
+  isCompanyAdmin,
+  isAdminManager,
   errMsg,
   isValid,
   setPasswordFocus,
@@ -19,6 +23,61 @@ const UserForm = ({
   setFormData,
 }) => {
   const [showUserPassword, setShowUserPassword] = useState(false)
+  const [showStoreDropdown, setShowStoreDropdown] = useState(false)
+  const dropdownRef = useRef(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowStoreDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleStoreToggle = (storeId) => {
+    const currentStores = formData.assignedStores || []
+    const updatedStores = currentStores.includes(storeId)
+      ? currentStores.filter((id) => id !== storeId)
+      : [...currentStores, storeId]
+    setFormData({ ...formData, assignedStores: updatedStores })
+  }
+
+  const getSelectedStoresDisplay = () => {
+    const selectedCount = (formData.assignedStores || []).length
+    if (selectedCount === 0) return 'Select Stores'
+    if (selectedCount === 1) {
+      const store = stores.find((s) => s._id === formData.assignedStores[0])
+      return store ? `${store.storeName} - ${store.region}` : 'Select Stores'
+    }
+    return `${selectedCount} stores selected`
+  }
+
+  // Filter roles based on logged-in user
+  const getFilteredRoles = () => {
+    if (isSuperAdmin) {
+      // Super Admin can see all roles
+      return role
+    } else if (isCompanyAdmin) {
+      // Company Admin can only see: Admin Manager, Technician, Sale User
+      return role.filter(r =>
+        r === USER_ROLES.ADMIN_MANAGER ||
+        r === USER_ROLES.TECHNICIAN ||
+        r === USER_ROLES.SALE_USER
+      )
+    } else if (isAdminManager) {
+      // Admin Manager can only see: Technician, Sale User
+      return role.filter(r =>
+        r === USER_ROLES.TECHNICIAN ||
+        r === USER_ROLES.SALE_USER
+      )
+    }
+    return []
+  }
+
+  const filteredRoles = getFilteredRoles()
 
   return (
     <form
@@ -118,24 +177,26 @@ const UserForm = ({
           required
         />
       </label>
-      <label className='flex flex-col w-[70%] gap-2'>
-        <span className='font-medium text-xl'>Company*</span>
-        <select
-          id='companyId'
-          name='companyId'
-          value={formData.companyId}
-          className='outline-none text-base border-2 px-2 py-2 rounded-lg'
-          onChange={handleChange}
-          required
-        >
-          <option value=''>Select Company</option>
-          {companies.map((company) => (
-            <option key={company._id} value={company._id}>
-              {company.name} ({company.companyCode})
-            </option>
-          ))}
-        </select>
-      </label>
+      {isSuperAdmin && (
+        <label className='flex flex-col w-[70%] gap-2'>
+          <span className='font-medium text-xl'>Company*</span>
+          <select
+            id='companyId'
+            name='companyId'
+            value={formData.companyId}
+            className='outline-none text-base border-2 px-2 py-2 rounded-lg'
+            onChange={handleChange}
+            required
+          >
+            <option value=''>Select Company</option>
+            {companies.map((company) => (
+              <option key={company._id} value={company._id}>
+                {company.name} ({company.companyCode})
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label className='flex flex-col w-[70%] gap-2'>
         <span className='font-medium text-xl'>Role*</span>
         <select
@@ -147,55 +208,79 @@ const UserForm = ({
           required
         >
           <option value=''>None</option>
-          {role.map((item) => (
+          {filteredRoles.map((item) => (
             <option key={item} value={item}>
               {item}
             </option>
           ))}
         </select>
       </label>
-      {isSuperAdmin && formData.role === 'Admin Manager' && (
-        <label className='flex flex-col w-[70%] gap-2'>
-          <span className='font-medium text-xl'>Store Name*</span>
-          <select
-            name='assignedStores'
-            id='assignedStores'
-            value={formData.assignedStores}
-            className='outline-none text-base border-2 p-2 rounded-lg'
-            onChange={(e) => {
-              const selected = Array.from(e.target.selectedOptions).map(
-                (option) => option.value
-              )
-              setFormData({ ...formData, assignedStores: selected })
-            }}
-            multiple
-            required
-          >
-            <option value=''>Select Store</option>
-            {stores.length === 0 ? (
-              <option value='' disabled>
-                {formData.companyId
-                  ? 'No stores available for this company'
-                  : 'Please select a company first'}
-              </option>
-            ) : (
-              stores.map((store) => (
-                <option key={store._id} value={store._id}>
-                  {store.storeName} - {store.region}
-                </option>
-              ))
+      {(isSuperAdmin || isCompanyAdmin || isAdminManager) &&
+        (formData.role === USER_ROLES.ADMIN_MANAGER ||
+          formData.role === USER_ROLES.TECHNICIAN) && (
+          <div className='flex flex-col w-[70%] gap-2' ref={dropdownRef}>
+            <span className='font-medium text-xl'>Store Name*</span>
+            <div className='relative'>
+              <div
+                onClick={() => setShowStoreDropdown(!showStoreDropdown)}
+                className='outline-none text-base border-2 p-2 rounded-lg cursor-pointer flex justify-between items-center bg-white'
+              >
+                <span className='truncate'>{getSelectedStoresDisplay()}</span>
+                <FaAngleDown
+                  className={`transition-transform ${
+                    showStoreDropdown ? 'rotate-180' : ''
+                  }`}
+                  size={17}
+                />
+              </div>
+              {showStoreDropdown && (
+                <div className='absolute z-10 w-full mt-1 bg-white border-2 rounded-lg shadow-lg max-h-60 overflow-y-auto'>
+                  {stores.length === 0 ? (
+                    <div className='p-3 text-gray-500'>
+                      {formData.companyId
+                        ? 'No stores available for this company'
+                        : 'Please select a company first'}
+                    </div>
+                  ) : (
+                    stores.map((store) => (
+                      <div
+                        key={store._id}
+                        onClick={() => handleStoreToggle(store._id)}
+                        className='p-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2'
+                      >
+                        <input
+                          type='checkbox'
+                          checked={(formData.assignedStores || []).includes(
+                            store._id
+                          )}
+                          onChange={() => {}}
+                          className='w-4 h-4 cursor-pointer'
+                        />
+                        <span className='text-base'>
+                          {store.storeName} - {store.region}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+            {(formData.assignedStores || []).length === 0 && (
+              <input
+                type='text'
+                className='hidden'
+                required
+                value={(formData.assignedStores || []).length > 0 ? 'valid' : ''}
+              />
             )}
-          </select>
-          <p className='text-sm text-gray-500'>
-            Hold Ctrl (Windows) or Cmd (Mac) to select multiple stores
-          </p>
-        </label>
-      )}
-      {isSuperAdmin &&
+          </div>
+        )}
+      {(isSuperAdmin || isCompanyAdmin || isAdminManager) &&
         formData.role &&
-        formData.role !== 'Admin Manager' &&
-        formData.role !== 'Super Admin' &&
-        formData.role !== 'Company Admin' && (
+        formData.role !== USER_ROLES.ADMIN_MANAGER &&
+        formData.role !== USER_ROLES.TECHNICIAN &&
+        formData.role !== USER_ROLES.SUPER_ADMIN &&
+        formData.role !== USER_ROLES.COMPANY_ADMIN && (
           <label className='flex flex-col w-[70%] gap-2'>
             <span className='font-medium text-xl'>Store Name*</span>
             <select

@@ -90,10 +90,10 @@ const Login = () => {
     const customTable = '/customertable'
     switch (role) {
       case 'Super Admin':
-      case 'Company Admin':
         navigate('/adminmodels')
         break
       case 'Admin Manager':
+      case 'Company Admin':
       case 'Super_Admin_Unicorn':
       case 'Admin_Manager_Unicorn':
         navigate(customTable)

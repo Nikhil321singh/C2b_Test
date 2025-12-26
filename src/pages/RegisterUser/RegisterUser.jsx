@@ -9,6 +9,7 @@ import StatusModal from './StatusModal'
 import UserForm from './UserForm'
 import { useStoreData } from './useStoreData'
 import { usePasswordValidation } from './usePasswordValidation'
+import { USER_ROLES } from '../../constants/roleConstants'
 
 const initForm = {
   firstName: '',
@@ -27,7 +28,9 @@ const initForm = {
 const RegisterUser = () => {
   const token = sessionStorage.getItem('authToken')
   const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
-  const isSuperAdmin = LoggedInUser?.role === 'Super Admin'
+  const isSuperAdmin = LoggedInUser?.role === USER_ROLES.SUPER_ADMIN
+  const isCompanyAdmin = LoggedInUser?.role === USER_ROLES.COMPANY_ADMIN
+  const isAdminManager = LoggedInUser?.role === USER_ROLES.ADMIN_MANAGER
 
   const [sideMenu, setsideMenu] = useState(false)
   const [isGrest, setIsGrest] = useState(null)
@@ -46,21 +49,30 @@ const RegisterUser = () => {
   const [errMsg, setErrMsg] = useState('')
   usePasswordValidation(formData.password, setPasswordValid, setErrMsg)
 
-  // Fetch companies on mount
+  // Set company ID for Company Admin automatically
   useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/findAll`,
-          { headers: { Authorization: token } }
-        )
-        setCompanies(response.data.result || [])
-      } catch (error) {
-        console.error('Error fetching companies:', error)
-      }
+    if (isCompanyAdmin && LoggedInUser?.companyId) {
+      setFormData((prev) => ({ ...prev, companyId: LoggedInUser.companyId }))
     }
-    fetchCompanies()
-  }, [token])
+  }, [isCompanyAdmin, LoggedInUser])
+
+  // Fetch companies on mount (only for Super Admin)
+  useEffect(() => {
+    if (isSuperAdmin) {
+      const fetchCompanies = async () => {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/findAll`,
+            { headers: { Authorization: token } }
+          )
+          setCompanies(response.data.result || [])
+        } catch (error) {
+          console.error('Error fetching companies:', error)
+        }
+      }
+      fetchCompanies()
+    }
+  }, [token, isSuperAdmin])
 
   console.log(formData)
 
@@ -105,7 +117,10 @@ const RegisterUser = () => {
         storeId: '',
       })
     } else {
-      setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value })
+      setFormData({
+        ...formData,
+        [name]: type === 'checkbox' ? checked : value,
+      })
     }
   }
 
@@ -122,15 +137,24 @@ const RegisterUser = () => {
       return
     }
 
+    // For Company Admin, ensure their company ID is used
+    const finalCompanyId = isCompanyAdmin ? LoggedInUser.companyId : formData.companyId
+
     const payload = {
       ...formData,
-      companyId: formData.companyId,
+      companyId: finalCompanyId,
     }
 
     // Remove store fields based on role
-    if (formData.role === 'Admin Manager') {
+    if (
+      formData.role === USER_ROLES.ADMIN_MANAGER ||
+      formData.role === USER_ROLES.TECHNICIAN
+    ) {
       delete payload.storeId
-    } else if (formData.role === 'Super Admin' || formData.role === 'Company Admin') {
+    } else if (
+      formData.role === USER_ROLES.SUPER_ADMIN ||
+      formData.role === USER_ROLES.COMPANY_ADMIN
+    ) {
       delete payload.storeId
       delete payload.assignedStores
     } else {
@@ -222,6 +246,8 @@ const RegisterUser = () => {
             handleChange={handleChange}
             storeData={storeData}
             isSuperAdmin={isSuperAdmin}
+            isCompanyAdmin={isCompanyAdmin}
+            isAdminManager={isAdminManager}
             errMsg={errMsg}
             isValid={passwordValid}
             setIsGrest={setIsGrest}

@@ -159,17 +159,10 @@ const PickupHistory = () => {
         </div>
       )}
       <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER header">
-        {userRole === "Technician" ? (
-          <div className="flex items-center justify-between w-full ">
-            <ProfileBox />
-            <img className="w-40" src={GREST_LOGO} alt="app logo" />
-          </div>
-        ) : (
-          <div className="navbar">
-            <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
-            <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
-          </div>
-        )}
+        <div className="navbar">
+          <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
+          <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
+        </div>
       </div>
       <NavigateTable />
       <button

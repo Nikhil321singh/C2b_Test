@@ -16,7 +16,9 @@ import { FaDownload, FaUpload } from 'react-icons/fa6'
 import AdminNavbar from '../../components/Admin_Navbar'
 import SideMenu from '../../components/SideMenu'
 import StoreEdit from '../../components/StoreEdit/StoreEdit'
+import StoreBulkUploadModal from '../../components/StoreBulkUploadModal'
 import { useNavigate } from 'react-router-dom'
+import { USER_ROLES } from '../../constants/roleConstants'
 
 const succTextColor = 'text-green-500'
 const failTextColor = 'text-primary'
@@ -30,7 +32,7 @@ const downloadExcel = (dataDown, curPage) => {
     return {
       'Date Created': new Date(item.createdAt).toLocaleDateString('en-GB'),
       'Company Name': item?.companyId?.name || 'N/A',
-      'Company ID': item?.companyId?.companyCode || 'N/A',
+      'Company Code': item?.companyId?.companyCode || 'N/A',
       'Store Name': item?.storeName,
       'Store Unique Id': item?.uniqueId,
       'Store Email': item.email,
@@ -55,12 +57,12 @@ const sampleDownloadHandler = () => {
   // Create sample data structure matching the exact format from public folder
   const sampleData = [
     {
-      storeName: '',
-      region: '',
-      email: '',
-      uniqueId: '',
-      contactNumber: '',
-      address: '',
+      storeName: 'ABC Store',
+      companyCode: 'COMPTSPL0',
+      region: 'Delhi',
+      email: 'abcstore@gmail.com',
+      contactNumber: '8917296981',
+      address: 'India',
     },
   ]
 
@@ -73,6 +75,7 @@ const sampleDownloadHandler = () => {
 
 const StoreListingTable = () => {
   const token = sessionStorage.getItem('authToken')
+  const profile = JSON.parse(sessionStorage.getItem('profile'))
   const navigate = useNavigate()
   const [data, setData] = useState([])
   const [companies, setCompanies] = useState([])
@@ -89,6 +92,8 @@ const StoreListingTable = () => {
   const [failBox, setFailBox] = useState(false)
   const [confBox, setConfBox] = useState(false)
   const [uploadBox, setUploadBox] = useState(false)
+
+  const isCompanyAdmin = profile?.role === USER_ROLES.COMPANY_ADMIN
 
   const getData = () => {
     setIsTableLoaded(true)
@@ -198,8 +203,18 @@ const StoreListingTable = () => {
     getData()
   }
 
+  const handleUploadSuccess = () => {
+    getData()
+    setUploadBox(false)
+  }
+
   return (
     <div className={`${styles.pickedup_page}`}>
+      <StoreBulkUploadModal
+        isOpen={uploadBox}
+        onClose={() => setUploadBox(false)}
+        onUploadSuccess={handleUploadSuccess}
+      />
       <ExtComps
         sucBox={sucBox}
         errMsg={errMsg}
@@ -213,8 +228,6 @@ const StoreListingTable = () => {
         setErrMsg={setErrMsg}
         editBoxOpen={editBoxOpen}
         setEditBoxOpen={setEditBoxOpen}
-        uploadBox={uploadBox}
-        setUploadBox={setUploadBox}
         searchValue={searchValue}
         storeEditData={storeEditData}
         setEditSuccess={setEditSuccess}
@@ -284,24 +297,26 @@ const StoreListingTable = () => {
           </button>
         </div>
 
-        {/* Company Filter - Moved to separate row */}
-        <div className='flex gap-2 items-center max-w-md'>
-          <label className='text-sm font-medium whitespace-nowrap'>
-            Filter by Company:
-          </label>
-          <select
-            value={companyFilter}
-            onChange={(e) => setCompanyFilter(e.target.value)}
-            className='text-sm bg-transparent border border-gray-300 rounded px-3 py-2 w-64'
-          >
-            <option value=''>All Companies</option>
-            {companies.map((company) => (
-              <option key={company._id} value={company._id}>
-                {company.name} ({company.companyCode})
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Company Filter - Hidden for Company Admin */}
+        {!isCompanyAdmin && (
+          <div className='flex gap-2 items-center max-w-md'>
+            <label className='text-sm font-medium whitespace-nowrap'>
+              Filter by Company:
+            </label>
+            <select
+              value={companyFilter}
+              onChange={(e) => setCompanyFilter(e.target.value)}
+              className='text-sm bg-transparent border border-gray-300 rounded px-3 py-2 w-64'
+            >
+              <option value=''>All Companies</option>
+              {companies.map((company) => (
+                <option key={company._id} value={company._id}>
+                  {company.name} ({company.companyCode})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
       <StoreTable
         data={data}
@@ -364,77 +379,6 @@ const useStoreDelete = (params) => {
   }
 }
 
-const useBulkUpload = (
-  utoken,
-  getData,
-  setIsTableLoaded,
-  setErrMsg,
-  setSucBox,
-  setFailBox
-) => {
-  const [file, setFile] = useState(null)
-
-  const handleExcelFileChange = (e) => {
-    const selectedFile = e.target.files[0]
-    setFile(selectedFile)
-  }
-
-  const handleBulkSubmit = async (event) => {
-    event.preventDefault()
-    setIsTableLoaded(true)
-    if (!file) {
-      setErrMsg('No file selected')
-      setFailBox(true)
-      setIsTableLoaded(false)
-      return
-    }
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`,
-        {
-          params: {
-            fileName: file.name,
-            fileType: file.type,
-          },
-          headers: {
-            Authorization: utoken,
-          },
-        }
-      )
-      const uploadResponse = await axios.put(response.data.url, file, {
-        headers: {
-          'Content-Type': file.type || 'application/octet-stream',
-        },
-      })
-      if (uploadResponse.status === 200) {
-        const uploadedFileUrl = response.data.url.split('?')[0]
-        await axios.post(
-          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/uploadStores`,
-          { fileUrl: uploadedFileUrl },
-          {
-            headers: {
-              Authorization: utoken,
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-          }
-        )
-        getData()
-        setErrMsg('Successfully uploaded stores data')
-        setSucBox(true)
-      } else {
-        throw new Error('File upload to S3 failed')
-      }
-    } catch (error) {
-      setErrMsg('Failed to upload store data')
-      setFailBox(true)
-    } finally {
-      setIsTableLoaded(false)
-    }
-  }
-
-  return { handleBulkSubmit, handleExcelFileChange }
-}
-
 const ModalComponents = ({
   sucBox,
   errMsg,
@@ -444,12 +388,8 @@ const ModalComponents = ({
   confBox,
   setConfBox,
   setIsTableLoaded,
-  uploadBox,
-  setUploadBox,
   selectedStr,
   deleteHandler,
-  handleBulkSubmit,
-  handleExcelFileChange,
   isTableLoaded,
 }) => {
   return (
@@ -511,14 +451,6 @@ const ModalComponents = ({
           </div>
         </div>
       )}
-      {uploadBox && (
-        <BulkUploadBox
-          handleBulkSubmit={handleBulkSubmit}
-          handleExcelFileChange={handleExcelFileChange}
-          setUploadBox={setUploadBox}
-          setIsTableLoaded={setIsTableLoaded}
-        />
-      )}
       {isTableLoaded && (
         <div className='fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
           <BeatLoader
@@ -545,8 +477,6 @@ const ExtComps = ({
   setErrMsg,
   editBoxOpen,
   setEditBoxOpen,
-  uploadBox,
-  setUploadBox,
   searchValue,
   storeEditData,
   setEditSuccess,
@@ -568,15 +498,6 @@ const ExtComps = ({
     setSucBox,
     setFailBox,
   })
-
-  const { handleBulkSubmit, handleExcelFileChange } = useBulkUpload(
-    utoken,
-    getData,
-    setIsTableLoaded,
-    setErrMsg,
-    setSucBox,
-    setFailBox
-  )
 
   return (
     <React.Fragment>
@@ -604,60 +525,11 @@ const ExtComps = ({
         confBox={confBox}
         setConfBox={setConfBox}
         setIsTableLoaded={setIsTableLoaded}
-        uploadBox={uploadBox}
-        setUploadBox={setUploadBox}
         selectedStr={selectedStr}
         deleteHandler={deleteHandler}
-        handleBulkSubmit={handleBulkSubmit}
-        handleExcelFileChange={handleExcelFileChange}
         isTableLoaded={isTableLoaded}
       />
     </React.Fragment>
-  )
-}
-
-const BulkUploadBox = ({
-  handleBulkSubmit,
-  handleExcelFileChange,
-  setUploadBox,
-  setIsTableLoaded,
-}) => {
-  return (
-    <div className='fixed top-0 left-0 z-48 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
-      <div className={`${styles.err_mod_box} ${failTextColor}`}>
-        <h6 className={failTextColor}>Bulk Upload Stores</h6>
-        <form className='flex flex-col gap-4' onSubmit={handleBulkSubmit}>
-          <div className='flex flex-col'>
-            <p className='mb-1 text-lg items-start text-slate-500'>
-              Upload Store Data Excel
-            </p>
-            <input
-              type='file'
-              name='excelFile'
-              id='excelFile'
-              accept='.xlsx, .xls'
-              onChange={(e) => handleExcelFileChange(e)}
-              required={true}
-            />
-          </div>
-          <div className='flex flex-row gap-2'>
-            <button type='submit' className={'bg-primary text-white'}>
-              Upload
-            </button>
-            <button
-              type='reset'
-              onClick={() => {
-                setUploadBox(false)
-                setIsTableLoaded(false)
-              }}
-              className='bg-white text-primary'
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
   )
 }
 
@@ -700,6 +572,7 @@ const StoreTable = ({
               <th className='text-sm p-2 md:p-3 md:text-base'>Store Name</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Unique Id</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Company Name</th>
+              <th className='text-sm p-2 md:p-3 md:text-base'>Company Code</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Email</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Phone Number</th>
               <th className='text-sm p-2 md:p-3 md:text-base'>Region</th>
@@ -737,6 +610,9 @@ const StoreTable = ({
                 </td>
                 <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {val?.companyId?.name || 'N/A'}
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  {val?.companyId?.companyCode || 'N/A'}
                 </td>
                 <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                   {val?.email}

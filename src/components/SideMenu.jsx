@@ -10,9 +10,12 @@ function SideMenu({ setsideMenu, sideMenu }) {
 
   const handleHome = () => {
     setsideMenu(!sideMenu)
-    if (profile.role === USER_ROLES.SUPER_ADMIN || profile.role === USER_ROLES.COMPANY_ADMIN) {
+    if (profile.role === USER_ROLES.SUPER_ADMIN) {
       navigate('/adminmodels')
-    } else if (profile.role === USER_ROLES.ADMIN_MANAGER) {
+    } else if (
+      profile.role === USER_ROLES.ADMIN_MANAGER ||
+      profile.role === USER_ROLES.COMPANY_ADMIN
+    ) {
       navigate('/customertable')
     } else if (profile.role === USER_ROLES.TECHNICIAN) {
       navigate('/devicepickupdashboard')
