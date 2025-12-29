@@ -159,6 +159,7 @@ const LeadsCompleted = () => {
   const saveStore = async () => {
     const temparr = await getStore();
     setStoreData(temparr);
+    setFilteredStores(temparr);
   };
   useEffect(() => {
     saveStore();
@@ -609,7 +610,7 @@ const SubLeadsCompletedBtns = ({
           placeholderText="Select to date"
         />
       </div>
-      {storeData && storeData.length > 1 && (
+      {storeData && storeData.length > 0 && (
         <div className="w-[250px] relative">
           <div
             className={`${styless.filter_button}`}

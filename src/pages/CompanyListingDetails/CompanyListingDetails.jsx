@@ -25,8 +25,7 @@ const downloadExcel = (apiData) => {
 
   const formattedData = apiData.map((item) => {
     return {
-      'Company Name': item.companyName,
-      'Unique Id': item.uniqueId,
+      'Company Name': item.name,
       'Company Code': item.companyCode,
       Address: item.address,
       'Contact Number': item.contactNumber,
