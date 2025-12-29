@@ -33,21 +33,24 @@ const downloadExcelStoreWise = (apiData) => {
     let deviceReportSummary = 'N/A'
     if (item.deviceReport && typeof item.deviceReport === 'object') {
       const selectedIssues = Object.entries(item.deviceReport)
-        .filter(([key, value]) => value === true || value === 'Yes' || value === 'true')
+        .filter(
+          ([key, value]) =>
+            value === true || value === 'Yes' || value === 'true'
+        )
         .map(([key]) => key)
-      deviceReportSummary = selectedIssues.length > 0 ? selectedIssues.join(', ') : 'No Issues'
+      deviceReportSummary =
+        selectedIssues.length > 0 ? selectedIssues.join(', ') : 'No Issues'
     }
 
     return {
       'Purchase Date': new Date(item.createdAt).toLocaleDateString('en-IN'),
-      'Company Name': item.companyId?.name || item.store?.companyId?.name || 'N/A',
-      'Company ID': item.companyId?.companyId || item.store?.companyId?.companyId || 'N/A',
-      'Purchase Grade': item.purchaseGrade || 'N/A',
       Technicians: item.userId?.firstName,
       Category: item.categoryInfo?.categoryName,
       'IMEI No.': item.documentId?.IMEI,
       'Product Details': item.modelId?.name,
       Location: item?.store?.storeName,
+      Company: item?.companyInfo?.name,
+      Grade: item?.grade,
       'Device Issues': deviceReportSummary,
       Price: item?.actualPrice,
       'Price Offered To Customer': item?.price,
@@ -87,7 +90,9 @@ const fetchDownloadDataStoreWise = (
     return
   }
   const userToken = sessionStorage.getItem('authToken')
-  let url = `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}&startDate=${fromDate}&endDate=${toDate}&store=${storeId}`
+  let url = `${
+    import.meta.env.VITE_REACT_APP_ENDPOINT
+  }/api/prospects/findAll?page=${0}&limit=${9999}&is_selled=${isSelled}&deviceType=${deviceCategory}&startDate=${fromDate}&endDate=${toDate}&store=${storeId}`
 
   if (companyId) {
     url += `&companyId=${companyId}`
@@ -214,7 +219,7 @@ const useStoreMetadata = (token) => {
 
   const getCategories = () => {
     axios
-      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/findAll`, {
+      .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`, {
         headers: { Authorization: token },
       })
       .then((res) => {
@@ -313,7 +318,7 @@ const StoreWiseReport = () => {
       getStore()
       getAllUser()
     }
-  }, [isSuperAdmin])
+  }, [])
 
   useEffect(() => {
     fetchStoreData()
@@ -480,6 +485,7 @@ const UpperFilter = ({
             <select
               name=''
               id=''
+              value={deviceCategory}
               className='bg-primary text-white rounded-lg outline-none px-2 py-1'
               onChange={(e) => setDeviceCategory(e.target.value)}
             >
@@ -492,6 +498,72 @@ const UpperFilter = ({
                   {cat?.categoryName}
                 </option>
               ))}
+            </select>
+          </div>
+          <div className='flex gap-2'>
+            <p className='font-medium'>Company</p>
+            <select
+              value={companyId}
+              onChange={(e) => setCompanyId(e.target.value)}
+              className='bg-primary text-white rounded-lg outline-none px-2 py-1'
+            >
+              <option className='bg-white text-primary font-medium' value=''>
+                All Companies
+              </option>
+              {companies.map((company) => (
+                <option
+                  className='bg-white text-primary font-medium'
+                  key={company._id}
+                  value={company._id}
+                >
+                  {company.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className='flex gap-2'>
+            <p className='font-medium'>Purchase Grade</p>
+            <select
+              value={purchaseGrade}
+              onChange={(e) => setPurchaseGrade(e.target.value)}
+              className='bg-primary text-white rounded-lg outline-none px-2 py-1'
+            >
+              <option className='bg-white text-primary font-medium' value=''>
+                All Grades
+              </option>
+              <option className='bg-white text-primary font-medium' value='A+'>
+                A+
+              </option>
+              <option className='bg-white text-primary font-medium' value='A'>
+                A
+              </option>
+              <option className='bg-white text-primary font-medium' value='B'>
+                B
+              </option>
+              <option className='bg-white text-primary font-medium' value='B-'>
+                B-
+              </option>
+              <option className='bg-white text-primary font-medium' value='C+'>
+                C+
+              </option>
+              <option className='bg-white text-primary font-medium' value='C'>
+                C
+              </option>
+              <option className='bg-white text-primary font-medium' value='C-'>
+                C-
+              </option>
+              <option className='bg-white text-primary font-medium' value='D+'>
+                D+
+              </option>
+              <option className='bg-white text-primary font-medium' value='D'>
+                D
+              </option>
+              <option className='bg-white text-primary font-medium' value='D-'>
+                D-
+              </option>
+              <option className='bg-white text-primary font-medium' value='E'>
+                E
+              </option>
             </select>
           </div>
           <div className={`${styles.search_bar_wrap}`}>
@@ -524,47 +596,6 @@ const UpperFilter = ({
             >
               <FaDownload /> Bulk Download
             </button>
-          </div>
-        </div>
-
-        {/* New filters row for Company and Purchase Grade */}
-        <div className='flex flex-row gap-4 items-center justify-center'>
-          <div className='flex gap-2 items-center'>
-            <p className='font-medium text-sm'>Company:</p>
-            <select
-              value={companyId}
-              onChange={(e) => setCompanyId(e.target.value)}
-              className='bg-white border border-gray-300 rounded-lg outline-none px-2 py-1 text-sm'
-            >
-              <option value=''>All Companies</option>
-              {companies.map((company) => (
-                <option key={company._id} value={company._id}>
-                  {company.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className='flex gap-2 items-center'>
-            <p className='font-medium text-sm'>Purchase Grade:</p>
-            <select
-              value={purchaseGrade}
-              onChange={(e) => setPurchaseGrade(e.target.value)}
-              className='bg-white border border-gray-300 rounded-lg outline-none px-2 py-1 text-sm'
-            >
-              <option value=''>All Grades</option>
-              <option value='A+'>A+</option>
-              <option value='A'>A</option>
-              <option value='B'>B</option>
-              <option value='B-'>B-</option>
-              <option value='C+'>C+</option>
-              <option value='C'>C</option>
-              <option value='C-'>C-</option>
-              <option value='D+'>D+</option>
-              <option value='D'>D</option>
-              <option value='D-'>D-</option>
-              <option value='E'>E</option>
-            </select>
           </div>
         </div>
       </div>

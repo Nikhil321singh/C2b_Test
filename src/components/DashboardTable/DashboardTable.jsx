@@ -1,7 +1,14 @@
 import React from 'react'
+import NoDataMessage from '../NoDataMessage'
 
 const DashboardTable = ({ tableData }) => {
   const tablevalue = tableData?.total
+  const hasData = tableData?.result && tableData.result.length > 0
+
+  if (!hasData) {
+    return <NoDataMessage />
+  }
+
   return (
     <div className='m-2 md:m-5 '>
       <div className='w-full '>
@@ -12,29 +19,29 @@ const DashboardTable = ({ tableData }) => {
 
               <th className='p-2 text-sm md:p-3 md:text-base'>-</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>
-                {tablevalue?.totalAvailableForPickup}
+                {tablevalue?.totalAvailableForPickup || 0}
               </th>
               <th className='p-2 text-sm md:p-3 md:text-base'>
-                {tablevalue?.totalPriceOfferToCustomer}
+                {tablevalue?.totalPriceOfferToCustomer || 0}
               </th>
               <th className='p-2 text-sm md:p-3 md:text-base'>
-                {tablevalue?.totalAvailableForPickup}
+                {tablevalue?.totalAvailableForPickup || 0}
               </th>
               <th className='p-2 text-sm md:p-3 md:text-base'>
-                {tablevalue?.totalPriceOfferToCustomer}
+                {tablevalue?.totalPriceOfferToCustomer || 0}
               </th>
               <th className='p-2 text-sm md:p-3 md:text-base'>
-                {tablevalue?.totalPicked}
+                {tablevalue?.totalPicked || 0}
               </th>
 
               <th className='p-2 text-sm md:p-3 md:text-base'>
-                {tablevalue?.totalPickedPrice}
+                {tablevalue?.totalPickedPrice || 0}
               </th>
               <th className='p-2 text-sm md:p-3 md:text-base'>
-                {tablevalue?.totalPendingForPickup}
+                {tablevalue?.totalPendingForPickup || 0}
               </th>
               <th className='p-2 text-sm md:p-3 md:text-base'>
-                {tablevalue?.totalPendingForPickupPrice}
+                {tablevalue?.totalPendingForPickupPrice || 0}
               </th>
             </tr>
             <tr className='bg-primary text-white align-top'>

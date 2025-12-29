@@ -9,7 +9,6 @@ import {
   IoIosCheckmarkCircle,
   IoIosCloseCircle,
   IoMdAdd,
-  IoMdInformationCircle,
   IoMdSearch,
 } from 'react-icons/io'
 import styles from './CompanyListingDetails.module.css'
@@ -17,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import * as XLSX from 'xlsx'
 import EditCompany from '../../components/EditCompany/EditCompany'
 import { AiOutlineFile } from 'react-icons/ai'
+import NoDataMessage from '../../components/NoDataMessage'
 
 const downloadExcel = (apiData) => {
   const fileType =
@@ -235,12 +235,7 @@ const CompanyListingDetails = () => {
           maxPages={maxPages}
         />
       ) : (
-        <div className='flex justify-center items-center h-[100vh]'>
-          <div className='flex flex-col justify-center items-center gap-2'>
-            <IoMdInformationCircle size={80} />
-            <h6 className='text-2xl'>No Data Found</h6>
-          </div>
-        </div>
+        <NoDataMessage />
       )}
     </div>
   )

@@ -33,7 +33,8 @@ const downloadExcel = (dataDown) => {
       'User Email': item.email,
       'Phone Number': item.phoneNumber,
       [`${import.meta.env.VITE_WEBSITE_TITLE} Member`]: item.grestMember,
-      'Company Name': item.companyName,
+      'Company Name': item.companyData?.name || 'N/A',
+      'Company Code': item.companyData?.companyCode || 'N/A',
       Role: item.role,
       'Assigned Stores Count': item.assignedStoreNames?.length || 0,
       'Assigned Stores': item.assignedStoreNames?.join(', ') || 'N/A',
@@ -54,12 +55,14 @@ const downloadExcel = (dataDown) => {
 const RegisterUserDetails = () => {
   const token = sessionStorage.getItem('authToken')
   const [data, setData] = useState([])
+  const [companies, setCompanies] = useState([])
   const [isTableLoaded, setIsTableLoaded] = useState(false)
   const [sideMenu, setsideMenu] = useState(false)
   const [userEditData, setUserEditData] = useState()
   const [searchValue, setSearchValue] = useState('')
   const [storeValue, setStoreValue] = useState('')
   const [roleValue, setRoleValue] = useState('')
+  const [companyFilter, setCompanyFilter] = useState('')
   const [editBoxOpen, setEditBoxOpen] = useState(false)
   const [editSuccess, setEditSuccess] = useState(false)
   const [selectedUser, setSelectedUser] = useState()
@@ -90,11 +93,17 @@ const RegisterUserDetails = () => {
   }
   const getDataBySearch = () => {
     setIsTableLoaded(true)
+    let url = `${
+      import.meta.env.VITE_REACT_APP_ENDPOINT
+    }/api/userregistry/search?uid=${searchValue}&storeName=${storeValue}&role=${roleValue}`
+
+    if (companyFilter) {
+      url += `&companyId=${companyFilter}`
+    }
+
     const config = {
       method: 'get',
-      url: `${
-        import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/userregistry/search?uid=${searchValue}&storeName=${storeValue}&role=${roleValue}`,
+      url: url,
       headers: { Authorization: token },
     }
     axios
@@ -107,6 +116,22 @@ const RegisterUserDetails = () => {
         setErrMsg('Failed to load data')
         setFailBox(true)
         setIsTableLoaded(false)
+      })
+  }
+
+  const getCompanies = () => {
+    const config = {
+      method: 'get',
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/findAll`,
+      headers: { Authorization: token },
+    }
+    axios
+      .request(config)
+      .then((response) => {
+        setCompanies(response.data.result || [])
+      })
+      .catch((error) => {
+        console.log('Failed to load companies:', error)
       })
   }
   useEffect(() => {
@@ -160,10 +185,32 @@ const RegisterUserDetails = () => {
 
   useEffect(() => {
     getData()
+    getCompanies()
   }, [])
+
+  useEffect(() => {
+    if (companyFilter !== '') {
+      getDataBySearch()
+    } else if (
+      companyFilter === '' &&
+      searchValue === '' &&
+      storeValue === '' &&
+      roleValue === ''
+    ) {
+      getData()
+    }
+  }, [companyFilter])
 
   const handleSearchClick = () => {
     getDataBySearch()
+  }
+
+  const handleSearchClear = () => {
+    setSearchValue('')
+    setStoreValue('')
+    setRoleValue('')
+    setCompanyFilter('')
+    getData()
   }
 
   useEffect(() => {
@@ -231,11 +278,14 @@ const RegisterUserDetails = () => {
         setSearchValue={setSearchValue}
         searchValue={searchValue}
         handleSearchClick={handleSearchClick}
-        getData={getData}
+        handleSearchClear={handleSearchClear}
         storeValue={storeValue}
         setRoleValue={setRoleValue}
         roleValue={roleValue}
         setStoreValue={setStoreValue}
+        companyFilter={companyFilter}
+        setCompanyFilter={setCompanyFilter}
+        companies={companies}
         data={data}
       />
       <RegisterUserTable
@@ -308,22 +358,19 @@ const TableFilters = ({
   setSearchValue,
   searchValue,
   handleSearchClick,
+  handleSearchClear,
   setRoleValue,
   roleValue,
   storeValue,
   setStoreValue,
-  getData,
+  companyFilter,
+  setCompanyFilter,
+  companies,
   data,
 }) => {
   const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
   const isSuperAdmin = LoggedInUser?.role === 'Super Admin'
   const navigate = useNavigate()
-  const handleSearchClear = () => {
-    setSearchValue('')
-    setStoreValue('')
-    setRoleValue('')
-    getData()
-  }
 
   return (
     <div className='m-2 flex flex-col gap-2 items-center w-[100%]'>
@@ -378,6 +425,27 @@ const TableFilters = ({
           <FaDownload /> Bulk Download
         </button>
       </div>
+
+      {/* Company Filter */}
+      {isSuperAdmin && (
+        <div className='flex gap-2 items-center max-w-md'>
+          <label className='text-sm font-medium whitespace-nowrap'>
+            Filter by Company:
+          </label>
+          <select
+            value={companyFilter}
+            onChange={(e) => setCompanyFilter(e.target.value)}
+            className='text-sm bg-transparent border border-gray-300 rounded px-3 py-2 w-64'
+          >
+            <option value=''>All Companies</option>
+            {companies.map((company) => (
+              <option key={company._id} value={company._id}>
+                {company.name} ({company.companyCode})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
     </div>
   )
 }

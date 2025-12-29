@@ -16,10 +16,13 @@ const AdminDashboard = () => {
   const [sideMenu, setsideMenu] = useState(false)
   const {
     tableData,
+    companies,
     isLoading,
     flag,
     searchValue,
     setSearchValue,
+    companyFilter,
+    setCompanyFilter,
     fromDate,
     setFromDate,
     toDate,
@@ -30,6 +33,9 @@ const AdminDashboard = () => {
     handleDownload,
     resetFilters,
   } = useAdminReport()
+
+  const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
+  const isSuperAdmin = LoggedInUser?.role === 'Super Admin'
 
   const handleFromDateChange = (date) => {
     setFromDate(date)
@@ -57,40 +63,63 @@ const AdminDashboard = () => {
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
 
-      <div className='flex gap-2 items-center justify-center mt-5 w-full'>
-        <div className={styles.search_bar_wrap}>
-          <input
-            className='text-sm'
-            placeholder='Search...'
-            type='text'
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+      <div className='flex flex-col gap-4 items-center mt-5 w-full'>
+        <div className='flex gap-2 items-center justify-center w-full'>
+          <div className={styles.search_bar_wrap}>
+            <input
+              className='text-sm'
+              placeholder='Search...'
+              type='text'
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+            <IoMdSearch size={25} onClick={fetchTableData} />
+          </div>
+          <div className={styles.icons_box}>
+            <IoRefresh onClick={resetFilters} size={25} />
+          </div>
+          <button onClick={handleDownload} className={styles.bulkdown_button}>
+            <FaDownload /> Bulk Download
+          </button>
+          <DatePicker
+            onChange={handleFromDateChange}
+            selected={fromDate}
+            className='mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md'
+            dateFormat='yyyy-MM-dd'
+            placeholderText='Select from date'
+            isClearable
           />
-          <IoMdSearch size={25} onClick={fetchTableData} />
+          <DatePicker
+            onChange={handleToDateChange}
+            selected={toDate}
+            className='mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md'
+            dateFormat='yyyy-MM-dd'
+            placeholderText='Select to date'
+            minDate={fromDate}
+            isClearable
+          />
         </div>
-        <div className={styles.icons_box}>
-          <IoRefresh onClick={resetFilters} size={25} />
-        </div>
-        <button onClick={handleDownload} className={styles.bulkdown_button}>
-          <FaDownload /> Bulk Download
-        </button>
-        <DatePicker
-          onChange={handleFromDateChange}
-          selected={fromDate}
-          className='mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md'
-          dateFormat='yyyy-MM-dd'
-          placeholderText='Select from date'
-          isClearable
-        />
-        <DatePicker
-          onChange={handleToDateChange}
-          selected={toDate}
-          className='mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md'
-          dateFormat='yyyy-MM-dd'
-          placeholderText='Select to date'
-          minDate={fromDate}
-          isClearable
-        />
+
+        {/* Company Filter */}
+        {isSuperAdmin && (
+          <div className='flex gap-2 items-center max-w-md'>
+            <label className='text-sm font-medium whitespace-nowrap'>
+              Filter by Company:
+            </label>
+            <select
+              value={companyFilter}
+              onChange={(e) => setCompanyFilter(e.target.value)}
+              className='text-sm bg-transparent border border-gray-300 rounded px-3 py-2 w-64'
+            >
+              <option value=''>All Companies</option>
+              {companies.map((company) => (
+                <option key={company._id} value={company._id}>
+                  {company.name} ({company.companyCode})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {flag && <DashboardTable tableData={tableData} />}
