@@ -142,6 +142,9 @@ const ViewPickupTable = ({ refNo, setShowView, fromOutStand = false }) => {
                     Device Name
                   </th>
                   <th className='p-2 min-w-[100px] text-sm md:p-3 md:text-base'>
+                    Location
+                  </th>
+                  <th className='p-2 min-w-[100px] text-sm md:p-3 md:text-base'>
                     RAM
                   </th>
                   <th className='p-2 min-w-[100px] text-sm md:p-3 md:text-base'>
@@ -152,9 +155,6 @@ const ViewPickupTable = ({ refNo, setShowView, fromOutStand = false }) => {
                   </th>
                   <th className='p-2 min-w-[100px] text-sm md:p-3 md:text-base'>
                     Final Price
-                  </th>
-                  <th className='p-2 min-w-[100px] text-sm md:p-3 md:text-base'>
-                    Location
                   </th>
                   {/* [5. Conditional Header] */}
                   {userRole === 'Technician' && (
@@ -179,6 +179,9 @@ const ViewPickupTable = ({ refNo, setShowView, fromOutStand = false }) => {
                       {val?.modelName}
                     </td>
                     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                      {val?.location}
+                    </td>
+                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                       {
                         val?.ramConfig.filter(
                           (i) => i.storage === val.leadsData.storage
@@ -197,9 +200,6 @@ const ViewPickupTable = ({ refNo, setShowView, fromOutStand = false }) => {
                       {val?.leadsData.price?.toString()[0] === '['
                         ? val?.leadsData.price.$numberDecimal
                         : val?.leadsData.price?.toString()}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {val?.location}
                     </td>
                     {/* [6. Conditional Cell] */}
                     {userRole === 'Technician' && (
