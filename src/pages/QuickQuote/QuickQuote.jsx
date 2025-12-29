@@ -47,8 +47,6 @@ const QuickQuote = () => {
   const qnaQuick = useSelector((state) => state.qnaQuick)
   const [isLoading, setIsLoading] = useState(false)
   const profile = useUserProfile()
-  const [stores, setStores] = useState([])
-  const [selectedStoreId, setSelectedStoreId] = useState('')
   const [storeError, setStoreError] = useState('')
 
   const backHandler = () => {
@@ -159,10 +157,6 @@ const QuickQuote = () => {
 
   const handlesubmit = async () => {
     // Validate store selection
-    if (!selectedStoreId) {
-      setStoreError('Please select a store before submitting')
-      return
-    }
 
     setIsLoading(true)
     setStoreError('')
@@ -180,7 +174,6 @@ const QuickQuote = () => {
         ram: id?.models?.config?.RAM,
         aadharNumber: '1234567890',
         name: profile?.name,
-        storeId: selectedStoreId, // Added store selection
       }
 
       const { data } = await axios.post(
@@ -194,9 +187,6 @@ const QuickQuote = () => {
           },
         }
       )
-
-      // Save selected store for future reference
-      sessionStorage.setItem('selectedQuickQuoteStoreId', selectedStoreId)
 
       await logQuickQuoteAttempt(data.data, id, token)
       sessionStorage.setItem('LeadId', data.data.id)
@@ -251,38 +241,6 @@ const QuickQuote = () => {
             Tell us more about your device?
           </div>
           <div className='underline'></div>
-
-          {/* Store Selection Dropdown */}
-          {/* <div className='mb-6 mt-4'>
-            <label className='block text-sm font-medium mb-2 text-gray-700'>
-              Select Store <span className='text-red-500'>*</span>
-            </label>
-            <select
-              value={selectedStoreId}
-              onChange={(e) => {
-                setSelectedStoreId(e.target.value)
-                setStoreError('')
-              }}
-              className={`w-full p-3 border rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary ${
-                storeError ? 'border-red-500' : 'border-gray-300'
-              }`}
-              required
-            >
-              <option value=''>-- Select a store --</option>
-              {stores.map((store) => (
-                <option key={store._id} value={store._id}>
-                  {store.storeName} {store.region ? `- ${store.region}` : ''}
-                </option>
-              ))}
-            </select>
-            {storeError && (
-              <p className='text-red-500 text-sm mt-1'>{storeError}</p>
-            )}
-            {stores.length === 0 && !storeError && (
-              <p className='text-gray-500 text-sm mt-1'>No stores available</p>
-            )}
-          </div> */}
-
           <QuestionList
             QQState={QQState}
             core={core}

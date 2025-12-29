@@ -204,6 +204,8 @@ const DeviceQuote = () => {
   const toggleModal = () => setShowModal(!showModal)
   const showDeviceReportHandler = () => setShowDeviceReport(!showDeviceReport)
 
+  console.log(quoteSaved, exactQuoteValue, currentDomain)
+
   return (
     <div
       className={`bg-white min-h-screen ${styles.page_wrap}`}
@@ -434,16 +436,14 @@ const QuoteCard = ({
             </div>
           )}
       </div>
-      {quoteSaved === false &&
-        exactQuoteValue === 'true' &&
-        currentDomain !== buyback && (
-          <button
-            className='hidden sm:block text-sm font-medium px-3 py-1 rounded text-primary border border-primary lg:ml-auto'
-            onClick={toggleModal}
-          >
-            Save Quote
-          </button>
-        )}
+      {quoteSaved === false && (
+        <button
+          className='hidden sm:block text-sm font-medium px-3 py-1 rounded text-primary border border-primary lg:ml-auto'
+          onClick={toggleModal}
+        >
+          Save Quote
+        </button>
+      )}
     </div>
   </div>
 )
