@@ -21,7 +21,9 @@ const maskEmail = (email, shouldMask) => {
   if (!shouldMask) {
     return email;
   }
-  if (!email) return "";
+  if (!email) {
+    return "";
+  }
 
   const [namee, domain] = email.split("@");
   const visibleLength = Math.ceil(namee?.length * 0.25);

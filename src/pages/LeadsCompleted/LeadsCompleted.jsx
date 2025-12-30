@@ -46,53 +46,61 @@ const getStore = async () => {
   return storeNamesArray;
 };
 
+// Extracted helper function to process QNA data
+const processQNAData = (qnaArray) => {
+  const questionData = {};
+  let index = 1;
+
+  if (!qnaArray?.[0] || typeof qnaArray[0] !== "object") {
+    return questionData;
+  }
+
+  for (const group in qnaArray[0]) {
+    if (Array.isArray(qnaArray[0][group])) {
+      qnaArray[0][group].forEach((qna) => {
+        questionData[`Q${index}. ${qna?.quetion}`] = qna?.key;
+        index++;
+      });
+    }
+  }
+
+  return questionData;
+};
+
+// Extracted helper function to process device report
+const processDeviceReport = (deviceReport) => {
+  if (!deviceReport || typeof deviceReport !== "object") {
+    return "N/A";
+  }
+
+  const selectedIssues = Object.entries(deviceReport)
+    .filter(
+      ([key, value]) => value === true || value === "Yes" || value === "true"
+    )
+    .map(([key]) => key);
+
+  return selectedIssues.length > 0 ? selectedIssues.join(", ") : "No Issues";
+};
+
+// Extracted helper function to get variant info
+const getVariantInfo = (val) => {
+  if (val?.modelId?.type === "CTG1") {
+    return `${
+      val?.storage && val?.ram ? `${val?.ram}/${val?.storage}` : val?.storage
+    }`;
+  }
+  return "-";
+};
+
+// Refactored main function with reduced complexity
 const downloadExcelLeadsompleted = (apiData) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
 
   const formattedData = apiData.map((item) => {
-    const questionData = {};
-    let index = 1;
-
-    if (item?.QNA?.[0] && typeof item.QNA[0] === "object") {
-      for (const group in item.QNA[0]) {
-        // Check if item.QNA[0][group] is an array before calling forEach
-        if (Array.isArray(item.QNA[0][group])) {
-          item.QNA[0][group].forEach((qna) => {
-            // Create a column for each question with its answer
-            questionData[`Q${index}. ${qna?.quetion}`] = qna?.key;
-            index++;
-          });
-        }
-      }
-    }
-
-    // Get variant info (same logic as getStorage in table)
-    const getVariant = (val) => {
-      if (val?.modelId?.type === "CTG1") {
-        return `${
-          val?.storage && val?.ram
-            ? `${val?.ram}/${val?.storage}`
-            : val?.storage
-        }`;
-      } else {
-        return "-";
-      }
-    };
-
-    // Filter device report to show only selected issues
-    let deviceReportSummary = "N/A";
-    if (item.deviceReport && typeof item.deviceReport === "object") {
-      const selectedIssues = Object.entries(item.deviceReport)
-        .filter(
-          ([key, value]) =>
-            value === true || value === "Yes" || value === "true"
-        )
-        .map(([key]) => key);
-      deviceReportSummary =
-        selectedIssues.length > 0 ? selectedIssues.join(", ") : "No Issues";
-    }
+    const questionData = processQNAData(item?.QNA);
+    const deviceReportSummary = processDeviceReport(item.deviceReport);
 
     return {
       "Date Created": new Date(item?.updatedAt).toLocaleDateString("en-IN"),
@@ -104,13 +112,13 @@ const downloadExcelLeadsompleted = (apiData) => {
       "Customer Mobile No.": item.phoneNumber,
       "Customer Name": item.name,
       Product: item.modelId?.name,
-      Variant: getVariant(item),
+      Variant: getVariantInfo(item),
       "Device Issues": deviceReportSummary,
       Price: item.actualPrice,
       "Final Price Offered to Customer": item?.price,
       "Order Id": item?.uniqueCode,
       "IMEI No.": item.documentId?.IMEI,
-      ...questionData, // Spread the questionData to include in the final object
+      ...questionData,
     };
   });
 
@@ -551,7 +559,7 @@ const SubLeadsCompletedBtns = ({
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: { scale: 2, logging: false },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy"] }, // Ensure page breaks work
+          pagebreak: { mode: ["css", "legacy"] },
         })
         .from(printElement)
         .save();

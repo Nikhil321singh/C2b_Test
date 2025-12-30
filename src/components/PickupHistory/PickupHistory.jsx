@@ -15,7 +15,6 @@ const isBuybackDomain = currentDomain === import.meta.env.VITE_BUYBACK_URL;
 const GREST_LOGO = isBuybackDomain ? BUYBACK_LOGO : DEFAULT_LOGO;
 import AdminNavbar from "../Admin_Navbar";
 import SideMenu from "../SideMenu";
-import ProfileBox from "../ProfileBox/ProfileBox";
 import { useDispatch, useSelector } from "react-redux";
 import { setStoreFilter } from "../../store/slices/userSlice";
 
@@ -65,15 +64,18 @@ const PickupHistory = () => {
   const firsttime = useRef(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStores, setFilteredStores] = useState(storeData);
-  const isSuperAdmin = userRole === 'Super Admin';
+  const isSuperAdmin = userRole === "Super Admin";
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
       method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}`,
       headers: { Authorization: token },
     };
-    axios.request(config)
+    axios
+      .request(config)
       .then((response) => {
         setPickupData(response.data.data);
         setIsTableLoaded(false);
@@ -88,14 +90,19 @@ const PickupHistory = () => {
     setIsTableLoaded(true);
     const conf = {
       method: "get",
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store/findAll?page=0&limit=9999`,
+      url: `${
+        import.meta.env.VITE_REACT_APP_ENDPOINT
+      }/api/store/findAll?page=0&limit=9999`,
       headers: { Authorization: token },
     };
-    axios.request(conf)
+    axios
+      .request(conf)
       .then((res) => {
         const allData = res.data.result;
         const storeNamesArray = res.data.result.map((store) => store.storeName);
-        const uniqueRegionsArray = [...new Set(res.data.result.map((store) => store.region))];
+        const uniqueRegionsArray = [
+          ...new Set(res.data.result.map((store) => store.region)),
+        ];
         setStoreData(storeNamesArray);
         setAllStore(allData);
         setIsTableLoaded(false);
@@ -147,7 +154,9 @@ const PickupHistory = () => {
     if (value === "") {
       setFilteredStores(storeData);
     } else {
-      const filtered = storeData.filter((store) => store.toLowerCase().includes(value.toLowerCase()));
+      const filtered = storeData.filter((store) =>
+        store.toLowerCase().includes(value.toLowerCase())
+      );
       setFilteredStores(filtered);
     }
   };
@@ -155,7 +164,11 @@ const PickupHistory = () => {
     <div>
       {isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 text-primary">
-          <BeatLoader color="var(--primary-color)" loading={isTableLoaded} size={15} />
+          <BeatLoader
+            color="var(--primary-color)"
+            loading={isTableLoaded}
+            size={15}
+          />
         </div>
       )}
       <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER header">
@@ -168,26 +181,39 @@ const PickupHistory = () => {
       <button
         className={`${styles.bulkdown_button}`}
         onClick={() => downloadExcel(pickupData)}
-      ><FaDownload /> Bulk Download</button>
+      >
+        <FaDownload /> Bulk Download
+      </button>
       {isSuperAdmin && (
         <div className="m-2 flex gap-2 w-100 items-center outline-none">
           <div className="w-[45%] relative">
-            <div onClick={() => {
-              setRegionDrop(!regionDrop);
-            }}
+            <div
+              onClick={() => {
+                setRegionDrop(!regionDrop);
+              }}
               className={`${styles.filter_button}`}
             >
-              <p className="truncate ">{region === "" ? "Select Region" : region}</p>
-              <FaAngleDown className={`${regionDrop && "rotate-180"}`} size={17} />
+              <p className="truncate ">
+                {region === "" ? "Select Region" : region}
+              </p>
+              <FaAngleDown
+                className={`${regionDrop && "rotate-180"}`}
+                size={17}
+              />
             </div>
-            {regionDrop && (<div className={`${styles.filter_drop}`}>
-              {regionData.map((elem) => (
-                <div key={elem}
-                  onClick={() => handleRegionChange(elem)}
-                  className={`${styles.filter_option}`}
-                ><p className="truncate">{elem}</p></div>
-              ))}
-            </div>)}
+            {regionDrop && (
+              <div className={`${styles.filter_drop}`}>
+                {regionData.map((elem) => (
+                  <div
+                    key={elem}
+                    onClick={() => handleRegionChange(elem)}
+                    className={`${styles.filter_option}`}
+                  >
+                    <p className="truncate">{elem}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className=" w-[70%] relative ">
             <div
@@ -197,7 +223,10 @@ const PickupHistory = () => {
               <p className="truncate ">
                 {searchTerm === "" ? "Select Store" : searchTerm}
               </p>
-              <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
+              <FaAngleDown
+                className={`${storeDrop && "rotate-180"}`}
+                size={17}
+              />
             </div>
             {storeDrop && (
               <div className="absolute w-full bg-white shadow-md  ">
@@ -213,7 +242,8 @@ const PickupHistory = () => {
                 >
                   {filteredStores.length > 0 ? (
                     filteredStores.map((item1, index) => (
-                      <div key={index}
+                      <div
+                        key={index}
                         onClick={() => {
                           handleStoreChange(item1);
                           setStoreDrop(false);
@@ -228,9 +258,11 @@ const PickupHistory = () => {
                     <p className="p-2   text-gray-500">No stores found</p>
                   )}
                 </div>
-              </div>)}
+              </div>
+            )}
           </div>
-        </div>)}
+        </div>
+      )}
       <div className="m-2 overflow-x-auto   md:m-5">
         {showView && (
           <div className={styles.view_wrap}>
