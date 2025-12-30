@@ -38,6 +38,8 @@ const RegionStoreFilter = ({
     }
   }
 
+  console.log({ filteredStores })
+
   return (
     <>
       <div className='relative w-[20%]'>
@@ -90,12 +92,12 @@ const RegionStoreFilter = ({
                     key={index}
                     onClick={() => {
                       handleStoreChange(item)
-                      setSearchTerm(item)
+                      setSearchTerm(item.storeName ?? item)
                       setStoreDrop(false)
                     }}
                     className={`${styles.filter_option}`}
                   >
-                    <p className='truncate'>{item}</p>
+                    <p className='truncate'>{item.storeName ?? item}</p>
                   </div>
                 ))
               ) : (
