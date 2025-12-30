@@ -45,7 +45,7 @@ const downloadExcel = (pickupData) => {
   saveAs(dataFile, "Pickedup_Devices_Lots_Data" + fileExtension);
 };
 
-const PickupHistory = () => {
+const usePickupHistory = () => {
   const token = sessionStorage.getItem("authToken");
   const dispatch = useDispatch();
   const userProfile = useSelector((state) => state.user);
@@ -65,6 +65,7 @@ const PickupHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStores, setFilteredStores] = useState(storeData);
   const isSuperAdmin = userRole === "Super Admin";
+
   const getData = () => {
     setIsTableLoaded(true);
     const config = {
@@ -113,6 +114,7 @@ const PickupHistory = () => {
         console.log(error);
       });
   };
+
   useEffect(() => {
     getData();
     if (isSuperAdmin) {
@@ -136,6 +138,7 @@ const PickupHistory = () => {
     setStoreData(storeNamesArray);
     dispatch(setStoreFilter({ selStore: "", selRegion: value }));
   };
+
   const handleStoreChange = (value) => {
     setStoreDrop(false);
     const filterStores = allStore.filter((store) => store.storeName === value);
@@ -144,10 +147,12 @@ const PickupHistory = () => {
     setRegion(newRegion);
     dispatch(setStoreFilter({ selStore: value, selRegion: newRegion }));
   };
+
   const viewHandler = (refID) => {
     setViewRef(refID);
     setShowView(true);
   };
+
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -160,116 +165,180 @@ const PickupHistory = () => {
       setFilteredStores(filtered);
     }
   };
+
+  return {
+    pickupData,
+    showView,
+    viewRef,
+    isTableLoaded,
+    sideMenu,
+    setsideMenu,
+    storeName,
+    region,
+    storeData,
+    regionData,
+    regionDrop,
+    setRegionDrop,
+    storeDrop,
+    setStoreDrop,
+    searchTerm,
+    filteredStores,
+    isSuperAdmin,
+    handleRegionChange,
+    handleStoreChange,
+    viewHandler,
+    handleSearch,
+  };
+};
+
+const FilterSection = ({
+  isSuperAdmin,
+  region,
+  regionDrop,
+  setRegionDrop,
+  regionData,
+  handleRegionChange,
+  searchTerm,
+  storeDrop,
+  setStoreDrop,
+  filteredStores,
+  handleStoreChange,
+  handleSearch,
+  styles,
+}) => {
+  if (!isSuperAdmin) return null;
+
+  return (
+    <div className="m-2 flex gap-2 w-100 items-center outline-none">
+      <div className="w-[45%] relative">
+        <div
+          onClick={() => setRegionDrop(!regionDrop)}
+          className={`${styles.filter_button}`}
+        >
+          <p className="truncate ">{region === "" ? "Select Region" : region}</p>
+          <FaAngleDown className={`${regionDrop && "rotate-180"}`} size={17} />
+        </div>
+        {regionDrop && (
+          <div className={`${styles.filter_drop}`}>
+            {regionData.map((elem) => (
+              <div
+                key={elem}
+                onClick={() => handleRegionChange(elem)}
+                className={`${styles.filter_option}`}
+              >
+                <p className="truncate">{elem}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className=" w-[70%] relative ">
+        <div
+          onClick={() => setStoreDrop(!storeDrop)}
+          className={` w-full ${styles.filter_button} `}
+        >
+          <p className="truncate ">
+            {searchTerm === "" ? "Select Store" : searchTerm}
+          </p>
+          <FaAngleDown className={`${storeDrop && "rotate-180"}`} size={17} />
+        </div>
+        {storeDrop && (
+          <div className="absolute w-full bg-white shadow-md  ">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full p-2 border-b border-gray-300 "
+              placeholder="Search store... "
+            />
+            <div
+              className={`overflow-y-scroll max-h-[200px]   ${styles.filter_drop} w-full `}
+            >
+              {filteredStores.length > 0 ? (
+                filteredStores.map((item1, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      handleStoreChange(item1);
+                      setStoreDrop(false);
+                    }}
+                    className={`${styles.filter_option}`}
+                  >
+                    <p className="truncate  ">{item1}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="p-2   text-gray-500">No stores found</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const PickupHistory = () => {
+  const hookData = usePickupHistory();
+
   return (
     <div>
-      {isTableLoaded && (
+      {hookData.isTableLoaded && (
         <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 text-primary">
           <BeatLoader
             color="var(--primary-color)"
-            loading={isTableLoaded}
+            loading={hookData.isTableLoaded}
             size={15}
           />
         </div>
       )}
       <div className="flex items-center w-[99%] h-16 py-4 bg-white border-b-2 HEADER header">
         <div className="navbar">
-          <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
-          <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
+          <AdminNavbar
+            setsideMenu={hookData.setsideMenu}
+            sideMenu={hookData.sideMenu}
+          />
+          <SideMenu
+            setsideMenu={hookData.setsideMenu}
+            sideMenu={hookData.sideMenu}
+          />
         </div>
       </div>
       <NavigateTable />
       <button
         className={`${styles.bulkdown_button}`}
-        onClick={() => downloadExcel(pickupData)}
+        onClick={() => downloadExcel(hookData.pickupData)}
       >
         <FaDownload /> Bulk Download
       </button>
-      {isSuperAdmin && (
-        <div className="m-2 flex gap-2 w-100 items-center outline-none">
-          <div className="w-[45%] relative">
-            <div
-              onClick={() => {
-                setRegionDrop(!regionDrop);
-              }}
-              className={`${styles.filter_button}`}
-            >
-              <p className="truncate ">
-                {region === "" ? "Select Region" : region}
-              </p>
-              <FaAngleDown
-                className={`${regionDrop && "rotate-180"}`}
-                size={17}
-              />
-            </div>
-            {regionDrop && (
-              <div className={`${styles.filter_drop}`}>
-                {regionData.map((elem) => (
-                  <div
-                    key={elem}
-                    onClick={() => handleRegionChange(elem)}
-                    className={`${styles.filter_option}`}
-                  >
-                    <p className="truncate">{elem}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className=" w-[70%] relative ">
-            <div
-              onClick={() => setStoreDrop(!storeDrop)}
-              className={` w-full ${styles.filter_button} `}
-            >
-              <p className="truncate ">
-                {searchTerm === "" ? "Select Store" : searchTerm}
-              </p>
-              <FaAngleDown
-                className={`${storeDrop && "rotate-180"}`}
-                size={17}
-              />
-            </div>
-            {storeDrop && (
-              <div className="absolute w-full bg-white shadow-md  ">
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="w-full p-2 border-b border-gray-300 "
-                  placeholder="Search store... "
-                />
-                <div
-                  className={`overflow-y-scroll max-h-[200px]   ${styles.filter_drop} w-full `}
-                >
-                  {filteredStores.length > 0 ? (
-                    filteredStores.map((item1, index) => (
-                      <div
-                        key={index}
-                        onClick={() => {
-                          handleStoreChange(item1);
-                          setStoreDrop(false);
-                          setSearchTerm(item1);
-                        }}
-                        className={`${styles.filter_option}`}
-                      >
-                        <p className="truncate  ">{item1}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="p-2   text-gray-500">No stores found</p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <FilterSection
+        isSuperAdmin={hookData.isSuperAdmin}
+        region={hookData.region}
+        regionDrop={hookData.regionDrop}
+        setRegionDrop={hookData.setRegionDrop}
+        regionData={hookData.regionData}
+        handleRegionChange={hookData.handleRegionChange}
+        searchTerm={hookData.searchTerm}
+        storeDrop={hookData.storeDrop}
+        setStoreDrop={hookData.setStoreDrop}
+        filteredStores={hookData.filteredStores}
+        handleStoreChange={hookData.handleStoreChange}
+        handleSearch={hookData.handleSearch}
+        styles={styles}
+      />
       <div className="m-2 overflow-x-auto   md:m-5">
-        {showView && (
+        {hookData.showView && (
           <div className={styles.view_wrap}>
-            <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
+            <ViewPickupTable
+              refNo={hookData.viewRef}
+              setShowView={(val) => hookData.viewHandler(val)}
+            />
           </div>
         )}
-        <PickupTable pickupData={pickupData} viewHandler={viewHandler} />
+        <PickupTable
+          pickupData={hookData.pickupData}
+          viewHandler={hookData.viewHandler}
+        />
       </div>
     </div>
   );

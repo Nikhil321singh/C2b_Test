@@ -10,12 +10,12 @@ import styles from '../PickedUpDevices.module.css'
 const getAllStoreNames = (allStore = []) =>
   allStore.map((store) => store.storeName)
 
-const getStoresByRegion = (allStore = [], region) =>
+const getStoresByRegion = (allStore = [], region = '') =>
   allStore
     .filter((store) => store.region === region)
     .map((store) => store.storeName)
 
-const filterStoresBySearch = (stores = [], searchTerm) => {
+const filterStoresBySearch = (stores = [], searchTerm = '') => {
   if (!searchTerm) {
     return stores
   }
@@ -73,9 +73,6 @@ const PickedUpFilter = ({
 
   const dispatch = useDispatch()
 
-  /* 
-     Effects
-  */
   useStoreFilterEffects({
     storeDrop,
     searchTerm,
@@ -85,10 +82,6 @@ const PickedUpFilter = ({
     searchValue,
     getData,
   })
-
-  /* 
-     Handlers
-  */
 
   const handleSearchClear = () => {
     setSearchValue('')

@@ -279,6 +279,182 @@ const RegisterUserEditForm = ({
   );
 };
 
+const FormFields = ({ formData, handleChange, companyData, isSuperAdmin }) => (
+  <>
+    <label className="flex flex-col gap-2 w-[70%]">
+      <span className="font-medium text-xl">First name*</span>
+      <input
+        id="firstName"
+        name="firstName"
+        className="border-2 px-2 py-2 rounded-lg outline-none"
+        placeholder="Enter first name"
+        value={formData.firstName}
+        onChange={handleChange}
+        type="text"
+        required
+      />
+    </label>
+    <label className="flex flex-col gap-2 w-[70%]">
+      <span className="font-medium text-xl">Last name</span>
+      <input
+        name="lastName"
+        id="lastName"
+        placeholder="Enter last name"
+        value={formData.lastName}
+        className="border-2 px-2 py-2 rounded-lg outline-none"
+        onChange={handleChange}
+        type="text"
+      />
+    </label>
+    <label className="flex flex-col gap-2 w-[70%]">
+      <span className="text-xl font-medium">Email*</span>
+      <input
+        name="email"
+        id="email"
+        minLength={5}
+        placeholder="Enter your email address"
+        className="border-2 px-2 py-2 rounded-lg  outline-none "
+        value={formData.email}
+        onChange={handleChange}
+        type="email"
+        required
+      />
+    </label>
+    <label className="flex flex-col w-[70%] gap-2 ">
+      <span className="font-medium text-xl">Mobile Number*</span>
+      <input
+        name="phoneNumber"
+        id="phoneNumber"
+        minLength={10}
+        placeholder="Enter 10-digit mobile number"
+        value={formData.phoneNumber}
+        onChange={handleChange}
+        className="border-2 px-2 py-2 rounded-lg  outline-none"
+        type="number"
+        required
+      />
+    </label>
+    {isSuperAdmin && (
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Company*</span>
+        <select
+          id="companyId"
+          name="companyId"
+          value={formData.companyId}
+          className="outline-none text-base border-2 px-2 py-2 rounded-lg"
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select Company</option>
+          {companyData.map((company) => (
+            <option key={company._id} value={company._id}>
+              {company.name} ({company.companyCode})
+            </option>
+          ))}
+        </select>
+      </label>
+    )}
+  </>
+);
+
+const StoreFields = ({
+  formData,
+  handleChange,
+  storeData,
+  showStoreDropdown,
+  setShowStoreDropdown,
+  handleStoreToggle,
+  dropdownRef,
+  isSuperAdmin,
+  isCompanyAdmin,
+  isAdminManager,
+}) => {
+  const showAssignedStores =
+    (isSuperAdmin || isCompanyAdmin || isAdminManager) &&
+    (formData.role === USER_ROLES.ADMIN_MANAGER ||
+      formData.role === USER_ROLES.TECHNICIAN);
+
+  const showSingleStore =
+    (isSuperAdmin || isCompanyAdmin || isAdminManager) &&
+    formData.role &&
+    formData.role !== USER_ROLES.ADMIN_MANAGER &&
+    formData.role !== USER_ROLES.TECHNICIAN &&
+    formData.role !== USER_ROLES.SUPER_ADMIN &&
+    formData.role !== USER_ROLES.COMPANY_ADMIN;
+
+  if (showAssignedStores) {
+    return (
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Assigned Stores*</span>
+        <div className="relative" ref={dropdownRef}>
+          <div
+            onClick={() => setShowStoreDropdown(!showStoreDropdown)}
+            className="outline-none text-base border-2 px-2 py-2 rounded-lg cursor-pointer flex justify-between items-center"
+          >
+            <span>{getSelectedStoresDisplay(formData, storeData)}</span>
+            <FaAngleDown
+              className={`${showStoreDropdown && "rotate-180"}`}
+              size={17}
+            />
+          </div>
+          {showStoreDropdown && (
+            <div className="absolute z-10 w-full mt-1 bg-white border-2 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              {storeData.length > 0 ? (
+                storeData.map((store) => (
+                  <div
+                    key={store._id}
+                    className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleStoreToggle(store._id)}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={(formData.assignedStores || []).includes(
+                        store._id
+                      )}
+                      onChange={() => {}}
+                      className="cursor-pointer"
+                    />
+                    <span>{`${store.storeName} - ${store.region}`}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="px-3 py-2 text-gray-500">
+                  No stores available
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </label>
+    );
+  }
+
+  if (showSingleStore) {
+    return (
+      <label className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Store Name*</span>
+        <select
+          id="storeId"
+          name="storeId"
+          value={formData.storeId}
+          className="outline-none text-base border-2 px-2 py-2 rounded-lg"
+          onChange={handleChange}
+          required
+        >
+          <option value="">None</option>
+          {storeData.map((item) => (
+            <option value={item._id} key={item._id}>
+              {`${item.storeName}, ${item.region}`}
+            </option>
+          ))}
+        </select>
+      </label>
+    );
+  }
+
+  return null;
+};
+
 const RegisterUserEditSub = ({
   closeHandler,
   submitHandler,
@@ -297,7 +473,6 @@ const RegisterUserEditSub = ({
   const [showStoreDropdown, setShowStoreDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -334,150 +509,24 @@ const RegisterUserEditSub = ({
         <p className="text-lg">All fields marked with * are required</p>
       </div>
       <form className="ml-10 flex flex-col gap-4" onSubmit={submitHandler}>
-        <label className="flex flex-col gap-2 w-[70%]">
-          <span className="font-medium text-xl">First name*</span>
-          <input
-            id="firstName"
-            name="firstName"
-            className="border-2 px-2 py-2 rounded-lg outline-none"
-            placeholder="Enter first name"
-            value={formData.firstName}
-            onChange={handleChange}
-            type="text"
-            required
-          />
-        </label>
-        <label className="flex flex-col gap-2 w-[70%]">
-          <span className="font-medium text-xl">Last name</span>
-          <input
-            name="lastName"
-            id="lastName"
-            placeholder="Enter last name"
-            value={formData.lastName}
-            className="border-2 px-2 py-2 rounded-lg outline-none"
-            onChange={handleChange}
-            type="text"
-          />
-        </label>
-        <label className="flex flex-col gap-2 w-[70%]">
-          <span className="text-xl font-medium">Email*</span>
-          <input
-            name="email"
-            id="email"
-            minLength={5}
-            placeholder="Enter your email address"
-            className="border-2 px-2 py-2 rounded-lg  outline-none "
-            value={formData.email}
-            onChange={handleChange}
-            type="email"
-            required
-          />
-        </label>
-        <label className="flex flex-col w-[70%] gap-2 ">
-          <span className="font-medium text-xl">Mobile Number*</span>
-          <input
-            name="phoneNumber"
-            id="phoneNumber"
-            minLength={10}
-            placeholder="Enter 10-digit mobile number"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            className="border-2 px-2 py-2 rounded-lg  outline-none"
-            type="number"
-            required
-          />
-        </label>
-        {isSuperAdmin && (
-          <label className="flex flex-col w-[70%] gap-2">
-            <span className="font-medium text-xl">Company*</span>
-            <select
-              id="companyId"
-              name="companyId"
-              value={formData.companyId}
-              className="outline-none text-base border-2 px-2 py-2 rounded-lg"
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Company</option>
-              {companyData.map((company) => (
-                <option key={company._id} value={company._id}>
-                  {company.name} ({company.companyCode})
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {(isSuperAdmin || isCompanyAdmin || isAdminManager) &&
-          (formData.role === USER_ROLES.ADMIN_MANAGER ||
-            formData.role === USER_ROLES.TECHNICIAN) && (
-            <label className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Assigned Stores*</span>
-              <div className="relative" ref={dropdownRef}>
-                <div
-                  onClick={() => setShowStoreDropdown(!showStoreDropdown)}
-                  className="outline-none text-base border-2 px-2 py-2 rounded-lg cursor-pointer flex justify-between items-center"
-                >
-                  <span>{getSelectedStoresDisplay(formData, storeData)}</span>
-                  <FaAngleDown
-                    className={`${showStoreDropdown && "rotate-180"}`}
-                    size={17}
-                  />
-                </div>
-                {showStoreDropdown && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border-2 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {storeData.length > 0 ? (
-                      storeData.map((store) => (
-                        <div
-                          key={store._id}
-                          className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                          onClick={() => handleStoreToggle(store._id)}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={(formData.assignedStores || []).includes(
-                              store._id
-                            )}
-                            onChange={() => {}}
-                            className="cursor-pointer"
-                          />
-                          <span>{`${store.storeName} - ${store.region}`}</span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="px-3 py-2 text-gray-500">
-                        No stores available
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </label>
-          )}
-        {(isSuperAdmin || isCompanyAdmin || isAdminManager) &&
-          formData.role &&
-          formData.role !== USER_ROLES.ADMIN_MANAGER &&
-          formData.role !== USER_ROLES.TECHNICIAN &&
-          formData.role !== USER_ROLES.SUPER_ADMIN &&
-          formData.role !== USER_ROLES.COMPANY_ADMIN && (
-            <label className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Store Name*</span>
-              <select
-                id="storeId"
-                name="storeId"
-                value={formData.storeId}
-                className="outline-none text-base border-2 px-2 py-2 rounded-lg"
-                onChange={handleChange}
-                required
-              >
-                <option value="">None</option>
-                {storeData.map((item) => (
-                  <option value={item._id} key={item._id}>
-                    {`${item.storeName}, ${item.region}`}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+        <FormFields
+          formData={formData}
+          handleChange={handleChange}
+          companyData={companyData}
+          isSuperAdmin={isSuperAdmin}
+        />
+        <StoreFields
+          formData={formData}
+          handleChange={handleChange}
+          storeData={storeData}
+          showStoreDropdown={showStoreDropdown}
+          setShowStoreDropdown={setShowStoreDropdown}
+          handleStoreToggle={handleStoreToggle}
+          dropdownRef={dropdownRef}
+          isSuperAdmin={isSuperAdmin}
+          isCompanyAdmin={isCompanyAdmin}
+          isAdminManager={isAdminManager}
+        />
         <label className="flex w-[70%] flex-col gap-2">
           <span className="font-medium text-xl">Role*</span>
           <select

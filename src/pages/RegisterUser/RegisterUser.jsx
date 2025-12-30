@@ -12,7 +12,6 @@ import { useStoreData } from './useStoreData'
 import { usePasswordValidation } from './usePasswordValidation'
 import { USER_ROLES } from '../../constants/roleConstants'
 
-
 const initForm = {
   firstName: '',
   lastName: '',
@@ -123,10 +122,6 @@ const RegisterUser = () => {
 
   const [errMsg, setErrMsg] = useState('')
   usePasswordValidation(formData.password, setPasswordValid, setErrMsg)
-
-  /* 
-     EFFECTS (same behavior)
-  */
 
   useEffect(() => {
     applyCompanyForAdmin(
