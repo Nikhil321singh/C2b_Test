@@ -4,7 +4,7 @@ import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 import styles from "../DevicePickupDashboard.module.css";
 import SideMenu from "../../../components/SideMenu";
 import AdminNavbar from "../../../components/Admin_Navbar";
-import ProfileBox from "../../../components/ProfileBox/ProfileBox";
+//import ProfileBox from "../../../components/ProfileBox/ProfileBox";
 import axios from "axios";
 
 const currentDomain = window.location.origin;

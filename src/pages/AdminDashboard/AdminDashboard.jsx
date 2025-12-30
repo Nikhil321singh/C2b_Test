@@ -1,19 +1,20 @@
-import React, { useState } from 'react'
-import DashboardTable from '../../components/DashboardTable/DashboardTable'
-import styles from '../CompanyListingDetails/CompanyListingDetails.module.css'
-import { IoMdSearch } from 'react-icons/io'
-import { IoRefresh } from 'react-icons/io5'
-import { FaDownload } from 'react-icons/fa'
-import SideMenu from '../../components/SideMenu'
-import AdminNavbar from '../../components/Admin_Navbar'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
-import { BeatLoader } from 'react-spinners'
-import { useAdminReport } from './hooks/useAdminReport'
-import { formatDateToString } from './utils/dateUtils'
+import React, { useState } from "react";
+import DashboardTable from "../../components/DashboardTable/DashboardTable";
+import styles from "../CompanyListingDetails/CompanyListingDetails.module.css";
+import { IoMdSearch } from "react-icons/io";
+import { IoRefresh } from "react-icons/io5";
+import { FaDownload } from "react-icons/fa";
+import SideMenu from "../../components/SideMenu";
+import AdminNavbar from "../../components/Admin_Navbar";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { BeatLoader } from "react-spinners";
+import { useAdminReport } from "./hooks/useAdminReport";
+import { formatDateToString } from "./utils/dateUtils";
+import CompanyFilter from "../../components/CompanyFilter";
 
 const AdminDashboard = () => {
-  const [sideMenu, setsideMenu] = useState(false)
+  const [sideMenu, setsideMenu] = useState(false);
   const {
     tableData,
     companies,
@@ -32,44 +33,44 @@ const AdminDashboard = () => {
     fetchTableData,
     handleDownload,
     resetFilters,
-  } = useAdminReport()
+  } = useAdminReport();
 
-  const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
-  const isSuperAdmin = LoggedInUser?.role === 'Super Admin'
+  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
+  const isSuperAdmin = LoggedInUser?.role === "Super Admin";
 
   const handleFromDateChange = (date) => {
-    setFromDate(date)
-    setFromDateDup(formatDateToString(date))
-  }
+    setFromDate(date);
+    setFromDateDup(formatDateToString(date));
+  };
 
   const handleToDateChange = (date) => {
-    setToDate(date)
-    setToDateDup(formatDateToString(date))
-  }
+    setToDate(date);
+    setToDateDup(formatDateToString(date));
+  };
 
   return (
     <div>
       {isLoading && (
-        <div className='fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
+        <div className="fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
           <BeatLoader
-            color='var(--primary-color)'
+            color="var(--primary-color)"
             loading={isLoading}
             size={15}
           />
         </div>
       )}
-      <div className='navbar'>
+      <div className="navbar">
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
 
-      <div className='flex flex-col gap-4 items-center mt-5 w-full'>
-        <div className='flex gap-2 items-center justify-center w-full'>
+      <div className="flex flex-col gap-4 items-center mt-5 w-full">
+        <div className="flex gap-2 items-center justify-center w-full">
           <div className={styles.search_bar_wrap}>
             <input
-              className='text-sm'
-              placeholder='Search...'
-              type='text'
+              className="text-sm"
+              placeholder="Search..."
+              type="text"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />
@@ -84,47 +85,35 @@ const AdminDashboard = () => {
           <DatePicker
             onChange={handleFromDateChange}
             selected={fromDate}
-            className='mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md'
-            dateFormat='yyyy-MM-dd'
-            placeholderText='Select from date'
+            className="mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md"
+            dateFormat="yyyy-MM-dd"
+            placeholderText="Select from date"
             isClearable
           />
           <DatePicker
             onChange={handleToDateChange}
             selected={toDate}
-            className='mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md'
-            dateFormat='yyyy-MM-dd'
-            placeholderText='Select to date'
+            className="mt-1 p-[6px] w-[150px] sm:w-[250px] border rounded-md"
+            dateFormat="yyyy-MM-dd"
+            placeholderText="Select to date"
             minDate={fromDate}
             isClearable
           />
         </div>
 
-        {/* Company Filter */}
+        {/* Company Filter - Refactored to use shared component */}
         {isSuperAdmin && (
-          <div className='flex gap-2 items-center max-w-md'>
-            <label className='text-sm font-medium whitespace-nowrap'>
-              Filter by Company:
-            </label>
-            <select
-              value={companyFilter}
-              onChange={(e) => setCompanyFilter(e.target.value)}
-              className='text-sm bg-transparent border border-gray-300 rounded px-3 py-2 w-64'
-            >
-              <option value=''>All Companies</option>
-              {companies.map((company) => (
-                <option key={company._id} value={company._id}>
-                  {company.name} ({company.companyCode})
-                </option>
-              ))}
-            </select>
-          </div>
+          <CompanyFilter
+            companyFilter={companyFilter}
+            setCompanyFilter={setCompanyFilter}
+            companies={companies}
+          />
         )}
       </div>
 
       {flag && <DashboardTable tableData={tableData} />}
     </div>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;

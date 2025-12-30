@@ -5,6 +5,79 @@ import { AiOutlineFile } from "react-icons/ai";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+
+// Extracted complex upload logic to a helper function
+const uploadDocumentsToS3 = async (attachedFiles, userToken) => {
+  const uploadedDocuments = [];
+
+  if (attachedFiles.length > 0) {
+    toast.loading("Uploading documents...");
+
+    for (const file of attachedFiles) {
+      try {
+        const timestamp = Date.now();
+        const fileName = `${timestamp}_${file.name}`;
+
+        const presignedUrlResponse = await axios.get(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/s3/get-presigned-url`,
+          {
+            params: {
+              fileName: fileName,
+              fileType: file.type,
+            },
+            headers: { Authorization: userToken },
+          }
+        );
+
+        if (presignedUrlResponse?.data?.url) {
+          const presignedUrl = presignedUrlResponse.data.url;
+
+          await axios.put(presignedUrl, file, {
+            headers: {
+              "Content-Type": file.type,
+            },
+            transformRequest: [
+              (data, headers) => {
+                delete headers.Authorization;
+                return data;
+              },
+            ],
+          });
+
+          const s3Url = presignedUrl.split("?")[0];
+          uploadedDocuments.push({
+            fileName: file.name,
+            fileUrl: s3Url,
+            fileType: file.type,
+            uploadedAt: new Date().toISOString(),
+          });
+        }
+      } catch (uploadError) {
+        console.error("File upload error:", uploadError);
+        toast.error(`Failed to upload ${file.name}`);
+      }
+    }
+    toast.dismiss();
+  }
+  return uploadedDocuments;
+};
+
+const FormInput = ({ label, value, onChange, required = false }) => (
+  <div className="flex flex-col w-[70%] gap-2">
+    <span className="font-medium text-xl">
+      {label}
+      {required && "*"}
+    </span>
+    <input
+      className="border-2 px-2 py-2 rounded-lg outline-none"
+      type="text"
+      value={value}
+      required={required}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  </div>
+);
+
 const CompanyListing = () => {
   const [sideMenu, setsideMenu] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
@@ -32,65 +105,10 @@ const CompanyListing = () => {
 
     try {
       // Step 1: Upload files to S3 using presigned URLs
-      const uploadedDocuments = [];
-
-      if (attachedFiles.length > 0) {
-        toast.loading("Uploading documents...");
-
-        for (const file of attachedFiles) {
-          try {
-            // Generate unique file name with timestamp
-            const timestamp = Date.now();
-            const fileName = `${timestamp}_${file.name}`;
-
-            // Get presigned URL from backend
-            const presignedUrlResponse = await axios.get(
-              `${
-                import.meta.env.VITE_REACT_APP_ENDPOINT
-              }/api/s3/get-presigned-url`,
-              {
-                params: {
-                  fileName: fileName,
-                  fileType: file.type,
-                },
-                headers: { Authorization: userToken },
-              }
-            );
-
-            if (presignedUrlResponse?.data?.url) {
-              const presignedUrl = presignedUrlResponse.data.url;
-
-              // Upload file directly to S3 using presigned URL
-              await axios.put(presignedUrl, file, {
-                headers: {
-                  "Content-Type": file.type,
-                },
-                transformRequest: [
-                  (data, headers) => {
-                    delete headers.Authorization;
-                    return data;
-                  },
-                ],
-              });
-
-              // Extract the public S3 URL (remove query params from presigned URL)
-              const s3Url = presignedUrl.split("?")[0];
-
-              uploadedDocuments.push({
-                fileName: file.name,
-                fileUrl: s3Url,
-                fileType: file.type,
-                uploadedAt: new Date().toISOString(),
-              });
-            }
-          } catch (uploadError) {
-            console.error("File upload error:", uploadError);
-            toast.error(`Failed to upload ${file.name}`);
-          }
-        }
-
-        toast.dismiss();
-      }
+      const uploadedDocuments = await uploadDocumentsToS3(
+        attachedFiles,
+        userToken
+      );
 
       // Step 2: Create company with uploaded file URLs
       const payload = {
@@ -136,6 +154,30 @@ const CompanyListing = () => {
       }
     }
   };
+
+  const formData = {
+    companyName,
+    contactNumber,
+    address,
+    gstNumber,
+    panNumber,
+    remarks,
+    showPrice,
+    maskInfo,
+    attachedFiles,
+  };
+
+  const setters = {
+    setCompanyName,
+    setContactNumber,
+    setAddress,
+    setGstNumber,
+    setPanNumber,
+    setRemarks,
+    setShowPrice,
+    setMaskInfo,
+  };
+
   return (
     <div>
       <div className="navbar">
@@ -179,113 +221,12 @@ const CompanyListing = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="ml-10 flex flex-col gap-4">
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Name*</span>
-              <input
-                className="border-2 px-2 py-2 rounded-lg outline-none"
-                type="text"
-                value={companyName}
-                required={true}
-                onChange={(e) => setCompanyName(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Address</span>
-              <input
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Contact Number</span>
-              <input
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="text"
-                value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">GST Number</span>
-              <input
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="text"
-                value={gstNumber}
-                onChange={(e) => setGstNumber(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">PAN Number</span>
-              <input
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="text"
-                value={panNumber}
-                onChange={(e) => setPanNumber(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Remarks</span>
-              <input
-                className="border-2 px-2 py-2 rounded-lg  outline-none"
-                type="text"
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-              />
-            </div>
-            {/* --- NEW FIELD: Show Price --- */}
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Show Price</span>
-              <select
-                className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
-                value={showPrice.toString()}
-                onChange={(e) => setShowPrice(e.target.value === "true")}
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
-            </div>
-
-            {/* --- NEW FIELD: Mask Info --- */}
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Mask Info</span>
-              <select
-                className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
-                value={maskInfo.toString()}
-                onChange={(e) => setMaskInfo(e.target.value === "true")}
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
-            </div>
-            <div className="flex flex-col w-[70%] gap-2">
-              <span className="font-medium text-xl">Attach Documents</span>
-              <input
-                className=" py-2 rounded-lg w-[250px] outline-none"
-                onChange={handleFileUpload}
-                type="file"
-                multiple
-              />
-            </div>
-
-            <div className="flex flex-wrap w-[90%] gap-2">
-              {attachedFiles.length > 0 &&
-                attachedFiles.map((file, index) => (
-                  <div className="flex flex-col items-center">
-                    <AiOutlineFile size={80} />
-                    <p key={index}>{file.name}</p>
-                  </div>
-                ))}
-            </div>
-
-            <div className="mt-8">
-              <button className="font-medium text-sm text-white p-3 rounded bg-primary">
-                Submit Form
-              </button>
-            </div>
-          </form>
+          <CompanyListingForm
+            formData={formData}
+            setters={setters}
+            handleSubmit={handleSubmit}
+            handleFileUpload={handleFileUpload}
+          />
         </div>
       </div>
     </div>
@@ -293,3 +234,105 @@ const CompanyListing = () => {
 };
 
 export default CompanyListing;
+
+// [FIX 2: BRAIN OVERLOAD]
+// Extracted the UI Form into a sub-component to reduce line count of main component
+const CompanyListingForm = ({
+  formData,
+  setters,
+  handleSubmit,
+  handleFileUpload,
+}) => {
+  const {
+    companyName,
+    address,
+    contactNumber,
+    gstNumber,
+    panNumber,
+    remarks,
+    showPrice,
+    maskInfo,
+    attachedFiles,
+  } = formData;
+
+  const {
+    setCompanyName,
+    setAddress,
+    setContactNumber,
+    setGstNumber,
+    setPanNumber,
+    setRemarks,
+    setShowPrice,
+    setMaskInfo,
+  } = setters;
+
+  return (
+    <form onSubmit={handleSubmit} className="ml-10 flex flex-col gap-4">
+      <FormInput
+        label="Name"
+        value={companyName}
+        onChange={setCompanyName}
+        required
+      />
+      <FormInput label="Address" value={address} onChange={setAddress} />
+      <FormInput
+        label="Contact Number"
+        value={contactNumber}
+        onChange={setContactNumber}
+      />
+      <FormInput label="GST Number" value={gstNumber} onChange={setGstNumber} />
+      <FormInput label="PAN Number" value={panNumber} onChange={setPanNumber} />
+      <FormInput label="Remarks" value={remarks} onChange={setRemarks} />
+
+      <div className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Show Price</span>
+        <select
+          className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
+          value={showPrice.toString()}
+          onChange={(e) => setShowPrice(e.target.value === "true")}
+        >
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      </div>
+
+      <div className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Mask Info</span>
+        <select
+          className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
+          value={maskInfo.toString()}
+          onChange={(e) => setMaskInfo(e.target.value === "true")}
+        >
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      </div>
+
+      <div className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Attach Documents</span>
+        <input
+          className=" py-2 rounded-lg w-[250px] outline-none"
+          onChange={handleFileUpload}
+          type="file"
+          multiple
+        />
+      </div>
+
+      <div className="flex flex-wrap w-[90%] gap-2">
+        {attachedFiles.length > 0 &&
+          attachedFiles.map((file, index) => (
+            <div key={index} className="flex flex-col items-center">
+              <AiOutlineFile size={80} />
+              <p>{file.name}</p>
+            </div>
+          ))}
+      </div>
+
+      <div className="mt-8">
+        <button className="font-medium text-sm text-white p-3 rounded bg-primary">
+          Submit Form
+        </button>
+      </div>
+    </form>
+  );
+};
