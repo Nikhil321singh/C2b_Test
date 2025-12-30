@@ -13,11 +13,11 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
     const fetchCompanies = async () => {
       const token = sessionStorage.getItem('authToken')
       try {
-        const response = await axios.get(
+        const res = await axios.get(
           `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/findAll`,
           { headers: { Authorization: token } }
         )
-        setCompanies(response.data.result || [])
+        setCompanies(res.data.result || [])
       } catch (error) {
         console.log('Error fetching companies:', error)
       }
@@ -164,8 +164,18 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
             </div>
 
             {[
-              { label: 'Store Name', name: 'storeName', type: 'text', disabled: false },
-              { label: 'Unique Id', name: 'uniqueId', type: 'text', disabled: true },
+              {
+                label: 'Store Name',
+                name: 'storeName',
+                type: 'text',
+                disabled: false,
+              },
+              {
+                label: 'Unique Id',
+                name: 'uniqueId',
+                type: 'text',
+                disabled: true,
+              },
               { label: 'Email', name: 'email', type: 'email', disabled: false },
               {
                 label: 'Contact Number',
@@ -173,8 +183,18 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
                 type: 'number',
                 disabled: false,
               },
-              { label: 'Region', name: 'region', type: 'text', disabled: false },
-              { label: 'Adddress', name: 'address', type: 'text', disabled: false },
+              {
+                label: 'Region',
+                name: 'region',
+                type: 'text',
+                disabled: false,
+              },
+              {
+                label: 'Adddress',
+                name: 'address',
+                type: 'text',
+                disabled: false,
+              },
             ].map(({ label, name, type, disabled }) => (
               <div key={name} className='flex flex-col gap-2 w-full md:w-[70%]'>
                 <label className='font-medium text-base md:text-xl'>

@@ -148,7 +148,9 @@ const TechnicianWiseReport = () => {
     console.log('to', date)
   }
   function reverseDate(itemDate) {
-    if (!itemDate) return 'N/A'
+    if (!itemDate) {
+      return 'N/A'
+    }
     const dateArr = itemDate.split('-')
     return dateArr.reverse().join('-')
   }

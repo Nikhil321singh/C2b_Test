@@ -47,7 +47,9 @@ const UserForm = ({
 
   const getSelectedStoresDisplay = () => {
     const selectedCount = (formData.assignedStores || []).length
-    if (selectedCount === 0) return 'Select Stores'
+    if (selectedCount === 0) {
+      return 'Select Stores'
+    }
     if (selectedCount === 1) {
       const store = stores.find((s) => s._id === formData.assignedStores[0])
       return store ? `${store.storeName} - ${store.region}` : 'Select Stores'
@@ -59,19 +61,19 @@ const UserForm = ({
   const getFilteredRoles = () => {
     if (isSuperAdmin) {
       // Super Admin can see all roles except Technician
-      return role.filter(r => r !== USER_ROLES.TECHNICIAN)
+      return role.filter((r) => r !== USER_ROLES.TECHNICIAN)
     } else if (isCompanyAdmin) {
       // Company Admin can only see: Admin Manager, Technician, Sale User
-      return role.filter(r =>
-        r === USER_ROLES.ADMIN_MANAGER ||
-        r === USER_ROLES.TECHNICIAN ||
-        r === USER_ROLES.SALE_USER
+      return role.filter(
+        (r) =>
+          r === USER_ROLES.ADMIN_MANAGER ||
+          r === USER_ROLES.TECHNICIAN ||
+          r === USER_ROLES.SALE_USER
       )
     } else if (isAdminManager) {
       // Admin Manager can only see: Technician, Sale User
-      return role.filter(r =>
-        r === USER_ROLES.TECHNICIAN ||
-        r === USER_ROLES.SALE_USER
+      return role.filter(
+        (r) => r === USER_ROLES.TECHNICIAN || r === USER_ROLES.SALE_USER
       )
     }
     return []
@@ -270,7 +272,9 @@ const UserForm = ({
                 type='text'
                 className='hidden'
                 required
-                value={(formData.assignedStores || []).length > 0 ? 'valid' : ''}
+                value={
+                  (formData.assignedStores || []).length > 0 ? 'valid' : ''
+                }
               />
             )}
           </div>
