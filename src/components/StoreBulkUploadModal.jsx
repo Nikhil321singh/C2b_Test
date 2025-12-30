@@ -6,6 +6,18 @@ import { saveAs } from "file-saver";
 import { useBulkUpload } from "../hooks/useBulkUpload";
 import FileUploadDropzone from "./FileUploadDropZone";
 
+const generateExcelFile = (data, fileName) => {
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const dataFile = new Blob([excelBuffer], { type: fileType });
+  saveAs(dataFile, `${fileName}${fileExtension}`);
+};
+
 const StoreBulkUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   const {
     file,
@@ -60,10 +72,6 @@ const StoreBulkUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   };
 
   const handleDownloadSample = () => {
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-    const fileExtension = ".xlsx";
-
     const sampleData = [
       {
         storeName: "Example Store",
@@ -75,30 +83,18 @@ const StoreBulkUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
       },
     ];
 
-    const ws = XLSX.utils.json_to_sheet(sampleData);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const dataFile = new Blob([excelBuffer], { type: fileType });
-    saveAs(dataFile, `store-upload-sample${fileExtension}`);
+    generateExcelFile(sampleData, "store-upload-sample");
   };
 
   const handleDownloadErrors = () => {
     if (uploadResult?.errorDetails && uploadResult.errorDetails.length > 0) {
-      const fileType =
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-      const fileExtension = ".xlsx";
-
       const errorData = uploadResult.errorDetails.map((err) => ({
         Row: err.row,
         Error: err.message,
         ...err.data,
       }));
 
-      const ws = XLSX.utils.json_to_sheet(errorData);
-      const wb = { Sheets: { errors: ws }, SheetNames: ["errors"] };
-      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-      const dataFile = new Blob([excelBuffer], { type: fileType });
-      saveAs(dataFile, `store-upload-errors${fileExtension}`);
+      generateExcelFile(errorData, "store-upload-errors");
     }
   };
 

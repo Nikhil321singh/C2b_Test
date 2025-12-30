@@ -3,6 +3,16 @@ import { IoEye, IoEyeOffSharp } from 'react-icons/io5'
 import { FaAngleDown } from 'react-icons/fa6'
 import { USER_ROLES } from '../../constants/roleConstants'
 
+const defaultRoles = [
+  'Super Admin',
+  'Company Admin',
+  'Admin Manager',
+  'Technician',
+  'Sale User',
+  'Super_Admin_Unicorn',
+  'Admin_Manager_Unicorn',
+]
+
 const role = import.meta.env.VITE_REACT_APP_ROLES
   ? import.meta.env.VITE_REACT_APP_ROLES.split(',').map((item) => item.trim())
   : defaultRoles

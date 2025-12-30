@@ -276,88 +276,36 @@ const SuperAdminProfile = ({
             Grade Pricing
           </li>
         )}
-        {isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleRegister}
-          >
-            Register User
-          </li>
-        )}
-        {!isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleRegister}
-          >
-            Register User
-          </li>
-        )}
-
-        {isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleBulkUploadHistory}
-          >
-            Bulk Upload History
-          </li>
-        )}
-        {!isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleBulkUploadHistory}
-          >
-            Bulk Upload History
-          </li>
-        )}
-
-        {isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleStoreListing}
-          >
-            Store Listing
-          </li>
-        )}
-        {!isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleStoreListing}
-          >
-            Store Listing
-          </li>
-        )}
-        {isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleStoreReport}
-          >
-            Store Report
-          </li>
-        )}
-        {!isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleStoreReport}
-          >
-            Store Report
-          </li>
-        )}
-        {isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer'
-            onClick={handleQuoteTracking}
-          >
-            Quote Tracking
-          </li>
-        )}
-        {!isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer'
-            onClick={handleQuoteTracking}
-          >
-            Quote Tracking
-          </li>
-        )}
+        <li
+          className='text-[20px] font-[300] cursor-pointer '
+          onClick={handleRegister}
+        >
+          Register User
+        </li>
+        <li
+          className='text-[20px] font-[300] cursor-pointer '
+          onClick={handleBulkUploadHistory}
+        >
+          Bulk Upload History
+        </li>
+        <li
+          className='text-[20px] font-[300] cursor-pointer '
+          onClick={handleStoreListing}
+        >
+          Store Listing
+        </li>
+        <li
+          className='text-[20px] font-[300] cursor-pointer '
+          onClick={handleStoreReport}
+        >
+          Store Report
+        </li>
+        <li
+          className='text-[20px] font-[300] cursor-pointer'
+          onClick={handleQuoteTracking}
+        >
+          Quote Tracking
+        </li>
         {!isCompanyAdmin && (
           <li
             className='text-[20px] font-[300] cursor-pointer'
@@ -366,22 +314,12 @@ const SuperAdminProfile = ({
             Coupon Management
           </li>
         )}
-        {isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleTable}
-          >
-            Customer Table
-          </li>
-        )}
-        {!isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handleTable}
-          >
-            Customer Table
-          </li>
-        )}
+        <li
+          className='text-[20px] font-[300] cursor-pointer '
+          onClick={handleTable}
+        >
+          Customer Table
+        </li>
         {!isCompanyAdmin && (
           <li
             className='text-[20px] font-[300] cursor-pointer '
@@ -390,54 +328,24 @@ const SuperAdminProfile = ({
             Company Listing
           </li>
         )}
-        {isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handlpickup}
-          >
-            Pickup & Cancel Device
-          </li>
-        )}
-        {!isCompanyAdmin && (
-          <li
-            className='text-[20px] font-[300] cursor-pointer '
-            onClick={handlpickup}
-          >
-            Pickup & Cancel Device
-          </li>
-        )}
-        {isCompanyAdmin && (
-          <li
-            onClick={handleTechnician}
-            className='text-[20px] cursor-pointer font-[300] '
-          >
-            Technician Report
-          </li>
-        )}
-        {!isCompanyAdmin && (
-          <li
-            onClick={handleTechnician}
-            className='text-[20px] cursor-pointer font-[300] '
-          >
-            Technician Report
-          </li>
-        )}
-        {isCompanyAdmin && (
-          <li
-            className='font-[300] cursor-pointer text-[20px] '
-            onClick={adminDashboard}
-          >
-            Admin Dashboard
-          </li>
-        )}
-        {!isCompanyAdmin && (
-          <li
-            className='font-[300] cursor-pointer text-[20px] '
-            onClick={adminDashboard}
-          >
-            Admin Dashboard
-          </li>
-        )}
+        <li
+          className='text-[20px] font-[300] cursor-pointer '
+          onClick={handlpickup}
+        >
+          Pickup & Cancel Device
+        </li>
+        <li
+          onClick={handleTechnician}
+          className='text-[20px] cursor-pointer font-[300] '
+        >
+          Technician Report
+        </li>
+        <li
+          className='font-[300] cursor-pointer text-[20px] '
+          onClick={adminDashboard}
+        >
+          Admin Dashboard
+        </li>
         <li
           className='text-[20px] font-[300] cursor-pointer '
           onClick={handleLogout}

@@ -450,6 +450,25 @@ const TableFilters = ({
   )
 }
 
+const renderStoreField = (val, field) => {
+  const hasMultiple = val?.assignedStoresData?.length > 0
+  const hasSingle = val?.stores && !hasMultiple
+
+  if (hasMultiple) {
+    return val.assignedStoresData.map((store, i) => (
+      <div key={i} className='border-b py-1 last:border-b-0'>
+        {store[field]}
+      </div>
+    ))
+  }
+
+  if (hasSingle) {
+    return val.stores[field]
+  }
+
+  return 'N/A'
+}
+
 const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
   return (
     <div className='m-2 overflow-x-auto md:m-5'>
@@ -477,9 +496,6 @@ const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
 
         <tbody>
           {data.map((val, index) => {
-            const hasMultiple = val?.assignedStoresData?.length > 0
-            const hasSingle = val?.stores && !hasMultiple
-
             return (
               <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
                 {/* ACTION BUTTONS */}
@@ -532,41 +548,17 @@ const RegisterUserTable = ({ data, editHandler, deleteConfHandler }) => {
 
                 {/* STORE NAME */}
                 <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                  {hasMultiple
-                    ? val.assignedStoresData.map((store, i) => (
-                        <div key={i} className='border-b py-1 last:border-b-0'>
-                          {store.storeName}
-                        </div>
-                      ))
-                    : hasSingle
-                    ? val.stores.storeName
-                    : 'N/A'}
+                  {renderStoreField(val, 'storeName')}
                 </td>
 
                 {/* REGION */}
                 <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                  {hasMultiple
-                    ? val.assignedStoresData.map((store, i) => (
-                        <div key={i} className='border-b py-1 last:border-b-0'>
-                          {store.region}
-                        </div>
-                      ))
-                    : hasSingle
-                    ? val.stores.region
-                    : 'N/A'}
+                  {renderStoreField(val, 'region')}
                 </td>
 
                 {/* ADDRESS */}
                 <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                  {hasMultiple
-                    ? val.assignedStoresData.map((store, i) => (
-                        <div key={i} className='border-b py-1 last:border-b-0'>
-                          {store.address}
-                        </div>
-                      ))
-                    : hasSingle
-                    ? val.stores.address
-                    : 'N/A'}
+                  {renderStoreField(val, 'address')}
                 </td>
               </tr>
             )

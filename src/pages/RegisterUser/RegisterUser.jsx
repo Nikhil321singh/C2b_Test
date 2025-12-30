@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { BeatLoader } from 'react-spinners'
-
 import AdminNavbar from '../../components/Admin_Navbar'
 import BulkUploadModal from '../../components/BulkUploadModal'
 import SideMenu from '../../components/SideMenu'
@@ -13,9 +12,6 @@ import { useStoreData } from './useStoreData'
 import { usePasswordValidation } from './usePasswordValidation'
 import { USER_ROLES } from '../../constants/roleConstants'
 
-/* 
-   INITIAL FORM
- */
 
 const initForm = {
   firstName: '',
@@ -30,11 +26,6 @@ const initForm = {
   address: '',
   companyId: '',
 }
-
-/* 
-   HELPERS (Sonar fix only)
-   
- */
 
 const applyCompanyForAdmin = (
   isCompanyAdmin,
@@ -110,10 +101,6 @@ const buildRegisterUserPayload = (formData, LoggedInUser, isCompanyAdmin) => {
   return payload
 }
 
-/*
-   COMPONENT
-*/
-
 const RegisterUser = () => {
   const token = sessionStorage.getItem('authToken')
   const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
@@ -163,10 +150,6 @@ const RegisterUser = () => {
   useEffect(() => {
     setFormData((prev) => ({ ...prev, grestMember: isGrest === 'yes' }))
   }, [isGrest])
-
-  /*
-     HANDLERS
-  */
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target

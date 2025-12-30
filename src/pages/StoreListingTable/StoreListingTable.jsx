@@ -24,11 +24,19 @@ import CompanyFilter from "../../components/CompanyFilter";
 const succTextColor = "text-green-500";
 const failTextColor = "text-primary";
 
-const downloadExcel = (dataDown, curPage) => {
+const generateExcelFile = (data, fileName) => {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
 
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  const dataFile = new Blob([excelBuffer], { type: fileType });
+  saveAs(dataFile, `${fileName}${fileExtension}`);
+};
+
+const downloadExcel = (dataDown, curPage) => {
   const formattedData = dataDown.map((item) => {
     return {
       "Date Created": new Date(item.createdAt).toLocaleDateString("en-GB"),
@@ -43,19 +51,10 @@ const downloadExcel = (dataDown, curPage) => {
     };
   });
 
-  const ws = XLSX.utils.json_to_sheet(formattedData);
-  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  const dataFile = new Blob([excelBuffer], { type: fileType });
-  saveAs(dataFile, `Stores_Data_${curPage}${fileExtension}`);
+  generateExcelFile(formattedData, `Stores_Data_${curPage}`);
 };
 
 const sampleDownloadHandler = () => {
-  const fileType =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = ".xlsx";
-
-  // Create sample data structure matching the exact format from public folder
   const sampleData = [
     {
       storeName: "ABC Store",
@@ -67,11 +66,7 @@ const sampleDownloadHandler = () => {
     },
   ];
 
-  const ws = XLSX.utils.json_to_sheet(sampleData);
-  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  const dataFile = new Blob([excelBuffer], { type: fileType });
-  saveAs(dataFile, `storelisting-sample-file-store${fileExtension}`);
+  generateExcelFile(sampleData, "storelisting-sample-file-store");
 };
 
 const StoreListingTable = () => {
