@@ -9,8 +9,6 @@ import {
   IoMdSearch,
 } from "react-icons/io";
 import { IoRefresh } from "react-icons/io5";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 import { FaDownload, FaUpload } from "react-icons/fa6";
 
 import AdminNavbar from "../../components/Admin_Navbar";
@@ -20,21 +18,10 @@ import StoreBulkUploadModal from "../../components/StoreBulkUploadModal";
 import { useNavigate } from "react-router-dom";
 import { USER_ROLES } from "../../constants/roleConstants";
 import CompanyFilter from "../../components/CompanyFilter";
+import { generateExcelFile } from "../../utils/excelHelper";
 
 const succTextColor = "text-green-500";
 const failTextColor = "text-primary";
-
-const generateExcelFile = (data, fileName) => {
-  const fileType =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = ".xlsx";
-
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  const dataFile = new Blob([excelBuffer], { type: fileType });
-  saveAs(dataFile, `${fileName}${fileExtension}`);
-};
 
 const downloadExcel = (dataDown, curPage) => {
   const formattedData = dataDown.map((item) => {

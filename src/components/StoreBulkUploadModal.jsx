@@ -1,22 +1,9 @@
 import axios from "axios";
 import UploadSpinner from "./UploadSpinner";
 import { IoCloudUploadOutline, IoDocumentTextOutline } from "react-icons/io5";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 import { useBulkUpload } from "../hooks/useBulkUpload";
 import FileUploadDropzone from "./FileUploadDropZone";
-
-const generateExcelFile = (data, fileName) => {
-  const fileType =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-  const fileExtension = ".xlsx";
-
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  const dataFile = new Blob([excelBuffer], { type: fileType });
-  saveAs(dataFile, `${fileName}${fileExtension}`);
-};
+import { generateExcelFile } from "../utils/excelHelper";
 
 const StoreBulkUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
   const {
