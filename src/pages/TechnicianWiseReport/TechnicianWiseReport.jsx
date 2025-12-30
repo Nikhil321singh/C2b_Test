@@ -27,16 +27,13 @@ const TechnicianWiseReport = () => {
   const getTableData = () => {
     setLoading(true)
     const userToken = sessionStorage.getItem('authToken')
-
     const queryParams = new URLSearchParams()
     if (isSuperAdmin && searchValue !== null) {
       queryParams.append('search', searchValue)
     }
-
     if (toDate !== null) {
       queryParams.append('todate', toDateDup)
     }
-
     if (fromDate !== null) {
       queryParams.append('fromdate', fromDateDup)
     }
@@ -69,7 +66,6 @@ const TechnicianWiseReport = () => {
     const fileType =
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
     const fileExtension = '.xlsx'
-
     const formattedData = apiData.map((item) => {
       return {
         Date: reverseDate(item?.date),
@@ -133,7 +129,6 @@ const TechnicianWiseReport = () => {
         .split('T')[0]
       setFromDateDup(formatDate)
     }
-    console.log('from', date)
   }
   const handleToDateChange = (date) => {
     if (date !== null) {
@@ -145,7 +140,6 @@ const TechnicianWiseReport = () => {
         .split('T')[0]
       setToDateDup(formatDate)
     }
-    console.log('to', date)
   }
   function reverseDate(itemDate) {
     if (!itemDate) {
@@ -162,6 +156,7 @@ const TechnicianWiseReport = () => {
     setFromDateDup('')
     getTableData()
   }, [])
+
   return (
     <div>
       {loading && (
@@ -201,7 +196,6 @@ const TechnicianWiseReport = () => {
         >
           <FaDownload /> Bulk Download
         </button>
-
         <div className='[bg-[#F5F4F9]'>
           <DatePicker
             selected={fromDate}

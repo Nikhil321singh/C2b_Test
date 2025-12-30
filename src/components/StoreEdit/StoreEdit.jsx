@@ -1,7 +1,105 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { BeatLoader } from 'react-spinners'
 import axios from 'axios'
 import { IoClose } from 'react-icons/io5'
+
+const FORM_FIELDS = [
+  {
+    label: 'Store Name',
+    name: 'storeName',
+    type: 'text',
+    disabled: false,
+  },
+  {
+    label: 'Unique Id',
+    name: 'uniqueId',
+    type: 'text',
+    disabled: true,
+  },
+  { label: 'Email', name: 'email', type: 'email', disabled: false },
+  {
+    label: 'Contact Number',
+    name: 'contactNumber',
+    type: 'number',
+    disabled: false,
+  },
+  {
+    label: 'Region',
+    name: 'region',
+    type: 'text',
+    disabled: false,
+  },
+  {
+    label: 'Adddress',
+    name: 'address',
+    type: 'text',
+    disabled: false,
+  },
+]
+
+const validateFormData = (formData, setResponse, setIsTableLoaded) => {
+  if (formData.email.length <= 5) {
+    setResponse('Email size is too small, must be more than 5')
+    setIsTableLoaded(false)
+    return false
+  }
+
+  if (formData.contactNumber.length <= 5) {
+    setResponse('Phone number is invalid, size must be more than 5')
+    setIsTableLoaded(false)
+    return false
+  }
+
+  return true
+}
+
+const CompanyDropdown = ({ companies, formData, setFormData }) => (
+  <div className='flex flex-col gap-2 w-full md:w-[70%]'>
+    <label className='font-medium text-base md:text-xl'>Company*</label>
+    <select
+      name='companyId'
+      value={formData?.companyId?._id || ''}
+      onChange={(e) => {
+        const selectedCompany = companies.find((c) => c._id === e.target.value)
+        setFormData({
+          ...formData,
+          companyId: {
+            _id: selectedCompany._id,
+            name: selectedCompany.companyName,
+            companyCode: selectedCompany.companyCode,
+          },
+        })
+      }}
+      required
+      className='border-2 px-3 py-2 rounded-lg outline-none'
+    >
+      <option value=''>Select a company</option>
+      {companies.map((company) => (
+        <option key={company._id} value={company._id}>
+          {company.name}
+        </option>
+      ))}
+    </select>
+  </div>
+)
+
+const FormField = ({ label, name, type, disabled, value, onChange }) => (
+  <div className='flex flex-col gap-2 w-full md:w-[70%]'>
+    <label className='font-medium text-base md:text-xl'>{label}*</label>
+    <input
+      id={name}
+      name={name}
+      type={type}
+      value={value}
+      onChange={onChange}
+      required
+      disabled={disabled}
+      className={`border-2 px-3 py-2 rounded-lg outline-none ${
+        disabled ? 'bg-gray-100 cursor-not-allowed' : ''
+      }`}
+    />
+  </div>
+)
 
 const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
   const [isTableLoaded, setIsTableLoaded] = useState(false)
@@ -44,15 +142,7 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
     setIsTableLoaded(true)
     const token = sessionStorage.getItem('authToken')
 
-    if (formData.email.length <= 5) {
-      setResponse('Email size is too small, must be more than 5')
-      setIsTableLoaded(false)
-      return
-    }
-
-    if (formData.contactNumber.length <= 5) {
-      setResponse('Phone number is invalid, size must be more than 5')
-      setIsTableLoaded(false)
+    if (!validateFormData(formData, setResponse, setIsTableLoaded)) {
       return
     }
 
@@ -85,7 +175,7 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
         setResponse(response1.data.msg)
         setEditSuccess(true)
       })
-      .catch((error) => {
+      .catch(() => {
         setIsTableLoaded(false)
         setResponse('Failed to update data')
       })
@@ -130,89 +220,22 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
 
           {/* Form */}
           <form className='flex flex-col gap-4' onSubmit={submitHandler}>
-            {/* Company Dropdown */}
-            <div className='flex flex-col gap-2 w-full md:w-[70%]'>
-              <label className='font-medium text-base md:text-xl'>
-                Company*
-              </label>
-              <select
-                name='companyId'
-                value={formData?.companyId?._id || ''}
-                onChange={(e) => {
-                  const selectedCompany = companies.find(
-                    (c) => c._id === e.target.value
-                  )
-                  setFormData({
-                    ...formData,
-                    companyId: {
-                      _id: selectedCompany._id,
-                      name: selectedCompany.companyName,
-                      companyCode: selectedCompany.companyCode,
-                    },
-                  })
-                }}
-                required
-                className='border-2 px-3 py-2 rounded-lg outline-none'
-              >
-                <option value=''>Select a company</option>
-                {companies.map((company) => (
-                  <option key={company._id} value={company._id}>
-                    {company.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <CompanyDropdown
+              companies={companies}
+              formData={formData}
+              setFormData={setFormData}
+            />
 
-            {[
-              {
-                label: 'Store Name',
-                name: 'storeName',
-                type: 'text',
-                disabled: false,
-              },
-              {
-                label: 'Unique Id',
-                name: 'uniqueId',
-                type: 'text',
-                disabled: true,
-              },
-              { label: 'Email', name: 'email', type: 'email', disabled: false },
-              {
-                label: 'Contact Number',
-                name: 'contactNumber',
-                type: 'number',
-                disabled: false,
-              },
-              {
-                label: 'Region',
-                name: 'region',
-                type: 'text',
-                disabled: false,
-              },
-              {
-                label: 'Adddress',
-                name: 'address',
-                type: 'text',
-                disabled: false,
-              },
-            ].map(({ label, name, type, disabled }) => (
-              <div key={name} className='flex flex-col gap-2 w-full md:w-[70%]'>
-                <label className='font-medium text-base md:text-xl'>
-                  {label}*
-                </label>
-                <input
-                  id={name}
-                  name={name}
-                  type={type}
-                  value={formData[name]}
-                  onChange={handleChange}
-                  required
-                  disabled={disabled}
-                  className={`border-2 px-3 py-2 rounded-lg outline-none ${
-                    disabled ? 'bg-gray-100 cursor-not-allowed' : ''
-                  }`}
-                />
-              </div>
+            {FORM_FIELDS.map(({ label, name, type, disabled }) => (
+              <FormField
+                key={name}
+                label={label}
+                name={name}
+                type={type}
+                disabled={disabled}
+                value={formData[name]}
+                onChange={handleChange}
+              />
             ))}
 
             <div className='mt-8 flex flex-row flex-wrap items-center gap-4'>
