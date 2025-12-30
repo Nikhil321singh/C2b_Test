@@ -52,25 +52,14 @@ const downloadExcel = (dataDown) => {
   saveAs(dataFile, 'Users_Data' + fileExtension)
 }
 
-const RegisterUserDetails = () => {
-  const token = sessionStorage.getItem('authToken')
+const useUserData = (token) => {
   const [data, setData] = useState([])
   const [companies, setCompanies] = useState([])
   const [isTableLoaded, setIsTableLoaded] = useState(false)
-  const [sideMenu, setsideMenu] = useState(false)
-  const [userEditData, setUserEditData] = useState()
   const [searchValue, setSearchValue] = useState('')
   const [storeValue, setStoreValue] = useState('')
   const [roleValue, setRoleValue] = useState('')
   const [companyFilter, setCompanyFilter] = useState('')
-  const [editBoxOpen, setEditBoxOpen] = useState(false)
-  const [editSuccess, setEditSuccess] = useState(false)
-  const [selectedUser, setSelectedUser] = useState()
-  const [selectedEmail, setSelectedEmail] = useState()
-  const [errMsg, setErrMsg] = useState('')
-  const [sucBox, setSucBox] = useState(false)
-  const [failBox, setFailBox] = useState(false)
-  const [confBox, setConfBox] = useState(false)
 
   const getData = () => {
     setIsTableLoaded(true)
@@ -85,12 +74,11 @@ const RegisterUserDetails = () => {
         setData(response.data.data)
         setIsTableLoaded(false)
       })
-      .catch((error) => {
-        setErrMsg('Failed to load data')
-        setFailBox(true)
+      .catch(() => {
         setIsTableLoaded(false)
       })
   }
+
   const getDataBySearch = () => {
     setIsTableLoaded(true)
     let url = `${
@@ -112,9 +100,7 @@ const RegisterUserDetails = () => {
         setData(response.data.data)
         setIsTableLoaded(false)
       })
-      .catch((error) => {
-        setErrMsg('Failed to load data')
-        setFailBox(true)
+      .catch(() => {
         setIsTableLoaded(false)
       })
   }
@@ -134,53 +120,17 @@ const RegisterUserDetails = () => {
         console.log('Failed to load companies:', error)
       })
   }
-  useEffect(() => {
-    if (editSuccess) {
-      getData()
-      setErrMsg('Succesfully updated user details')
-      setSucBox(true)
-      setEditSuccess(false)
-      setEditBoxOpen(false)
-    }
-  }, [editSuccess])
-  const editHandler = (userData) => {
-    console.log(userData)
-    setUserEditData(userData)
-    setEditBoxOpen(true)
+
+  const handleSearchClick = () => {
+    getDataBySearch()
   }
-  const deleteConfHandler = (userID, userEmail) => {
-    setSelectedUser(userID)
-    setSelectedEmail(userEmail)
-    setConfBox(true)
-  }
-  const deleteHandler = (userID) => {
-    setIsTableLoaded(true)
-    setConfBox(false)
-    const config = {
-      method: 'delete',
-      maxBodyLength: Infinity,
-      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/userregistry/delete`,
-      headers: {
-        Authorization: token,
-        'Content-Type': 'application/json',
-      },
-      data: {
-        userID: userID,
-      },
-    }
-    axios
-      .request(config)
-      .then((response) => {
-        getDataBySearch()
-        setErrMsg(`Succesfully deleted user with email - ${selectedEmail}`)
-        setSucBox(true)
-        setIsTableLoaded(false)
-      })
-      .catch((error) => {
-        setErrMsg('Failed to deleted user with email - ' + selectedEmail)
-        setFailBox(true)
-        setIsTableLoaded(false)
-      })
+
+  const handleSearchClear = () => {
+    setSearchValue('')
+    setStoreValue('')
+    setRoleValue('')
+    setCompanyFilter('')
+    getData()
   }
 
   useEffect(() => {
@@ -201,16 +151,70 @@ const RegisterUserDetails = () => {
     }
   }, [companyFilter])
 
-  const handleSearchClick = () => {
-    getDataBySearch()
+  return {
+    data,
+    companies,
+    isTableLoaded,
+    searchValue,
+    setSearchValue,
+    storeValue,
+    setStoreValue,
+    roleValue,
+    setRoleValue,
+    companyFilter,
+    setCompanyFilter,
+    getData,
+    getDataBySearch,
+    handleSearchClick,
+    handleSearchClear,
+  }
+}
+
+const useUserOperations = (token, getDataBySearch) => {
+  const [userEditData, setUserEditData] = useState()
+  const [editBoxOpen, setEditBoxOpen] = useState(false)
+  const [editSuccess, setEditSuccess] = useState(false)
+  const [selectedUser, setSelectedUser] = useState()
+  const [selectedEmail, setSelectedEmail] = useState()
+  const [errMsg, setErrMsg] = useState('')
+  const [sucBox, setSucBox] = useState(false)
+  const [failBox, setFailBox] = useState(false)
+  const [confBox, setConfBox] = useState(false)
+
+  const editHandler = (userData) => {
+    setUserEditData(userData)
+    setEditBoxOpen(true)
   }
 
-  const handleSearchClear = () => {
-    setSearchValue('')
-    setStoreValue('')
-    setRoleValue('')
-    setCompanyFilter('')
-    getData()
+  const deleteConfHandler = (userID, userEmail) => {
+    setSelectedUser(userID)
+    setSelectedEmail(userEmail)
+    setConfBox(true)
+  }
+
+  const deleteHandler = (userID) => {
+    setConfBox(false)
+    const config = {
+      method: 'delete',
+      maxBodyLength: Infinity,
+      url: `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/userregistry/delete`,
+      headers: {
+        Authorization: token,
+        'Content-Type': 'application/json',
+      },
+      data: { userID },
+    }
+    axios
+      .request(config)
+      .then(() => {
+        getDataBySearch()
+        setErrMsg(`Succesfully deleted user with email - ${selectedEmail}`)
+        setSucBox(true)
+      })
+      .catch(() => {
+        setErrMsg('Failed to deleted user with email - ' + selectedEmail)
+        setFailBox(true)
+      })
   }
 
   useEffect(() => {
@@ -221,14 +225,52 @@ const RegisterUserDetails = () => {
     }
   }, [editBoxOpen])
 
+  return {
+    userEditData,
+    editBoxOpen,
+    setEditBoxOpen,
+    editSuccess,
+    setEditSuccess,
+    selectedUser,
+    errMsg,
+    setErrMsg,
+    sucBox,
+    setSucBox,
+    failBox,
+    setFailBox,
+    confBox,
+    setConfBox,
+    editHandler,
+    deleteConfHandler,
+    deleteHandler,
+  }
+}
+
+const RegisterUserDetails = () => {
+  const token = sessionStorage.getItem('authToken')
+  const [sideMenu, setsideMenu] = useState(false)
+
+  const userData = useUserData(token)
+  const userOps = useUserOperations(token, userData.getDataBySearch)
+
+  useEffect(() => {
+    if (userOps.editSuccess) {
+      userData.getData()
+      userOps.setErrMsg('Succesfully updated user details')
+      userOps.setSucBox(true)
+      userOps.setEditSuccess(false)
+      userOps.setEditBoxOpen(false)
+    }
+  }, [userOps.editSuccess])
+
   return (
     <div>
-      {editBoxOpen && (
+      {userOps.editBoxOpen && (
         <div className={`${styles.edit_page}`}>
           <RegisterUserEdit
-            userData={userEditData}
-            setEditBoxOpen={setEditBoxOpen}
-            setEditSuccess={setEditSuccess}
+            userData={userOps.userEditData}
+            setEditBoxOpen={userOps.setEditBoxOpen}
+            setEditSuccess={userOps.setEditSuccess}
           />
         </div>
       )}
@@ -238,16 +280,14 @@ const RegisterUserDetails = () => {
           <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
         </div>
       </div>
-      {sucBox && (
+      {userOps.sucBox && (
         <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
           <div className={`${styles.err_mod_box} ${succTextColor}`}>
             <IoIosCheckmarkCircle className={succTextColor} size={90} />
             <h6 className={succTextColor}>Success!</h6>
-            <p className='text-slate-500'>{errMsg}</p>
+            <p className='text-slate-500'>{userOps.errMsg}</p>
             <button
-              onClick={() => {
-                setSucBox(false)
-              }}
+              onClick={() => userOps.setSucBox(false)}
               className={'text-white bg-green-500'}
             >
               Okay
@@ -255,43 +295,42 @@ const RegisterUserDetails = () => {
           </div>
         </div>
       )}
-      {failBox && <FailBox errMsg={errMsg} setFailBox={setFailBox} />}
-      {confBox && (
+      {userOps.failBox && <FailBox errMsg={userOps.errMsg} setFailBox={userOps.setFailBox} />}
+      {userOps.confBox && (
         <ConfBox
-          selectedEmail={selectedEmail}
-          deleteHandler={deleteHandler}
-          selectedUser={selectedUser}
-          setIsTableLoaded={setIsTableLoaded}
-          setConfBox={setConfBox}
+          selectedEmail={userOps.selectedEmail}
+          deleteHandler={userOps.deleteHandler}
+          selectedUser={userOps.selectedUser}
+          setConfBox={userOps.setConfBox}
         />
       )}
-      {isTableLoaded && (
+      {userData.isTableLoaded && (
         <div className='fixed top-0 left-0 z-49 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
           <BeatLoader
             color='var(--primary-color)'
-            loading={isTableLoaded}
+            loading={userData.isTableLoaded}
             size={15}
           />
         </div>
       )}
       <TableFilters
-        setSearchValue={setSearchValue}
-        searchValue={searchValue}
-        handleSearchClick={handleSearchClick}
-        handleSearchClear={handleSearchClear}
-        storeValue={storeValue}
-        setRoleValue={setRoleValue}
-        roleValue={roleValue}
-        setStoreValue={setStoreValue}
-        companyFilter={companyFilter}
-        setCompanyFilter={setCompanyFilter}
-        companies={companies}
-        data={data}
+        setSearchValue={userData.setSearchValue}
+        searchValue={userData.searchValue}
+        handleSearchClick={userData.handleSearchClick}
+        handleSearchClear={userData.handleSearchClear}
+        storeValue={userData.storeValue}
+        setRoleValue={userData.setRoleValue}
+        roleValue={userData.roleValue}
+        setStoreValue={userData.setStoreValue}
+        companyFilter={userData.companyFilter}
+        setCompanyFilter={userData.setCompanyFilter}
+        companies={userData.companies}
+        data={userData.data}
       />
       <RegisterUserTable
-        data={data}
-        editHandler={editHandler}
-        deleteConfHandler={deleteConfHandler}
+        data={userData.data}
+        editHandler={userOps.editHandler}
+        deleteConfHandler={userOps.deleteConfHandler}
       />
     </div>
   )
@@ -322,7 +361,6 @@ const ConfBox = ({
   selectedEmail,
   deleteHandler,
   selectedUser,
-  setIsTableLoaded,
   setConfBox,
 }) => {
   return (
@@ -340,10 +378,7 @@ const ConfBox = ({
             Okay
           </button>
           <button
-            onClick={() => {
-              setConfBox(false)
-              setIsTableLoaded(false)
-            }}
+            onClick={() => setConfBox(false)}
             className='bg-white text-primary'
           >
             Cancel

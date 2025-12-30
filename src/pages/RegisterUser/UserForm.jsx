@@ -188,6 +188,103 @@ const CompanyAndRoleFields = ({ formData, handleChange, companies, isSuperAdmin,
   </>
 )
 
+const MultiStoreDropdown = ({ formData, stores, showStoreDropdown, setShowStoreDropdown, handleStoreToggle, dropdownRef }) => (
+  <div className='flex flex-col w-[70%] gap-2' ref={dropdownRef}>
+    <span className='font-medium text-xl'>Store Name*</span>
+    <div className='relative'>
+      <div
+        onClick={() => setShowStoreDropdown(!showStoreDropdown)}
+        className='outline-none text-base border-2 p-2 rounded-lg cursor-pointer flex justify-between items-center bg-white'
+      >
+        <span className='truncate'>
+          {getSelectedStoresDisplay(formData, stores)}
+        </span>
+        <FaAngleDown
+          className={`transition-transform ${showStoreDropdown ? 'rotate-180' : ''}`}
+          size={17}
+        />
+      </div>
+      {showStoreDropdown && (
+        <div className='absolute z-10 w-full mt-1 bg-white border-2 rounded-lg shadow-lg max-h-60 overflow-y-auto'>
+          {stores.length === 0 ? (
+            <div className='p-3 text-gray-500'>
+              {formData.companyId
+                ? 'No stores available for this company'
+                : 'Please select a company first'}
+            </div>
+          ) : (
+            stores.map((store) => (
+              <div
+                key={store._id}
+                onClick={() => handleStoreToggle(store._id)}
+                className='p-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2'
+              >
+                <input
+                  type='checkbox'
+                  checked={(formData.assignedStores || []).includes(store._id)}
+                  onChange={() => {}}
+                  className='w-4 h-4 cursor-pointer'
+                />
+                <span className='text-base'>
+                  {store.storeName} - {store.region}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+    {(formData.assignedStores || []).length === 0 && (
+      <input
+        type='text'
+        className='hidden'
+        required
+        value={(formData.assignedStores || []).length > 0 ? 'valid' : ''}
+      />
+    )}
+  </div>
+)
+
+const SingleStoreSelect = ({ formData, stores, handleChange }) => (
+  <label className='flex flex-col w-[70%] gap-2'>
+    <span className='font-medium text-xl'>Store Name*</span>
+    <select
+      name='storeId'
+      id='storeId'
+      value={formData.storeId}
+      className='outline-none text-base border-2 p-2 rounded-lg'
+      onChange={handleChange}
+      required
+    >
+      <option value=''>Select Store</option>
+      {stores.length === 0 ? (
+        <option value='' disabled>
+          {formData.companyId
+            ? 'No stores available for this company'
+            : 'Please select a company first'}
+        </option>
+      ) : (
+        stores.map((store) => (
+          <option key={store._id} value={store._id}>
+            {store.storeName} - {store.region}
+          </option>
+        ))
+      )}
+    </select>
+  </label>
+)
+
+const shouldShowMultiStore = (userRole, formDataRole) =>
+  userRole && (formDataRole === USER_ROLES.ADMIN_MANAGER || formDataRole === USER_ROLES.TECHNICIAN)
+
+const shouldShowSingleStore = (userRole, formDataRole) =>
+  userRole &&
+  formDataRole &&
+  formDataRole !== USER_ROLES.ADMIN_MANAGER &&
+  formDataRole !== USER_ROLES.TECHNICIAN &&
+  formDataRole !== USER_ROLES.SUPER_ADMIN &&
+  formDataRole !== USER_ROLES.COMPANY_ADMIN
+
 const StoreSelectionFields = ({
   formData,
   handleChange,
@@ -200,111 +297,27 @@ const StoreSelectionFields = ({
   handleStoreToggle,
   dropdownRef,
 }) => {
-  const showMultiStoreSelect =
-    (isSuperAdmin || isCompanyAdmin || isAdminManager) &&
-    (formData.role === USER_ROLES.ADMIN_MANAGER ||
-      formData.role === USER_ROLES.TECHNICIAN)
+  const hasStorePermission = isSuperAdmin || isCompanyAdmin || isAdminManager
 
-  const showSingleStoreSelect =
-    (isSuperAdmin || isCompanyAdmin || isAdminManager) &&
-    formData.role &&
-    formData.role !== USER_ROLES.ADMIN_MANAGER &&
-    formData.role !== USER_ROLES.TECHNICIAN &&
-    formData.role !== USER_ROLES.SUPER_ADMIN &&
-    formData.role !== USER_ROLES.COMPANY_ADMIN
+  if (!hasStorePermission) {
+    return null
+  }
 
-  if (showMultiStoreSelect) {
+  if (shouldShowMultiStore(hasStorePermission, formData.role)) {
     return (
-      <div className='flex flex-col w-[70%] gap-2' ref={dropdownRef}>
-        <span className='font-medium text-xl'>Store Name*</span>
-        <div className='relative'>
-          <div
-            onClick={() => setShowStoreDropdown(!showStoreDropdown)}
-            className='outline-none text-base border-2 p-2 rounded-lg cursor-pointer flex justify-between items-center bg-white'
-          >
-            <span className='truncate'>
-              {getSelectedStoresDisplay(formData, stores)}
-            </span>
-            <FaAngleDown
-              className={`transition-transform ${
-                showStoreDropdown ? 'rotate-180' : ''
-              }`}
-              size={17}
-            />
-          </div>
-          {showStoreDropdown && (
-            <div className='absolute z-10 w-full mt-1 bg-white border-2 rounded-lg shadow-lg max-h-60 overflow-y-auto'>
-              {stores.length === 0 ? (
-                <div className='p-3 text-gray-500'>
-                  {formData.companyId
-                    ? 'No stores available for this company'
-                    : 'Please select a company first'}
-                </div>
-              ) : (
-                stores.map((store) => (
-                  <div
-                    key={store._id}
-                    onClick={() => handleStoreToggle(store._id)}
-                    className='p-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2'
-                  >
-                    <input
-                      type='checkbox'
-                      checked={(formData.assignedStores || []).includes(
-                        store._id
-                      )}
-                      onChange={() => {}}
-                      className='w-4 h-4 cursor-pointer'
-                    />
-                    <span className='text-base'>
-                      {store.storeName} - {store.region}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-        </div>
-        {(formData.assignedStores || []).length === 0 && (
-          <input
-            type='text'
-            className='hidden'
-            required
-            value={(formData.assignedStores || []).length > 0 ? 'valid' : ''}
-          />
-        )}
-      </div>
+      <MultiStoreDropdown
+        formData={formData}
+        stores={stores}
+        showStoreDropdown={showStoreDropdown}
+        setShowStoreDropdown={setShowStoreDropdown}
+        handleStoreToggle={handleStoreToggle}
+        dropdownRef={dropdownRef}
+      />
     )
   }
 
-  if (showSingleStoreSelect) {
-    return (
-      <label className='flex flex-col w-[70%] gap-2'>
-        <span className='font-medium text-xl'>Store Name*</span>
-        <select
-          name='storeId'
-          id='storeId'
-          value={formData.storeId}
-          className='outline-none text-base border-2 p-2 rounded-lg'
-          onChange={handleChange}
-          required
-        >
-          <option value=''>Select Store</option>
-          {stores.length === 0 ? (
-            <option value='' disabled>
-              {formData.companyId
-                ? 'No stores available for this company'
-                : 'Please select a company first'}
-            </option>
-          ) : (
-            stores.map((store) => (
-              <option key={store._id} value={store._id}>
-                {store.storeName} - {store.region}
-              </option>
-            ))
-          )}
-        </select>
-      </label>
-    )
+  if (shouldShowSingleStore(hasStorePermission, formData.role)) {
+    return <SingleStoreSelect formData={formData} stores={stores} handleChange={handleChange} />
   }
 
   return null

@@ -69,27 +69,12 @@ const sampleDownloadHandler = () => {
   generateExcelFile(sampleData, "storelisting-sample-file-store");
 };
 
-const StoreListingTable = () => {
-  const token = sessionStorage.getItem("authToken");
-  const profile = JSON.parse(sessionStorage.getItem("profile"));
-  const navigate = useNavigate();
+const useStoreData = (token, curPage, companyFilter, searchValue) => {
   const [data, setData] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [isTableLoaded, setIsTableLoaded] = useState(false);
-  const [storeEditData, setStoreEditData] = useState();
-  const [searchValue, setSearchValue] = useState("");
-  const [companyFilter, setCompanyFilter] = useState("");
-  const [editBoxOpen, setEditBoxOpen] = useState(false);
-  const [editSuccess, setEditSuccess] = useState(false);
-  const [curPage, setCurPage] = useState(0);
-  const [selectedStr, setSelectedStr] = useState();
   const [errMsg, setErrMsg] = useState("");
-  const [sucBox, setSucBox] = useState(false);
   const [failBox, setFailBox] = useState(false);
-  const [confBox, setConfBox] = useState(false);
-  const [uploadBox, setUploadBox] = useState(false);
-
-  const isCompanyAdmin = profile?.role === USER_ROLES.COMPANY_ADMIN;
 
   const getData = () => {
     setIsTableLoaded(true);
@@ -110,7 +95,7 @@ const StoreListingTable = () => {
         setData(response.data.result);
         setIsTableLoaded(false);
       })
-      .catch((error) => {
+      .catch(() => {
         setErrMsg("Failed to load data");
         setFailBox(true);
         setIsTableLoaded(false);
@@ -154,11 +139,58 @@ const StoreListingTable = () => {
         setData(response.data.result);
         setIsTableLoaded(false);
       })
-      .catch((error) => {
+      .catch(() => {
         setErrMsg("Failed to load data");
         setFailBox(true);
         setIsTableLoaded(false);
       });
+  };
+
+  useEffect(() => {
+    getData();
+  }, [curPage, companyFilter]);
+
+  useEffect(() => {
+    getCompanies();
+  }, []);
+
+  return {
+    data,
+    companies,
+    isTableLoaded,
+    setIsTableLoaded,
+    errMsg,
+    setErrMsg,
+    failBox,
+    setFailBox,
+    getData,
+    getDataBySearch,
+  };
+};
+
+const useStoreOperations = (searchValue, getData, getDataBySearch) => {
+  const [storeEditData, setStoreEditData] = useState();
+  const [editBoxOpen, setEditBoxOpen] = useState(false);
+  const [editSuccess, setEditSuccess] = useState(false);
+  const [selectedStr, setSelectedStr] = useState();
+  const [sucBox, setSucBox] = useState(false);
+  const [confBox, setConfBox] = useState(false);
+  const [uploadBox, setUploadBox] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
+
+  const editHandler = (storeData) => {
+    setStoreEditData(storeData);
+    setEditBoxOpen(true);
+  };
+
+  const deleteConfHandler = (store) => {
+    setSelectedStr(store);
+    setConfBox(true);
+  };
+
+  const handleUploadSuccess = () => {
+    getData();
+    setUploadBox(false);
   };
 
   useEffect(() => {
@@ -175,61 +207,72 @@ const StoreListingTable = () => {
     }
   }, [editSuccess]);
 
-  const editHandler = (storeData) => {
-    setStoreEditData(storeData);
-    setEditBoxOpen(true);
+  return {
+    storeEditData,
+    editBoxOpen,
+    setEditBoxOpen,
+    editSuccess,
+    setEditSuccess,
+    selectedStr,
+    sucBox,
+    setSucBox,
+    confBox,
+    setConfBox,
+    uploadBox,
+    setUploadBox,
+    errMsg,
+    setErrMsg,
+    editHandler,
+    deleteConfHandler,
+    handleUploadSuccess,
   };
+};
 
-  const deleteConfHandler = (store) => {
-    setSelectedStr(store);
-    setConfBox(true);
-  };
+const StoreListingTable = () => {
+  const token = sessionStorage.getItem("authToken");
+  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+  const [companyFilter, setCompanyFilter] = useState("");
+  const [curPage, setCurPage] = useState(0);
 
-  useEffect(() => {
-    getData();
-  }, [curPage, companyFilter]);
+  const isCompanyAdmin = profile?.role === USER_ROLES.COMPANY_ADMIN;
 
-  useEffect(() => {
-    getCompanies();
-  }, []);
+  const storeData = useStoreData(token, curPage, companyFilter, searchValue);
+  const storeOps = useStoreOperations(searchValue, storeData.getData, storeData.getDataBySearch);
 
   const handleSearchClear = () => {
     setSearchValue("");
     setCompanyFilter("");
-    getData();
-  };
-
-  const handleUploadSuccess = () => {
-    getData();
-    setUploadBox(false);
+    storeData.getData();
   };
 
   return (
     <div className={`${styles.pickedup_page}`}>
       <StoreBulkUploadModal
-        isOpen={uploadBox}
-        onClose={() => setUploadBox(false)}
-        onUploadSuccess={handleUploadSuccess}
+        isOpen={storeOps.uploadBox}
+        onClose={() => storeOps.setUploadBox(false)}
+        onUploadSuccess={storeOps.handleUploadSuccess}
       />
       <ExtComps
-        sucBox={sucBox}
-        errMsg={errMsg}
-        setSucBox={setSucBox}
-        isTableLoaded={isTableLoaded}
-        setIsTableLoaded={setIsTableLoaded}
-        failBox={failBox}
-        setFailBox={setFailBox}
-        confBox={confBox}
-        setConfBox={setConfBox}
-        setErrMsg={setErrMsg}
-        editBoxOpen={editBoxOpen}
-        setEditBoxOpen={setEditBoxOpen}
+        sucBox={storeOps.sucBox}
+        errMsg={storeOps.errMsg || storeData.errMsg}
+        setSucBox={storeOps.setSucBox}
+        isTableLoaded={storeData.isTableLoaded}
+        setIsTableLoaded={storeData.setIsTableLoaded}
+        failBox={storeData.failBox}
+        setFailBox={storeData.setFailBox}
+        confBox={storeOps.confBox}
+        setConfBox={storeOps.setConfBox}
+        setErrMsg={storeData.setErrMsg}
+        editBoxOpen={storeOps.editBoxOpen}
+        setEditBoxOpen={storeOps.setEditBoxOpen}
         searchValue={searchValue}
-        storeEditData={storeEditData}
-        setEditSuccess={setEditSuccess}
-        selectedStr={selectedStr}
-        getData={getData}
-        getDataBySearch={getDataBySearch}
+        storeEditData={storeOps.storeEditData}
+        setEditSuccess={storeOps.setEditSuccess}
+        selectedStr={storeOps.selectedStr}
+        getData={storeData.getData}
+        getDataBySearch={storeData.getDataBySearch}
       />
       <div className="my-4 px-2 w-full flex flex-col gap-4 items-center">
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-6 gap-2 w-full items-center justify-center">
@@ -247,7 +290,7 @@ const StoreListingTable = () => {
           </button>
           <button
             className={`${styles.bulkdown_button} w-full`}
-            onClick={() => setUploadBox(true)}
+            onClick={() => storeOps.setUploadBox(true)}
           >
             <FaUpload /> Bulk Upload
           </button>
@@ -263,7 +306,7 @@ const StoreListingTable = () => {
                 value={searchValue}
               />
               <IoMdSearch
-                onClick={getDataBySearch}
+                onClick={storeData.getDataBySearch}
                 size={25}
                 className="ml-2 cursor-pointer"
               />
@@ -287,7 +330,7 @@ const StoreListingTable = () => {
           </div>
           <button
             className={`${styles.bulkdown_button} w-full`}
-            onClick={() => downloadExcel(data, curPage)}
+            onClick={() => downloadExcel(storeData.data, curPage)}
           >
             <FaDownload /> Bulk Download
           </button>
@@ -298,18 +341,18 @@ const StoreListingTable = () => {
           <CompanyFilter
             companyFilter={companyFilter}
             setCompanyFilter={setCompanyFilter}
-            companies={companies}
+            companies={storeData.companies}
           />
         )}
       </div>
       <StoreTable
-        data={data}
+        data={storeData.data}
         searchValue={searchValue}
         curPage={curPage}
         setCurPage={setCurPage}
-        setIsTableLoaded={setIsTableLoaded}
-        editHandler={editHandler}
-        deleteConfHandler={deleteConfHandler}
+        setIsTableLoaded={storeData.setIsTableLoaded}
+        editHandler={storeOps.editHandler}
+        deleteConfHandler={storeOps.deleteConfHandler}
       />
     </div>
   );
