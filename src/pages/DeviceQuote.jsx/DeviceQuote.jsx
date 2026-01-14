@@ -83,7 +83,8 @@ const DeviceQuote = () => {
 
   // Coupon and Bonus toggle states
   const [mode, setMode] = useState('bonus') // 'bonus' or 'coupon'
-  const [eligibleCoupon, setEligibleCoupon] = useState(null)
+  const [eligibleCoupons, setEligibleCoupons] = useState([]) // Changed to array
+  const [selectedCoupon, setSelectedCoupon] = useState(null) // Currently selected coupon
   const [isCouponApplied, setIsCouponApplied] = useState(false)
   const [isLoadingCoupon, setIsLoadingCoupon] = useState(true)
   const leadId = sessionStorage.getItem('LeadId')
@@ -103,10 +104,10 @@ const DeviceQuote = () => {
   const calculateFinalBonus = () => {
     if (mode === 'bonus') {
       return Number(bonus) || 0
-    } else if (mode === 'coupon' && isCouponApplied && eligibleCoupon) {
-      return eligibleCoupon.discountType === 'Fixed'
-        ? eligibleCoupon.discountValue
-        : Math.round((Number(Price) * eligibleCoupon.discountValue) / 100)
+    } else if (mode === 'coupon' && isCouponApplied && selectedCoupon) {
+      return selectedCoupon.discountType === 'Fixed'
+        ? selectedCoupon.discountValue
+        : Math.round((Number(Price) * selectedCoupon.discountValue) / 100)
     }
     return 0
   }
@@ -119,9 +120,9 @@ const DeviceQuote = () => {
     appliedCoupon: null,
   })
 
-  // Fetch eligible coupon when component mounts
+  // Fetch eligible coupons when component mounts
   useEffect(() => {
-    const fetchCoupon = async () => {
+    const fetchCoupons = async () => {
       if (!leadId || !token) {
         setIsLoadingCoupon(false)
         return
@@ -135,22 +136,28 @@ const DeviceQuote = () => {
             headers: { Authorization: token },
           }
         )
-        const coupon = response?.data?.data
-        setEligibleCoupon(coupon)
-        if (coupon && coupon.couponCode) {
-          sessionStorage.setItem('eligibleCouponCode', coupon.couponCode)
+        const coupons = response?.data?.data
+        // Handle both single object and array responses for backward compatibility
+        const couponsArray = Array.isArray(coupons) ? coupons : coupons ? [coupons] : []
+        setEligibleCoupons(couponsArray)
+        // Auto-select first coupon if only one is available
+        if (couponsArray.length === 1) {
+          setSelectedCoupon(couponsArray[0])
+        }
+        if (couponsArray.length > 0 && couponsArray[0].couponCode) {
+          sessionStorage.setItem('eligibleCouponCode', couponsArray[0].couponCode)
         }
       } catch (error) {
         console.error(
-          '❌ Error fetching coupon:',
+          '❌ Error fetching coupons:',
           error?.response?.data || error.message
         )
-        setEligibleCoupon(null)
+        setEligibleCoupons([])
       } finally {
         setIsLoadingCoupon(false)
       }
     }
-    fetchCoupon()
+    fetchCoupons()
   }, [leadId, token])
 
   // Mode switching and coupon functions
@@ -164,11 +171,18 @@ const DeviceQuote = () => {
   }
 
   const handleApplyCoupon = () => {
-    if (!eligibleCoupon) {
+    if (!selectedCoupon) {
+      toast.error('Please select a coupon first.')
       return
     }
     setIsCouponApplied(true)
-    toast.success(`Coupon "${eligibleCoupon.couponCode}" applied!`)
+    toast.success(`Coupon "${selectedCoupon.couponCode}" applied!`)
+  }
+
+  const handleCouponSelect = (coupon) => {
+    setSelectedCoupon(coupon)
+    setIsCouponApplied(true) // Auto-apply on selection
+    toast.success(`Coupon "${coupon.couponCode}" applied!`)
   }
 
   const handleRemoveCoupon = () => {
@@ -239,11 +253,13 @@ const DeviceQuote = () => {
               showDeviceReportHandler={showDeviceReportHandler}
               mode={mode}
               handleModeSwitch={handleModeSwitch}
-              eligibleCoupon={eligibleCoupon}
+              eligibleCoupons={eligibleCoupons}
+              selectedCoupon={selectedCoupon}
               isCouponApplied={isCouponApplied}
               isLoadingCoupon={isLoadingCoupon}
               handleApplyCoupon={handleApplyCoupon}
               handleRemoveCoupon={handleRemoveCoupon}
+              handleCouponSelect={handleCouponSelect}
             />
           </div>
           <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2 bg-white'>
@@ -343,11 +359,13 @@ const QuoteCard = ({
   showDeviceReportHandler,
   mode,
   handleModeSwitch,
-  eligibleCoupon,
+  eligibleCoupons,
+  selectedCoupon,
   isCouponApplied,
   isLoadingCoupon,
   handleApplyCoupon,
   handleRemoveCoupon,
+  handleCouponSelect,
 }) => (
   <div
     className={`${styles.QuoteCardShadow} rounded-md p-4 w-full max-w-[600px]`}
@@ -385,11 +403,13 @@ const QuoteCard = ({
           mode={mode}
           bonus={bonus}
           setBonus={setBonus}
-          eligibleCoupon={eligibleCoupon}
+          eligibleCoupons={eligibleCoupons}
+          selectedCoupon={selectedCoupon}
           isCouponApplied={isCouponApplied}
           isLoadingCoupon={isLoadingCoupon}
           handleApplyCoupon={handleApplyCoupon}
           handleRemoveCoupon={handleRemoveCoupon}
+          handleCouponSelect={handleCouponSelect}
         />
       )}
 
@@ -452,21 +472,25 @@ const CouponBonusToggle = ({
   mode,
   bonus,
   setBonus,
-  eligibleCoupon,
+  eligibleCoupons,
+  selectedCoupon,
   isCouponApplied,
   isLoadingCoupon,
   handleApplyCoupon,
   handleRemoveCoupon,
+  handleCouponSelect,
 }) => (
   <div className='px-2 my-2'>
     {mode === 'bonus' && <BonusInput bonus={bonus} setBonus={setBonus} />}
     {mode === 'coupon' && (
       <CouponDisplay
-        eligibleCoupon={eligibleCoupon}
+        eligibleCoupons={eligibleCoupons}
+        selectedCoupon={selectedCoupon}
         isCouponApplied={isCouponApplied}
         isLoadingCoupon={isLoadingCoupon}
         handleApplyCoupon={handleApplyCoupon}
         handleRemoveCoupon={handleRemoveCoupon}
+        handleCouponSelect={handleCouponSelect}
       />
     )}
   </div>
@@ -502,24 +526,26 @@ const BonusInput = ({ bonus, setBonus }) => (
 )
 
 const CouponDisplay = ({
-  eligibleCoupon,
+  eligibleCoupons,
+  selectedCoupon,
   isCouponApplied,
   isLoadingCoupon,
   handleApplyCoupon,
   handleRemoveCoupon,
+  handleCouponSelect,
 }) => {
   if (isLoadingCoupon) {
     return (
       <div className='px-2 my-3 h-12 flex items-center justify-center'>
         <div className='flex items-center justify-center'>
           <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-primary'></div>
-          <span className='ml-2 text-sm text-gray-600'>Loading coupon...</span>
+          <span className='ml-2 text-sm text-gray-600'>Loading coupons...</span>
         </div>
       </div>
     )
   }
 
-  if (!eligibleCoupon) {
+  if (!eligibleCoupons || eligibleCoupons.length === 0) {
     return (
       <div className='px-2 my-3 h-12 flex items-center justify-center'>
         <div className='w-full p-2 text-center bg-gray-100 border border-gray-300 rounded-md'>
@@ -531,32 +557,104 @@ const CouponDisplay = ({
     )
   }
 
-  const discountText =
-    eligibleCoupon.discountType === 'Fixed'
-      ? `₹${eligibleCoupon.discountValue}`
-      : `${eligibleCoupon.discountValue}%`
+  // Single coupon - original UI
+  if (eligibleCoupons.length === 1) {
+    const coupon = eligibleCoupons[0]
+    const discountText =
+      coupon.discountType === 'Fixed'
+        ? `₹${coupon.discountValue}`
+        : `${coupon.discountValue}%`
 
+    return (
+      <div className='px-2 my-3 h-12 flex items-center justify-center'>
+        <div className='flex items-center justify-between w-full p-2 bg-green-100 border border-green-400 rounded-md'>
+          <p className='text-sm font-medium text-green-800'>
+            {coupon.couponCode} ({discountText})
+          </p>
+          {!isCouponApplied ? (
+            <button
+              onClick={handleApplyCoupon}
+              className='px-3 py-1 text-xs font-semibold text-white bg-primary rounded-md'
+            >
+              Apply
+            </button>
+          ) : (
+            <button
+              onClick={handleRemoveCoupon}
+              className='px-3 py-1 text-xs font-semibold text-white bg-red-600 rounded-md'
+            >
+              Remove
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // Multiple coupons - new UI with selection
   return (
-    <div className='px-2 my-3 h-12 flex items-center justify-center'>
-      <div className='flex items-center justify-between w-full p-2 bg-green-100 border border-green-400 rounded-md'>
-        <p className='text-sm font-medium text-green-800'>
-          Eligible: {eligibleCoupon.couponCode} ({discountText})
-        </p>
-        {!isCouponApplied ? (
-          <button
-            onClick={handleApplyCoupon}
-            className='px-3 py-1 text-xs font-semibold text-white bg-primary rounded-md'
-          >
-            Apply
-          </button>
-        ) : (
-          <button
-            onClick={handleRemoveCoupon}
-            className='px-3 py-1 text-xs font-semibold text-white bg-red-600 rounded-md'
-          >
-            Remove
-          </button>
-        )}
+    <div className='px-2 my-3'>
+      <p className='text-sm font-medium text-gray-700 mb-2'>
+        {eligibleCoupons.length} coupons available - Click to apply:
+      </p>
+      <div className='flex flex-col gap-2 max-h-[200px] overflow-y-auto'>
+        {eligibleCoupons.map((coupon) => {
+          const discountText =
+            coupon.discountType === 'Fixed'
+              ? `₹${coupon.discountValue}`
+              : `${coupon.discountValue}%`
+          const isSelected = selectedCoupon?._id === coupon._id
+          const isCurrentlyApplied = isSelected && isCouponApplied
+
+          return (
+            <div
+              key={coupon._id}
+              className={`flex items-center justify-between w-full p-2 rounded-md border-2 transition-all ${
+                isCurrentlyApplied
+                  ? 'bg-green-50 border-green-500 shadow-sm'
+                  : 'bg-gray-50 border-gray-300 hover:border-primary hover:shadow-sm cursor-pointer'
+              }`}
+              onClick={() => !isCurrentlyApplied && handleCouponSelect(coupon)}
+            >
+              <div className='flex items-center gap-2 flex-1'>
+                <input
+                  type='radio'
+                  checked={isCurrentlyApplied}
+                  onChange={() => handleCouponSelect(coupon)}
+                  className='w-4 h-4 cursor-pointer accent-green-600'
+                  disabled={isCurrentlyApplied}
+                />
+                <div className='flex flex-col'>
+                  <div className='flex items-center gap-2'>
+                    <p className='text-sm font-semibold text-gray-800'>
+                      {coupon.couponCode}
+                    </p>
+                    {isCurrentlyApplied && (
+                      <span className='text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded'>
+                        Applied
+                      </span>
+                    )}
+                  </div>
+                  <p className='text-xs text-gray-600'>
+                    Discount: {discountText}
+                    {coupon.description && ` - ${coupon.description}`}
+                  </p>
+                </div>
+              </div>
+              {isCurrentlyApplied && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleRemoveCoupon()
+                  }}
+                  className='px-3 py-1 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors'
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

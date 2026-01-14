@@ -409,7 +409,7 @@ const UserForm = ({
         />
       </label>
       <label className='flex flex-col w-[70%] gap-2'>
-        <span className='font-medium text-xl'>Adddress</span>
+        <span className='font-medium text-xl'>Address</span>
         <input
           name='address'
           id='address'

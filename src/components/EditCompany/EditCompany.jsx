@@ -12,7 +12,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
   }
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    const newValue = type === 'checkbox' ? checked : value
+    let newValue = type === 'checkbox' ? checked : value
     console.log('name', e.target.name)
     if (type === 'file') {
       setFormValues({
@@ -20,6 +20,10 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
         [name]: files,
       })
     } else {
+      // Convert string 'true'/'false' to boolean for showPrice and maskInfo
+      if (name === 'showPrice' || name === 'maskInfo') {
+        newValue = value === 'true'
+      }
       setFormValues({
         ...formValues,
         [name]: newValue,
@@ -37,6 +41,8 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
     formData.append('gstNumber', formValues.gstNumber)
     formData.append('panNumber', formValues.panNumber)
     formData.append('remarks', formValues.remarks)
+    formData.append('showPrice', formValues.showPrice)
+    formData.append('maskInfo', formValues.maskInfo)
     formData.append('id', formValues._id)
     if (formValues.documents && formValues.documents.length > 0) {
       for (let i = 0; i < formValues.documents.length; i++) {
@@ -110,7 +116,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
               />
             </div>
             <div className='flex flex-col w-[70%] gap-2'>
-              <span className='font-medium text-xl'>Adddress</span>
+              <span className='font-medium text-xl'>Address</span>
               <input
                 className='border-2 px-2 py-2 rounded-lg  outline-none'
                 type='text'
@@ -158,6 +164,30 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
                 value={formValues.remarks}
                 onChange={handleChange}
               />
+            </div>
+            <div className='flex flex-col w-[70%] gap-2'>
+              <span className='font-medium text-xl'>Show Price</span>
+              <select
+                className='border-2 px-2 py-2 rounded-lg outline-none bg-white'
+                name='showPrice'
+                value={formValues.showPrice?.toString() || 'false'}
+                onChange={handleChange}
+              >
+                <option value='true'>True</option>
+                <option value='false'>False</option>
+              </select>
+            </div>
+            <div className='flex flex-col w-[70%] gap-2'>
+              <span className='font-medium text-xl'>Mask Info</span>
+              <select
+                className='border-2 px-2 py-2 rounded-lg outline-none bg-white'
+                name='maskInfo'
+                value={formValues.maskInfo?.toString() || 'false'}
+                onChange={handleChange}
+              >
+                <option value='true'>True</option>
+                <option value='false'>False</option>
+              </select>
             </div>
             <div className='flex flex-col w-[70%] gap-2'>
               <span className='font-medium text-xl'>Attach New Documents</span>
