@@ -189,7 +189,14 @@ const DeviceQuote = () => {
           }
         )
         const coupons = response?.data?.data
-        const couponsArray = Array.isArray(coupons) ? coupons : coupons ? [coupons] : []
+        let couponsArray = []
+
+        if (Array.isArray(coupons)) {
+          couponsArray = coupons
+        } else if (coupons) {
+          couponsArray = [coupons]
+        }
+
         setEligibleCoupons(couponsArray)
 
         if (couponsArray.length === 1) {

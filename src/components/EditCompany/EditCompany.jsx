@@ -4,15 +4,13 @@ import axios from 'axios'
 import { IoClose } from 'react-icons/io5'
 
 const LoadingSpinner = ({ isLoading }) => {
-  if (!isLoading) return null
+  if (!isLoading) {
+    return null
+  }
 
   return (
     <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
-      <BeatLoader
-        color='var(--primary-color)'
-        loading={isLoading}
-        size={15}
-      />
+      <BeatLoader color='var(--primary-color)' loading={isLoading} size={15} />
     </div>
   )
 }
@@ -29,9 +27,20 @@ const FormHeader = ({ onClose }) => (
   </div>
 )
 
-const FormField = ({ label, name, value, onChange, required = false, readOnly = false, type = 'text' }) => (
+const FormField = ({
+  label,
+  name,
+  value,
+  onChange,
+  required = false,
+  readOnly = false,
+  type = 'text',
+}) => (
   <div className='flex flex-col w-[70%] gap-2'>
-    <span className='font-medium text-xl'>{label}{required && '*'}</span>
+    <span className='font-medium text-xl'>
+      {label}
+      {required && '*'}
+    </span>
     <input
       className='border-2 px-2 py-2 rounded-lg outline-none'
       type={type}
@@ -53,8 +62,10 @@ const SelectField = ({ label, name, value, onChange, options }) => (
       value={value}
       onChange={onChange}
     >
-      {options.map(opt => (
-        <option key={opt.value} value={opt.value}>{opt.label}</option>
+      {options.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
       ))}
     </select>
   </div>
@@ -125,7 +136,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
 
   const booleanOptions = [
     { value: 'true', label: 'True' },
-    { value: 'false', label: 'False' }
+    { value: 'false', label: 'False' },
   ]
 
   return (
