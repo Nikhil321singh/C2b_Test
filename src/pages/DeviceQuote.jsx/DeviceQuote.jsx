@@ -57,20 +57,80 @@ const getDeviceDisplayName = (deviceModalInfo) => {
   return `${models?.name}(${ram}/${storage})`
 }
 
-const DeviceQuote = () => {
+// Custom hooks
+const useDeviceQuoteData = () => {
   const dispatch = useDispatch()
   const Device = sessionStorage.getItem('DeviceType')
-  const DummyImg =
-    Device === 'CTG1'
-      ? 'https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg'
-      : apple_watch
+  let DummyImg = apple_watch
+
+  if (Device === 'CTG1') {
+    DummyImg = 'https://grest-c2b-images.s3.ap-south-1.amazonaws.com/gresTest/1705473080031front.jpg'
+  }
+
   const phoneImg = JSON.parse(sessionStorage.getItem('dataModel'))
-  const phoneFrontPhoto =
-    phoneImg?.models?.phonePhotos?.front ||
-    phoneImg?.models?.phonePhotos?.upFront
+  const phoneFrontPhoto = phoneImg?.models?.phonePhotos?.front || phoneImg?.models?.phonePhotos?.upFront
   const exactQuoteValue = sessionStorage.getItem('ExactQuote')
   const dataModel = JSON.parse(sessionStorage.getItem('dataModel'))
   const deviceModalInfo = dataModel
+  const leadId = sessionStorage.getItem('LeadId')
+  const token = sessionStorage.getItem('authToken')
+
+  const ResponseData = useSelector((state) => state.responseData)
+  const Price = useSelector((state) => state.responseData.price)
+  const uniqueCode = useSelector((state) => state.responseData.uniqueCode)
+  const savedBonus = useSelector((state) => state.responseData?.bonus) || null
+
+  return {
+    dispatch,
+    DummyImg,
+    phoneFrontPhoto,
+    exactQuoteValue,
+    deviceModalInfo,
+    leadId,
+    token,
+    ResponseData,
+    Price,
+    uniqueCode,
+    savedBonus
+  }
+}
+
+const useCouponHandlers = (setMode, setIsCouponApplied, setBonus, setSelectedCoupon, setIsCouponApplied2) => {
+  const handleModeSwitch = (newMode) => {
+    setMode(newMode)
+    if (newMode === 'bonus') {
+      setIsCouponApplied(false)
+    } else if (newMode === 'coupon') {
+      setBonus(null)
+    }
+  }
+
+  const handleApplyCoupon = (selectedCoupon) => {
+    if (!selectedCoupon) {
+      toast.error('Please select a coupon first.')
+      return
+    }
+    setIsCouponApplied(true)
+    toast.success(`Coupon "${selectedCoupon.couponCode}" applied!`)
+  }
+
+  const handleCouponSelect = (coupon) => {
+    setSelectedCoupon(coupon)
+    setIsCouponApplied2(true)
+    toast.success(`Coupon "${coupon.couponCode}" applied!`)
+  }
+
+  const handleRemoveCoupon = () => {
+    setIsCouponApplied(false)
+    toast.success('Coupon removed.')
+  }
+
+  return { handleModeSwitch, handleApplyCoupon, handleCouponSelect, handleRemoveCoupon }
+}
+
+const DeviceQuote = () => {
+  const quoteData = useDeviceQuoteData()
+  const { dispatch, DummyImg, phoneFrontPhoto, exactQuoteValue, deviceModalInfo, leadId, token, ResponseData, Price, uniqueCode, savedBonus } = quoteData
 
   const [showModal, setShowModal] = useState(false)
   const [continueOTPOpen, setContinueOTPOpen] = useState(false)
@@ -81,34 +141,29 @@ const DeviceQuote = () => {
   const [termsChecked, setTermsChecked] = useState(false)
   const hasShownError = useRef(false)
 
-  // Coupon and Bonus toggle states
-  const [mode, setMode] = useState('bonus') // 'bonus' or 'coupon'
-  const [eligibleCoupons, setEligibleCoupons] = useState([]) // Changed to array
-  const [selectedCoupon, setSelectedCoupon] = useState(null) // Currently selected coupon
+  const [mode, setMode] = useState('bonus')
+  const [eligibleCoupons, setEligibleCoupons] = useState([])
+  const [selectedCoupon, setSelectedCoupon] = useState(null)
   const [isCouponApplied, setIsCouponApplied] = useState(false)
   const [isLoadingCoupon, setIsLoadingCoupon] = useState(true)
-  const leadId = sessionStorage.getItem('LeadId')
-  const token = sessionStorage.getItem('authToken')
-
-  const ResponseData = useSelector((state) => state.responseData)
-  const Price = useSelector((state) => state.responseData.price)
-  const uniqueCode = useSelector((state) => state.responseData.uniqueCode)
-  const savedBonus = useSelector((state) => state.responseData?.bonus) || null
 
   useEffect(() => {
     setQuoteId(uniqueCode)
     setBonus(savedBonus || null)
   }, [uniqueCode, savedBonus])
 
-  // Calculate final bonus for current mode
   const calculateFinalBonus = () => {
     if (mode === 'bonus') {
       return Number(bonus) || 0
-    } else if (mode === 'coupon' && isCouponApplied && selectedCoupon) {
-      return selectedCoupon.discountType === 'Fixed'
-        ? selectedCoupon.discountValue
-        : Math.round((Number(Price) * selectedCoupon.discountValue) / 100)
     }
+
+    if (mode === 'coupon' && isCouponApplied && selectedCoupon) {
+      if (selectedCoupon.discountType === 'Fixed') {
+        return selectedCoupon.discountValue
+      }
+      return Math.round((Number(Price) * selectedCoupon.discountValue) / 100)
+    }
+
     return 0
   }
 
@@ -120,7 +175,6 @@ const DeviceQuote = () => {
     appliedCoupon: null,
   })
 
-  // Fetch eligible coupons when component mounts
   useEffect(() => {
     const fetchCoupons = async () => {
       if (!leadId || !token) {
@@ -129,18 +183,15 @@ const DeviceQuote = () => {
       }
       try {
         const response = await axios.get(
-          `${
-            import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/coupons/find-eligible/${leadId}`,
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/coupons/find-eligible/${leadId}`,
           {
             headers: { Authorization: token },
           }
         )
         const coupons = response?.data?.data
-        // Handle both single object and array responses for backward compatibility
         const couponsArray = Array.isArray(coupons) ? coupons : coupons ? [coupons] : []
         setEligibleCoupons(couponsArray)
-        // Auto-select first coupon if only one is available
+
         if (couponsArray.length === 1) {
           setSelectedCoupon(couponsArray[0])
         }
@@ -148,10 +199,7 @@ const DeviceQuote = () => {
           sessionStorage.setItem('eligibleCouponCode', couponsArray[0].couponCode)
         }
       } catch (error) {
-        console.error(
-          '❌ Error fetching coupons:',
-          error?.response?.data || error.message
-        )
+        console.error('❌ Error fetching coupons:', error?.response?.data || error.message)
         setEligibleCoupons([])
       } finally {
         setIsLoadingCoupon(false)
@@ -160,47 +208,16 @@ const DeviceQuote = () => {
     fetchCoupons()
   }, [leadId, token])
 
-  // Mode switching and coupon functions
-  const handleModeSwitch = (newMode) => {
-    setMode(newMode)
-    if (newMode === 'bonus') {
-      setIsCouponApplied(false)
-    } else if (newMode === 'coupon') {
-      setBonus(null) // Clear bonus when switching to coupon mode
-    }
-  }
-
-  const handleApplyCoupon = () => {
-    if (!selectedCoupon) {
-      toast.error('Please select a coupon first.')
-      return
-    }
-    setIsCouponApplied(true)
-    toast.success(`Coupon "${selectedCoupon.couponCode}" applied!`)
-  }
-
-  const handleCouponSelect = (coupon) => {
-    setSelectedCoupon(coupon)
-    setIsCouponApplied(true) // Auto-apply on selection
-    toast.success(`Coupon "${coupon.couponCode}" applied!`)
-  }
-
-  const handleRemoveCoupon = () => {
-    setIsCouponApplied(false)
-    toast.success('Coupon removed.')
-  }
+  const couponHandlers = useCouponHandlers(setMode, setIsCouponApplied, setBonus, setSelectedCoupon, setIsCouponApplied)
 
   useEffect(() => {
-    if (
-      !hasShownError.current &&
-      quoteSaved === false &&
-      exactQuoteValue === 'true' &&
-      currentDomain !== buyback
-    ) {
+    const shouldShowError = !hasShownError.current && quoteSaved === false && exactQuoteValue === 'true' && currentDomain !== buyback
+
+    if (shouldShowError) {
       toast.error('Bonus Must Be Less Than ₹2000.')
       hasShownError.current = true
     }
-  }, [quoteSaved, exactQuoteValue, currentDomain])
+  }, [quoteSaved, exactQuoteValue])
 
   const continueOTPHandler = () => {
     const resData = {
@@ -224,9 +241,7 @@ const DeviceQuote = () => {
     <div
       className={`bg-white min-h-screen ${styles.page_wrap}`}
       style={{
-        paddingTop: continueOTPOpen
-          ? 0
-          : 'calc(4rem + env(safe-area-inset-top))',
+        paddingTop: continueOTPOpen ? 0 : 'calc(4rem + env(safe-area-inset-top))',
         minHeight: '100vh',
       }}
     >
@@ -252,14 +267,14 @@ const DeviceQuote = () => {
               exactQuoteValue={exactQuoteValue}
               showDeviceReportHandler={showDeviceReportHandler}
               mode={mode}
-              handleModeSwitch={handleModeSwitch}
+              handleModeSwitch={couponHandlers.handleModeSwitch}
               eligibleCoupons={eligibleCoupons}
               selectedCoupon={selectedCoupon}
               isCouponApplied={isCouponApplied}
               isLoadingCoupon={isLoadingCoupon}
-              handleApplyCoupon={handleApplyCoupon}
-              handleRemoveCoupon={handleRemoveCoupon}
-              handleCouponSelect={handleCouponSelect}
+              handleApplyCoupon={() => couponHandlers.handleApplyCoupon(selectedCoupon)}
+              handleRemoveCoupon={couponHandlers.handleRemoveCoupon}
+              handleCouponSelect={couponHandlers.handleCouponSelect}
             />
           </div>
           <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2 bg-white'>
