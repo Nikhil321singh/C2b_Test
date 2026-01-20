@@ -301,7 +301,7 @@ const PurchaseReceipt = ({
   const COMPANY_EMAIL =
     currentDomain === import.meta.env.VITE_BUYBACK_URL
       ? import.meta.env.VITE_COMPANY_BUYBACK_EMAIL
-      : import.meta.env.VITE_COMPANY_EMAIL;
+      : import.meta.env.VITE_COMPANY_BUYBACK_EMAIL;
 
   return (
     <div className="p-4 px-12 bg-white border-2 text-sm">
