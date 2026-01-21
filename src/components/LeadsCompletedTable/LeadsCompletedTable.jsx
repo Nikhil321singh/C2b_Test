@@ -83,7 +83,7 @@ const TableRow = ({ val, index, onDetailsClick, onImageClick, onPDFClick }) => (
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
       <span className='p-2 text-sm text-center md:p-3 md:text-base'>
-        {val?.gradeId?.grade || 'N/A'}
+        {val?.gradeId?.grade || val.grade || 'N/A'}
       </span>
     </td>
     <td className='p-2 min-w-[140px] text-sm text-center md:p-3 md:text-base'>
@@ -147,7 +147,7 @@ const LeadsCompletedTable = ({ data }) => {
   const [dataIndex, setDataIndex] = useState(null)
 
   const handleDetailsClick = (value) => {
-    console.log('cvalue',value)
+    console.log('cvalue', value)
     setQNAData(value.QNA)
     setShowModal(true)
   }
@@ -172,8 +172,8 @@ const LeadsCompletedTable = ({ data }) => {
       year: 'numeric',
     })
 
-    const showPrice = data[index].companyInfo.showPrice;
-    const maskInfo = data[index].companyInfo.maskInfo;
+    const showPrice = data[index].companyInfo.showPrice
+    const maskInfo = data[index].companyInfo.maskInfo
 
     const signatureUrl = data[index]?.documentId?.signature
     const signatureBase64 = signatureUrl
@@ -200,7 +200,7 @@ const LeadsCompletedTable = ({ data }) => {
         signatureUrl={signatureBase64 || signatureUrl}
         showPrice={showPrice}
         maskInfo={maskInfo}
-      />
+      />,
     )
 
     generatePDF(printElement)
