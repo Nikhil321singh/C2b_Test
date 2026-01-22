@@ -81,9 +81,9 @@ const TableRow = ({ val, index, onDetailsClick, onImageClick, onPDFClick }) => (
     <td className="p-2 min-w-[150px] text-sm text-center md:p-3 md:text-base">
       {val?.companyInfo?.name || "N/A"}
     </td>
-    <td className="p-2 text-sm text-center md:p-3 md:text-base">
-      <span className="p-2 text-sm text-center md:p-3 md:text-base">
-        {val?.gradeId?.grade || "N/A"}
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <span className='p-2 text-sm text-center md:p-3 md:text-base'>
+        {val?.gradeId?.grade || val.grade || 'N/A'}
       </span>
     </td>
     <td className="p-2 min-w-[140px] text-sm text-center md:p-3 md:text-base">
@@ -147,10 +147,10 @@ const LeadsCompletedTable = ({ data }) => {
   const [dataIndex, setDataIndex] = useState(null);
 
   const handleDetailsClick = (value) => {
-    console.log("cvalue", value);
-    setQNAData(value.QNA);
-    setShowModal(true);
-  };
+    console.log('cvalue', value)
+    setQNAData(value.QNA)
+    setShowModal(true)
+  }
 
   const handleImageModal = (index) => {
     setDataIndex(index);
