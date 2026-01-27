@@ -38,7 +38,7 @@ export const usePriceForm = () => {
   const savedOtpData = JSON.parse(localStorage.getItem('otpData'))
   const token = sessionStorage.getItem('authToken')
   const Device = sessionStorage.getItem('DeviceType')
-  const categories = JSON.parse(sessionStorage.getItem('Categories'))
+  const categories = JSON.parse(sessionStorage.getItem('Categories')) || []
   const prod = categories.filter((elem) => elem.categoryCode === Device)
 
   useEffect(() => {
