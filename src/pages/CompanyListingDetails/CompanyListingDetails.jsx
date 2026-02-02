@@ -28,8 +28,12 @@ const CompanyListingDetails = () => {
   const [selectedCompany, setSelectedCompany] = useState()
   const [companyEditData, setCompanyEditData] = useState()
   const [companyDocsData, setCompanyDocsData] = useState()
-
+  const [editSuccess, setEditSuccess] = useState(false)
   const [editBoxOpen, setEditBoxOpen] = useState(false)
+  const [confBox, setConfBox] = useState(false)
+  const [sucBox, setSucBox] = useState(false)
+  const [failBox, setFailBox] = useState(false)
+  const [errMsg, setErrMsg] = useState('')
   const [viewDocsModalOpen, setViewDocsModalOpen] = useState(false)
   const [uploadPriceModalOpen, setUploadPriceModalOpen] = useState(false)
   const [selectedCompanyForPricing, setSelectedCompanyForPricing] =
@@ -61,6 +65,18 @@ const CompanyListingDetails = () => {
       .finally(() => setIsTableLoading(false))
   }
 
+  useEffect(() => {
+    if (editSuccess) {
+      if (searchValue === '') {
+        fetchTableData()
+      } else {
+        getDataBySearch()
+      }
+      setEditSuccess(false)
+      setEditBoxOpen(false)
+    }
+  }, [editSuccess])
+
   const editHandler = (companyData) => {
     setCompanyEditData(companyData)
     setEditBoxOpen(true)
@@ -68,6 +84,7 @@ const CompanyListingDetails = () => {
 
   const deleteConfHandler = (companyData) => {
     setSelectedCompany(companyData)
+    setConfBox(true)
   }
 
   const openViewDocsModal = (data) => {
@@ -98,17 +115,28 @@ const CompanyListingDetails = () => {
         editBoxOpen={editBoxOpen}
         setEditBoxOpen={setEditBoxOpen}
         companyEditData={companyEditData}
+        setEditSuccess={setEditSuccess}
         isTableLoading={isTableLoading}
         setIsTableLoading={setIsTableLoading}
+        sucBox={sucBox}
+        errMsg={errMsg}
+        failBox={failBox}
+        setSucBox={setSucBox}
+        setFailBox={setFailBox}
+        confBox={confBox}
         selectedCompany={selectedCompany}
+        setConfBox={setConfBox}
+        viewDocsModalOpen={viewDocsModalOpen}
         companyDocsData={companyDocsData}
         setViewDocsModalOpen={setViewDocsModalOpen}
+        searchValue={searchValue}
+        fetchTableData={fetchTableData}
+        getDataBySearch={getDataBySearch}
+        setErrMsg={setErrMsg}
         uploadPriceModalOpen={uploadPriceModalOpen}
         setUploadPriceModalOpen={setUploadPriceModalOpen}
         selectedCompanyForPricing={selectedCompanyForPricing}
         categories={categories}
-        fetchTableData={fetchTableData}
-        getDataBySearch={getDataBySearch}
       />
 
       <div className='flex gap-2 justify-center mt-5'>

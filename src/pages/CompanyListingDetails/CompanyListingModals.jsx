@@ -7,7 +7,6 @@ import EditCompany from '../../components/EditCompany/EditCompany'
 import { BeatLoader } from 'react-spinners'
 import toast from 'react-hot-toast'
 import { AiOutlineFile } from 'react-icons/ai'
-import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io'
 import styles from './CompanyListingDetails.module.css'
 
 const getTextColorClass = (isSuccess) =>
@@ -40,6 +39,7 @@ const CompanyListingModals = ({
   selectedCompanyForPricing,
   categories,
 }) => {
+  console.log(selectedCompany, 'arijit')
   const token = sessionStorage.getItem('authToken')
   const [sideMenu, setsideMenu] = useState(false)
   const [isFileUploading, setIsFileUploading] = useState(false)
@@ -124,49 +124,28 @@ const CompanyListingModals = ({
         <AdminNavbar setsideMenu={setsideMenu} sideMenu={sideMenu} />
         <SideMenu setsideMenu={setsideMenu} sideMenu={sideMenu} />
       </div>
-      {sucBox && (
-        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
-          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
-            <IoIosCheckmarkCircle
-              className={getTextColorClass(sucBox)}
-              size={90}
-            />
-            <h6 className={getTextColorClass(sucBox)}>Success!</h6>
-            <p className='text-slate-500'>{errMsg}</p>
-            <button
-              onClick={() => {
-                setSucBox(false)
-              }}
-              className={'bg-green-500 text-white'}
-            >
-              Okay
-            </button>
-          </div>
-        </div>
-      )}
-      {failBox && (
-        <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
-          <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
-            <IoIosCloseCircle className={getTextColorClass(sucBox)} size={90} />
-            <h6 className={getTextColorClass(sucBox)}>Error!</h6>
-            <p className='text-slate-500'>{errMsg}</p>
-            <button
-              onClick={() => {
-                setFailBox(false)
-              }}
-              className={'bg-primary text-white'}
-            >
-              Okay
-            </button>
-          </div>
-        </div>
-      )}
+      <StatusModal
+        open={sucBox}
+        type='success'
+        title='Success!'
+        message={errMsg}
+        onClose={() => setSucBox(false)}
+      />
+
+      <StatusModal
+        open={failBox}
+        type='error'
+        title='Error!'
+        message={errMsg}
+        onClose={() => setFailBox(false)}
+      />
+
       {confBox && (
         <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
           <div className={`${styles.err_mod_box} ${getTextColorClass(sucBox)}`}>
             <h6 className={`${getTextColorClass(sucBox)}`}>Confirmation!</h6>
             <p className='text-slate-500'>
-              {`Do you want to delete store ${selectedCompany.companyName} ?`}
+              {`Do you want to delete company ${selectedCompany.name} ?`}
             </p>
             <div className='flex flex-row gap-2'>
               <button
