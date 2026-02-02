@@ -8,6 +8,7 @@ import { BeatLoader } from 'react-spinners'
 import toast from 'react-hot-toast'
 import { AiOutlineFile } from 'react-icons/ai'
 import styles from './CompanyListingDetails.module.css'
+import StatusModal from './StatusModal'
 
 const getTextColorClass = (isSuccess) =>
   isSuccess ? 'text-green-500' : 'text-primary'
