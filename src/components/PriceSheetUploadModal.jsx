@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { generateExcelFile } from '../utils/excelHelper'
 import { generatePreview } from '../utils/bulkUploadUtils'
 import { IoCloudUploadOutline } from 'react-icons/io5'
 import UploadProgress from './UploadProgress'
+import PreviewTable from './PreviewTable'
+import { downloadPriceSheetSample } from '../utils/priceSheetSample'
 
 const PriceSheetUploadModal = ({
   isOpen,
@@ -29,37 +30,6 @@ const PriceSheetUploadModal = ({
     }
   }
 
-  const handleDownloadSample = () => {
-    const sampleData = [
-      {
-        'Sr No.': 1,
-        'Model Details': 'Apple iPhone 11',
-        Brand: 'Apple',
-        Series: '11 series',
-        Storage: '128 GB',
-        Ram: '4 GB',
-        'A+WARRANTY': 45000,
-        A: 42000,
-        'A-': 40000,
-        'A-Limited': 38000,
-        'B+': 36000,
-        B: 35000,
-        'B-': 33000,
-        'B-Limited': 31000,
-        'C+': 30000,
-        C: 28000,
-        'C-': 26000,
-        'C-Limited': 24000,
-        'D+': 23000,
-        D: 21000,
-        'D-': 19000,
-        E: 17000,
-      },
-    ]
-
-    generateExcelFile(sampleData, 'gradepricing-sample-file')
-  }
-
   const handleSubmit = (e) => {
     e.preventDefault()
     onSubmit(file, selectedCategory)
@@ -78,7 +48,9 @@ const PriceSheetUploadModal = ({
     onClose()
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <div className='fixed top-0 left-0 z-48 flex items-center justify-center w-full h-full bg-black bg-opacity-50 p-4'>
@@ -132,7 +104,7 @@ const PriceSheetUploadModal = ({
               </p>
               <button
                 type='button'
-                onClick={handleDownloadSample}
+                onClick={downloadPriceSheetSample}
                 className='text-blue-600 hover:text-blue-800 text-sm font-semibold inline-flex items-center gap-1'
               >
                 <svg
@@ -178,45 +150,7 @@ const PriceSheetUploadModal = ({
                 <p className='mt-4 text-sm text-red-600 text-center'>{error}</p>
               )}
 
-              {previewData.length > 0 && (
-                <div className='mt-6'>
-                  <h4 className='font-semibold text-gray-700 mb-2'>
-                    File Preview ({previewData.length} rows)
-                  </h4>
-                  <div className='overflow-x-auto border border-primary rounded-lg max-h-96 overflow-y-auto'>
-                    <table className='w-full text-sm text-left'>
-                      <thead className='bg-primary text-white sticky top-0'>
-                        <tr>
-                          {previewHeaders.map((header, index) => (
-                            <th key={index} className='p-2 md:p-3 font-medium'>
-                              {header}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className='bg-white'>
-                        {previewData.map((row, rowIndex) => (
-                          <tr
-                            key={rowIndex}
-                            className={
-                              rowIndex % 2 === 0 ? 'bg-gray-100' : 'bg-white'
-                            }
-                          >
-                            {row.map((cell, cellIndex) => (
-                              <td
-                                key={cellIndex}
-                                className='p-2 md:p-3 text-gray-700 truncate max-w-xs'
-                              >
-                                {cell}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
+              <PreviewTable headers={previewHeaders} data={previewData} />
             </div>
 
             <div className='flex gap-3 pt-4'>
