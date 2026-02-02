@@ -2,8 +2,9 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import AdminNavbar from '../../components/Admin_Navbar'
 import SideMenu from '../../components/SideMenu'
+import PriceSheetUploadModal from '../../components/PriceSheetUploadModal'
 import { BeatLoader } from 'react-spinners'
-import { FaDownload } from 'react-icons/fa6'
+import { FaDownload, FaUpload } from 'react-icons/fa6'
 import { IoRefresh } from 'react-icons/io5'
 import {
   IoIosCheckmarkCircle,
@@ -17,6 +18,8 @@ import * as XLSX from 'xlsx'
 import EditCompany from '../../components/EditCompany/EditCompany'
 import { AiOutlineFile } from 'react-icons/ai'
 import NoDataMessage from '../../components/NoDataMessage'
+import toast from 'react-hot-toast'
+import { saveAs } from 'file-saver'
 
 const downloadExcel = (apiData) => {
   const fileType =
@@ -54,7 +57,7 @@ const handleDownload = (totalCount) => {
         headers: {
           authorization: `${userToken1}`,
         },
-      }
+      },
     )
     .then((res) => {
       downloadExcel(res.data.result)
@@ -86,6 +89,10 @@ const CompanyListingDetails = () => {
   const [editBoxOpen, setEditBoxOpen] = useState(false)
   const [editSuccess, setEditSuccess] = useState(false)
   const [viewDocsModalOpen, setViewDocsModalOpen] = useState(false)
+  const [uploadPriceModalOpen, setUploadPriceModalOpen] = useState(false)
+  const [selectedCompanyForPricing, setSelectedCompanyForPricing] =
+    useState(null)
+  const [categories, setCategories] = useState([])
   const navigate = useNavigate()
 
   const fetchTableData = () => {
@@ -95,7 +102,7 @@ const CompanyListingDetails = () => {
         `${
           import.meta.env.VITE_REACT_APP_ENDPOINT
         }/api/company/findAll?page=${currentPage}&limit=${pageLimit}`,
-        { headers: { Authorization: userToken } }
+        { headers: { Authorization: userToken } },
       )
       .then((res) => {
         setMaxPages(Math.ceil(res.data.totalCounts / 10))
@@ -111,6 +118,24 @@ const CompanyListingDetails = () => {
   useEffect(() => {
     fetchTableData()
   }, [currentPage, pageLimit])
+
+  useEffect(() => {
+    getCategories()
+  }, [])
+
+  const getCategories = async () => {
+    try {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`,
+        {
+          headers: { Authorization: userToken },
+        },
+      )
+      setCategories(data.data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   const deleteConfHandler = (conpanyId) => {
     setSelectedCompany(conpanyId)
@@ -167,6 +192,11 @@ const CompanyListingDetails = () => {
     setCompanyDocsData(data)
     setViewDocsModalOpen(true)
   }
+
+  const openUploadPriceModal = (companyData) => {
+    setSelectedCompanyForPricing(companyData)
+    setUploadPriceModalOpen(true)
+  }
   return (
     <div>
       <ExtComps
@@ -191,6 +221,10 @@ const CompanyListingDetails = () => {
         fetchTableData={fetchTableData}
         getDataBySearch={getDataBySearch}
         setErrMsg={setErrMsg}
+        uploadPriceModalOpen={uploadPriceModalOpen}
+        setUploadPriceModalOpen={setUploadPriceModalOpen}
+        selectedCompanyForPricing={selectedCompanyForPricing}
+        categories={categories}
       />
       <div className='m-2 flex flex-col gap-2 items-center w-[100%]'>
         <div className='flex gap-2 items-center justify-center outline-none mt-5 w-[100%]'>
@@ -229,6 +263,7 @@ const CompanyListingDetails = () => {
           editHandler={editHandler}
           deleteConfHandler={deleteConfHandler}
           openViewDocsModal={openViewDocsModal}
+          openUploadPriceModal={openUploadPriceModal}
           setCurrentPage={setCurrentPage}
           currentPage={currentPage}
           maxPages={maxPages}
@@ -264,9 +299,63 @@ const ExtComps = ({
   fetchTableData,
   getDataBySearch,
   setErrMsg,
+  uploadPriceModalOpen,
+  setUploadPriceModalOpen,
+  selectedCompanyForPricing,
+  categories,
 }) => {
   const userToken2 = sessionStorage.getItem('authToken')
   const [sideMenu, setsideMenu] = useState(false)
+  const [isFileUploading, setIsFileUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+
+  const handlePriceSheetUpload = (file, category) => {
+    setIsFileUploading(true)
+    setUploadProgress(0)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('companyId', selectedCompanyForPricing._id)
+    formData.append('category', category)
+
+    axios
+      .post(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/grades/company/upload`,
+        formData,
+        {
+          headers: {
+            Authorization: userToken2,
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total,
+            )
+            setUploadProgress(percentCompleted)
+          },
+        },
+      )
+      .then(() => {
+        toast.success(
+          `Price sheet uploaded successfully for ${selectedCompanyForPricing.name}`,
+        )
+        setUploadPriceModalOpen(false)
+      })
+      .catch((err) => {
+        console.log(err)
+        toast.error(
+          err.response?.data?.message || 'Failed to upload price sheet',
+        )
+      })
+      .finally(() => {
+        setIsFileUploading(false)
+        setUploadProgress(0)
+        fetchTableData()
+      })
+  }
+
+  const handleCloseUploadModal = () => {
+    setUploadPriceModalOpen(false)
+  }
+
   const deleteHandler = (companyId) => {
     setIsTableLoading(true)
     setConfBox(false)
@@ -286,7 +375,7 @@ const ExtComps = ({
           getDataBySearch()
         }
         setErrMsg(
-          'Succesfully deleted company - ' + response.data.result.companyName
+          'Succesfully deleted company - ' + response.data.result.companyName,
         )
         setSucBox(true)
         setIsTableLoading(false)
@@ -416,6 +505,16 @@ const ExtComps = ({
           </div>
         </div>
       )}
+      <PriceSheetUploadModal
+        isOpen={uploadPriceModalOpen}
+        onClose={handleCloseUploadModal}
+        onSubmit={handlePriceSheetUpload}
+        categories={categories}
+        title='Company Price Sheet Upload'
+        description={`Upload price sheet for ${selectedCompanyForPricing?.name}. Download the sample template to ensure your data is in the correct format.`}
+        isUploading={isFileUploading}
+        uploadProgress={uploadProgress}
+      />
     </React.Fragment>
   )
 }
@@ -425,6 +524,7 @@ const CompanyTable = ({
   editHandler,
   deleteConfHandler,
   openViewDocsModal,
+  openUploadPriceModal,
   setCurrentPage,
   currentPage,
   maxPages,
@@ -446,6 +546,7 @@ const CompanyTable = ({
               <th className='p-2 text-sm md:p-3 md:text-base'>PAN Number</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Remarks</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Documents</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Price Sheets</th>
             </tr>
           </thead>
           <tbody>
@@ -474,6 +575,14 @@ const CompanyTable = ({
                           }}
                         >
                           Delete
+                        </button>
+                        <button
+                          className='bg-blue-500 text-white px-2 py-1 text-xs rounded hover:bg-blue-600 flex items-center justify-center gap-1'
+                          onClick={() => {
+                            openUploadPriceModal(data)
+                          }}
+                        >
+                          <FaUpload size={12} /> Price Sheet
                         </button>
                       </div>
                     </td>
@@ -504,6 +613,27 @@ const CompanyTable = ({
                       style={{ cursor: 'pointer' }}
                     >
                       View Docs
+                    </td>
+                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                      {data.priceSheets && data.priceSheets.length > 0 ? (
+                        <div className='flex flex-col gap-1'>
+                          {data.priceSheets.map((sheet, idx) => (
+                            <a
+                              key={idx}
+                              href={sheet.fileUrl}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='text-blue-600 hover:text-blue-800 text-sm underline flex items-center justify-center gap-1'
+                            >
+                              <FaDownload size={10} />
+                              {sheet.fileName} (
+                              {new Date(sheet.uploadedAt).toLocaleDateString()})
+                            </a>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className='text-gray-400 text-sm'>No files</span>
+                      )}
                     </td>
                   </tr>
                 ))}

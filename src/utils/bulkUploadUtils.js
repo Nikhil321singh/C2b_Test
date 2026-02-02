@@ -5,7 +5,8 @@ export const generatePreview = (
   inputFile,
   setPreviewHeaders,
   setPreviewData,
-  setError
+  setError,
+  maxRows = null
 ) => {
   const reader = new FileReader()
   const isExcel =
@@ -19,12 +20,13 @@ export const generatePreview = (
         const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 })
         if (json.length > 0) {
           setPreviewHeaders(json[0])
-          setPreviewData(json.slice(1, 6))
+          const dataRows = maxRows ? json.slice(1, maxRows + 1) : json.slice(1)
+          setPreviewData(dataRows)
         }
       } else {
         Papa.parse(e.target.result, {
           header: true,
-          preview: 5,
+          preview: maxRows || 0,
           skipEmptyLines: true,
           complete: (results) => {
             if (results.data.length > 0) {
