@@ -81,8 +81,7 @@ const Price = () => {
             !phoneBottom ||
             !signatureFile || //check signature
             !customerPhoto || // check customer photo
-            !ceirImage || // check CEIR image
-            !isAadharVerified // check aadhar verification
+            !ceirImage
               ? 'cursor-not-allowed bg-gray-400'
               : pink
           }`}
