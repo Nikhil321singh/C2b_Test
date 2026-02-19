@@ -63,7 +63,7 @@ const createAnswer = (questionData, answer) => {
     if (group === 'Warranty') {
       // Warranty → select "out of warranty"
       const outOfWarrantyIndex = options.findIndex((option) =>
-        option.caption.toLowerCase().includes('out of warranty'),
+        option.caption.toLowerCase().includes('out of warranty')
       )
       const selected = createDefaultSelected(options.length, false)
       if (outOfWarrantyIndex !== -1) {
@@ -112,8 +112,6 @@ const NewDeviceqs = () => {
   const [NDstate, dispatch] = useReducer(qnaReducer, initialState)
   const qna = useSelector((state) => state.qna)
 
-  console.log(profile, 'arijit')
-
   const fetchData = async () => {
     try {
       const apiUrl = `${
@@ -159,7 +157,7 @@ const NewDeviceqs = () => {
 
   const updateAns = (group) => {
     const filteredAnswers = newGroupanswers.filter(
-      (question) => question.group === group,
+      (question) => question.group === group
     )
     store.dispatch(setGroupAnswers({ group, filteredAnswers }))
     if (showPopup === false) {
@@ -187,7 +185,7 @@ const NewDeviceqs = () => {
   ]
 
   const availableParts = parts.filter(
-    (part) => part.data && part.data.length > 0,
+    (part) => part.data && part.data.length > 0
   )
 
   return (
