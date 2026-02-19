@@ -11,7 +11,11 @@ export const usePriceForm = () => {
   const [phoneRight, setPhoneRight] = useState(null)
   const [phoneTop, setPhoneTop] = useState(null)
   const [phoneBottom, setPhoneBottom] = useState(null)
+  const [signatureFile, setSignatureFile] = useState(null) // Added new signature file state
+  const [customerPhoto, setCustomerPhoto] = useState(null) // Added new customer photo
+  const [ceirImage, setCeirImage] = useState(null) // Added new CEIR image state
   const [aadharNumber, setAadharNumber] = useState('')
+  const [isAadharVerified, setIsAadharVerified] = useState(false) // Aadhar verification status
   const [imeinumber, setImeiNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBillRequired, setIsBillRequired] = useState(false)
@@ -26,13 +30,15 @@ export const usePriceForm = () => {
   const phoneRightRef = useRef(null)
   const phoneTopRef = useRef(null)
   const phoneBottomRef = useRef(null)
+  const customerPhotoRef = useRef(null)
+  const ceirImageRef = useRef(null)
 
   // Get session data
   const leadsubmitDATA = JSON.parse(sessionStorage.getItem('responsedatadata'))
   const savedOtpData = JSON.parse(localStorage.getItem('otpData'))
   const token = sessionStorage.getItem('authToken')
   const Device = sessionStorage.getItem('DeviceType')
-  const categories = JSON.parse(sessionStorage.getItem('Categories'))
+  const categories = JSON.parse(sessionStorage.getItem('Categories')) || []
   const prod = categories.filter((elem) => elem.categoryCode === Device)
 
   useEffect(() => {
@@ -43,10 +49,11 @@ export const usePriceForm = () => {
   }, [])
 
   const handleCameraButtonClick = (ref) => {
-    if (!ref.current) {
-      return
+    if (ref && ref.current) {
+      ref.current.click()
+    } else {
+      console.error('Camera button click failed: ref is not valid', ref)
     }
-    ref.current.click()
   }
 
   return {
@@ -69,8 +76,16 @@ export const usePriceForm = () => {
     setPhoneTop,
     phoneBottom,
     setPhoneBottom,
+    signatureFile, //Added new signatureFile
+    setSignatureFile, //Added new signature state function
+    customerPhoto, //Added new customerPhoto
+    setCustomerPhoto, //Added new customerPhoto state
+    ceirImage, //Added new CEIR image
+    setCeirImage, //Added new CEIR image state
     aadharNumber,
     setAadharNumber,
+    isAadharVerified, //Added Aadhar verification status
+    setIsAadharVerified, //Added Aadhar verification status setter
     imeinumber,
     setImeiNumber,
     isLoading,
@@ -87,6 +102,8 @@ export const usePriceForm = () => {
     phoneRightRef,
     phoneTopRef,
     phoneBottomRef,
+    customerPhotoRef,
+    ceirImageRef,
 
     // Session data
     leadsubmitDATA,
@@ -95,6 +112,6 @@ export const usePriceForm = () => {
     prod,
 
     // Handlers
-    handleCameraButtonClick
+    handleCameraButtonClick,
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaAngleDown } from 'react-icons/fa6'
 import styles from '../StoreWiseReport.module.css'
 
@@ -20,6 +20,11 @@ const RegionStoreFilter = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredStores, setFilteredStores] = useState(storeData)
 
+  // Update filteredStores when storeData prop changes
+  useEffect(() => {
+    setFilteredStores(storeData)
+  }, [storeData])
+
   const handleSearch = (e) => {
     const value = e.target.value
     setSearchTerm(value)
@@ -27,11 +32,13 @@ const RegionStoreFilter = ({
       setFilteredStores(storeData)
     } else {
       const filtered = storeData.filter((store) =>
-        store.storeName.toLowerCase().includes(value.toLowerCase())
+        store.toLowerCase().includes(value.toLowerCase())
       )
       setFilteredStores(filtered)
     }
   }
+
+  console.log({ filteredStores })
 
   return (
     <>
@@ -85,12 +92,12 @@ const RegionStoreFilter = ({
                     key={index}
                     onClick={() => {
                       handleStoreChange(item)
-                      setSearchTerm(item.storeName)
+                      setSearchTerm(item.storeName ?? item)
                       setStoreDrop(false)
                     }}
                     className={`${styles.filter_option}`}
                   >
-                    <p className='truncate'>{item.storeName}</p>
+                    <p className='truncate'>{item.storeName ?? item}</p>
                   </div>
                 ))
               ) : (

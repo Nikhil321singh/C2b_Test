@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import { useEffect } from 'react'
+import { setupGlobalInterceptors } from './utils/axiosInterceptor'
 import './App.css'
 import SelectBrand from './pages/SelectBrand'
 import InputNumber from './pages/InputNumber'
@@ -61,6 +63,11 @@ import CreateCoupon from './pages/CreateCoupon'
 import CouponDetails from './pages/CouponDetails'
 
 function App() {
+  // Setup global axios interceptors on app mount
+  useEffect(() => {
+    setupGlobalInterceptors();
+  }, []);
+
   return (
     <>
       <AnswerProvider>
