@@ -86,8 +86,6 @@ export const SeriesFilter = ({
 const SelectDevice = () => {
   const [modelInfo, setModelInfo] = useState()
   const userToken = sessionStorage.getItem('authToken')
-  const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
-
   const Device = sessionStorage.getItem('DeviceType')
   const [selectedBtn, setSelectedBtn] = useState('All')
   const [seriesType, setSeriesType] = useState('')
@@ -113,7 +111,6 @@ const SelectDevice = () => {
       },
       data: {
         brandId: brandId,
-        companyId: LoggedInUser.companyId || null,
         deviceType: Device,
         series: seriesType,
         search: searchModel,
