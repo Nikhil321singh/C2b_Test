@@ -3,10 +3,6 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { DataProvider } from "./components/dataContext.jsx";
-import logger from "./utils/secureLogger.js";
-
-// DPDP Compliance: Replace global console with secure logger to prevent PII leakage
-logger.replaceGlobalConsole();
 
 const currentDomain = window.location.origin;
 
