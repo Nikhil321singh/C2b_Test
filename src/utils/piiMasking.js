@@ -1,5 +1,7 @@
 export function maskAadhaar(aadharNumber) {
-  if (!aadharNumber) return ''
+  if (!aadharNumber) {
+    return ''
+  }
 
   // Convert to string and remove any spaces or dashes
   const cleaned = String(aadharNumber).replace(/[\s-]/g, '')
@@ -15,7 +17,9 @@ export function maskAadhaar(aadharNumber) {
 }
 
 export function maskPhone(phoneNumber) {
-  if (!phoneNumber) return ''
+  if (!phoneNumber) {
+    return ''
+  }
 
   // Convert to string and remove spaces, dashes, parentheses
   const cleaned = String(phoneNumber).replace(/[\s\-()]/g, '')
@@ -43,7 +47,9 @@ export function maskPhone(phoneNumber) {
 }
 
 export function maskEmail(email) {
-  if (!email || typeof email !== 'string') return ''
+  if (!email || typeof email !== 'string') {
+    return ''
+  }
 
   const parts = email.split('@')
   if (parts.length !== 2) return email // Invalid email format
@@ -59,7 +65,9 @@ export function maskEmail(email) {
 }
 
 export function maskIMEI(imei) {
-  if (!imei) return ''
+  if (!imei) {
+    return ''
+  }
 
   // Convert to string and remove any dashes or spaces
   const cleaned = String(imei).replace(/[\s-]/g, '')
@@ -75,7 +83,9 @@ export function maskIMEI(imei) {
 }
 
 export function maskPAN(pan) {
-  if (!pan || typeof pan !== 'string') return ''
+  if (!pan || typeof pan !== 'string') {
+    return ''
+  }
 
   // Remove spaces and convert to uppercase
   const cleaned = pan.replace(/\s/g, '').toUpperCase()
@@ -91,7 +101,9 @@ export function maskPAN(pan) {
 }
 
 export function maskGST(gst) {
-  if (!gst || typeof gst !== 'string') return ''
+  if (!gst || typeof gst !== 'string') {
+    return ''
+  }
 
   // Remove spaces and convert to uppercase
   const cleaned = gst.replace(/\s/g, '').toUpperCase()
@@ -107,11 +119,15 @@ export function maskGST(gst) {
 }
 
 export function maskAccountNumber(accountNumber) {
-  if (!accountNumber) return ''
+  if (!accountNumber) {
+    return ''
+  }
 
   const cleaned = String(accountNumber).replace(/\s/g, '')
 
-  if (cleaned.length <= 4) return accountNumber
+  if (cleaned.length <= 4) {
+    return accountNumber
+  }
 
   const lastFour = cleaned.slice(-4)
   return `${'X'.repeat(cleaned.length - 4)}${lastFour}`
@@ -133,7 +149,9 @@ export function canViewFullEmail(userRole) {
 }
 
 export function maskPII(value, type, userRole) {
-  if (!value) return ''
+  if (!value) {
+    return ''
+  }
 
   // Determine if user should see full value based on type
   let shouldMask = true
@@ -175,7 +193,9 @@ export function maskPII(value, type, userRole) {
 }
 
 export function containsPII(text) {
-  if (!text || typeof text !== 'string') return false
+  if (!text || typeof text !== 'string') {
+    return false
+  }
 
   const piiPatterns = [
     /\d{12}/, // Aadhaar pattern
