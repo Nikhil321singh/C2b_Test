@@ -49,9 +49,15 @@ const sanitizeString = (data) => {
 const sanitizeNumber = (num) => {
   const str = String(num)
 
-  if (str.length === 12) return maskAadhaar(str)
-  if (str.length === 10) return maskPhone(str)
-  if (str.length === 15) return maskIMEI(str)
+  if (str.length === 12) {
+    return maskAadhaar(str)
+  }
+  if (str.length === 10) {
+    return maskPhone(str)
+  }
+  if (str.length === 15) {
+    return maskIMEI(str)
+  }
 
   return num
 }
