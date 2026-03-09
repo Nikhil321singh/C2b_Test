@@ -1,3 +1,8 @@
+function applyMask(value, userRole, permissionCheck, maskFn) {
+  const shouldMask = !permissionCheck(userRole)
+  return shouldMask ? maskFn(value) : value
+}
+
 export function maskAadhaar(aadharNumber) {
   if (!aadharNumber) {
     return ''
@@ -52,7 +57,9 @@ export function maskEmail(email) {
   }
 
   const parts = email.split('@')
-  if (parts.length !== 2) return email // Invalid email format
+  if (parts.length !== 2) {
+    return email // Invalid email format
+  }
 
   const [localPart, domain] = parts
 
@@ -153,39 +160,31 @@ export function maskPII(value, type, userRole) {
     return ''
   }
 
-  // Determine if user should see full value based on type
-  let shouldMask = true
+  const normalizedType = type?.toLowerCase()
 
-  switch (type?.toLowerCase()) {
+  switch (normalizedType) {
     case 'aadhaar':
-      shouldMask = !canViewFullPII(userRole)
-      return shouldMask ? maskAadhaar(value) : value
+      return applyMask(value, userRole, canViewFullPII, maskAadhaar)
 
     case 'phone':
     case 'mobile':
-      shouldMask = !canViewFullPhone(userRole)
-      return shouldMask ? maskPhone(value) : value
+      return applyMask(value, userRole, canViewFullPhone, maskPhone)
 
     case 'email':
-      shouldMask = !canViewFullEmail(userRole)
-      return shouldMask ? maskEmail(value) : value
+      return applyMask(value, userRole, canViewFullEmail, maskEmail)
 
     case 'imei':
-      shouldMask = !canViewFullPII(userRole)
-      return shouldMask ? maskIMEI(value) : value
+      return applyMask(value, userRole, canViewFullPII, maskIMEI)
 
     case 'pan':
-      shouldMask = !canViewFullPII(userRole)
-      return shouldMask ? maskPAN(value) : value
+      return applyMask(value, userRole, canViewFullPII, maskPAN)
 
     case 'gst':
-      shouldMask = !canViewFullPII(userRole)
-      return shouldMask ? maskGST(value) : value
+      return applyMask(value, userRole, canViewFullPII, maskGST)
 
     case 'account':
     case 'accountnumber':
-      shouldMask = !canViewFullPII(userRole)
-      return shouldMask ? maskAccountNumber(value) : value
+      return applyMask(value, userRole, canViewFullPII, maskAccountNumber)
 
     default:
       return value

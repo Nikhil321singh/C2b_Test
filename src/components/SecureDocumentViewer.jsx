@@ -35,7 +35,9 @@ export function SecureDocumentViewer({
     if (!hasAccess) {
       setAccessDenied(true)
       setLoading(false)
-      return
+
+      // return empty cleanup to keep return type consistent
+      return () => {}
     }
 
     // Fetch pre-signed URL from backend
@@ -47,14 +49,13 @@ export function SecureDocumentViewer({
         fetchSecureDocumentUrl()
       },
       14 * 60 * 1000,
-    ) // 14 minutes
+    )
 
-    return () => clearInterval(refreshInterval)
+    return () => {
+      clearInterval(refreshInterval)
+    }
   }, [documentType, leadId, userRole])
 
-  /**
-   * Fetches pre-signed S3 URL from backend
-   */
   const fetchSecureDocumentUrl = async () => {
     try {
       setLoading(true)

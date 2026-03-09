@@ -8,6 +8,84 @@ import {
   containsPII,
 } from './piiMasking'
 
+const sanitizeString = (data) => {
+  const cleaned = data.replace(/[\s-()]/g, '')
+
+  if (/^\d{12}$/.test(cleaned)) {
+    return maskAadhaar(data)
+  }
+
+  if (/^(\+91)?\d{10}$/.test(cleaned)) {
+    return maskPhone(data)
+  }
+
+  if (/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data)) {
+    return maskEmail(data)
+  }
+
+  if (/^\d{15}$/.test(cleaned)) {
+    return maskIMEI(data)
+  }
+
+  if (/^[A-Z]{5}\d{4}[A-Z]$/i.test(data.replace(/\s/g, ''))) {
+    return maskPAN(data)
+  }
+
+  if (
+    /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}$/i.test(
+      data.replace(/\s/g, ''),
+    )
+  ) {
+    return maskGST(data)
+  }
+
+  if (containsPII(data)) {
+    return '[CONTAINS PII - MASKED]'
+  }
+
+  return data
+}
+
+const sanitizeNumber = (num) => {
+  const str = String(num)
+
+  if (str.length === 12) return maskAadhaar(str)
+  if (str.length === 10) return maskPhone(str)
+  if (str.length === 15) return maskIMEI(str)
+
+  return num
+}
+
+const sanitizeObject = (obj, sanitizeFn) => {
+  const piiKeys = [
+    'aadhaar',
+    'aadhar',
+    'phone',
+    'mobile',
+    'email',
+    'imei',
+    'pan',
+    'gst',
+    'password',
+    'token',
+    'secret',
+  ]
+
+  const sanitized = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    const keyLower = key.toLowerCase()
+
+    if (piiKeys.some((piiKey) => keyLower.includes(piiKey))) {
+      sanitized[key] = '[MASKED]'
+    } else {
+      sanitized[key] = sanitizeFn(value)
+    }
+  }
+
+  return sanitized
+}
+
 class SecureLogger {
   constructor() {
     this.isProduction = import.meta.env.PROD
@@ -23,127 +101,30 @@ class SecureLogger {
     }
   }
 
-  /**
-   * Sanitizes a single value by masking PII patterns
-   * @param {any} data - Data to sanitize
-   * @returns {any} Sanitized data
-   */
   sanitize(data) {
-    // Handle null/undefined
     if (data === null || data === undefined) {
       return data
     }
 
-    // Handle strings - check for PII patterns
     if (typeof data === 'string') {
-      // Check for Aadhaar (12 digits)
-      if (/^\d{12}$/.test(data.replace(/[\s-]/g, ''))) {
-        return maskAadhaar(data)
-      }
-
-      // Check for phone (10 digits or +91 format)
-      if (/^(\+91)?[\s-]?\d{10}$/.test(data.replace(/[\s-()]/g, ''))) {
-        return maskPhone(data)
-      }
-
-      // Check for email
-      if (/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data)) {
-        return maskEmail(data)
-      }
-
-      // Check for IMEI (15 digits)
-      if (/^\d{15}$/.test(data.replace(/[\s-]/g, ''))) {
-        return maskIMEI(data)
-      }
-
-      // Check for PAN (5 letters, 4 digits, 1 letter)
-      if (/^[A-Z]{5}\d{4}[A-Z]$/i.test(data.replace(/\s/g, ''))) {
-        return maskPAN(data)
-      }
-
-      // Check for GST (15 characters)
-      if (
-        /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}$/i.test(
-          data.replace(/\s/g, ''),
-        )
-      ) {
-        return maskGST(data)
-      }
-
-      // For strings containing PII in sentences, use containsPII
-      if (containsPII(data)) {
-        return '[CONTAINS PII - MASKED]'
-      }
-
-      return data
+      return sanitizeString(data)
     }
 
-    // Handle numbers - check if it could be PII
     if (typeof data === 'number') {
-      const str = String(data)
-
-      // Check for Aadhaar (12 digits)
-      if (str.length === 12) {
-        return maskAadhaar(str)
-      }
-
-      // Check for phone (10 digits)
-      if (str.length === 10) {
-        return maskPhone(str)
-      }
-
-      // Check for IMEI (15 digits)
-      if (str.length === 15) {
-        return maskIMEI(str)
-      }
-
-      return data
+      return sanitizeNumber(data)
     }
 
-    // Handle arrays
     if (Array.isArray(data)) {
       return data.map((item) => this.sanitize(item))
     }
 
-    // Handle objects
     if (typeof data === 'object') {
-      const sanitized = {}
-
-      for (const [key, value] of Object.entries(data)) {
-        // Check if key name suggests PII
-        const keyLower = key.toLowerCase()
-        const piiKeys = [
-          'aadhaar',
-          'aadhar',
-          'phone',
-          'mobile',
-          'email',
-          'imei',
-          'pan',
-          'gst',
-          'password',
-          'token',
-          'secret',
-        ]
-
-        // If key suggests PII, mask the value more aggressively
-        if (piiKeys.some((piiKey) => keyLower.includes(piiKey))) {
-          sanitized[key] = '[MASKED]'
-        } else {
-          sanitized[key] = this.sanitize(value)
-        }
-      }
-
-      return sanitized
+      return sanitizeObject(data, (value) => this.sanitize(value))
     }
 
-    // Return other types as-is (boolean, function, etc.)
     return data
   }
 
-  /**
-   * Safe log method - masks PII before logging
-   */
   log(...args) {
     if (this.isProduction) {
       return
