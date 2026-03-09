@@ -7,6 +7,7 @@ import {
   initializeDigilocker,
   submitDigilockerKYC,
 } from '../../utils/digilockerSDK'
+import ConsentCheckbox from '../ConsentCheckbox'
 
 const AadharNumberField = ({
   aadharNumber,
@@ -16,6 +17,7 @@ const AadharNumberField = ({
 }) => {
   const [error, setError] = useState(true)
   const [isVerifying, setIsVerifying] = useState(false)
+  const [aadhaarConsent, setAadhaarConsent] = useState(false)
   const pink = 'bg-primary'
 
   const otpData = localStorage.getItem('otpData')
@@ -53,6 +55,11 @@ const AadharNumberField = ({
 
   const handleVerify = async () => {
     if (!validateAadharNumber(aadharNumber)) {
+      return
+    }
+
+    if (!aadhaarConsent) {
+      toast.error('Please provide consent for Aadhaar collection')
       return
     }
 
@@ -194,6 +201,14 @@ const AadharNumberField = ({
       {error && typeof error === 'string' && (
         <p className='text-primary mt-2 text-sm'>{error}</p>
       )}
+
+      <div className='mt-4 ml-[19px]'>
+        <ConsentCheckbox
+          consentType='aadhaar_collection'
+          onConsentChange={setAadhaarConsent}
+          required={true}
+        />
+      </div>
     </div>
   )
 }
