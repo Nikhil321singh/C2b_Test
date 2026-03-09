@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import { AADHAR_LENGTH } from '../../constants/priceConstants'
-import { createDigilockerKYCRequest } from '../../services/digilockerService'
 import {
-  loadDigilockerSDK,
-  initializeDigilocker,
-  submitDigilockerKYC,
-} from '../../utils/digilockerSDK'
+  sendAadhaarOtp,
+  verifyAadhaarOtp,
+} from '../../services/paysprintAadhaarService'
 import ConsentCheckbox from '../ConsentCheckbox'
 
 const AadharNumberField = ({
@@ -16,23 +14,18 @@ const AadharNumberField = ({
   setIsVerified,
 }) => {
   const [error, setError] = useState(true)
-  const [isVerifying, setIsVerifying] = useState(false)
+  const [isSendingOtp, setIsSendingOtp] = useState(false)
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
   const [aadhaarConsent, setAadhaarConsent] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+  const [clientId, setClientId] = useState('')
+  const [refId, setRefId] = useState('')
   const pink = 'bg-primary'
 
-  const otpData = localStorage.getItem('otpData')
-    ? JSON.parse(localStorage.getItem('otpData'))
-    : null
-
   useEffect(() => {
-    // Load Digilocker SDK on component mount
-    loadDigilockerSDK()
-      .then((Digio) => {
-        console.log('Digilocker SDK loaded successfully')
-      })
-      .catch((err) => {
-        console.error('Failed to load Digilocker SDK:', err)
-      })
+    if (aadharNumber) validateAadharNumber(aadharNumber)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const validateAadharNumber = (value) => {
@@ -48,12 +41,37 @@ const AadharNumberField = ({
   }
 
   const handleChange = (e) => {
-    const value = e.target.value
+    const value = e.target.value.replace(/\D/g, '')
     setAadharNumber(value)
+    setOtp('')
+    setOtpSent(false)
+    setClientId('')
+    setRefId('')
     validateAadharNumber(value)
   }
 
-  const handleVerify = async () => {
+  const isSuccessResponse = (response) => {
+    const explicitStatus = response?.status ?? response?.success
+    if (typeof explicitStatus === 'boolean') {
+      return explicitStatus
+    }
+
+    const code =
+      response?.response_code ?? response?.status_code ?? response?.statuscode
+    if (code !== undefined) {
+      const normalized = String(code)
+      return normalized === '1' || normalized === '200'
+    }
+
+    return true
+  }
+
+  const generateRefId = () =>
+    `REF${Date.now()}${Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, '0')}`
+
+  const handleSendOtp = async () => {
     if (!validateAadharNumber(aadharNumber)) {
       return
     }
@@ -63,111 +81,123 @@ const AadharNumberField = ({
       return
     }
 
-    setIsVerifying(true)
+    setIsSendingOtp(true)
 
     try {
-      // Step 1: Ensure SDK is loaded
-      await loadDigilockerSDK()
-
-      // Step 2: Call Digilocker API to create KYC request
-      const kycData = {
-        customer_identifier: otpData.email,
-        customer_name: otpData.name,
-        template_name: import.meta.env.VITE_DIGIO_TEMPLATE_NAME,
-        notify_customer: false,
-        expire_in_days: 10,
-        generate_access_token: true,
-        reference_id: '1234',
-        transaction_id: 'ABCW233',
+      const response = await sendAadhaarOtp(aadharNumber)
+      if (!isSuccessResponse(response)) {
+        throw new Error(response?.message || 'Failed to send Aadhaar OTP')
       }
 
-      const response = await createDigilockerKYCRequest(kycData)
+      const extractedClientId =
+        response?.data?.client_id ||
+        response?.client_id ||
+        response?.data?.clientId ||
+        response?.clientId ||
+        response?.data?.clientid ||
+        response?.clientid
+      const extractedRefId =
+        response?.data?.refid ||
+        response?.refid ||
+        response?.data?.ref_id ||
+        response?.ref_id ||
+        response?.data?.refId ||
+        response?.refId ||
+        response?.data?.request_id ||
+        response?.request_id ||
+        response?.data?.requestid ||
+        response?.requestid ||
+        response?.data?.txnid ||
+        response?.txnid ||
+        response?.data?.reference_id ||
+        response?.reference_id
 
-      console.log('KYC Request Response:', response)
+      if (!extractedClientId) {
+        throw new Error(
+          'Missing client_id in PaySprint response. Please check backend response mapping.',
+        )
+      }
 
-      // Step 3: Initialize Digilocker SDK with callback
-      const digio = initializeDigilocker({
-        callback: function (sdkResponse) {
-          console.log('Digilocker SDK Response:', sdkResponse)
-          setIsVerifying(false)
+      const resolvedRefId = extractedRefId || generateRefId()
 
-          // Check for errors in the response
-          if (
-            sdkResponse.hasOwnProperty('error_code') ||
-            sdkResponse.message === 'failed'
-          ) {
-            const errorMessage =
-              sdkResponse.message || 'Verification failed. Please try again.'
-            setError(errorMessage)
-            toast.error(errorMessage)
-            console.error('Error in Digilocker process:', sdkResponse)
-          }
-          // Check for successful verification
-          else if (
-            sdkResponse.message === 'success' ||
-            !sdkResponse.hasOwnProperty('error_code')
-          ) {
-            setError('')
-            setIsVerified(true)
-            toast.success('Aadhar verified successfully!')
-            console.log('Verification completed successfully', sdkResponse)
-          }
-        },
-        event_listener: function (event) {
-          console.log('Digilocker Event:', event.event)
-
-          // Handle specific events
-          if (event.event === 'success') {
-            console.log('Verification success event received')
-          } else if (event.event === 'failure') {
-            toast.error('Verification failed')
-          }
-        },
-      })
-
-      // Step 4: Submit to Digilocker with entity_id, identifier, and access_token
-      const entityId = response.access_token.entity_id
-      const identifier = response.customer_identifier
-      const accessToken = response.access_token.id
-
-      console.log('Submitting to Digilocker:', {
-        entityId,
-        identifier,
-        accessToken,
-      })
-
-      submitDigilockerKYC(digio, entityId, identifier, accessToken)
+      setClientId(String(extractedClientId))
+      setRefId(String(resolvedRefId))
+      setOtpSent(true)
+      setError('')
+      toast.success('OTP sent to Aadhaar linked mobile number')
     } catch (err) {
-      console.error('Verification error:', err)
+      console.error('Send Aadhaar OTP error:', err)
       const errorMessage =
-        err.response?.data?.message ||
-        'Failed to initiate verification. Please try again.'
+        err.response?.data?.message || err.message || 'Failed to send OTP'
       setError(errorMessage)
       toast.error(errorMessage)
-      setIsVerifying(false)
+    } finally {
+      setIsSendingOtp(false)
     }
   }
 
-  // Determine button class based on verification state
+  const handleVerifyOtp = async () => {
+    if (!otpSent) {
+      toast.error('Please send OTP first')
+      return
+    }
+
+    if (!/^\d{6}$/.test(otp)) {
+      toast.error('OTP must be 6 digits')
+      return
+    }
+
+    if (!clientId || !refId) {
+      toast.error('Missing verification context. Please resend OTP.')
+      return
+    }
+
+    setIsVerifyingOtp(true)
+    try {
+      const response = await verifyAadhaarOtp({
+        client_id: clientId,
+        otp,
+        refid: refId,
+      })
+
+      if (!isSuccessResponse(response)) {
+        throw new Error(response?.message || 'Invalid or expired OTP')
+      }
+
+      setError('')
+      setIsVerified(true)
+      toast.success('Aadhar verified successfully!')
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || err.message || 'Failed to verify OTP'
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setIsVerifyingOtp(false)
+    }
+  }
+
   const getButtonClass = () => {
     if (isVerified) {
       return 'bg-green-500 cursor-not-allowed'
     }
-    if (!error && !isVerifying) {
+    if (!error && !isSendingOtp) {
       return pink
     }
     return 'bg-gray-400 cursor-not-allowed'
   }
 
-  // Determine button text based on verification state
   const getButtonText = () => {
     if (isVerified) {
       return 'Verified'
     }
-    if (isVerifying) {
-      return 'Verifying...'
+    if (isSendingOtp) {
+      return 'Sending OTP...'
     }
-    return 'Verify'
+    if (otpSent) {
+      return 'Resend OTP'
+    }
+    return 'Send OTP'
   }
 
   return (
@@ -192,12 +222,33 @@ const AadharNumberField = ({
         />
         <button
           className={`px-4 py-2 font-bold text-white rounded ${getButtonClass()}`}
-          onClick={handleVerify}
-          disabled={!!error || isVerifying || isVerified}
+          onClick={handleSendOtp}
+          disabled={!!error || isSendingOtp || isVerified}
         >
           {getButtonText()}
         </button>
       </div>
+      {otpSent && !isVerified && (
+        <div className='flex items-center gap-4 mt-3 ml-[19px]'>
+          <input
+            type='text'
+            className='w-auto p-2 border-2 border-gray-300 rounded outline-none'
+            value={otp}
+            placeholder='Enter OTP'
+            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+            maxLength={6}
+          />
+          <button
+            className={`px-4 py-2 font-bold text-white rounded ${
+              isVerifyingOtp ? 'bg-gray-400 cursor-not-allowed' : pink
+            }`}
+            onClick={handleVerifyOtp}
+            disabled={isVerifyingOtp || otp.length !== 6}
+          >
+            {isVerifyingOtp ? 'Verifying...' : 'Verify OTP'}
+          </button>
+        </div>
+      )}
       {error && typeof error === 'string' && (
         <p className='text-primary mt-2 text-sm'>{error}</p>
       )}
