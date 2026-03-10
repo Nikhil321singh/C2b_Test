@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import CustomerFormDetails from "../CustomerFormDetails";
-import SecureField from "../SecureField";
 
 const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
   const [showModal, setShowModal] = useState(false);
@@ -92,10 +91,10 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
                     {data.lead?.name}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    <SecureField value={data.lead?.phoneNumber} type="phone" />
+                    {data.lead?.phoneNumber}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                    <SecureField value={data.lead?.emailId} type="email" />
+                    {data.lead?.emailId}
                   </td>
 
                   <td className="cursor-pointer p-2 text-sm text-center md:p-3 md:text-base">

@@ -3,7 +3,6 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { IoMdDownload } from "react-icons/io";
-import { maskPhone, maskEmail, maskIMEI } from "../utils/piiMasking";
 
 const ExportTableData = ({
   selecTime,
@@ -35,14 +34,14 @@ const ExportTableData = ({
     const fileExten = ".xlsx";
     const formattedData = apiData.map((elem) => {
       return {
-        phoneNumber: maskPhone(elem.phoneNumber),
-        "User Email": maskEmail(elem.userId?.email),
-        "Customer Mobile No.": maskPhone(elem.phoneNumber),
+        phoneNumber: elem.phoneNumber,
+        "User Email": elem.userId?.email,
+        "Customer Mobile No.": elem.phoneNumber,
         "Customer Name": elem.name,
         Product: elem.modelId?.name,
         Price: elem.actualPrice,
         "Prospect Id": elem.userId?._id,
-        "IMEI No.": maskIMEI(elem.documentId?.IMEI),
+        "IMEI No.": elem.documentId?.IMEI,
       };
     });
 

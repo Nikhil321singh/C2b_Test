@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import CustomerFormDetails from "./CustomerFormDetails";
 import CustomerImageDetails from "./CustomerImageDetails";
-import SecureField from "./SecureField";
 
 const UserTable = ({ data }) => {
   const [showModal, setShowModal] = useState(false);
@@ -106,10 +105,10 @@ const UserTable = ({ data }) => {
                 {val?.lead?.name}
               </td>
               <td className="p-2  min-w-[200px] text-sm text-center md:p-3 md:text-base">
-                <SecureField value={val?.lead?.phoneNumber} type="phone" />
+                {val?.lead?.phoneNumber}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                <SecureField value={val?.lead?.emailId} type="email" />
+                {val?.lead?.emailId}
               </td>
 
               <td className="p-2 text-sm text-center md:p-3 md:text-base">

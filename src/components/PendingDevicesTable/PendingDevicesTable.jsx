@@ -1,6 +1,5 @@
 import CustomerFormDetails from '../CustomerFormDetails'
 import { useState } from 'react'
-import SecureField from '../SecureField'
 
 const PendingDevicesTable = ({
   pendingTableData,
@@ -135,7 +134,7 @@ const PendingDevicesTable = ({
                 {val?.storage ? val.storage : '512 GB'}
               </td>
               <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                <SecureField value={val?.imei} type="imei" />
+                {val?.imei}
               </td>
               <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                 {val?.price?.toString()[0] === '['
