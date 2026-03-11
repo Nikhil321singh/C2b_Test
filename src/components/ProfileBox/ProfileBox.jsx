@@ -5,6 +5,7 @@ import { IoClose } from "react-icons/io5";
 import styles from "./ProfileBox.module.css";
 import { GiHamburgerMenu } from "react-icons/gi";
 import axiosInstance from "../../utils/axiosInterceptor";
+import SecureField from "../SecureField";
 
 function setName(firstName, lastName) {
   if (!firstName && !lastName) {
@@ -103,7 +104,9 @@ const ProfileBox = () => {
                 className="absolute right-0 text-primary"
               />
             </div>
-            <p className="font-medium underline text-primary">{userEmail}</p>
+            <p className="font-medium underline text-primary">
+              <SecureField value={userEmail} type="email" />
+            </p>
             <div className={`${styles.button_wrap}`}>
               <button onClick={handlePwdChange}>Change Password</button>
             </div>
