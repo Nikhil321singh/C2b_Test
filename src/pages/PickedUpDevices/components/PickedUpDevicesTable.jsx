@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import axios from "axios";
-import ViewPickupTable from "../../../components/ViewPickupTable/ViewPickupTable";
-import UserAdminContent from "./UserAdminContent";
-import styles from "../PickedUpDevices.module.css";
-import { StatusReasonModal } from "./StatusReasonModal";
+import React, { useState } from 'react'
+import axios from 'axios'
+import ViewPickupTable from '../../../components/ViewPickupTable/ViewPickupTable'
+import UserAdminContent from './UserAdminContent'
+import styles from '../PickedUpDevices.module.css'
+import { StatusReasonModal } from './StatusReasonModal'
 import {
   userRoles,
   TABLE_CELL_BASE,
@@ -18,26 +18,26 @@ import {
   PickupCompleteConf,
   PickupCancelConf,
   OutForPickup,
-} from "../constants";
-import NoDataMessage from "../../../components/NoDataMessage";
+} from '../constants'
+import NoDataMessage from '../../../components/NoDataMessage'
 
 const renderTableRow = (val, index, renderActionCell) => (
-  <tr key={index} className={index % 2 === 0 ? "bg-gray-200" : ""}>
+  <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
     {renderActionCell(val)}
     <td className={TABLE_CELL_CENTER}>{val?.status}</td>
     <td className={TABLE_CELL_CENTER}>
-      {new Date(val.createdAt).toLocaleDateString("en-GB")}
+      {new Date(val.createdAt).toLocaleDateString('en-GB')}
     </td>
     <td className={TABLE_CELL_CENTER}>{val?.uniqueCode || val?._id}</td>
     <td className={TABLE_CELL_CENTER}>{val?.totalDevice}</td>
     <td className={TABLE_CELL_CENTER}>{val?.totalAmount}</td>
-    <td className={TABLE_CELL_CENTER}>{val?.remarks || ""}</td>
+    <td className={TABLE_CELL_CENTER}>{val?.remarks || ''}</td>
     {/* Added Location Data Cell */}
-    <td className={TABLE_CELL_CENTER}>{val?.location || ""}</td>
+    <td className={TABLE_CELL_CENTER}>{val?.location || ''}</td>
   </tr>
-);
+)
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 10
 
 const PickedUpDevicesTable = ({
   data,
@@ -54,27 +54,25 @@ const PickedUpDevicesTable = ({
   setCurrentPage,
   totalCount,
 }) => {
-  const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-  const userRole = LoggedInUser?.role || "";
-  const token2 = sessionStorage.getItem("authToken");
-
-  const [showView, setShowView] = useState(false);
-  const [viewRef, setViewRef] = useState("");
-
-  const [activeModal, setActiveModal] = useState(null);
-  const [tempRefId, setTempRefId] = useState("");
-  const [tempUniqueCode, setTempUniqueCode] = useState("");
-  const [tempNewStatus, setTempNewStatus] = useState("");
+  const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
+  const userRole = LoggedInUser?.role || ''
+  const token2 = sessionStorage.getItem('authToken')
+  const [showView, setShowView] = useState(false)
+  const [viewRef, setViewRef] = useState('')
+  const [activeModal, setActiveModal] = useState(null)
+  const [tempRefId, setTempRefId] = useState('')
+  const [tempUniqueCode, setTempUniqueCode] = useState('')
+  const [tempNewStatus, setTempNewStatus] = useState('')
 
   const viewHandler = (refID) => {
-    setViewRef(refID);
-    setShowView(true);
-  };
+    setViewRef(refID)
+    setShowView(true)
+  }
 
   const statusUpdateHandler = (refID, newStatus, uniqueCode) => {
-    setTempRefId(refID);
-    setTempUniqueCode(uniqueCode);
-    setTempNewStatus(newStatus);
+    setTempRefId(refID)
+    setTempUniqueCode(uniqueCode)
+    setTempNewStatus(newStatus)
 
     const modalStatuses = [
       PickConf,
@@ -84,18 +82,18 @@ const PickedUpDevicesTable = ({
       DeliveredConf,
       ApprovDelivery,
       OutForPickup,
-    ];
+    ]
 
     if (modalStatuses.includes(newStatus)) {
-      setActiveModal(newStatus);
+      setActiveModal(newStatus)
     } else {
-      performStatusUpdate(refID, newStatus, uniqueCode, "");
+      performStatusUpdate(refID, newStatus, uniqueCode, '')
     }
-  };
+  }
 
-  const performStatusUpdate = (refID, newStatus, uniqueCode, reason = "") => {
-    setIsTableLoaded(true);
-    setConfMod(false);
+  const performStatusUpdate = (refID, newStatus, uniqueCode, reason = '') => {
+    setIsTableLoaded(true)
+    setConfMod(false)
     axios
       .post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/pickupDevices/update`,
@@ -104,35 +102,33 @@ const PickedUpDevicesTable = ({
       )
       .then(() => {
         // Success messages
-        let msg = `Successfully Updated Status to ${newStatus}`;
-        let msg1 = `Lot No. :- ${uniqueCode}`;
-        let msg2 = checkOnPkd;
-
+        let msg = `Successfully Updated Status to ${newStatus}`
+        let msg1 = `Lot No. :- ${uniqueCode}`
+        let msg2 = checkOnPkd
         if (newStatus === PickConf) {
-          msg = `Pickup Confirmed Successfully, Lot No. ${uniqueCode}`;
-          msg1 = `Status Pending for Delivery at Warehouse`;
+          msg = `Pickup Confirmed Successfully, Lot No. ${uniqueCode}`
+          msg1 = `Status Pending for Delivery at Warehouse`
         } else if (newStatus === PickDelivered) {
-          msg1 = `Pending Admin Approval for Delivery for Lot No. :- ${uniqueCode}`;
-          msg2 = "Check it On History";
+          msg1 = `Pending Admin Approval for Delivery for Lot No. :- ${uniqueCode}`
+          msg2 = 'Check it On History'
         } else if (newStatus === ApprovDelivery) {
-          msg2 = "Check it On History";
+          msg2 = 'Check it On History'
         }
-
-        setErrorMsg(msg);
-        setErrorMsg1(msg1);
-        setErrorMsg2(msg2);
-        setSuccessMod(true);
-        getData();
-        setIsTableLoaded(false);
+        setErrorMsg(msg)
+        setErrorMsg1(msg1)
+        setErrorMsg2(msg2)
+        setSuccessMod(true)
+        getData()
+        setIsTableLoaded(false)
       })
       .catch(() => {
         setErrorMsg(
           `Failed to update the status of lot ${uniqueCode} to ${newStatus}`,
-        );
-        setFailMode(true);
-        setIsTableLoaded(false);
-      });
-  };
+        )
+        setFailMode(true)
+        setIsTableLoaded(false)
+      })
+  }
 
   const renderTechnicianActions = (val) => (
     <div className={FLEX_COL_GAP_1}>
@@ -160,7 +156,7 @@ const PickedUpDevicesTable = ({
         </button>
       )}
     </div>
-  );
+  )
 
   const renderStoreActions = (val) => (
     <div className={FLEX_COL_GAP_1}>
@@ -168,14 +164,14 @@ const PickedUpDevicesTable = ({
         View
       </button>
     </div>
-  );
+  )
 
   const renderActionCell = (val) => (
     <td className={TABLE_CELL_CENTER}>
-      {userRoles[userRole] === "Store" && renderStoreActions(val)}
-      {(userRole === "Super Admin" ||
-        userRole === "Company Admin" ||
-        userRole === "Admin Manager") && (
+      {userRoles[userRole] === 'Store' && renderStoreActions(val)}
+      {(userRole === 'Super Admin' ||
+        userRole === 'Company Admin' ||
+        userRole === 'Admin Manager') && (
         <UserAdminContent
           confHandler={confHandler}
           val={val}
@@ -183,16 +179,16 @@ const PickedUpDevicesTable = ({
           viewHandler={viewHandler}
         />
       )}
-      {userRole === "Technician" && renderTechnicianActions(val)}
+      {userRole === 'Technician' && renderTechnicianActions(val)}
     </td>
-  );
+  )
 
   // Check if there's no data
-  const hasData = data && data.length > 0;
+  const hasData = data && data.length > 0
 
   return (
     <div className={styles.pd_cont}>
-      <div className="m-2 overflow-x-auto md:m-5">
+      <div className='m-2 overflow-x-auto md:m-5'>
         {showView && (
           <div className={styles.view_wrap}>
             <ViewPickupTable refNo={viewRef} setShowView={setShowView} />
@@ -202,8 +198,8 @@ const PickedUpDevicesTable = ({
         {!hasData && <NoDataMessage />}
 
         {hasData && (
-          <table className="w-full border border-primary">
-            <thead className="bg-primary text-white">
+          <table className='w-full border border-primary'>
+            <thead className='bg-primary text-white'>
               <tr>
                 <th className={TABLE_CELL_BASE}>Action</th>
                 <th className={TABLE_CELL_BASE}>Status</th>
@@ -224,14 +220,14 @@ const PickedUpDevicesTable = ({
         )}
       </div>
 
-      <div className="flex justify-center my-4">
+      <div className='flex justify-center my-4'>
         <button
           disabled={currentPage === 0}
           onClick={() => setCurrentPage((p) => p - 1)}
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage === 0
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-primary text-white"
+              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+              : 'bg-primary text-white'
           }`}
         >
           Previous
@@ -241,25 +237,24 @@ const PickedUpDevicesTable = ({
           onClick={() => setCurrentPage((p) => p + 1)}
           className={`mx-2 px-4 py-2 rounded-lg ${
             currentPage >= Math.ceil((totalCount || 0) / PAGE_SIZE) - 1
-              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-primary text-white"
+              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+              : 'bg-primary text-white'
           }`}
         >
           Next
         </button>
       </div>
-
       <StatusReasonModal
         statusKey={activeModal}
         isOpen={!!activeModal}
         onClose={() => setActiveModal(null)}
         onSubmit={(reason) => {
-          performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason);
-          setActiveModal(null);
+          performStatusUpdate(tempRefId, tempNewStatus, tempUniqueCode, reason)
+          setActiveModal(null)
         }}
       />
     </div>
-  );
-};
+  )
+}
 
-export default PickedUpDevicesTable;
+export default PickedUpDevicesTable
