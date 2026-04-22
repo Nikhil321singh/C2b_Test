@@ -20,7 +20,6 @@ const AadharNumberField = ({
   const [otp, setOtp] = useState('')
   const [otpSent, setOtpSent] = useState(false)
   const [clientId, setClientId] = useState('')
-  const [refId, setRefId] = useState('')
   const pink = 'bg-primary'
 
   useEffect(() => {
@@ -46,7 +45,6 @@ const AadharNumberField = ({
     setOtp('')
     setOtpSent(false)
     setClientId('')
-    setRefId('')
     validateAadharNumber(value)
   }
 
@@ -66,11 +64,6 @@ const AadharNumberField = ({
     return true
   }
 
-  const generateRefId = () =>
-    `REF${Date.now()}${Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, '0')}`
-
   const handleSendOtp = async () => {
     if (!validateAadharNumber(aadharNumber)) {
       return
@@ -89,39 +82,15 @@ const AadharNumberField = ({
         throw new Error(response?.message || 'Failed to send Aadhaar OTP')
       }
 
-      const extractedClientId =
-        response?.data?.client_id ||
-        response?.client_id ||
-        response?.data?.clientId ||
-        response?.clientId ||
-        response?.data?.clientid ||
-        response?.clientid
-      const extractedRefId =
-        response?.data?.refid ||
-        response?.refid ||
-        response?.data?.ref_id ||
-        response?.ref_id ||
-        response?.data?.refId ||
-        response?.refId ||
-        response?.data?.request_id ||
-        response?.request_id ||
-        response?.data?.requestid ||
-        response?.requestid ||
-        response?.data?.txnid ||
-        response?.txnid ||
-        response?.data?.reference_id ||
-        response?.reference_id
+      const extractedClientId = response?.client_id
 
       if (!extractedClientId) {
         throw new Error(
-          'Missing client_id in PaySprint response. Please check backend response mapping.',
+          'Missing client id in PaySprint response. Please check backend response mapping.',
         )
       }
 
-      const resolvedRefId = extractedRefId || generateRefId()
-
       setClientId(String(extractedClientId))
-      setRefId(String(resolvedRefId))
       setOtpSent(true)
       setError('')
       toast.success('OTP sent to Aadhaar linked mobile number')
@@ -147,7 +116,7 @@ const AadharNumberField = ({
       return
     }
 
-    if (!clientId || !refId) {
+    if (!clientId) {
       toast.error('Missing verification context. Please resend OTP.')
       return
     }
@@ -157,7 +126,6 @@ const AadharNumberField = ({
       const response = await verifyAadhaarOtp({
         client_id: clientId,
         otp,
-        refid: refId,
       })
 
       if (!isSuccessResponse(response)) {
@@ -194,9 +162,6 @@ const AadharNumberField = ({
     if (isSendingOtp) {
       return 'Sending OTP...'
     }
-    if (otpSent) {
-      return 'Resend OTP'
-    }
     return 'Send OTP'
   }
 
@@ -210,7 +175,7 @@ const AadharNumberField = ({
         </p>
       </div>
 
-      <div className='flex items-center gap-4 mt-2 ml-[19px]'>
+      <div className='flex flex-wrap items-center gap-4 mt-2 ml-[19px]'>
         <input
           type='text'
           className='w-auto p-2 border-2 border-gray-300 rounded outline-none'
@@ -223,11 +188,12 @@ const AadharNumberField = ({
         <button
           className={`px-4 py-2 font-bold text-white rounded ${getButtonClass()}`}
           onClick={handleSendOtp}
-          disabled={!!error || isSendingOtp || isVerified}
+          disabled={!!error || isSendingOtp || otpSent}
         >
           {getButtonText()}
         </button>
       </div>
+
       {otpSent && !isVerified && (
         <div className='flex items-center gap-4 mt-3 ml-[19px]'>
           <input
