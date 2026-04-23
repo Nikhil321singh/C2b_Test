@@ -40,7 +40,6 @@ const CompanyListingModals = ({
   selectedCompanyForPricing,
   categories,
 }) => {
-  console.log(selectedCompany, 'arijit')
   const token = sessionStorage.getItem('authToken')
   const [sideMenu, setsideMenu] = useState(false)
   const [isFileUploading, setIsFileUploading] = useState(false)

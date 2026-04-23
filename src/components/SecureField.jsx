@@ -20,8 +20,6 @@ export function SecureField({
     setUserRole(LoggedInUser?.role)
   }, [])
 
-  console.log(userRole, 'arijit')
-
   // Handle empty value
   if (!value) {
     return <span className={className}>{emptyText}</span>
