@@ -23,7 +23,9 @@ const AadharNumberField = ({
   const pink = 'bg-primary'
 
   useEffect(() => {
-    if (aadharNumber) validateAadharNumber(aadharNumber)
+    if (aadharNumber) {
+      validateAadharNumber(aadharNumber)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
