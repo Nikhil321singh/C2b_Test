@@ -59,8 +59,6 @@ export function maskEmail(email) {
     return email // Invalid email format
   }
 
-  const [localPart, domain] = parts
-
   // Return full email
   return email
 }
