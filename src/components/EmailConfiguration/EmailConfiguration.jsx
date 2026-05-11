@@ -29,7 +29,9 @@ const EmailConfiguration = ({ value, onChange }) => {
   }
 
   const handleAddRecipient = () => {
-    if (!newEmail.email) return
+    if (!newEmail.email) {
+      return
+    }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -57,7 +59,6 @@ const EmailConfiguration = ({ value, onChange }) => {
     setEmailConfig(updated)
     onChange(updated)
   }
-
 
   return (
     <div className='border border-gray-300 rounded-lg p-4 mb-4'>
