@@ -79,7 +79,6 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
     emailConfiguration: companyData.emailConfiguration || {
       enabled: false,
       recipients: [],
-      commonEmails: true,
       notificationTypes: ['paymentReceipt']
     }
   })

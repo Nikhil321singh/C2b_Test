@@ -94,7 +94,6 @@ const CompanyListing = () => {
   const [emailConfiguration, setEmailConfiguration] = useState({
     enabled: false,
     recipients: [],
-    commonEmails: true,
     notificationTypes: ['paymentReceipt']
   });
 

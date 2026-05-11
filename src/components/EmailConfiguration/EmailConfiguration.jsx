@@ -6,7 +6,6 @@ const EmailConfiguration = ({ value, onChange }) => {
     value || {
       enabled: false,
       recipients: [],
-      commonEmails: true,
       notificationTypes: ['paymentReceipt'],
     },
   )
@@ -59,11 +58,6 @@ const EmailConfiguration = ({ value, onChange }) => {
     onChange(updated)
   }
 
-  const handleToggleCommonEmails = () => {
-    const updated = { ...emailConfig, commonEmails: !emailConfig.commonEmails }
-    setEmailConfig(updated)
-    onChange(updated)
-  }
 
   return (
     <div className='border border-gray-300 rounded-lg p-4 mb-4'>
@@ -157,23 +151,6 @@ const EmailConfiguration = ({ value, onChange }) => {
               ))}
             </div>
           )}
-
-          {/* Common Emails Toggle */}
-          <div className='flex items-center gap-2 mb-3'>
-            <input
-              type='checkbox'
-              checked={emailConfig.commonEmails}
-              onChange={handleToggleCommonEmails}
-              className='w-4 h-4 cursor-pointer'
-            />
-            <label
-              className='text-sm text-gray-700 cursor-pointer'
-              onClick={handleToggleCommonEmails}
-            >
-              Include common GREST emails (tech@grest.in, procurement@grest.in,
-              etc.)
-            </label>
-          </div>
 
           {/* Info Box */}
           <div className='p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-800'>
