@@ -352,7 +352,6 @@ export const BrandList = ({ deviceType }) => {
       )
       .then((res) => {
         setBrandList(res.data.data)
-        console.log(res.data.data)
       })
       .catch((err) => {
         console.log(err)
@@ -367,8 +366,6 @@ export const BrandList = ({ deviceType }) => {
   }
 
   const handleBrandClick = (brandItem) => {
-    console.log('adasdasasfdafadf', deviceType)
-
     const allowedBrandsCTG1 = new Set([
       'Apple',
       'OnePlus',
@@ -487,7 +484,6 @@ const searchDeviceAPI = async (val) => {
       `https://alpha.imeicheck.com/api/modelBrandName?imei=${val}&format=json`,
     )
     .then((response) => {
-      console.log(response)
       brand = response?.data?.object?.brand
       model = response?.data?.object?.name
     })
@@ -688,7 +684,6 @@ const SelectDeviceType = () => {
           ...item,
           imgSrc: ImgSelectore(item),
         }))
-        console.log(updatedData)
         setTopmodels(updatedData)
       } catch (err) {
         console.error(err)
@@ -699,10 +694,8 @@ const SelectDeviceType = () => {
 
   const handlepick = (e) => {
     if (e.target.value === 'Custom') {
-      console.log('customr daba h ')
       setshowFromdate(true)
     } else {
-      console.log('days', e.target.value)
       setDays(e.target.value)
       setshowFromdate(false)
       // Clear custom dates when selecting predefined filter
