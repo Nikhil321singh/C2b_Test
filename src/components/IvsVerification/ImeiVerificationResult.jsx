@@ -146,7 +146,6 @@ const ImeiVerificationResult = ({
             )}
 
             <div className='flex items-center justify-between text-xs text-gray-500'>
-              <span>Ref: {result.referenceId}</span>
               <span>{new Date(result.verifiedAt).toLocaleString()}</span>
             </div>
           </div>
@@ -161,22 +160,12 @@ const ImeiVerificationResult = ({
             {result.message}
           </div>
 
-          {isBlocked && (
-            <div className='mt-3 p-3 rounded-lg bg-red-50 border border-red-300 text-red-800 text-sm'>
-              This transaction cannot proceed. The device IMEI is reported as{' '}
-              {result.imei1Status === IVS_STATUS.BLOCKED
-                ? 'blocked'
-                : 'stolen'}
-              .
-              {result.imei1Status === IVS_STATUS.STOLEN && (
-                <p className='mt-2 text-xs'>
-                  Please advise the customer to report this to the nearest
-                  police station and file a complaint on the Sanchar Saathi
-                  portal (sancharsaathi.gov.in).
-                </p>
-              )}
-            </div>
-          )}
+          <div className='mt-2 flex items-center gap-1 text-sm text-gray-700'>
+            <span className='text-red-500 font-bold'>*</span>
+            <span>Convenience fee for device verification is Rs10</span>
+          </div>
+
+          
 
           {needsSupervisorOverride && !overrideMode && (
             <div className='mt-4'>
