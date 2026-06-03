@@ -10,6 +10,7 @@ const Scanner = (props) => {
   const [status, setStatus] = useState("steady");
   const [error, setError] = useState(null);
   const isAndroid = Capacitor.getPlatform() === 'android';
+  const isNative = Capacitor.isNativePlatform();
 
   const checkAndRequestPermissions = async () => {
     try {
@@ -30,7 +31,7 @@ const Scanner = (props) => {
 
   const initializeScanner = async () => {
     try {
-      if (isAndroid) {
+      if (isNative) {
         const hasPermission = await checkAndRequestPermissions();
         if (!hasPermission){
             return;

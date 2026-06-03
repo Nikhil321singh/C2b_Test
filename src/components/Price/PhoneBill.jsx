@@ -34,6 +34,8 @@ const PhoneBill = ({
           </p>
           <input
             type='file'
+            accept='image/*'
+            capture='environment'
             onChange={(e) =>
               handleChange(setPhoneBill, e, 'phoneBill', 'phoneBill')
             }
