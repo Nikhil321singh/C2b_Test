@@ -62,8 +62,8 @@ const Price = () => {
     phoneBottom &&
     signatureFile &&
     customerPhoto &&
-    ceirImage &&
-    isAadharVerified &&
+    ceirImage
+    && isAadharVerified &&
     imeiVerified &&
     !isImeiBlocked
 
