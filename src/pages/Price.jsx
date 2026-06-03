@@ -62,10 +62,10 @@ const Price = () => {
     phoneBottom &&
     signatureFile &&
     customerPhoto &&
-    ceirImage &&
-    isAadharVerified &&
-    imeiVerified &&
-    !isImeiBlocked
+    ceirImage
+    // && isAadharVerified &&
+    // imeiVerified &&
+    // !isImeiBlocked
 
   const handleImeiVerificationComplete = (result) => {
     setImeiVerificationResult(result)
@@ -98,7 +98,7 @@ const Price = () => {
         </div>
       </div>
       <div className='flex-shrink-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2'>
-        {!isAadharVerified && (
+        {/* {!isAadharVerified && (
           <p className='text-sm text-center text-red-500'>
             Please verify your Aadhar number before submitting
           </p>
@@ -116,7 +116,7 @@ const Price = () => {
           <p className='text-sm text-center text-amber-500'>
             Please verify IMEI with Sanchar Saathi before submitting
           </p>
-        )}
+        )} */}
         <div
           onClick={() => canSubmit && uploadAllImages(navigate)}
           className={`relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
