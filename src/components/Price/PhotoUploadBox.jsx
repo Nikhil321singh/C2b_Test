@@ -20,8 +20,6 @@ const PhotoUploadBox = ({
       <input
         onChange={(e) => handleChange(setMethod, e, fileName, fileKey)}
         type='file'
-        accept='image/*'
-        capture='environment'
         style={{ display: 'none' }}
         ref={fileRef}
       />

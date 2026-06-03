@@ -246,7 +246,6 @@ const CustomerPhotoField = ({
         <input
           type='file'
           accept={INPUT_ACCEPT}
-          capture='environment'
           onChange={onFileSelect}
           style={{ display: 'none' }}
           ref={fileInputRef}

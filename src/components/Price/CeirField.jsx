@@ -28,8 +28,6 @@ const CeirField = ({
           <p className='font-semibold text-center'>CEIR Image</p>
           <input
             type='file'
-            accept='image/*'
-            capture='environment'
             onChange={(e) =>
               handleChange(setCeirImage, e, 'ceir', 'ceir')
             }

@@ -31,8 +31,6 @@ const AdharField = ({
           <p className='font-semibold text-center'>Adhaar(Front)</p>
           <input
             type='file'
-            accept='image/*'
-            capture='environment'
             onChange={(e) =>
               handleChange(setFile, e, 'adhaarFront', 'adhaarFront')
             }
@@ -60,8 +58,6 @@ const AdharField = ({
           <p className='font-semibold text-center'>Adhaar(Back)</p>
           <input
             type='file'
-            accept='image/*'
-            capture='environment'
             onChange={(e) =>
               handleChange(setIdProofBack, e, 'adhaarBack', 'adhaarBack')
             }

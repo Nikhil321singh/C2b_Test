@@ -6,19 +6,7 @@
     "androidScheme": "https"
   },
   "ios": {
-    "contentInset": "never",
-    "infoPlist": {
-      "NSCameraUsageDescription": "Camera access is needed to scan IMEI barcodes and capture device photos for trade-in evaluation."
-    }
-  },
-  "android": {
-    "overrideUserAgent": "Grest Android"
-  },
-  "plugins": {
-    "Camera": {
-      "permissions": {
-        "camera": "Camera access is needed to scan IMEI barcodes and capture device photos for trade-in evaluation."
-      }
-    }
+    "contentInset": "never"
   }
+
 }
