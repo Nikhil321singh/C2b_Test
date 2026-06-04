@@ -34,7 +34,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice,  conversionFe
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1">
                 
-                <p>Conversion Fee</p>
+                <p>Authentication Fee</p>
               </div>
               <p className="text-red-500">-₹{conversionFee}</p>
             </div>
