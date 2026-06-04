@@ -358,7 +358,7 @@ const SubSpecialOffers = ({
           <div className="flex flex-col">
             <p className="text-xl">₹{Math.round(Number(phonePrice)) - Number(responseData.conversionFee)}</p>
             <div className="flex items-center gap-1 text-xs text-gray-500">
-              <span>Conversion Fee: -₹{responseData.conversionFee}</span>
+              <span>Authentication Fee: -₹{responseData.conversionFee}</span>
             </div>
           </div>
           <p
