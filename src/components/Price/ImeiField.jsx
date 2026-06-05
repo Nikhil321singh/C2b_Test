@@ -12,6 +12,8 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVer
   const [deviceModelInput, setDeviceModelInput] = useState('')
   const pink = 'bg-primary'
 
+  const isMobile = prod?.[0]?.categoryCode === 'CTG1'
+
   const storeId = JSON.parse(sessionStorage.getItem('profile'))?.storeId || ''
   const agentId = sessionStorage.getItem('userId') || ''
   const leadId = sessionStorage.getItem('LeadId') || ''
@@ -135,7 +137,7 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVer
         </div>
       </div>
 
-      {canVerify && (
+      {isMobile && canVerify && (
         <div className='ml-[19px]'>
           <ImeiVerificationResult
             imei1={imeinumber}
