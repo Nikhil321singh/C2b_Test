@@ -67,7 +67,7 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVer
               type='text'
               className='w-auto outline-none'
               value={imeinumber}
-              placeholder='IMEI 1 (15 digits)'
+              placeholder='IMEI No./serial no.'
               onChange={(e) => handleChange(e, setImeiNumber, setError)}
               maxLength={15}
             />
@@ -82,12 +82,12 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVer
         {error && <p className='text-primary mt-2 text-sm'>{error}</p>}
       </div>
 
-      {imei2 !== undefined && (
+      {isMobile && imei2 !== undefined && (
         <div className='flex flex-col eminumber mt-[4px]'>
           <div className='flex gap-1 two'>
             <p className='text-base font-medium'>1b.</p>
             <p className='text-base font-medium three'>
-              IMEI 2 (for dual-SIM devices)
+               Enter your IMEI 2 (for dual-SIM devices)
               <span className='text-gray-400 text-sm ml-1'>(optional)</span>
             </p>
           </div>
@@ -114,28 +114,30 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVer
         </div>
       )}
 
-      <div className='flex flex-col eminumber mt-[4px]'>
-        <div className='flex gap-1 two'>
-          <p className='text-base font-medium'>1c.</p>
-          <p className='text-base font-medium three'>
-            Device Model Name
-            <span className='text-gray-400 text-sm ml-1'>(optional)</span>
-          </p>
-        </div>
+      {isMobile && (
+        <div className='flex flex-col eminumber mt-[4px]'>
+          <div className='flex gap-1 two'>
+            <p className='text-base font-medium'>1c.</p>
+            <p className='text-base font-medium three'>
+              Device Model Name
+              <span className='text-gray-400 text-sm ml-1'>(optional)</span>
+            </p>
+          </div>
 
-        <div className='flex items-center gap-4 mt-2 ml-[19px]'>
-          <div className='flex items-center p-2 border-2 border-gray-300 rounded'>
-            <input
-              type='text'
-              className='w-auto outline-none'
-              value={deviceModelInput}
-              placeholder='e.g. iPhone 14, '
-              onChange={(e) => setDeviceModelInput(e.target.value)}
-              maxLength={200}
-            />
+          <div className='flex items-center gap-4 mt-2 ml-[19px]'>
+            <div className='flex items-center p-2 border-2 border-gray-300 rounded'>
+              <input
+                type='text'
+                className='w-auto outline-none'
+                value={deviceModelInput}
+                placeholder='e.g. iPhone 14, '
+                onChange={(e) => setDeviceModelInput(e.target.value)}
+                maxLength={200}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {isMobile && canVerify && (
         <div className='ml-[19px]'>
