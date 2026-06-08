@@ -228,7 +228,8 @@ const SpecialOffers = () => {
     const formData = new FormData();
     formData.append("id", LeadId);
     formData.append("bonusPrice", responseData.bonus);
-    formData.append("sellingPrice", Math.round(responseData.price) - Number(responseData.conversionFee));
+    const deviceType = sessionStorage.getItem("DeviceType");
+    formData.append("sellingPrice", Math.round(responseData.price) - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0));
     axios
       .post(
         `${
@@ -356,10 +357,12 @@ const SubSpecialOffers = ({
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div className="flex justify-between text-lg font-medium">
           <div className="flex flex-col">
-            <p className="text-xl">₹{Math.round(Number(phonePrice)) - Number(responseData.conversionFee)}</p>
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <span>Authentication Fee: -₹{responseData.conversionFee}</span>
-            </div>
+            <p className="text-xl">₹{Math.round(Number(phonePrice)) - (Device === 'CTG1' ? Number(responseData.conversionFee) : 0)}</p>
+            {Device === 'CTG1' && (
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <span>Authentication Fee: -₹{responseData.conversionFee}</span>
+              </div>
+            )}
           </div>
           <p
             onClick={handleViewSummary}
@@ -388,7 +391,7 @@ const SubSpecialOffers = ({
         onClose={handleCloseModal}
         bonus={extraBonus}
         grestLogo={GREST_LOGO}
-        conversionFee={responseData.conversionFee}
+        conversionFee={Device === 'CTG1' ? responseData.conversionFee : 0}
       />
     </div>
   );
