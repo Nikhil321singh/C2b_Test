@@ -78,7 +78,7 @@ const StoreWiseTable = ({ currentPage, tableData }) => {
                     {data.actualPrice}
                   </td>
                   <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                    {data.price}
+                    {data.finalPrice ?? data.price}
                   </td>
                   <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                     {data.uniqueCode}

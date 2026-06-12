@@ -82,7 +82,7 @@ const formatDownloadData = (apiData) =>
       'Product Name': ele?.lead?.model?.name,
       Variant: ele?.lead?.storage,
       Price: ele?.lead?.actualPrice,
-      'Final Price Offered to Customer': ele?.lead?.price,
+      'Final Price Offered to Customer': ele?.lead?.finalPrice,
       'Unique Id': ele?.lead?.uniqueCode,
       'Customer Name': ele?.lead?.name,
       'Phone Number': ele?.lead?.phoneNumber,
