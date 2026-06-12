@@ -153,18 +153,33 @@ const SpecialOffers = () => {
   const [isSelected, setIsSelected] = useState(null);
   const [extraBonus, setExtraBonus] = useState(0);
   const [disableBtn, setDisableBtn] = useState(initialDisableBtn);
-  const [phonePrice, setPhonePrice] = useState(Price + responseData.bonus);
   const dispatch = useDispatch(false);
   const { setAnswers } = useQuestionContext();
   const leadId = sessionStorage.getItem("LeadId");
   const navigate = useNavigate();
 
+  const slabBonusAmount = Number(responseData.slabBonusAmount) || 0;
+  const negotiatedAmount = Number(responseData.bonus) || 0;
+  const slabApplied = responseData.slabApplied || '';
+  const exactValue = responseData.exactValue || Number(Price);
+  const dynamicPricingEnabled = responseData.dynamicPricingEnabled || false;
+  const bonusMode = responseData.mode || 'bonus';
+  const couponCode = responseData.couponCode || '';
+
+  const calcQuotedPrice = () => {
+    const couponVal = isSelected ? (isSelected === "GRU250" ? 250 : isSelected === "GRU500" ? 500 : Number(isSelected)) : 0;
+    return Math.round(Math.max(0, exactValue - slabBonusAmount + negotiatedAmount + couponVal));
+  };
+
+  const phonePrice = calcQuotedPrice();
+
   useEffect(() => {
     dispatch(setOtpVerified(false));
   }, []);
+
   const handleViewSummary = () => {
-    const bonus = Number(phonePrice) - Number(Price);
-    setExtraBonus(bonus);
+    const extraAmt = Math.max(0, Number(phonePrice) - Number(Price));
+    setExtraBonus(extraAmt);
     setShowModal(true);
   };
   const handleCloseModal = () => {
@@ -200,10 +215,10 @@ const SpecialOffers = () => {
         { headers: { authorization: userToken, "X-Skip-Interceptor": "true" } }
       )
       .then((res) => {
-        const newPrice = res.data.data.price + discountAvailable;
-        console.log("dasd", res.data.data);
-        localStorage.setItem("ItemPrice", newPrice);
-        setPhonePrice(newPrice);
+        if (!dynamicPricingEnabled) {
+          const newPrice = res.data.data.price + discountAvailable;
+          localStorage.setItem("ItemPrice", newPrice);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -227,9 +242,20 @@ const SpecialOffers = () => {
     const LeadId = sessionStorage.getItem("LeadId");
     const formData = new FormData();
     formData.append("id", LeadId);
-    formData.append("bonusPrice", responseData.bonus);
     const deviceType = sessionStorage.getItem("DeviceType");
-    formData.append("sellingPrice", Math.round(responseData.price) - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0));
+    if (dynamicPricingEnabled) {
+      const sellingPrice = Number(exactValue) - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0);
+      formData.append("sellingPrice", sellingPrice);
+      formData.append("negotiatedAmount", negotiatedAmount);
+      formData.append("slabBonusAmount", slabBonusAmount);
+      formData.append("slabApplied", slabApplied);
+      formData.append("exactValue", exactValue);
+      const couponVal = isSelected ? (isSelected === "GRU250" ? 250 : isSelected === "GRU500" ? 500 : Number(isSelected)) : 0;
+      formData.append("couponDiscount", couponVal);
+    } else {
+      formData.append("sellingPrice", Math.round(responseData.price) - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0));
+      formData.append("negotiatedAmount", negotiatedAmount);
+    }
     axios
       .post(
         `${
@@ -288,6 +314,13 @@ const SpecialOffers = () => {
         showModal={showModal}
         handleCloseModal={handleCloseModal}
         extraBonus={extraBonus}
+        slabBonusAmount={slabBonusAmount}
+        negotiatedAmount={negotiatedAmount}
+        slabApplied={slabApplied}
+        exactValue={exactValue}
+        dynamicPricingEnabled={dynamicPricingEnabled}
+        bonusMode={bonusMode}
+        couponCode={couponCode}
       />
     </div>
   );
@@ -305,6 +338,13 @@ const SubSpecialOffers = ({
   showModal,
   handleCloseModal,
   extraBonus,
+  slabBonusAmount,
+  negotiatedAmount,
+  slabApplied,
+  exactValue,
+  dynamicPricingEnabled,
+  bonusMode,
+  couponCode,
 }) => {
   const navigate = useNavigate();
   const responseData = useSelector((state) => state.responseData);
@@ -390,8 +430,14 @@ const SubSpecialOffers = ({
         sellingPrice={phonePrice}
         onClose={handleCloseModal}
         bonus={extraBonus}
-        grestLogo={GREST_LOGO}
         conversionFee={Device === 'CTG1' ? responseData.conversionFee : 0}
+        dynamicPricingEnabled={dynamicPricingEnabled}
+        exactValue={exactValue}
+        slabBonusAmount={slabBonusAmount}
+        negotiatedAmount={negotiatedAmount}
+        couponDiscount={isSelected ? (isSelected === "GRU250" ? 250 : isSelected === "GRU500" ? 500 : Number(isSelected)) : 0}
+        bonusMode={bonusMode}
+        couponCode={couponCode}
       />
     </div>
   );

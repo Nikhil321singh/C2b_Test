@@ -110,7 +110,7 @@ const TableRow = ({
       {val?.actualPrice}
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-      {val?.price}
+      {val?.finalPrice}
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
       {userRole === 'Company Admin' ? (

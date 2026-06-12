@@ -3,12 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IoMdAdd, IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
-import { FaDownload } from 'react-icons/fa6'
+import { FaDownload, FaToggleOn, FaToggleOff } from 'react-icons/fa6'
 import styles from './CompanyListingDetails.module.css'
 import NoDataMessage from '../../components/NoDataMessage'
 import CompanyTable from './CompanyTable'
 import CompanyListingModals from './CompanyListingModals'
 import { handleDownload } from './excelUtils'
+import { toast } from 'react-hot-toast'
 
 const pageLimit = 10
 
@@ -24,6 +25,7 @@ const CompanyListingDetails = () => {
 
   const [searchValue, setSearchValue] = useState('')
   const [categories, setCategories] = useState([])
+  const [pricingFilter, setPricingFilter] = useState('all')
 
   const [selectedCompany, setSelectedCompany] = useState()
   const [companyEditData, setCompanyEditData] = useState()
@@ -38,6 +40,32 @@ const CompanyListingDetails = () => {
   const [uploadPriceModalOpen, setUploadPriceModalOpen] = useState(false)
   const [selectedCompanyForPricing, setSelectedCompanyForPricing] =
     useState(null)
+
+  const [selectedIds, setSelectedIds] = useState([])
+  const [isBulkLoading, setIsBulkLoading] = useState(false)
+  const [pricingStatusMap, setPricingStatusMap] = useState({})
+
+  const fetchPricingStatuses = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/dynamic-pricing/all?limit=500`,
+        { headers: { Authorization: token } }
+      )
+      const configs = res.data.data || []
+      const map = {}
+      configs.forEach(c => {
+        const companyId = c.companyId?._id || c.companyId
+        if (c.isEnabled) {
+          map[companyId] = c.slabs?.length ? 'ON' : 'Config Pending'
+        } else {
+          map[companyId] = 'OFF'
+        }
+      })
+      setPricingStatusMap(map)
+    } catch (err) {
+      console.error('Failed to fetch pricing statuses', err)
+    }
+  }
 
   const fetchTableData = () => {
     setIsTableLoading(true)
@@ -72,6 +100,7 @@ const CompanyListingDetails = () => {
       } else {
         getDataBySearch()
       }
+      fetchPricingStatuses()
       setEditSuccess(false)
       setEditBoxOpen(false)
     }
@@ -102,12 +131,64 @@ const CompanyListingDetails = () => {
   }, [currentPage])
 
   useEffect(() => {
+    fetchPricingStatuses()
+  }, [])
+
+  useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/category/getAll`, {
         headers: { Authorization: token },
       })
       .then((res) => setCategories(res.data.data))
   }, [])
+
+  const handleBulkToggle = async (isEnabled) => {
+    if (selectedIds.length === 0) return
+    const filteredIds = selectedIds.filter(id => {
+      const status = pricingStatusMap[id]
+      return isEnabled ? status !== 'ON' : status !== 'OFF'
+    })
+    if (filteredIds.length === 0) {
+      toast.error(isEnabled ? 'All selected companies already have Dynamic Pricing enabled' : 'All selected companies already have Dynamic Pricing disabled')
+      return
+    }
+    setIsBulkLoading(true)
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/dynamic-pricing/bulk-toggle`,
+        { companyIds: filteredIds, isEnabled },
+        { headers: { Authorization: token } }
+      )
+      toast.success(res.data.message)
+      setSelectedIds([])
+      fetchTableData()
+      fetchPricingStatuses()
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Bulk operation failed')
+    } finally {
+      setIsBulkLoading(false)
+    }
+  }
+
+  const handleExportConfig = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/dynamic-pricing/export`,
+        { headers: { Authorization: token }, responseType: 'blob' }
+      )
+      const url = window.URL.createObjectURL(new Blob([res.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'dynamic_pricing_config.xlsx')
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+      toast.success('Pricing configuration exported successfully')
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Export failed')
+    }
+  }
 
   return (
     <div>
@@ -139,7 +220,7 @@ const CompanyListingDetails = () => {
         categories={categories}
       />
 
-      <div className='flex gap-2 justify-center mt-5'>
+      <div className='flex gap-2 justify-center mt-5 flex-wrap'>
         <button
           className={styles.bulkdown_button}
           onClick={() => navigate('/companylisting')}
@@ -156,9 +237,28 @@ const CompanyListingDetails = () => {
           <IoMdSearch size={25} onClick={getDataBySearch} />
         </div>
 
+        <select
+          className='border-2 px-2 py-1 rounded-lg outline-none bg-white'
+          value={pricingFilter}
+          onChange={(e) => setPricingFilter(e.target.value)}
+        >
+          <option value="all">All</option>
+          <option value="ON">Dynamic Pricing: ON</option>
+          <option value="OFF">Dynamic Pricing: OFF</option>
+          <option value="Config Pending">Config Pending</option>
+        </select>
+
         <div className={styles.icons_box}>
-          <IoRefresh onClick={fetchTableData} className='' size={25} />
+          <IoRefresh onClick={() => { fetchTableData(); fetchPricingStatuses() }} className='' size={25} />
         </div>
+
+        <button
+          className={styles.bulkdown_button}
+          onClick={handleExportConfig}
+        >
+          <FaDownload /> Export Pricing Config
+        </button>
+
         <button
           className={styles.bulkdown_button}
           onClick={() => handleDownload(totalCount)}
@@ -167,17 +267,57 @@ const CompanyListingDetails = () => {
         </button>
       </div>
 
+      {selectedIds.length > 0 && (
+        <div className='flex gap-2 justify-center mt-2 flex-wrap'>
+          <button
+            onClick={() => handleBulkToggle(true)}
+            disabled={isBulkLoading}
+            className='bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 flex items-center gap-1'
+          >
+            <FaToggleOn size={16} /> Enable Dynamic Pricing
+          </button>
+          <button
+            onClick={() => handleBulkToggle(false)}
+            disabled={isBulkLoading}
+            className='bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 flex items-center gap-1'
+          >
+            <FaToggleOff size={16} /> Disable Dynamic Pricing
+          </button>
+          <button
+            onClick={() => setSelectedIds([])}
+            disabled={isBulkLoading}
+            className='bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-600 disabled:opacity-50'
+          >
+            Clear Selection
+          </button>
+        </div>
+      )}
+
       {tableData?.length ? (
-        <CompanyTable
-          tableData={tableData}
-          editHandler={editHandler}
-          deleteConfHandler={deleteConfHandler}
-          openViewDocsModal={openViewDocsModal}
-          openUploadPriceModal={openUploadPriceModal}
-          setCurrentPage={setCurrentPage}
-          currentPage={currentPage}
-          maxPages={maxPages}
-        />
+        (() => {
+          const enriched = tableData.map(d => ({
+            ...d,
+            dynamicPricingStatus: pricingStatusMap[d._id] || 'OFF'
+          }))
+          const filtered = pricingFilter === 'all'
+            ? enriched
+            : enriched.filter(d => d.dynamicPricingStatus === pricingFilter)
+          return (
+            <CompanyTable
+              tableData={filtered}
+              editHandler={editHandler}
+              deleteConfHandler={deleteConfHandler}
+              openViewDocsModal={openViewDocsModal}
+              openUploadPriceModal={openUploadPriceModal}
+              setCurrentPage={setCurrentPage}
+              currentPage={currentPage}
+              maxPages={maxPages}
+              selectedIds={selectedIds}
+              onSelectId={(id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id])}
+              onSelectAll={(ids) => setSelectedIds(ids)}
+            />
+          )
+        })()
       ) : (
         <NoDataMessage />
       )}
