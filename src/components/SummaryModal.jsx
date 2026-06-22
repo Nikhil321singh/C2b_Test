@@ -42,7 +42,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee
             )}
             {dynamicPricingEnabled && isSlabApplied && Number(slabBonusAmount) > 0 && (
               <div className="flex justify-between">
-                <span>Slab Bonus</span>
+                <span>Slab Amount</span>
                 <span className="text-green-600">+₹{Number(slabBonusAmount).toLocaleString('en-IN')}</span>
               </div>
             )}

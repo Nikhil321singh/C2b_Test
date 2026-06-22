@@ -114,7 +114,7 @@ const useCouponHandlers = (setMode, setIsCouponApplied, setBonus, setSelectedCou
 
   const handleApplyCoupon = (selectedCoupon) => {
     if (isSlabApplied) {
-      toast.error('Please remove slab bonus first to apply a coupon')
+      toast.error('Please remove slab amount first to apply a coupon')
       return
     }
     if (!selectedCoupon) {
@@ -127,7 +127,7 @@ const useCouponHandlers = (setMode, setIsCouponApplied, setBonus, setSelectedCou
 
   const handleCouponSelect = (coupon) => {
     if (isSlabApplied) {
-      toast.error('Please remove slab bonus first to apply a coupon')
+      toast.error('Please remove slab amount first to apply a coupon')
       return
     }
     setSelectedCoupon(coupon)
@@ -241,7 +241,7 @@ const DeviceQuote = () => {
   const handleSlabToggle = (value) => {
     if (value) {
       if (isCouponApplied) {
-        toast.error('Please remove coupon first to apply slab bonus')
+        toast.error('Please remove coupon first to apply slab amount')
         return
       }
       setMode('bonus')
@@ -513,7 +513,7 @@ const QuoteCard = ({
               <span>₹{Math.round(displayPrice).toLocaleString('en-IN')}</span>
             </p>
             <p className='flex justify-between gap-4 text-green-600 text-sm'>
-              <span className='text-gray-700 font-normal'>Slab Bonus</span>
+              <span className='text-gray-700 font-normal'>Slab Amount</span>
               <span>+ ₹{Number(slabBonusAmount).toLocaleString('en-IN')}</span>
             </p>
             <div className='border-t border-gray-400 my-0.5'></div>
@@ -692,7 +692,7 @@ const SlabBonusCard = ({ slabBonusAmount, slabApplied, isSlabApplied, setIsSlabA
         : 'bg-gray-100 border border-gray-300'
     }`}>
       <p className={`text-sm font-medium ${isSlabApplied ? 'text-green-800' : 'text-gray-800'}`}>
-        Slab Bonus (₹{slabBonusAmount})
+        Slab Amount (₹{slabBonusAmount})
       </p>
       {isSlabApplied ? (
         <button
