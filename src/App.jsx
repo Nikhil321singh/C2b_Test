@@ -39,6 +39,7 @@ import StoreListing from './pages/StoreListing/StoreListing'
 import CompanyListing from './pages/CompanyListing/CompanyListing'
 import DynamicPricingDashboard from './pages/DynamicPricingDashboard'
 import DynamicPricingDetails from './pages/DynamicPricingDetails'
+import ErrorBoundary from './components/ErrorBoundary'
 import OutStandingDevices from './pages/OutStandingDevices/OutStandingDevices'
 import Offers from './pages/Offers/Offers'
 import ViewOfferDetail from './pages/ViewOfferDetail/ViewOfferDetail'
@@ -202,11 +203,11 @@ function App() {
                 ></Route>
                 <Route
                   path='/dynamic-pricing'
-                  element={<DynamicPricingDashboard />}
+                  element={<ErrorBoundary><DynamicPricingDashboard /></ErrorBoundary>}
                 ></Route>
                 <Route
                   path='/dynamic-pricing-details'
-                  element={<DynamicPricingDetails />}
+                  element={<ErrorBoundary><DynamicPricingDetails /></ErrorBoundary>}
                 ></Route>
                 <Route
                   path='/quotescreated'

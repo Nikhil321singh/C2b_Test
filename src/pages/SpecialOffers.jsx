@@ -163,22 +163,35 @@ const SpecialOffers = () => {
   const slabApplied = responseData.slabApplied || '';
   const exactValue = responseData.exactValue || Number(Price);
   const dynamicPricingEnabled = responseData.dynamicPricingEnabled || false;
+  const isSlabApplied = responseData.isSlabApplied;
   const bonusMode = responseData.mode || 'bonus';
   const couponCode = responseData.couponCode || '';
 
-  const calcQuotedPrice = () => {
+  // Same calculation as DeviceQuote displayPrice (top card)
+  const basePrice = dynamicPricingEnabled
+    ? Math.round(Math.max(0, Number(exactValue) - Number(slabBonusAmount)))
+    : Number(Price);
+
+  // Same calculation as DeviceQuote quotedPrice (bottom bar)
+  const quotedPrice = dynamicPricingEnabled
+    ? Math.round(Number(exactValue) - (isSlabApplied ? 0 : Number(slabBonusAmount)) + Number(negotiatedAmount))
+    : Math.round(Number(Price) + Number(negotiatedAmount));
+
+  // Total = quotedPrice from DeviceQuote + any new coupon selected here
+  const calcTotalPrice = () => {
     const couponVal = isSelected ? (isSelected === "GRU250" ? 250 : isSelected === "GRU500" ? 500 : Number(isSelected)) : 0;
-    return Math.round(Math.max(0, exactValue - slabBonusAmount + negotiatedAmount + couponVal));
+    return Math.round(Math.max(0, quotedPrice + couponVal));
   };
 
-  const phonePrice = calcQuotedPrice();
+  const totalPrice = calcTotalPrice();
 
   useEffect(() => {
     dispatch(setOtpVerified(false));
   }, []);
 
+
   const handleViewSummary = () => {
-    const extraAmt = Math.max(0, Number(phonePrice) - Number(Price));
+    const extraAmt = Math.max(0, Number(totalPrice) - Number(Price));
     setExtraBonus(extraAmt);
     setShowModal(true);
   };
@@ -219,6 +232,10 @@ const SpecialOffers = () => {
           const newPrice = res.data.data.price + discountAvailable;
           localStorage.setItem("ItemPrice", newPrice);
         }
+        if (!dynamicPricingEnabled) {
+          const newPrice = res.data.data.price + discountAvailable;
+          localStorage.setItem("ItemPrice", newPrice);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -246,6 +263,7 @@ const SpecialOffers = () => {
     if (dynamicPricingEnabled) {
       const sellingPrice = Number(exactValue) - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0);
       formData.append("sellingPrice", sellingPrice);
+      formData.append("bonusPrice", 0);
       formData.append("negotiatedAmount", negotiatedAmount);
       formData.append("slabBonusAmount", slabBonusAmount);
       formData.append("slabApplied", slabApplied);
@@ -254,7 +272,8 @@ const SpecialOffers = () => {
       formData.append("couponDiscount", couponVal);
     } else {
       formData.append("sellingPrice", Math.round(responseData.price) - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0));
-      formData.append("negotiatedAmount", negotiatedAmount);
+      formData.append("bonusPrice", negotiatedAmount);
+      formData.append("negotiatedAmount", 0);
     }
     axios
       .post(
@@ -303,7 +322,8 @@ const SpecialOffers = () => {
     <div className="min-h-screen mb-10 overflow-y-auto bg-white">
       <SubSpecialOffers
         navigate={navigate}
-        phonePrice={phonePrice}
+        totalPrice={totalPrice}
+        basePrice={basePrice}
         Price={Price}
         hanldePermanenet={hanldePermanenet}
         isSelected={isSelected}
@@ -319,6 +339,7 @@ const SpecialOffers = () => {
         slabApplied={slabApplied}
         exactValue={exactValue}
         dynamicPricingEnabled={dynamicPricingEnabled}
+        isSlabApplied={isSlabApplied}
         bonusMode={bonusMode}
         couponCode={couponCode}
       />
@@ -327,7 +348,8 @@ const SpecialOffers = () => {
 };
 
 const SubSpecialOffers = ({
-  phonePrice,
+  totalPrice,
+  basePrice,
   Price,
   hanldePermanenet,
   isSelected,
@@ -343,6 +365,7 @@ const SubSpecialOffers = ({
   slabApplied,
   exactValue,
   dynamicPricingEnabled,
+  isSlabApplied,
   bonusMode,
   couponCode,
 }) => {
@@ -388,7 +411,7 @@ const SubSpecialOffers = ({
         <DevicePriceCards
           phonePhoto={phoneFrontPhoto ? phoneFrontPhoto : DummyImg}
           model={dataModelInfo?.models?.name}
-          price={phonePrice}
+          price={totalPrice}
           ram={dataModelInfo?.models?.config?.RAM}
           storage={dataModelInfo?.models?.config?.storage}
           type={dataModelInfo?.models?.type}
@@ -397,7 +420,7 @@ const SubSpecialOffers = ({
       <div className="fixed bottom-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2 ">
         <div className="flex justify-between text-lg font-medium">
           <div className="flex flex-col">
-            <p className="text-xl">₹{Math.round(Number(phonePrice)) - (Device === 'CTG1' ? Number(responseData.conversionFee) : 0)}</p>
+            <p className="text-xl">₹{Math.round(Number(totalPrice)) - (Device === 'CTG1' ? Number(responseData.conversionFee) : 0)}</p>
             {Device === 'CTG1' && (
               <div className="flex items-center gap-1 text-xs text-gray-500">
                 <span>Authentication Fee: -₹{responseData.conversionFee}</span>
@@ -427,7 +450,7 @@ const SubSpecialOffers = ({
       <SummaryModal
         show={showModal}
         price={Price}
-        sellingPrice={phonePrice}
+        sellingPrice={totalPrice}
         onClose={handleCloseModal}
         bonus={extraBonus}
         conversionFee={Device === 'CTG1' ? responseData.conversionFee : 0}
@@ -438,6 +461,7 @@ const SubSpecialOffers = ({
         couponDiscount={isSelected ? (isSelected === "GRU250" ? 250 : isSelected === "GRU500" ? 500 : Number(isSelected)) : 0}
         bonusMode={bonusMode}
         couponCode={couponCode}
+        isSlabApplied={isSlabApplied}
       />
     </div>
   );

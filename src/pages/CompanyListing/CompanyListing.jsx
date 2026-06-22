@@ -64,7 +64,7 @@ const uploadDocumentsToS3 = async (attachedFiles, userToken) => {
 };
 
 const FormInput = ({ label, value, onChange, required = false }) => (
-  <div className="flex flex-col w-[70%] gap-2">
+   <div className="flex flex-col w-[70%] gap-2">
     <span className="font-medium text-xl">
       {label}
       {required && "*"}
@@ -106,8 +106,8 @@ const CompanyListing = () => {
     { minValue: 20000, maxValue: 34999, bonusAmount: 8000 },
     { minValue: 35000, maxValue: 999999, bonusAmount: 10000 },
   ]);
-  const [effectiveFrom, setEffectiveFrom] = useState("");
-  const [pricingNotes, setPricingNotes] = useState("");
+  const [effectiveFrom, setEffectiveFrom] = useState('');
+  const [pricingNotes, setPricingNotes] = useState('');
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [generatedCompanyCode, setGeneratedCompanyCode] = useState("");
@@ -128,45 +128,40 @@ const CompanyListing = () => {
   };
 
   const removeSlab = (index) => {
+    if (slabs.length <= 1) return;
     setSlabs(slabs.filter((_, i) => i !== index));
   };
 
   const validatePricing = () => {
     if (dynamicPricingEnabled) {
       if (slabs.length === 0) {
-        toast.error("Please add at least one pricing slab before saving.");
+        toast.error('Please add at least one pricing slab before saving.');
         return false;
       }
       for (let i = 0; i < slabs.length; i++) {
         const s = slabs[i];
         if (Number(s.maxValue) <= Number(s.minValue)) {
-          toast.error(
-            "Max Value must be greater than Min Value in every slab row.",
-          );
+          toast.error('Max Value must be greater than Min Value in every slab row.');
           return false;
         }
         if (Number(s.bonusAmount) > Number(s.maxValue)) {
-          toast.error(
-            "Bonus Amount cannot exceed the Exact Value for this slab range.",
-          );
+          toast.error('Bonus Amount cannot exceed the Exact Value for this slab range.');
           return false;
         }
         if (i > 0 && Number(s.minValue) <= Number(slabs[i - 1].maxValue)) {
-          toast.error(
-            "Slab ranges overlap. Please ensure slabs are contiguous with no gaps.",
-          );
+          toast.error('Slab ranges overlap. Please ensure slabs are contiguous with no gaps.');
           return false;
         }
       }
       if (!effectiveFrom) {
-        toast.error("Effective From Date is required");
+        toast.error('Effective From Date is required');
         return false;
       }
       const selectedDate = new Date(effectiveFrom);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       if (selectedDate < today) {
-        toast.error("Effective From Date cannot be set in the past.");
+        toast.error('Effective From Date cannot be set in the past.');
         return false;
       }
     }
@@ -175,6 +170,7 @@ const CompanyListing = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validatePricing()) return;
     if (!validatePricing()) return;
     const userToken = sessionStorage.getItem("authToken");
 
@@ -191,6 +187,9 @@ const CompanyListing = () => {
         gstNumber: gstNumber.toUpperCase(),
         panNumber: panNumber.toUpperCase(),
         remarks: remarks,
+        showPrice: showPrice,
+        maskInfo: maskInfo,
+        emailConfiguration: emailConfiguration,
         showPrice: showPrice,
         maskInfo: maskInfo,
         emailConfiguration: emailConfiguration,
@@ -215,16 +214,15 @@ const CompanyListing = () => {
         {
           companyId,
           isEnabled: dynamicPricingEnabled,
-          slabs: slabs.map((s) => ({
+          slabs: slabs.map(s => ({
             minValue: Number(s.minValue),
             maxValue: Number(s.maxValue),
-            bonusAmount: Number(s.bonusAmount),
+            bonusAmount: Number(s.bonusAmount)
           })),
-          effectiveFrom:
-            effectiveFrom || new Date().toISOString().split("T")[0],
-          notes: pricingNotes,
+          effectiveFrom: effectiveFrom || new Date().toISOString().split('T')[0],
+          notes: pricingNotes
         },
-        { headers: { Authorization: userToken } },
+        { headers: { Authorization: userToken } }
       );
 
       toast.success("Company Added Successfully!");
@@ -261,6 +259,10 @@ const CompanyListing = () => {
     slabs,
     effectiveFrom,
     pricingNotes,
+    dynamicPricingEnabled,
+    slabs,
+    effectiveFrom,
+    pricingNotes,
   };
 
   const setters = {
@@ -273,6 +275,10 @@ const CompanyListing = () => {
     setShowPrice,
     setMaskInfo,
     setEmailConfiguration,
+    setDynamicPricingEnabled,
+    setSlabs,
+    setEffectiveFrom,
+    setPricingNotes,
     setDynamicPricingEnabled,
     setSlabs,
     setEffectiveFrom,
@@ -344,24 +350,24 @@ const AddSlabRow = ({ slab, index, onChange, onRemove }) => (
       <input
         type="number"
         placeholder="Min"
-        className="border-2 px-2 py-2 rounded-lg outline-none w-[100px] text-sm"
+        className="border border-gray-300 px-2 py-1.5 rounded-lg outline-none w-[100px] text-sm focus:border-[var(--primary-color)] transition"
         value={slab.minValue}
-        onChange={(e) => onChange(index, "minValue", e.target.value)}
+        onChange={(e) => onChange(index, 'minValue', e.target.value)}
       />
       <span className="text-gray-400">-</span>
       <input
         type="number"
         placeholder="Max"
-        className="border-2 px-2 py-2 rounded-lg outline-none w-[100px] text-sm"
+        className="border border-gray-300 px-2 py-1.5 rounded-lg outline-none w-[100px] text-sm focus:border-[var(--primary-color)] transition"
         value={slab.maxValue}
-        onChange={(e) => onChange(index, "maxValue", e.target.value)}
+        onChange={(e) => onChange(index, 'maxValue', e.target.value)}
       />
       <input
         type="number"
         placeholder="Bonus"
-        className="border-2 px-2 py-2 rounded-lg outline-none w-[100px] text-sm"
+        className="border border-gray-300 px-2 py-1.5 rounded-lg outline-none w-[100px] text-sm focus:border-[var(--primary-color)] transition"
         value={slab.bonusAmount}
-        onChange={(e) => onChange(index, "bonusAmount", e.target.value)}
+        onChange={(e) => onChange(index, 'bonusAmount', e.target.value)}
       />
       <button
         type="button"
@@ -372,9 +378,7 @@ const AddSlabRow = ({ slab, index, onChange, onRemove }) => (
         &times;
       </button>
     </div>
-    <div className="text-xs text-gray-400 ml-1">
-      Quoted Price = Exact Value - ₹{slab.bonusAmount || 0}
-    </div>
+    <div className="text-xs text-gray-400 ml-1">Quoted Price = Exact Value - ₹{slab.bonusAmount || 0}</div>
   </div>
 );
 
@@ -399,6 +403,10 @@ const CompanyListingForm = ({
     slabs,
     effectiveFrom,
     pricingNotes,
+    dynamicPricingEnabled,
+    slabs,
+    effectiveFrom,
+    pricingNotes,
   } = formData;
 
   const {
@@ -411,6 +419,10 @@ const CompanyListingForm = ({
     setShowPrice,
     setMaskInfo,
     setEmailConfiguration,
+    setDynamicPricingEnabled,
+    setSlabs,
+    setEffectiveFrom,
+    setPricingNotes,
     setDynamicPricingEnabled,
     setSlabs,
     setEffectiveFrom,
@@ -428,6 +440,7 @@ const CompanyListingForm = ({
   };
 
   const removeSlab = (index) => {
+    if (slabs.length <= 1) return;
     setSlabs(slabs.filter((_, i) => i !== index));
   };
 
@@ -473,17 +486,17 @@ const CompanyListingForm = ({
         </select>
       </div>
 
-      <div className="w-[70%]">
+     <div className="w-[70%]">
         <EmailConfiguration
           value={emailConfiguration}
           onChange={setEmailConfiguration}
         />
       </div>
 
-      <div className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Attach Documents</span>
+      <div className="flex flex-col w-[70%] gap-1.5">
+        <span className="font-medium text-sm text-gray-700">Attach Documents</span>
         <input
-          className=" py-2 rounded-lg w-[250px] outline-none"
+          className="py-2 rounded-lg outline-none text-sm"
           onChange={handleFileUpload}
           type="file"
           multiple
@@ -500,23 +513,18 @@ const CompanyListingForm = ({
           ))}
       </div>
 
-      <div className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Dynamic Pricing & Bonus Settings</span>
-        <p className="text-sm text-gray-500 mb-2">
-          Configure bonus amount slabs and pricing rules for this company. When
-          enabled, the system automatically deducts a fixed Bonus Amount from
-          the device Exact Value to calculate the final Quoted Price shown to
-          the customer.
+      <div className="w-[70%] mt-6 p-4 border border-gray-200 rounded-lg">
+
+        <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+          Configure bonus amount slabs and pricing rules for this company. When enabled, the system automatically deducts a fixed Bonus Amount from the device Exact Value to calculate the final Quoted Price shown to the customer.
         </p>
 
-        <div className="flex flex-col gap-2 mb-2">
-          <span className="font-medium text-xl">Enable Dynamic Pricing</span>
+        <div className="flex flex-col gap-1.5 mb-4">
+          <span className="font-medium text-sm text-gray-700">Enable Dynamic Pricing</span>
           <select
-            className="border-2 px-2 py-2 rounded-lg outline-none bg-white w-[120px]"
+            className="border border-gray-300 px-3 py-2 rounded-lg outline-none bg-white focus:border-[var(--primary-color)] transition text-sm w-[120px]"
             value={dynamicPricingEnabled.toString()}
-            onChange={(e) =>
-              setDynamicPricingEnabled(e.target.value === "true")
-            }
+            onChange={(e) => setDynamicPricingEnabled(e.target.value === "true")}
           >
             <option value="true">ON</option>
             <option value="false">OFF</option>
@@ -524,68 +532,64 @@ const CompanyListingForm = ({
         </div>
 
         {dynamicPricingEnabled && (
-          <div className="flex flex-col gap-4 pt-2">
-            <div>
-              <span className="font-medium text-xl">
-                Bonus Amount Slab Table
-              </span>
-            </div>
-            <div className="flex gap-2 text-sm font-medium text-gray-500">
-              <span className="w-[100px]">Min Value (Rs.)</span>
-              <span className="w-[30px]"></span>
-              <span className="w-[100px]">Max Value (Rs.)</span>
-              <span className="w-[100px]">Bonus Amount (Rs.)</span>
-            </div>
-            <div className="flex flex-col gap-3">
-              {slabs.map((slab, index) => (
-                <AddSlabRow
-                  key={index}
-                  slab={slab}
-                  index={index}
-                  onChange={handleSlabChange}
-                  onRemove={removeSlab}
-                />
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={addSlab}
-              className="self-start border-2 border-dashed border-gray-300 px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:border-gray-400 transition"
-            >
-              + Add Slab
-            </button>
+        <div className="flex flex-col gap-4 border-t border-gray-100 pt-4">
+          <div>
+            <span className="font-semibold text-sm text-gray-800">Bonus Amount Slab Table</span>
+          </div>
+          <div className="flex gap-2 text-xs font-medium text-gray-500">
+            <span className="w-[100px]">Min Value (Rs.)</span>
+            <span className="w-[30px]"></span>
+            <span className="w-[100px]">Max Value (Rs.)</span>
+            <span className="w-[100px]">Bonus Amount (Rs.)</span>
+          </div>
+          <div className="flex flex-col gap-3">
+            {slabs.map((slab, index) => (
+              <AddSlabRow
+                key={index}
+                slab={slab}
+                index={index}
+                onChange={handleSlabChange}
+                onRemove={removeSlab}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={addSlab}
+            className="self-start bg-gray-50 border-2 border-dashed border-gray-300 px-4 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:border-gray-400 transition"
+          >
+            + Add Slab
+          </button>
 
-            <div className="grid grid-row-1 md:grid-row-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <span className="font-medium text-xl">Effective From Date</span>
-                <p className="text-sm text-gray-400">
-                  Set when pricing rules take effect. Must be today or future.
-                </p>
-                <input
-                  type="date"
-                  className="border-2 px-2 py-2 rounded-lg outline-none"
-                  value={effectiveFrom}
-                  min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) => setEffectiveFrom(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <span className="font-medium text-xl">Notes / Remarks</span>
-                <textarea
-                  className="border-2 px-2 py-2 rounded-lg outline-none resize-none"
-                  rows={2}
-                  value={pricingNotes}
-                  onChange={(e) => setPricingNotes(e.target.value)}
-                  placeholder="Internal notes for this pricing configuration..."
-                />
-              </div>
+          <div className="grid grid-row-1 md:grid-row-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <span className="font-medium text-sm text-gray-700">Effective From Date</span>
+              <p className="text-xs text-gray-400">Set when pricing rules take effect. Must be today or future.</p>
+              <input
+                type="date"
+                className="border border-gray-300 px-3 py-2 rounded-lg outline-none focus:border-[var(--primary-color)] transition text-sm"
+                value={effectiveFrom}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setEffectiveFrom(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <span className="font-medium text-sm text-gray-700">Notes / Remarks</span>
+              <textarea
+                className="border border-gray-300 px-3 py-2 rounded-lg outline-none focus:border-[var(--primary-color)] transition text-sm resize-none"
+                rows={2}
+                value={pricingNotes}
+                onChange={(e) => setPricingNotes(e.target.value)}
+                placeholder="Internal notes for this pricing configuration..."
+              />
             </div>
           </div>
+          </div>
         )}
-      </div>
+        </div>
 
-      <div className="mt-8">
-         <button className="font-medium text-sm text-white p-3 rounded bg-primary">
+        <div className="mt-8">
+        <button className="font-medium text-sm text-white p-3 rounded bg-primary">
           Submit Form
         </button>
       </div>

@@ -76,6 +76,7 @@ const DynamicPricingDashboard = () => {
   }
 
   const removeSlab = (index) => {
+    if (formData.slabs.length <= 1) return
     setFormData((prev) => ({
       ...prev,
       slabs: prev.slabs.filter((_, i) => i !== index),

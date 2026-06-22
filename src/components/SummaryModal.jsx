@@ -1,7 +1,10 @@
 import React from "react";
 import { IoCloseCircle } from "react-icons/io5";
-const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee, dynamicPricingEnabled, exactValue, slabBonusAmount, negotiatedAmount, couponDiscount, bonusMode, couponCode }) => {
-  const total = Number(exactValue) - Number(slabBonusAmount) + Number(negotiatedAmount) + Number(couponDiscount) - Number(conversionFee)
+const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee, dynamicPricingEnabled, exactValue, slabBonusAmount, negotiatedAmount, couponDiscount, bonusMode, couponCode, isSlabApplied }) => {
+  const effectiveValue = dynamicPricingEnabled && !isSlabApplied && Number(slabBonusAmount) > 0
+    ? Number(exactValue) - Number(slabBonusAmount)
+    : Number(exactValue);
+  const total = effectiveValue + Number(negotiatedAmount) + Number(couponDiscount) - Number(conversionFee)
   return (
     <div
       className={`fixed bg-white rounded-l-3xl rounded-r-3xl bottom-0 left-0 w-full p-4 transition-all 
@@ -20,9 +23,10 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee
         </div>
         <div className="text-sm mx-2 ">
           <div className="font-medium mt-4 flex flex-col gap-3">
+          <div className="font-medium mt-4 flex flex-col gap-3">
             <div className="flex justify-between">
               <span>Base Price</span>
-              <span>₹{exactValue}</span>
+              <span>₹{Math.round(Number(exactValue) - Number(slabBonusAmount)).toLocaleString('en-IN')}</span>
             </div>
             <div className="flex justify-between">
               <p>Pickup Charges</p>
@@ -33,8 +37,14 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee
             </div>
             {negotiatedAmount > 0 && (
               <div className="flex justify-between">
-                <span>{bonusMode === 'coupon' ? `Coupon Code (${couponCode})` : 'Negotiated Amount'}</span>
+                <span>Negotiated Amount</span>
                 <span>+₹{negotiatedAmount}</span>
+              </div>
+            )}
+            {dynamicPricingEnabled && isSlabApplied && Number(slabBonusAmount) > 0 && (
+              <div className="flex justify-between">
+                <span>Slab Bonus</span>
+                <span className="text-green-600">+₹{Number(slabBonusAmount).toLocaleString('en-IN')}</span>
               </div>
             )}
             {couponDiscount > 0 && (
@@ -43,12 +53,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee
                 <span>+₹{couponDiscount}</span>
               </div>
             )}
-            {dynamicPricingEnabled && Number(slabBonusAmount) > 0 && (
-              <div className="flex justify-between">
-                <span>Slab Bonus </span>
-                <span className="text-red-500">-₹{slabBonusAmount}</span>
-              </div>
-            )}
+
             {Number(conversionFee) > 0 && (
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-1">
@@ -57,6 +62,9 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee
                 <p className="text-red-500">-₹{conversionFee}</p>
               </div>
             )}
+            <div className="flex justify-between font-semibold text-lg border-t pt-2 mt-1">
+              <span>Total</span>
+              <span>₹{total}</span>
             <div className="flex justify-between font-semibold text-lg border-t pt-2 mt-1">
               <span>Total</span>
               <span>₹{total}</span>

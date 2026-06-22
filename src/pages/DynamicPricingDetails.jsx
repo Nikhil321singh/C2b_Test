@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import AdminNavbar from '../components/Admin_Navbar'
 import SideMenu from '../components/SideMenu'
+import AuditLogModal from '../components/AuditLogModal'
 import { toast } from 'react-hot-toast'
 import styles from './DynamicPricingDetails.module.css'
 
@@ -16,6 +17,7 @@ const DynamicPricingDetails = () => {
   const [toggling, setToggling] = useState(null)
   const [confirmModal, setConfirmModal] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [auditLogModal, setAuditLogModal] = useState(null)
 
   useEffect(() => {
     fetchConfigs()
@@ -153,6 +155,18 @@ const DynamicPricingDetails = () => {
         </div>
       )}
 
+      <AuditLogModal
+        isOpen={!!auditLogModal}
+        onClose={() => setAuditLogModal(null)}
+        title='Pricing Audit Log'
+        subtitle={
+          auditLogModal
+            ? `${auditLogModal.companyId?.name || 'Unknown Company'}${auditLogModal.companyId?.companyCode ? ` (${auditLogModal.companyId.companyCode})` : ''}`
+            : ''
+        }
+        entries={auditLogModal?.auditLog || []}
+      />
+
       <div
         style={{
           boxShadow:
@@ -247,6 +261,12 @@ const DynamicPricingDetails = () => {
                               {toggling === config._id ? '...' : config.isEnabled ? 'Disable' : 'Enable'}
                             </button>
                             <button
+                              className={styles.view_btn}
+                              onClick={() => setAuditLogModal(config)}
+                            >
+                              Audit Log
+                            </button>
+                            <button
                               className={styles.delete_btn}
                               disabled={toggling === config._id}
                               onClick={() => setDeleteConfirm(config)}
@@ -265,13 +285,14 @@ const DynamicPricingDetails = () => {
                                 <span className='w-[70px] sm:w-[100px]'>Min Value</span>
                                 <span className='w-[70px] sm:w-[100px]'>Max Value</span>
                                 <span className='w-[70px] sm:w-[100px]'>Bonus Amt</span>
-                               
+                                <span className='hidden sm:inline'>Formula</span>
                               </div>
                               {config.slabs.map((slab, idx) => (
                                 <div key={idx} className='flex gap-2 sm:gap-4 py-1 text-xs border-b border-gray-200'>
                                   <span className='w-[70px] sm:w-[100px]'>Rs. {slab.minValue}</span>
                                   <span className='w-[70px] sm:w-[100px]'>Rs. {slab.maxValue}</span>
                                   <span className='w-[70px] sm:w-[100px]'>Rs. {slab.bonusAmount}</span>
+                                  <span className='text-gray-400 truncate'>EV - Rs. {slab.bonusAmount}</span>
                                 </div>
                               ))}
                             </div>
