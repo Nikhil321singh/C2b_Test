@@ -261,7 +261,8 @@ const SpecialOffers = () => {
     formData.append("id", LeadId);
     const deviceType = sessionStorage.getItem("DeviceType");
     if (dynamicPricingEnabled) {
-      const sellingPrice = Number(exactValue) - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0);
+      const baseVal = isSlabApplied ? Number(exactValue) : Number(exactValue) - Number(slabBonusAmount);
+      const sellingPrice = baseVal - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0);
       formData.append("sellingPrice", sellingPrice);
       formData.append("bonusPrice", 0);
       formData.append("negotiatedAmount", negotiatedAmount);

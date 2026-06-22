@@ -157,7 +157,7 @@ const OrderQuoteCreated = ({ orderType, daysfilters, head }) => {
               savedBy={item.user?.name}
               deviceRam={item.lead?.model?.config?.RAM}
               deviceStorage={item.lead?.model?.config?.storage}
-              price={item.lead?.finalPrice}
+              price={item.lead?.bonusPrice || item.lead?.price}
               quoteId={item.lead?.uniqueCode}
               dateTime={item.updatedAt}
               phonePhoto={
