@@ -87,7 +87,7 @@ const useDeviceQuoteData = () => {
   const ResponseData = useSelector((state) => state.responseData)
   const Price = useSelector((state) => state.responseData.price)
   const uniqueCode = useSelector((state) => state.responseData.uniqueCode)
-  const savedBonus = useSelector((state) => state.responseData?.bonus) || null
+  const savedBonus = useSelector((state) => state.responseData?.bonus) ?? null
 
   return {
     dispatch,
@@ -620,7 +620,6 @@ const QuoteCard = ({
                 onClick={() => handleModeSwitch('bonus')}
               >
                 Negotiated amount
-                Negotiated amount
               </button>
               <button
                 className='text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded text-primary border border-primary whitespace-nowrap sm:hidden'
@@ -718,7 +717,6 @@ const BonusInput = ({ bonus, setBonus }) => (
   <div className='flex flex-row items-center justify-between px-2 my-2'>
     <div className='w-[50%] font-medium text-gray-700 text-sm sm:text-base'>
       {currentDomain === switchKart && 'SwitchKart'} Negotiated Amount :
-      {currentDomain === switchKart && 'SwitchKart'} Negotiated Amount :
     </div>
     <div className='rounded-md bg-[#f6f6f6] py-1 sm:py-2 w-[45%]  border-2 border-primary flex flex-col items-center justify-center'>
       <input
@@ -726,7 +724,6 @@ const BonusInput = ({ bonus, setBonus }) => (
         name='bonus'
         id='bonus'
         type='number'
-        placeholder='Enter Negotiated Amount'
         placeholder='Enter Negotiated Amount'
         value={bonus}
         maxLength={6}
