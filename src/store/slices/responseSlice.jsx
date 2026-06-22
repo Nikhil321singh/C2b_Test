@@ -16,6 +16,8 @@ const responseSlice = createSlice({
     conversionFee: 10,
     mode: 'bonus',
     couponCode: '',
+    mode: 'bonus',
+    couponCode: '',
     name: "",
     email: "",
     phone: "",
@@ -35,6 +37,8 @@ const responseSlice = createSlice({
       state.dynamicPricingEnabled = dynamicPricingEnabled ?? false;
       state.isSlabApplied = isSlabApplied ?? true;
       state.conversionFee = conversionFee ?? 10;
+      state.mode = mode ?? 'bonus';
+      state.couponCode = couponCode ?? '';
       state.mode = mode ?? 'bonus';
       state.couponCode = couponCode ?? '';
     },

@@ -8,11 +8,11 @@ import EmailConfiguration from '../EmailConfiguration/EmailConfiguration'
 const LoadingSpinner = ({ isLoading }) => {
   if (!isLoading) return null
   return (
-    <div className='fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50'>
-      <BeatLoader color='var(--primary-color)' loading={isLoading} size={15} />
+    <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
+      <BeatLoader color="var(--primary-color)" loading={isLoading} size={15} />
     </div>
-  )
-}
+  );
+};
 
 const FormHeader = ({ onClose }) => (
   <div className='sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between'>
@@ -22,7 +22,7 @@ const FormHeader = ({ onClose }) => (
     </div>
     <IoClose size={28} className='text-gray-400 hover:text-gray-700 cursor-pointer transition' onClick={onClose} />
   </div>
-)
+);
 
 const FormField = ({ label, name, value, onChange, required = false, readOnly = false, type = 'text' }) => (
   <div className='flex flex-col gap-1.5'>
@@ -39,7 +39,7 @@ const FormField = ({ label, name, value, onChange, required = false, readOnly = 
       onChange={onChange}
     />
   </div>
-)
+);
 
 const SelectField = ({ label, name, value, onChange, options }) => (
   <div className='flex flex-col gap-1.5'>
@@ -92,7 +92,7 @@ const booleanOptions = [
 ]
 
 const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
-  const [isTableLoading, setIsTableLoading] = useState(false)
+  const [isTableLoading, setIsTableLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     ...companyData,
     emailConfiguration: companyData.emailConfiguration || { enabled: false, recipients: [], notificationTypes: ['paymentReceipt'] }

@@ -4,11 +4,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { IoMdAdd, IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
 import { FaDownload, FaToggleOn, FaToggleOff } from 'react-icons/fa6'
+import { FaDownload, FaToggleOn, FaToggleOff } from 'react-icons/fa6'
 import styles from './CompanyListingDetails.module.css'
 import NoDataMessage from '../../components/NoDataMessage'
 import CompanyTable from './CompanyTable'
 import CompanyListingModals from './CompanyListingModals'
 import { handleDownload } from './excelUtils'
+import { toast } from 'react-hot-toast'
 import { toast } from 'react-hot-toast'
 
 const pageLimit = 10
@@ -103,6 +105,7 @@ const CompanyListingDetails = () => {
         getDataBySearch()
       }
       fetchPricingStatuses()
+      fetchPricingStatuses()
       setEditSuccess(false)
       setEditBoxOpen(false)
     }
@@ -131,6 +134,10 @@ const CompanyListingDetails = () => {
   useEffect(() => {
     fetchTableData()
   }, [currentPage])
+
+  useEffect(() => {
+    fetchPricingStatuses()
+  }, [])
 
   useEffect(() => {
     fetchPricingStatuses()
@@ -221,6 +228,7 @@ const CompanyListingDetails = () => {
       />
 
       <div className='flex gap-2 justify-center mt-5 flex-wrap'>
+      <div className='flex gap-2 justify-center mt-5 flex-wrap'>
         <button
           className={styles.bulkdown_button}
           onClick={() => navigate('/companylisting')}
@@ -257,7 +265,16 @@ const CompanyListingDetails = () => {
 
         <div className={styles.icons_box}>
           <IoRefresh onClick={() => { fetchTableData(); fetchPricingStatuses() }} className='' size={25} />
+          <IoRefresh onClick={() => { fetchTableData(); fetchPricingStatuses() }} className='' size={25} />
         </div>
+
+        <button
+          className={styles.bulkdown_button}
+          onClick={handleExportConfig}
+        >
+          <FaDownload /> Export Pricing Config
+        </button>
+
 
         <button
           className={styles.bulkdown_button}
@@ -329,6 +346,30 @@ const CompanyListingDetails = () => {
       )}
 
       {tableData?.length ? (
+        (() => {
+          const enriched = tableData.map(d => ({
+            ...d,
+            dynamicPricingStatus: pricingStatusMap[d._id] || 'OFF'
+          }))
+          const filtered = pricingFilter === 'all'
+            ? enriched
+            : enriched.filter(d => d.dynamicPricingStatus === pricingFilter)
+          return (
+            <CompanyTable
+              tableData={filtered}
+              editHandler={editHandler}
+              deleteConfHandler={deleteConfHandler}
+              openViewDocsModal={openViewDocsModal}
+              openUploadPriceModal={openUploadPriceModal}
+              setCurrentPage={setCurrentPage}
+              currentPage={currentPage}
+              maxPages={maxPages}
+              selectedIds={selectedIds}
+              onSelectId={(id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id])}
+              onSelectAll={(ids) => setSelectedIds(ids)}
+            />
+          )
+        })()
         (() => {
           const enriched = tableData.map(d => ({
             ...d,

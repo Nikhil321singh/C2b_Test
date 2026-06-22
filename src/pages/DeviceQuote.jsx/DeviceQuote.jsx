@@ -163,6 +163,12 @@ const DeviceQuote = () => {
   const [isSlabApplied, setIsSlabApplied] = useState(false)
   const [exactValue, setExactValue] = useState(Number(Price))
 
+  const [slabBonusAmount, setSlabBonusAmount] = useState(0)
+  const [slabApplied, setSlabApplied] = useState('')
+  const [dynamicPricingEnabled, setDynamicPricingEnabled] = useState(false)
+  const [isSlabApplied, setIsSlabApplied] = useState(false)
+  const [exactValue, setExactValue] = useState(Number(Price))
+
   const [mode, setMode] = useState('bonus')
   const [eligibleCoupons, setEligibleCoupons] = useState([])
   const [selectedCoupon, setSelectedCoupon] = useState(null)
@@ -377,11 +383,18 @@ const DeviceQuote = () => {
               bonus={bonus}
               setBonus={setBonus}
               setMode={setMode}
+              setBonus={setBonus}
+              setMode={setMode}
               quoteSaved={quoteSaved}
               exactQuoteValue={exactQuoteValue}
               termsChecked={termsChecked}
               continueOTPHandler={continueOTPHandler}
               finalBonus={calculateFinalBonus()}
+              slabBonusAmount={slabBonusAmount}
+              slabApplied={slabApplied}
+              isSlabApplied={isSlabApplied}
+              dynamicPricingEnabled={dynamicPricingEnabled}
+              exactValue={exactValue}
               slabBonusAmount={slabBonusAmount}
               slabApplied={slabApplied}
               isSlabApplied={isSlabApplied}
@@ -465,6 +478,7 @@ const QuoteCard = ({
   bonus,
   setBonus,
   setMode,
+  setMode,
   exactQuoteValue,
   showDeviceReportHandler,
   finalBonus,
@@ -477,6 +491,12 @@ const QuoteCard = ({
   handleApplyCoupon,
   handleRemoveCoupon,
   handleCouponSelect,
+  slabBonusAmount,
+  slabApplied,
+  isSlabApplied,
+  setIsSlabApplied,
+  dynamicPricingEnabled,
+  exactValue,
   slabBonusAmount,
   slabApplied,
   isSlabApplied,
@@ -559,6 +579,7 @@ const QuoteCard = ({
           bonus={bonus}
           setBonus={setBonus}
           setMode={setMode}
+          setMode={setMode}
           eligibleCoupons={eligibleCoupons}
           selectedCoupon={selectedCoupon}
           isCouponApplied={isCouponApplied}
@@ -566,6 +587,11 @@ const QuoteCard = ({
           handleApplyCoupon={handleApplyCoupon}
           handleRemoveCoupon={handleRemoveCoupon}
           handleCouponSelect={handleCouponSelect}
+          slabBonusAmount={slabBonusAmount}
+          slabApplied={slabApplied}
+          isSlabApplied={isSlabApplied}
+          setIsSlabApplied={setIsSlabApplied}
+          dynamicPricingEnabled={dynamicPricingEnabled}
           slabBonusAmount={slabBonusAmount}
           slabApplied={slabApplied}
           isSlabApplied={isSlabApplied}
@@ -607,6 +633,7 @@ const QuoteCard = ({
                 onClick={() => handleModeSwitch('bonus')}
               >
                 Negotiated amount
+                Negotiated amount
               </button>
               <button
                 className='text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded text-primary border border-primary whitespace-nowrap sm:hidden'
@@ -634,6 +661,7 @@ const CouponBonusToggle = ({
   bonus,
   setBonus,
   setMode,
+  setMode,
   eligibleCoupons,
   selectedCoupon,
   isCouponApplied,
@@ -641,6 +669,11 @@ const CouponBonusToggle = ({
   handleApplyCoupon,
   handleRemoveCoupon,
   handleCouponSelect,
+  slabBonusAmount,
+  slabApplied,
+  isSlabApplied,
+  setIsSlabApplied,
+  dynamicPricingEnabled,
   slabBonusAmount,
   slabApplied,
   isSlabApplied,
@@ -704,6 +737,7 @@ const BonusInput = ({ bonus, setBonus }) => (
   <div className='flex flex-row items-center justify-between px-2 my-2'>
     <div className='w-[50%] font-medium text-gray-700 text-sm sm:text-base'>
       {currentDomain === switchKart && 'SwitchKart'} Negotiated Amount :
+      {currentDomain === switchKart && 'SwitchKart'} Negotiated Amount :
     </div>
     <div className='rounded-md bg-[#f6f6f6] py-1 sm:py-2 w-[45%]  border-2 border-primary flex flex-col items-center justify-center'>
       <input
@@ -711,6 +745,7 @@ const BonusInput = ({ bonus, setBonus }) => (
         name='bonus'
         id='bonus'
         type='number'
+        placeholder='Enter Negotiated Amount'
         placeholder='Enter Negotiated Amount'
         value={bonus}
         maxLength={6}
@@ -870,6 +905,8 @@ const SubDeviceQuote = ({
   bonus,
   setBonus,
   setMode,
+  setBonus,
+  setMode,
   quoteSaved,
   exactQuoteValue,
   termsChecked,
@@ -880,8 +917,14 @@ const SubDeviceQuote = ({
   isSlabApplied,
   dynamicPricingEnabled,
   exactValue,
+  slabBonusAmount,
+  slabApplied,
+  isSlabApplied,
+  dynamicPricingEnabled,
+  exactValue,
 }) => {
   const navigate = useNavigate()
+  const [countdown, setCountdown] = useState(10)
   const [countdown, setCountdown] = useState(10)
 
   useEffect(() => {
@@ -901,6 +944,11 @@ const SubDeviceQuote = ({
     : Math.round(Number(Price) + Number(finalBonus))
 
   return (
+    <div className='flex flex-col gap-1'>
+      <div className='flex items-center justify-between gap-2'>
+        <div className='flex flex-col w-1/2 text-xl font-medium'>
+          <p>₹{quotedPrice.toLocaleString('en-IN')}</p>
+        </div>
     <div className='flex flex-col gap-1'>
       <div className='flex items-center justify-between gap-2'>
         <div className='flex flex-col w-1/2 text-xl font-medium'>
@@ -934,6 +982,7 @@ const SubDeviceQuote = ({
           </p>
         </div>
       )}
+      </div>
       </div>
     </div>
   )

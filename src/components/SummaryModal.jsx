@@ -23,6 +23,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee
         </div>
         <div className="text-sm mx-2 ">
           <div className="font-medium mt-4 flex flex-col gap-3">
+          <div className="font-medium mt-4 flex flex-col gap-3">
             <div className="flex justify-between">
               <span>Base Price</span>
               <span>₹{Math.round(Number(exactValue) - Number(slabBonusAmount)).toLocaleString('en-IN')}</span>
@@ -61,6 +62,9 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee
                 <p className="text-red-500">-₹{conversionFee}</p>
               </div>
             )}
+            <div className="flex justify-between font-semibold text-lg border-t pt-2 mt-1">
+              <span>Total</span>
+              <span>₹{total}</span>
             <div className="flex justify-between font-semibold text-lg border-t pt-2 mt-1">
               <span>Total</span>
               <span>₹{total}</span>

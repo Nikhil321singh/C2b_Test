@@ -27,7 +27,7 @@ const uploadDocumentsToS3 = async (attachedFiles, userToken) => {
               fileType: file.type,
             },
             headers: { Authorization: userToken },
-          }
+          },
         );
 
         if (presignedUrlResponse?.data?.url) {
@@ -94,7 +94,7 @@ const CompanyListing = () => {
   const [emailConfiguration, setEmailConfiguration] = useState({
     enabled: false,
     recipients: [],
-    notificationTypes: ['paymentReceipt']
+    notificationTypes: ["paymentReceipt"],
   });
 
   const [dynamicPricingEnabled, setDynamicPricingEnabled] = useState(false);
@@ -171,12 +171,13 @@ const CompanyListing = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validatePricing()) return;
+    if (!validatePricing()) return;
     const userToken = sessionStorage.getItem("authToken");
 
     try {
       const uploadedDocuments = await uploadDocumentsToS3(
         attachedFiles,
-        userToken
+        userToken,
       );
 
       const payload = {
@@ -186,6 +187,9 @@ const CompanyListing = () => {
         gstNumber: gstNumber.toUpperCase(),
         panNumber: panNumber.toUpperCase(),
         remarks: remarks,
+        showPrice: showPrice,
+        maskInfo: maskInfo,
+        emailConfiguration: emailConfiguration,
         showPrice: showPrice,
         maskInfo: maskInfo,
         emailConfiguration: emailConfiguration,
@@ -200,7 +204,7 @@ const CompanyListing = () => {
             Authorization: userToken,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       const companyId = response.data.result._id;
@@ -255,6 +259,10 @@ const CompanyListing = () => {
     slabs,
     effectiveFrom,
     pricingNotes,
+    dynamicPricingEnabled,
+    slabs,
+    effectiveFrom,
+    pricingNotes,
   };
 
   const setters = {
@@ -267,6 +275,10 @@ const CompanyListing = () => {
     setShowPrice,
     setMaskInfo,
     setEmailConfiguration,
+    setDynamicPricingEnabled,
+    setSlabs,
+    setEffectiveFrom,
+    setPricingNotes,
     setDynamicPricingEnabled,
     setSlabs,
     setEffectiveFrom,
@@ -391,6 +403,10 @@ const CompanyListingForm = ({
     slabs,
     effectiveFrom,
     pricingNotes,
+    dynamicPricingEnabled,
+    slabs,
+    effectiveFrom,
+    pricingNotes,
   } = formData;
 
   const {
@@ -403,6 +419,10 @@ const CompanyListingForm = ({
     setShowPrice,
     setMaskInfo,
     setEmailConfiguration,
+    setDynamicPricingEnabled,
+    setSlabs,
+    setEffectiveFrom,
+    setPricingNotes,
     setDynamicPricingEnabled,
     setSlabs,
     setEffectiveFrom,

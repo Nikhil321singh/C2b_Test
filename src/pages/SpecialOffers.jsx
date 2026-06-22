@@ -189,6 +189,7 @@ const SpecialOffers = () => {
     dispatch(setOtpVerified(false));
   }, []);
 
+
   const handleViewSummary = () => {
     const extraAmt = Math.max(0, Number(totalPrice) - Number(Price));
     setExtraBonus(extraAmt);
@@ -227,6 +228,10 @@ const SpecialOffers = () => {
         { headers: { authorization: userToken, "X-Skip-Interceptor": "true" } }
       )
       .then((res) => {
+        if (!dynamicPricingEnabled) {
+          const newPrice = res.data.data.price + discountAvailable;
+          localStorage.setItem("ItemPrice", newPrice);
+        }
         if (!dynamicPricingEnabled) {
           const newPrice = res.data.data.price + discountAvailable;
           localStorage.setItem("ItemPrice", newPrice);
