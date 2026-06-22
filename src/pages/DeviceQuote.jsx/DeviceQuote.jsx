@@ -198,6 +198,10 @@ const DeviceQuote = () => {
     slabBonusAmount,
   })
 
+  const quotedPrice = dynamicPricingEnabled
+    ? Math.round(Number(exactValue) - (isSlabApplied ? 0 : Number(slabBonusAmount)) + Number(calculateFinalBonus()))
+    : Math.round(Number(Price) + Number(calculateFinalBonus()))
+
   useEffect(() => {
     const fetchCoupons = async () => {
       if (!leadId || !token) {
@@ -362,6 +366,7 @@ const DeviceQuote = () => {
               setIsSlabApplied={handleSlabToggle}
               dynamicPricingEnabled={dynamicPricingEnabled}
               exactValue={exactValue}
+              quotedPrice={quotedPrice}
             />
           </div>
           <div className='fixed bottom-0 flex flex-col w-full gap-2 p-4 border-t-2 bg-white'>
@@ -490,6 +495,7 @@ const QuoteCard = ({
   setIsSlabApplied,
   dynamicPricingEnabled,
   exactValue,
+  quotedPrice,
 }) => (
   <div
     className={`${styles.QuoteCardShadow} rounded-md p-4 w-full max-w-[600px]`}
@@ -555,7 +561,7 @@ const QuoteCard = ({
       handleClose={toggleModal}
       setQuoteSaved={setQuoteSaved}
       quoteId={quoteId}
-      bonusPrice={bonus}
+      bonusPrice={quotedPrice}
     />
 
     {quoteSaved === false &&
@@ -610,16 +616,6 @@ const QuoteCard = ({
                 onClick={() => handleModeSwitch('coupon')}
               >
                 Coupon code
-              </button>
-              <button
-                className={`text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded whitespace-nowrap ${
-                  mode === 'bonus'
-                    ? 'bg-primary text-white'
-                    : 'text-primary border border-primary'
-                }`}
-                onClick={() => handleModeSwitch('bonus')}
-              >
-                Negotiated amount
               </button>
               <button
                 className='text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded text-primary border border-primary whitespace-nowrap sm:hidden'
@@ -790,7 +786,7 @@ const CouponDisplay = ({
           </p>
           {!isCouponApplied ? (
             <button
-              onClick={handleApplyCoupon}
+              onClick={() => handleCouponSelect(coupon)}
               className='px-3 py-1 text-xs font-semibold text-white bg-primary rounded-md'
             >
               Apply
