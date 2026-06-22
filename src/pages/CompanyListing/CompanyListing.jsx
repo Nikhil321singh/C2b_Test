@@ -403,10 +403,6 @@ const CompanyListingForm = ({
     slabs,
     effectiveFrom,
     pricingNotes,
-    dynamicPricingEnabled,
-    slabs,
-    effectiveFrom,
-    pricingNotes,
   } = formData;
 
   const {
@@ -419,10 +415,6 @@ const CompanyListingForm = ({
     setShowPrice,
     setMaskInfo,
     setEmailConfiguration,
-    setDynamicPricingEnabled,
-    setSlabs,
-    setEffectiveFrom,
-    setPricingNotes,
     setDynamicPricingEnabled,
     setSlabs,
     setEffectiveFrom,
