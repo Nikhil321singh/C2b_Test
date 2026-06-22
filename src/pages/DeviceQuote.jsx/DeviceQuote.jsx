@@ -163,12 +163,6 @@ const DeviceQuote = () => {
   const [isSlabApplied, setIsSlabApplied] = useState(false)
   const [exactValue, setExactValue] = useState(Number(Price))
 
-  const [slabBonusAmount, setSlabBonusAmount] = useState(0)
-  const [slabApplied, setSlabApplied] = useState('')
-  const [dynamicPricingEnabled, setDynamicPricingEnabled] = useState(false)
-  const [isSlabApplied, setIsSlabApplied] = useState(false)
-  const [exactValue, setExactValue] = useState(Number(Price))
-
   const [mode, setMode] = useState('bonus')
   const [eligibleCoupons, setEligibleCoupons] = useState([])
   const [selectedCoupon, setSelectedCoupon] = useState(null)
@@ -478,7 +472,6 @@ const QuoteCard = ({
   bonus,
   setBonus,
   setMode,
-  setMode,
   exactQuoteValue,
   showDeviceReportHandler,
   finalBonus,
@@ -491,12 +484,6 @@ const QuoteCard = ({
   handleApplyCoupon,
   handleRemoveCoupon,
   handleCouponSelect,
-  slabBonusAmount,
-  slabApplied,
-  isSlabApplied,
-  setIsSlabApplied,
-  dynamicPricingEnabled,
-  exactValue,
   slabBonusAmount,
   slabApplied,
   isSlabApplied,
@@ -661,7 +648,6 @@ const CouponBonusToggle = ({
   bonus,
   setBonus,
   setMode,
-  setMode,
   eligibleCoupons,
   selectedCoupon,
   isCouponApplied,
@@ -669,11 +655,6 @@ const CouponBonusToggle = ({
   handleApplyCoupon,
   handleRemoveCoupon,
   handleCouponSelect,
-  slabBonusAmount,
-  slabApplied,
-  isSlabApplied,
-  setIsSlabApplied,
-  dynamicPricingEnabled,
   slabBonusAmount,
   slabApplied,
   isSlabApplied,
@@ -905,8 +886,6 @@ const SubDeviceQuote = ({
   bonus,
   setBonus,
   setMode,
-  setBonus,
-  setMode,
   quoteSaved,
   exactQuoteValue,
   termsChecked,
@@ -917,14 +896,8 @@ const SubDeviceQuote = ({
   isSlabApplied,
   dynamicPricingEnabled,
   exactValue,
-  slabBonusAmount,
-  slabApplied,
-  isSlabApplied,
-  dynamicPricingEnabled,
-  exactValue,
 }) => {
   const navigate = useNavigate()
-  const [countdown, setCountdown] = useState(10)
   const [countdown, setCountdown] = useState(10)
 
   useEffect(() => {
@@ -944,11 +917,6 @@ const SubDeviceQuote = ({
     : Math.round(Number(Price) + Number(finalBonus))
 
   return (
-    <div className='flex flex-col gap-1'>
-      <div className='flex items-center justify-between gap-2'>
-        <div className='flex flex-col w-1/2 text-xl font-medium'>
-          <p>₹{quotedPrice.toLocaleString('en-IN')}</p>
-        </div>
     <div className='flex flex-col gap-1'>
       <div className='flex items-center justify-between gap-2'>
         <div className='flex flex-col w-1/2 text-xl font-medium'>
@@ -982,7 +950,6 @@ const SubDeviceQuote = ({
           </p>
         </div>
       )}
-      </div>
       </div>
     </div>
   )
