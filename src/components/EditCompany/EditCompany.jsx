@@ -225,6 +225,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
       setEditSuccess(true)
     } catch (err) {
       setIsTableLoading(false)
+      toast.error(err.response?.data?.message || 'Failed to update company')
     }
   }
 
@@ -257,7 +258,6 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
         <div className='border border-gray-200 rounded-lg p-4'>
           <div className='flex items-center justify-between mb-3'>
             {sectionTitle('Dynamic Pricing & Bonus Settings')}
-            <span className='text-xs text-gray-400 cursor-help' title='When enabled, bonus amount slabs will auto-deduct from Exact Value'>&#9432; Info</span>
           </div>
           <p className='text-xs text-gray-500 mb-4 leading-relaxed'>
             Configure bonus amount slabs and pricing rules for this company. When enabled, the system automatically deducts a fixed Bonus Amount from the device Exact Value to calculate the final Quoted Price shown to the customer.
@@ -273,7 +273,6 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
           <div className='flex flex-col gap-4 border-t border-gray-100 pt-4'>
             <div>
               {sectionTitle('Bonus Amount Slab Table')}
-              <p className='text-xs text-gray-400 mt-1'>Define price brackets with fixed bonus amounts. Each slab defines Min Value, Max Value, and the fixed Bonus Amount (in Rs.) to deduct. The Quoted Price is always Exact Value minus Bonus Amount.</p>
             </div>
             <div className='flex gap-2 text-xs font-medium text-gray-500'>
               <span className='w-[100px]'>Min Value (Rs.)</span>
@@ -287,7 +286,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
               ))}
             </div>
             <button type='button' onClick={addSlab} className='self-start bg-gray-50 border-2 border-dashed border-gray-300 px-4 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:border-gray-400 transition'>+ Add Slab</button>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='grid grid-row-2 gap-4'>
               <div className='flex flex-col gap-1.5'>
                 <span className='font-medium text-sm text-gray-700'>Effective From Date</span>
                 <p className='text-xs text-gray-400'>Set when pricing rules take effect. Must be today or future.</p>

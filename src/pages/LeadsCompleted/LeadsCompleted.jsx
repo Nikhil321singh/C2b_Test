@@ -16,6 +16,7 @@ import ReactDOMServer from 'react-dom/server'
 import html2pdf from 'html2pdf.js'
 import PurchaseReceipt from '../../components/PurchaseReceipt'
 import { fetchSignatureAsBase64 } from '../../utils/fetchSignatureAsBase64'
+import { saveAs } from 'file-saver'
 const pageLimit = 10
 const ALLstore = 'All Stores'
 const iniDate = '2023-01-01'

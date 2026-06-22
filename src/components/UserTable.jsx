@@ -97,7 +97,7 @@ const UserTable = ({ data }) => {
                 {val?.lead?.actualPrice}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                {val?.lead?.finalPrice}
+                {val?.lead?.bonusPrice}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.lead?.uniqueCode}

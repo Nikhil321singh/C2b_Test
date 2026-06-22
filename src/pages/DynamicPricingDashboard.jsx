@@ -160,12 +160,14 @@ const DynamicPricingDashboard = () => {
         toast.error('Effective From Date is required')
         return false
       }
-      const selectedDate = new Date(formData.effectiveFrom)
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      if (selectedDate < today) {
-        toast.error('Effective From Date cannot be set in the past.')
-        return false
+      if (!editCompanyId) {
+        const selectedDate = new Date(formData.effectiveFrom)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        if (selectedDate < today) {
+          toast.error('Effective From Date cannot be set in the past.')
+          return false
+        }
       }
     }
     return true
@@ -174,11 +176,7 @@ const DynamicPricingDashboard = () => {
   const handleSubmitClick = (e) => {
     e.preventDefault()
     if (!validate()) return
-    if (formData.isEnabled === 'false') {
-      setConfirmModal(true)
-    } else {
-      saveConfig()
-    }
+    setConfirmModal(true)
   }
 
   const saveConfig = async () => {
@@ -218,9 +216,16 @@ const DynamicPricingDashboard = () => {
       {confirmModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
           <div className='bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl'>
-            <p className='text-lg font-semibold mb-2'>Disable Dynamic Pricing?</p>
+            <p className='text-lg font-semibold mb-2'>
+              {editCompanyId ? 'Update Dynamic Pricing?' : formData.isEnabled === 'true' ? 'Enable Dynamic Pricing?' : 'Disable Dynamic Pricing?'}
+            </p>
             <p className='text-sm text-gray-600 mb-4'>
-              Disabling this will revert this company to standard pricing. Existing transactions are unaffected. Confirm?
+              {editCompanyId
+                ? `This will update the pricing configuration for this company. Confirm?`
+                : formData.isEnabled === 'true'
+                  ? `Enabling this will apply dynamic pricing. Existing slabs will become active. Confirm?`
+                  : `Disabling this will revert this company to standard pricing. Existing transactions are unaffected. Confirm?`
+              }
             </p>
             <div className='flex gap-3 justify-end'>
               <button
@@ -234,9 +239,11 @@ const DynamicPricingDashboard = () => {
                 type='button'
                 onClick={saveConfig}
                 disabled={saving}
-                className='font-medium text-sm text-white px-4 py-2 rounded bg-red-600 hover:bg-red-700 disabled:opacity-50'
+                className={`font-medium text-sm text-white px-4 py-2 rounded disabled:opacity-50 ${
+                  formData.isEnabled === 'false' || !formData.isEnabled ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
+                }`}
               >
-                {saving ? 'Disabling...' : 'Confirm'}
+                {saving ? 'Saving...' : 'Confirm'}
               </button>
             </div>
           </div>
@@ -248,11 +255,11 @@ const DynamicPricingDashboard = () => {
           boxShadow:
             'rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px',
         }}
-        className='items-center bg-white max-w-full sm:max-w-[900px] flex py-6 sm:py-8 mx-2 sm:mx-auto mt-4 justify-center flex-col'
+        className='items-center bg-white max-w-full sm:max-w-[900px] flex py-6 sm:py-8 mx-2 sm:mx-auto mt-10 justify-center flex-col'
       >
         <div className='flex flex-col w-full px-4 sm:px-10'>
           <div className='mb-6 flex flex-col gap-2 border-b-2 pb-2'>
-            <p className='text-2xl sm:text-4xl font-bold'>Dynamic Pricing Configuration</p>
+            <p className='text-2xl sm:text-4xl font-bold'>{editCompanyId ? 'Edit Dynamic Pricing Configuration' : 'Add Dynamic Pricing Configuration'}</p>
           </div>
 
           <div className='flex flex-wrap gap-2 mb-6'>
@@ -394,7 +401,7 @@ const DynamicPricingDashboard = () => {
                 disabled={saving}
                 className='font-medium text-sm text-white p-3 rounded bg-primary disabled:opacity-50'
               >
-                {saving ? 'Saving...' : 'Submit Form'}
+                {saving ? 'Saving...' : editCompanyId ? 'Update Configuration' : 'Submit Form'}
               </button>
             </div>
           </form>

@@ -83,7 +83,7 @@ const QuotesCreatedAdminTable = ({ currentPage, tableData }) => {
                       : data?.lead?.storage}
                   </td>
                   <td className="p-2 text-sm min-w-[100px] text-center md:p-3 md:text-base">
-                    {data.lead?.finalPrice}
+                    {data.lead?.bonusPrice || data.lead?.price}
                   </td>
                   <td className="p-2 text-sm text-center md:p-3 md:text-base">
                     {data.lead?.uniqueCode}
