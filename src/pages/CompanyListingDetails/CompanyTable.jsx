@@ -20,9 +20,9 @@ const CompanyTable = ({
   return (
     <React.Fragment>
       {selectedIds.length > 0 && (
-        <div className='flex items-center justify-between px-4 py-2 mb-2 bg-blue-50 border border-blue-200 rounded-lg mx-2 md:mx-5'>
+        <div className='flex items-center justify-between px-4 py-2  mt-3 mb-2 bg-blue-50 border border-blue-200 rounded-lg mx-2 md:mx-5'>
           <span className='text-sm font-medium text-blue-800'>
-            {selectedIds.length} company(ies) selected
+            {selectedIds.length} {selectedIds.length === 1 ? 'company' : 'companies'} selected
           </span>
         </div>
       )}

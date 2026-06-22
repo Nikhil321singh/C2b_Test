@@ -38,11 +38,7 @@ const DynamicPricingDetails = () => {
   }
 
   const handleToggle = async (config, newValue) => {
-    if (!newValue) {
-      setConfirmModal(config)
-      return
-    }
-    await doToggle(config, newValue)
+    setConfirmModal({ config, newValue })
   }
 
   const doToggle = async (config, newValue) => {
@@ -102,9 +98,14 @@ const DynamicPricingDetails = () => {
       {confirmModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
           <div className='bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl'>
-            <p className='text-lg font-semibold mb-2'>Disable Dynamic Pricing?</p>
+            <p className='text-lg font-semibold mb-2'>
+              {confirmModal.newValue ? 'Enable Dynamic Pricing?' : 'Disable Dynamic Pricing?'}
+            </p>
             <p className='text-sm text-gray-600 mb-4'>
-              Disabling this will revert {confirmModal.companyId?.name || 'this company'} to standard pricing. Existing transactions are unaffected. Confirm?
+              {confirmModal.newValue
+                ? `Enabling this will apply dynamic pricing for ${confirmModal.config.companyId?.name || 'this company'}. Existing slabs will become active. Confirm?`
+                : `Disabling this will revert ${confirmModal.config.companyId?.name || 'this company'} to standard pricing. Existing transactions are unaffected. Confirm?`
+              }
             </p>
             <div className='flex gap-3 justify-end'>
               <button
@@ -116,11 +117,16 @@ const DynamicPricingDetails = () => {
               </button>
               <button
                 type='button'
-                onClick={() => doToggle(confirmModal, false)}
-                disabled={toggling === confirmModal?._id}
-                className='font-medium text-sm text-white px-4 py-2 rounded bg-red-600 hover:bg-red-700 disabled:opacity-50'
+                onClick={() => doToggle(confirmModal.config, confirmModal.newValue)}
+                disabled={toggling === confirmModal.config?._id}
+                className={`font-medium text-sm text-white px-4 py-2 rounded disabled:opacity-50 ${
+                  confirmModal.newValue ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
+                }`}
               >
-                {toggling === confirmModal?._id ? 'Disabling...' : 'Confirm'}
+                {toggling === confirmModal.config?._id
+                  ? `${confirmModal.newValue ? 'Enabling' : 'Disabling'}...`
+                  : 'Confirm'
+                }
               </button>
             </div>
           </div>
@@ -172,7 +178,7 @@ const DynamicPricingDetails = () => {
           boxShadow:
             'rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px',
         }}
-        className='items-center bg-white max-w-full sm:max-w-[1100px] flex py-6 sm:py-8 mx-2 sm:mx-auto mt-4 justify-center flex-col'
+        className='items-center bg-white max-w-full sm:max-w-[1100px] flex py-6 sm:py-8 mx-2 sm:mx-auto mt-6 justify-center flex-col'
       >
         <div className='flex flex-col w-full px-4 sm:px-10'>
           <div className='mb-6 flex flex-col gap-2 border-b-2 pb-2'>
@@ -273,6 +279,7 @@ const DynamicPricingDetails = () => {
                             >
                               Delete
                             </button>
+                            
                           </div>
                         </td>
                       </tr>

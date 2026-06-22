@@ -103,7 +103,6 @@ const CompanyListingDetails = () => {
         getDataBySearch()
       }
       fetchPricingStatuses()
-      fetchPricingStatuses()
       setEditSuccess(false)
       setEditBoxOpen(false)
     }
@@ -132,10 +131,6 @@ const CompanyListingDetails = () => {
   useEffect(() => {
     fetchTableData()
   }, [currentPage])
-
-  useEffect(() => {
-    fetchPricingStatuses()
-  }, [])
 
   useEffect(() => {
     fetchPricingStatuses()
@@ -194,6 +189,9 @@ const CompanyListingDetails = () => {
       toast.error(err.response?.data?.message || 'Export failed')
     }
   }
+  const sectionTitle = (text) => (
+    <span className='font-semibold text-base text-gray-800'>{text}</span>
+  )
 
   return (
     <div>
@@ -262,16 +260,7 @@ const CompanyListingDetails = () => {
 
         <div className={styles.icons_box}>
           <IoRefresh onClick={() => { fetchTableData(); fetchPricingStatuses() }} className='' size={25} />
-          <IoRefresh onClick={() => { fetchTableData(); fetchPricingStatuses() }} className='' size={25} />
         </div>
-
-        <button
-          className={styles.bulkdown_button}
-          onClick={handleExportConfig}
-        >
-          <FaDownload /> Export Pricing Config
-        </button>
-
 
         <button
           className={styles.bulkdown_button}

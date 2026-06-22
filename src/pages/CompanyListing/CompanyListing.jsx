@@ -78,6 +78,9 @@ const FormInput = ({ label, value, onChange, required = false }) => (
     />
   </div>
 );
+  const sectionTitle = (text) => (
+    <span className='font-semibold text-base text-gray-800'>{text}</span>
+  )
 
 const CompanyListing = () => {
   const [sideMenu, setsideMenu] = useState(false);
@@ -350,7 +353,7 @@ const AddSlabRow = ({ slab, index, onChange, onRemove }) => (
       <input
         type="number"
         placeholder="Min"
-        className="border border-gray-300 px-2 py-1.5 rounded-lg outline-none w-[100px] text-sm focus:border-[var(--primary-color)] transition"
+        className="border border-gray-300 px-2 py-1.5 rounded-lg outline-none w-[100px] text-sm  transition"
         value={slab.minValue}
         onChange={(e) => onChange(index, 'minValue', e.target.value)}
       />
@@ -358,14 +361,14 @@ const AddSlabRow = ({ slab, index, onChange, onRemove }) => (
       <input
         type="number"
         placeholder="Max"
-        className="border border-gray-300 px-2 py-1.5 rounded-lg outline-none w-[100px] text-sm focus:border-[var(--primary-color)] transition"
+        className="border border-gray-300 px-2 py-1.5 rounded-lg outline-none w-[100px] text-sm  transition"
         value={slab.maxValue}
         onChange={(e) => onChange(index, 'maxValue', e.target.value)}
       />
       <input
         type="number"
         placeholder="Bonus"
-        className="border border-gray-300 px-2 py-1.5 rounded-lg outline-none w-[100px] text-sm focus:border-[var(--primary-color)] transition"
+        className="border border-gray-300 px-2 py-1.5 rounded-lg outline-none w-[100px] text-sm transition"
         value={slab.bonusAmount}
         onChange={(e) => onChange(index, 'bonusAmount', e.target.value)}
       />
@@ -505,7 +508,10 @@ const CompanyListingForm = ({
           ))}
       </div>
 
-      <div className="w-[70%] mt-6 p-4 border border-gray-200 rounded-lg">
+      <div className="w-[70%] mt-2 p-4 border border-gray-200 rounded-lg">
+         <div className='flex items-center justify-between mb-3'>
+            {sectionTitle('Dynamic Pricing & Bonus Settings')}
+          </div>
 
         <p className="text-xs text-gray-500 mb-4 leading-relaxed">
           Configure bonus amount slabs and pricing rules for this company. When enabled, the system automatically deducts a fixed Bonus Amount from the device Exact Value to calculate the final Quoted Price shown to the customer.
@@ -514,7 +520,7 @@ const CompanyListingForm = ({
         <div className="flex flex-col gap-1.5 mb-4">
           <span className="font-medium text-sm text-gray-700">Enable Dynamic Pricing</span>
           <select
-            className="border border-gray-300 px-3 py-2 rounded-lg outline-none bg-white focus:border-[var(--primary-color)] transition text-sm w-[120px]"
+            className="border border-gray-300 px-3 py-2 rounded-lg outline-none bg-white transition text-sm w-[120px]"
             value={dynamicPricingEnabled.toString()}
             onChange={(e) => setDynamicPricingEnabled(e.target.value === "true")}
           >
@@ -559,7 +565,7 @@ const CompanyListingForm = ({
               <p className="text-xs text-gray-400">Set when pricing rules take effect. Must be today or future.</p>
               <input
                 type="date"
-                className="border border-gray-300 px-3 py-2 rounded-lg outline-none focus:border-[var(--primary-color)] transition text-sm"
+                className="border border-gray-300 px-3 py-2 rounded-lg outline-none  transition text-sm"
                 value={effectiveFrom}
                 min={new Date().toISOString().split('T')[0]}
                 onChange={(e) => setEffectiveFrom(e.target.value)}
@@ -568,7 +574,7 @@ const CompanyListingForm = ({
             <div className="flex flex-col gap-1.5">
               <span className="font-medium text-sm text-gray-700">Notes / Remarks</span>
               <textarea
-                className="border border-gray-300 px-3 py-2 rounded-lg outline-none focus:border-[var(--primary-color)] transition text-sm resize-none"
+                className="border border-gray-300 px-3 py-2 rounded-lg outline-none  transition text-sm resize-none"
                 rows={2}
                 value={pricingNotes}
                 onChange={(e) => setPricingNotes(e.target.value)}
