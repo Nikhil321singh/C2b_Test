@@ -225,6 +225,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
       setEditSuccess(true)
     } catch (err) {
       setIsTableLoading(false)
+      toast.error(err.response?.data?.message || 'Failed to update company')
     }
   }
 

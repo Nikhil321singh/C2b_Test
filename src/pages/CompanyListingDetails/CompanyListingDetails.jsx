@@ -176,7 +176,15 @@ const CompanyListingDetails = () => {
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/dynamic-pricing/export`,
         { headers: { Authorization: token }, responseType: 'blob' }
       )
-      const url = window.URL.createObjectURL(new Blob([res.data]))
+      const contentType = res.headers['content-type']
+      if (contentType && contentType.includes('json')) {
+        const text = await res.data.text()
+        const json = JSON.parse(text)
+        toast.error(json.message || 'No data to export')
+        return
+      }
+      const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+      const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
       link.setAttribute('download', 'dynamic_pricing_config.xlsx')
@@ -186,7 +194,10 @@ const CompanyListingDetails = () => {
       window.URL.revokeObjectURL(url)
       toast.success('Pricing configuration exported successfully')
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Export failed')
+      const msg = err.response?.data?.message
+        ? err.response.data.message
+        : err.message || 'Export failed'
+      toast.error(msg)
     }
   }
   const sectionTitle = (text) => (
