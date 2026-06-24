@@ -16,8 +16,7 @@ const responseSlice = createSlice({
     conversionFee: 10,
     mode: 'bonus',
     couponCode: '',
-    mode: 'bonus',
-    couponCode: '',
+    couponDiscount: 0,
     name: "",
     email: "",
     phone: "",
@@ -25,7 +24,7 @@ const responseSlice = createSlice({
 
   reducers: {
     setResponseData: (state, action) => {
-      const { id, price, grade, uniqueCode, bonus, slabBonusAmount, slabApplied, exactValue, dynamicPricingEnabled, isSlabApplied, conversionFee, mode, couponCode } = action.payload;
+      const { id, price, grade, uniqueCode, bonus, slabBonusAmount, slabApplied, exactValue, dynamicPricingEnabled, isSlabApplied, conversionFee, mode, couponCode, couponDiscount } = action.payload;
       state.id = id;
       state.price = price;
       state.grade = grade;
@@ -39,8 +38,7 @@ const responseSlice = createSlice({
       state.conversionFee = conversionFee ?? 10;
       state.mode = mode ?? 'bonus';
       state.couponCode = couponCode ?? '';
-      state.mode = mode ?? 'bonus';
-      state.couponCode = couponCode ?? '';
+      state.couponDiscount = couponDiscount ?? 0;
     },
     setLeadOTPData: (state, action) => {
       const { name, email, phone } = action.payload;
