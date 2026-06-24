@@ -160,6 +160,7 @@ const SpecialOffers = () => {
 
   const slabBonusAmount = Number(responseData.slabBonusAmount) || 0;
   const negotiatedAmount = Number(responseData.bonus) || 0;
+  const couponDiscount = Number(responseData.couponDiscount) || 0;
   const slabApplied = responseData.slabApplied || '';
   const exactValue = responseData.exactValue || Number(Price);
   const dynamicPricingEnabled = responseData.dynamicPricingEnabled || false;
@@ -174,8 +175,8 @@ const SpecialOffers = () => {
 
   // Same calculation as DeviceQuote quotedPrice (bottom bar)
   const quotedPrice = dynamicPricingEnabled
-    ? Math.round(Number(exactValue) - (isSlabApplied ? 0 : Number(slabBonusAmount)) + Number(negotiatedAmount))
-    : Math.round(Number(Price) + Number(negotiatedAmount));
+    ? Math.round(Number(exactValue) - (isSlabApplied ? 0 : Number(slabBonusAmount)) + Number(negotiatedAmount) + Number(couponDiscount))
+    : Math.round(Number(Price) + Number(negotiatedAmount) + Number(couponDiscount));
 
   // Total = quotedPrice from DeviceQuote + any new coupon selected here
   const calcTotalPrice = () => {
@@ -260,6 +261,8 @@ const SpecialOffers = () => {
     const formData = new FormData();
     formData.append("id", LeadId);
     const deviceType = sessionStorage.getItem("DeviceType");
+    const newCouponVal = isSelected ? (isSelected === "GRU250" ? 250 : isSelected === "GRU500" ? 500 : Number(isSelected)) : 0;
+    const totalCouponDiscount = Number(couponDiscount) + newCouponVal;
     if (dynamicPricingEnabled) {
       const baseVal = isSlabApplied ? Number(exactValue) : Number(exactValue) - Number(slabBonusAmount);
       const sellingPrice = baseVal - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0);
@@ -269,12 +272,13 @@ const SpecialOffers = () => {
       formData.append("slabBonusAmount", slabBonusAmount);
       formData.append("slabApplied", slabApplied);
       formData.append("exactValue", exactValue);
-      const couponVal = isSelected ? (isSelected === "GRU250" ? 250 : isSelected === "GRU500" ? 500 : Number(isSelected)) : 0;
-      formData.append("couponDiscount", couponVal);
+      formData.append("quotedPrice", responseData.quotedPrice ?? (Number(exactValue) - Number(slabBonusAmount)));
+      formData.append("couponDiscount", totalCouponDiscount);
     } else {
       formData.append("sellingPrice", Math.round(responseData.price) - (deviceType === 'CTG1' ? Number(responseData.conversionFee) : 0));
       formData.append("bonusPrice", negotiatedAmount);
       formData.append("negotiatedAmount", 0);
+      formData.append("couponDiscount", totalCouponDiscount);
     }
     axios
       .post(
@@ -343,6 +347,7 @@ const SpecialOffers = () => {
         isSlabApplied={isSlabApplied}
         bonusMode={bonusMode}
         couponCode={couponCode}
+        couponDiscount={couponDiscount}
       />
     </div>
   );
@@ -369,6 +374,7 @@ const SubSpecialOffers = ({
   isSlabApplied,
   bonusMode,
   couponCode,
+  couponDiscount,
 }) => {
   const navigate = useNavigate();
   const responseData = useSelector((state) => state.responseData);
@@ -459,7 +465,7 @@ const SubSpecialOffers = ({
         exactValue={exactValue}
         slabBonusAmount={slabBonusAmount}
         negotiatedAmount={negotiatedAmount}
-        couponDiscount={isSelected ? (isSelected === "GRU250" ? 250 : isSelected === "GRU500" ? 500 : Number(isSelected)) : 0}
+        couponDiscount={Number(couponDiscount) + (isSelected ? (isSelected === "GRU250" ? 250 : isSelected === "GRU500" ? 500 : Number(isSelected)) : 0)}
         bonusMode={bonusMode}
         couponCode={couponCode}
         isSlabApplied={isSlabApplied}

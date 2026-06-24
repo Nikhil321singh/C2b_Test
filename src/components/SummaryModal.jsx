@@ -1,10 +1,8 @@
 import React from "react";
 import { IoCloseCircle } from "react-icons/io5";
 const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee, dynamicPricingEnabled, exactValue, slabBonusAmount, negotiatedAmount, couponDiscount, bonusMode, couponCode, isSlabApplied }) => {
-  const effectiveValue = dynamicPricingEnabled && !isSlabApplied && Number(slabBonusAmount) > 0
-    ? Number(exactValue) - Number(slabBonusAmount)
-    : Number(exactValue);
-  const total = effectiveValue + Number(negotiatedAmount) + Number(couponDiscount) - Number(conversionFee)
+  const baseValue = Number(exactValue) - Number(slabBonusAmount);
+  const total = (dynamicPricingEnabled && !isSlabApplied ? baseValue : Number(exactValue)) + Number(negotiatedAmount) + Number(couponDiscount) - Number(conversionFee)
   return (
     <div
       className={`fixed bg-white rounded-l-3xl rounded-r-3xl bottom-0 left-0 w-full p-4 transition-all 
