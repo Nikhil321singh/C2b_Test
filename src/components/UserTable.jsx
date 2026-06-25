@@ -97,7 +97,7 @@ const UserTable = ({ data }) => {
                 {getDeviceDetails(val)}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
-                  {val?.lead?.price}
+                  {val?.lead?.slabApplied ? Number(val?.lead?.price || 0) - Number(val?.lead?.slabBonusAmount || 0) : val?.lead?.price}
               </td>
               <td className="p-2 text-sm text-center md:p-3 md:text-base">
                 {val?.lead?.negotiatedAmount ?? 0}
