@@ -115,6 +115,9 @@ function hanldlejsx_pdf(leadData, setReceipt) {
       storage={leadData?.storage}
       RAM={leadData?.ram}
       formattedDate={formattedDate}
+      companyName={leadData?.companyInfo?.name}
+      companyGstin={leadData?.companyInfo?.gstNumber}
+      companyAddress={leadData?.companyInfo?.address}
     />
   );
 

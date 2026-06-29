@@ -552,6 +552,9 @@ const SubLeadsCompletedBtns = ({
           formattedDate={formattedDate}
           price={item?.price}
           signatureUrl={signatureBase64 || signatureUrl}
+          companyName={item?.companyInfo?.name}
+          companyGstin={item?.companyInfo?.gstNumber}
+          companyAddress={item?.companyInfo?.address}
         />,
       )
       html2pdf()

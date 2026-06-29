@@ -232,6 +232,9 @@ const LeadsCompletedTable = ({ data }) => {
         formattedDate={formattedDate}
         signatureUrl={signatureBase64 || signatureUrl}
         maskInfo={maskInfo}
+        companyName={data[index]?.companyInfo?.name}
+        companyGstin={data[index]?.companyInfo?.gstNumber}
+        companyAddress={data[index]?.companyInfo?.address}
       />,
     )
 
