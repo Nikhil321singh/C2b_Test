@@ -18,6 +18,6 @@ jobs:
     with:
       project_key: com.agbe:grestc2b-ui
       project_name: "Grest C2B UI"
-      # sources: "app"
+      sources: "src"
       exclusions: "coverage-reports/**/*,xunit-reports/**/*,static,fonts,certificates,**/*.nosql"
     secrets: inherit
