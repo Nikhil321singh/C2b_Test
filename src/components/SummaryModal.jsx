@@ -60,7 +60,7 @@ const SummaryModal = ({ show, onClose, price, bonus, sellingPrice, conversionFee
               </div>
             )}
             <div className="flex justify-between font-semibold text-lg border-t pt-2 mt-1">
-              <span>Total</span>
+              <span>Total Amount</span>
               <span>₹{total}</span>
             </div>
           </div>

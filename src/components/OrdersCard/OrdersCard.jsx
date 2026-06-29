@@ -142,6 +142,9 @@ async function buildPrintElement(item) {
       price={item.price}
       signatureUrl={signatureBase64 || signatureUrl}
       maskInfo={maskInfo}
+      companyName={item.companyInfo?.name}
+      companyGstin={item.companyInfo?.gstNumber}
+      companyAddress={item.companyInfo?.address}
     />,
   )
 }
