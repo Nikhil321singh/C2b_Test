@@ -182,11 +182,11 @@ const DeviceQuote = () => {
           { headers: { Authorization: token } }
         )
         const coupons = response?.data?.data
-        const arr = Array.isArray(coupons)
-          ? coupons
-          : (coupons ? [coupons] : [])
+        let arr = []
+        if (Array.isArray(coupons)) { arr = coupons }
+        else if (coupons) { arr = [coupons] }
         setEligibleCoupons(arr)
-        if (arr.length === 1) setSelectedCoupon(arr[0])
+        if (arr.length === 1) { setSelectedCoupon(arr[0]) }
         if (arr.length > 0 && arr[0].couponCode) {
           sessionStorage.setItem('eligibleCouponCode', arr[0].couponCode)
         }

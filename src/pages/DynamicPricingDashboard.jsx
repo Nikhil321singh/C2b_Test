@@ -15,21 +15,65 @@ const DEFAULT_SLABS = [
 ]
 
 const getConfirmTitle = (editCompanyId, isEnabled) => {
-  if (editCompanyId) return 'Update Dynamic Pricing?'
-  if (isEnabled === 'true') return 'Enable Dynamic Pricing?'
+  if (editCompanyId) {
+    return 'Update Dynamic Pricing?'
+  }
+  if (isEnabled === 'true') {
+    return 'Enable Dynamic Pricing?'
+  }
   return 'Disable Dynamic Pricing?'
 }
 
 const getConfirmDescription = (editCompanyId, isEnabled) => {
-  if (editCompanyId) return 'This will update the pricing configuration for this company. Confirm?'
-  if (isEnabled === 'true') return 'Enabling this will apply dynamic pricing. Existing slabs will become active. Confirm?'
+  if (editCompanyId) {
+    return 'This will update the pricing configuration for this company. Confirm?'
+  }
+  if (isEnabled === 'true') {
+    return 'Enabling this will apply dynamic pricing. Existing slabs will become active. Confirm?'
+  }
   return 'Disabling this will revert this company to standard pricing. Existing transactions are unaffected. Confirm?'
 }
 
 const getSubmitButtonText = (saving, editCompanyId) => {
-  if (saving) return 'Saving...'
-  if (editCompanyId) return 'Update Configuration'
+  if (saving) {
+    return 'Saving...'
+  }
+  if (editCompanyId) {
+    return 'Update Configuration'
+  }
   return 'Submit Form'
+}
+
+const validateSlabs = (slabs) => {
+  for (let i = 0; i < slabs.length; i++) {
+    const s = slabs[i]
+    if (Number(s.maxValue) <= Number(s.minValue)) {
+      toast.error('Max Value must be greater than Min Value in every slab row.')
+      return false
+    }
+    if (Number(s.bonusAmount) > Number(s.maxValue)) {
+      toast.error('Bonus Amount cannot exceed the Exact Value for this slab range.')
+      return false
+    }
+    if (i > 0 && Number(s.minValue) <= Number(slabs[i - 1].maxValue)) {
+      toast.error('Slab ranges overlap. Please ensure slabs are contiguous with no gaps.')
+      return false
+    }
+  }
+  return true
+}
+
+const validateDate = (effectiveFrom, editCompanyId) => {
+  if (!editCompanyId) {
+    const selectedDate = new Date(effectiveFrom)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    if (selectedDate < today) {
+      toast.error('Effective From Date cannot be set in the past.')
+      return false
+    }
+  }
+  return true
 }
 
 const validateForm = (formData, editCompanyId) => {
@@ -46,33 +90,15 @@ const validateForm = (formData, editCompanyId) => {
       toast.error('Please add at least one pricing slab before saving.')
       return false
     }
-    for (let i = 0; i < formData.slabs.length; i++) {
-      const s = formData.slabs[i]
-      if (Number(s.maxValue) <= Number(s.minValue)) {
-        toast.error('Max Value must be greater than Min Value in every slab row.')
-        return false
-      }
-      if (Number(s.bonusAmount) > Number(s.maxValue)) {
-        toast.error('Bonus Amount cannot exceed the Exact Value for this slab range.')
-        return false
-      }
-      if (i > 0 && Number(s.minValue) <= Number(formData.slabs[i - 1].maxValue)) {
-        toast.error('Slab ranges overlap. Please ensure slabs are contiguous with no gaps.')
-        return false
-      }
+    if (!validateSlabs(formData.slabs)) {
+      return false
     }
     if (!formData.effectiveFrom) {
       toast.error('Effective From Date is required')
       return false
     }
-    if (!editCompanyId) {
-      const selectedDate = new Date(formData.effectiveFrom)
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      if (selectedDate < today) {
-        toast.error('Effective From Date cannot be set in the past.')
-        return false
-      }
+    if (!validateDate(formData.effectiveFrom, editCompanyId)) {
+      return false
     }
   }
   return true
@@ -159,7 +185,9 @@ const DynamicPricingDashboard = () => {
   }
 
   const removeSlab = (index) => {
-    if (formData.slabs.length <= 1) { return }
+    if (formData.slabs.length <= 1) {
+      return
+    }
     setFormData((prev) => ({
       ...prev,
       slabs: prev.slabs.filter((_, i) => i !== index),
@@ -212,7 +240,9 @@ const DynamicPricingDashboard = () => {
 
   const handleSubmitClick = (e) => {
     e.preventDefault()
-    if (!validateForm(formData, editCompanyId)) { return }
+    if (!validateForm(formData, editCompanyId)) {
+      return
+    }
     setConfirmModal(true)
   }
 
