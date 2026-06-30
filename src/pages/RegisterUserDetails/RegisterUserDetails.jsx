@@ -486,8 +486,8 @@ const TableFilters = ({
 }
 
 const getStores = (val) => {
-  if (val?.assignedStoresData?.length > 0) return val.assignedStoresData
-  if (val?.stores) return [val.stores]
+  if (val?.assignedStoresData?.length > 0) { return val.assignedStoresData }
+  if (val?.stores) { return [val.stores] }
   return []
 }
 

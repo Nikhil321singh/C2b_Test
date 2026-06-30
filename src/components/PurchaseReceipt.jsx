@@ -44,7 +44,9 @@ const CompanyHeader = ({ COMPANY_EMAIL, companyName, companyGstin, companyAddres
   const isRadicalRetail = companyName === 'Radical Retail Pvt Ltd'
   const name = isRadicalRetail ? 'Radical Retail Pvt Ltd' : (companyName || import.meta.env.VITE_COMPANY_NAME)
   const gstin = isRadicalRetail ? '29ABCDE1234F1Z5' : (companyGstin || import.meta.env.VITE_COMPANY_GSTIN)
-  const addr = isRadicalRetail ? 'Khasra No. 34/22, Ground Floor, NK Tower, Kanhai Road, Sector-45, Gurugram, Haryana - 122003' : (companyAddress || import.meta.env.VITE_COMPANY_ADDRESS)
+  const addr = isRadicalRetail
+    ? 'Khasra No. 34/22, Ground Floor, NK Tower, Kanhai Road, Sector-45, Gurugram, Haryana - 122003'
+    : (companyAddress || import.meta.env.VITE_COMPANY_ADDRESS)
   return (
     <>
       <div className='flex items-center justify-center bg-white p-[1vh] mx-[2vh] my-[1vh]'>
