@@ -272,40 +272,43 @@ const DynamicPricingDetails = () => {
     setToggling(null)
   }
 
-  const tableContent = loading ? (
-    <p className='text-gray-500 text-center py-8'>Loading configurations...</p>
-  ) : configs.length === 0 ? (
-    <p className='text-gray-500 text-center py-8'>No configurations found</p>
-  ) : (
-    <table className='w-full border border-primary min-w-[600px]'>
-      <thead className='bg-primary text-white'>
-        <tr>
-          <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Company</th>
-          <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Status</th>
-          <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Slabs</th>
-          <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Effective From</th>
-          <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Notes</th>
-          <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {configs.map((config, index) => (
-          <DynamicPricingRow
-            key={config._id}
-            config={config}
-            index={index}
-            expanded={expanded}
-            toggling={toggling}
-            onEdit={handleEdit}
-            onToggleExpand={(id) => setExpanded(expanded === id ? null : id)}
-            onToggleEnable={handleToggle}
-            onAuditLog={setAuditLogModal}
-            onDelete={setDeleteConfirm}
-          />
-        ))}
-      </tbody>
-    </table>
-  )
+  let tableContent
+  if (loading) {
+    tableContent = <p className='text-gray-500 text-center py-8'>Loading configurations...</p>
+  } else if (configs.length === 0) {
+    tableContent = <p className='text-gray-500 text-center py-8'>No configurations found</p>
+  } else {
+    tableContent = (
+      <table className='w-full border border-primary min-w-[600px]'>
+        <thead className='bg-primary text-white'>
+          <tr>
+            <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Company</th>
+            <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Status</th>
+            <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Slabs</th>
+            <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Effective From</th>
+            <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Notes</th>
+            <th className='p-2 text-xs sm:text-sm md:p-3 md:text-base'>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {configs.map((config, index) => (
+            <DynamicPricingRow
+              key={config._id}
+              config={config}
+              index={index}
+              expanded={expanded}
+              toggling={toggling}
+              onEdit={handleEdit}
+              onToggleExpand={(id) => setExpanded(expanded === id ? null : id)}
+              onToggleEnable={handleToggle}
+              onAuditLog={setAuditLogModal}
+              onDelete={setDeleteConfirm}
+            />
+          ))}
+        </tbody>
+      </table>
+    )
+  }
 
   return (
     <div className='min-h-screen pb-8 bg-[#F5F4F9]'>
