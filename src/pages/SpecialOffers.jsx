@@ -475,9 +475,15 @@ const SubSpecialOffers = ({
 };
 
 const getCouponVal = (val) => {
-  if (!val) return 0
-  if (val === "GRU250") return 250
-  if (val === "GRU500") return 500
+  if (!val) {
+    return 0
+  }
+  if (val === "GRU250") {
+    return 250
+  }
+  if (val === "GRU500") {
+    return 500
+  }
   return Number(val)
 }
 
