@@ -270,87 +270,106 @@ const DynamicPricingDashboard = () => {
         />
       )}
 
-      <div
-        style={{
-          boxShadow:
-            'rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px',
-        }}
-        className='items-center bg-white max-w-full sm:max-w-[900px] flex py-6 sm:py-8 mx-2 sm:mx-auto mt-10 justify-center flex-col'
-      >
-        <div className='flex flex-col w-full px-4 sm:px-10'>
-          <div className='mb-6 flex flex-col gap-2 border-b-2 pb-2'>
-            <p className='text-2xl sm:text-4xl font-bold'>{editCompanyId ? 'Edit Dynamic Pricing Configuration' : 'Add Dynamic Pricing Configuration'}</p>
-          </div>
-
-          <div className='flex flex-wrap gap-2 mb-6'>
-            <button
-              type='button'
-              onClick={() => navigate('/dynamic-pricing-details')}
-              className='font-medium text-sm text-white p-3 rounded bg-primary'
-            >
-              View Configurations
-            </button>
-          </div>
-
-          <form className='flex flex-col gap-4' onSubmit={handleSubmitClick} autoComplete='off'>
-            <label className='flex flex-col w-full sm:w-[70%] gap-2'>
-              <span className='font-medium text-lg sm:text-xl'>Company*</span>
-              <select
-                name='companyId'
-                value={formData.companyId}
-                className='outline-none text-base border-2 px-2 py-2 rounded-lg'
-                onChange={handleCompanyChange}
-                required
-              >
-                <option value=''>Select Company</option>
-                {companies.map((company) => (
-                  <option key={company._id} value={company._id}>
-                    {company.name} ({company.companyCode})
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className='flex flex-col w-full sm:w-[70%] gap-2'>
-              <span className='font-medium text-lg sm:text-xl'>Enable Dynamic Pricing*</span>
-              <select
-                name='isEnabled'
-                value={formData.isEnabled}
-                className='outline-none text-base border-2 px-2 py-2 rounded-lg'
-                onChange={handleChange}
-                required
-              >
-                <option value=''>-- Select --</option>
-                <option value='true'>ON</option>
-                <option value='false'>OFF</option>
-              </select>
-            </label>
-
-            {formData.isEnabled === 'true' && (
-              <PricingSlabSection
-                formData={formData}
-                onSlabChange={handleSlabChange}
-                onAddSlab={addSlab}
-                onRemoveSlab={removeSlab}
-                onChange={handleChange}
-              />
-            )}
-
-            <div className='mt-6'>
-              <button
-                type='submit'
-                disabled={saving}
-                className='font-medium text-sm text-white p-3 rounded bg-primary disabled:opacity-50'
-              >
-                {getSubmitButtonText(saving, editCompanyId)}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+      <PricingFormCard
+        companies={companies}
+        formData={formData}
+        editCompanyId={editCompanyId}
+        saving={saving}
+        navigate={navigate}
+        onCompanyChange={handleCompanyChange}
+        onChange={handleChange}
+        onSlabChange={handleSlabChange}
+        onAddSlab={addSlab}
+        onRemoveSlab={removeSlab}
+        onSubmit={handleSubmitClick}
+      />
     </div>
   )
 }
+
+const PricingFormCard = ({
+  companies, formData, editCompanyId, saving, navigate,
+  onCompanyChange, onChange, onSlabChange, onAddSlab, onRemoveSlab, onSubmit,
+}) => (
+  <div
+    style={{
+      boxShadow:
+        'rgba(0, 0, 0, 0.3) 0px 0px 10px, rgba(0, 0, 0, 0.1) 0px 5px 12px',
+    }}
+    className='items-center bg-white max-w-full sm:max-w-[900px] flex py-6 sm:py-8 mx-2 sm:mx-auto mt-10 justify-center flex-col'
+  >
+    <div className='flex flex-col w-full px-4 sm:px-10'>
+      <div className='mb-6 flex flex-col gap-2 border-b-2 pb-2'>
+        <p className='text-2xl sm:text-4xl font-bold'>{editCompanyId ? 'Edit Dynamic Pricing Configuration' : 'Add Dynamic Pricing Configuration'}</p>
+      </div>
+
+      <div className='flex flex-wrap gap-2 mb-6'>
+        <button
+          type='button'
+          onClick={() => navigate('/dynamic-pricing-details')}
+          className='font-medium text-sm text-white p-3 rounded bg-primary'
+        >
+          View Configurations
+        </button>
+      </div>
+
+      <form className='flex flex-col gap-4' onSubmit={onSubmit} autoComplete='off'>
+        <label className='flex flex-col w-full sm:w-[70%] gap-2'>
+          <span className='font-medium text-lg sm:text-xl'>Company*</span>
+          <select
+            name='companyId'
+            value={formData.companyId}
+            className='outline-none text-base border-2 px-2 py-2 rounded-lg'
+            onChange={onCompanyChange}
+            required
+          >
+            <option value=''>Select Company</option>
+            {companies.map((company) => (
+              <option key={company._id} value={company._id}>
+                {company.name} ({company.companyCode})
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className='flex flex-col w-full sm:w-[70%] gap-2'>
+          <span className='font-medium text-lg sm:text-xl'>Enable Dynamic Pricing*</span>
+          <select
+            name='isEnabled'
+            value={formData.isEnabled}
+            className='outline-none text-base border-2 px-2 py-2 rounded-lg'
+            onChange={onChange}
+            required
+          >
+            <option value=''>-- Select --</option>
+            <option value='true'>ON</option>
+            <option value='false'>OFF</option>
+          </select>
+        </label>
+
+        {formData.isEnabled === 'true' && (
+          <PricingSlabSection
+            formData={formData}
+            onSlabChange={onSlabChange}
+            onAddSlab={onAddSlab}
+            onRemoveSlab={onRemoveSlab}
+            onChange={onChange}
+          />
+        )}
+
+        <div className='mt-6'>
+          <button
+            type='submit'
+            disabled={saving}
+            className='font-medium text-sm text-white p-3 rounded bg-primary disabled:opacity-50'
+          >
+            {getSubmitButtonText(saving, editCompanyId)}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)
 
 const ConfirmModal = ({ editCompanyId, formData, saving, onCancel, onConfirm }) => (
   <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
