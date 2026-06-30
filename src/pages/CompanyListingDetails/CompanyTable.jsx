@@ -5,14 +5,22 @@ import styles from './CompanyListingDetails.module.css'
 const CONFIG_PENDING = 'Config Pending'
 
 const getStatusBadgeClass = (status) => {
-  if (status === 'ON') { return 'bg-green-100 text-green-700' }
-  if (status === CONFIG_PENDING) { return 'bg-yellow-100 text-yellow-700' }
+  if (status === 'ON') {
+    return 'bg-green-100 text-green-700'
+  }
+  if (status === CONFIG_PENDING) {
+    return 'bg-yellow-100 text-yellow-700'
+  }
   return 'bg-gray-100 text-gray-500'
 }
 
 const getStatusLabel = (status) => {
-  if (status === 'ON') { return 'ON' }
-  if (status === CONFIG_PENDING) { return CONFIG_PENDING }
+  if (status === 'ON') {
+    return 'ON'
+  }
+  if (status === CONFIG_PENDING) {
+    return CONFIG_PENDING
+  }
   return 'OFF'
 }
 
