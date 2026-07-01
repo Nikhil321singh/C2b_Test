@@ -55,6 +55,9 @@ const TableHeader = () => (
       <th className='p-2 text-sm md:p-3 md:text-base'>Product Name</th>
       <th className='p-2 text-sm md:p-3 md:text-base'>Variant</th>
       <th className='p-2 text-sm md:p-3 md:text-base'>Price</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Negotiation Amt</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Coupon Amt</th>
+      <th className='p-2 text-sm md:p-3 md:text-base'>Bonus Amt</th>
       <th className='p-2 text-sm md:p-3 md:text-base min-w-[160px]'>
         Final Price Offered to Customer
       </th>
@@ -110,7 +113,16 @@ const TableRow = ({
       {val?.actualPrice}
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-      {val?.price}
+      {val?.negotiatedAmount ?? 0}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {val?.couponDiscount ?? 0}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {val?.slabApplied ? val?.slabBonusAmount : 0}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {val?.finalPrice}
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
       {userRole === 'Company Admin' ? (
@@ -220,6 +232,9 @@ const LeadsCompletedTable = ({ data }) => {
         formattedDate={formattedDate}
         signatureUrl={signatureBase64 || signatureUrl}
         maskInfo={maskInfo}
+        companyName={data[index]?.companyInfo?.name}
+        companyGstin={data[index]?.companyInfo?.gstNumber}
+        companyAddress={data[index]?.companyInfo?.address}
       />,
     )
 

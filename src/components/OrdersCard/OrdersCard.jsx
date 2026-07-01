@@ -142,6 +142,9 @@ async function buildPrintElement(item) {
       price={item.price}
       signatureUrl={signatureBase64 || signatureUrl}
       maskInfo={maskInfo}
+      companyName={item.companyInfo?.name}
+      companyGstin={item.companyInfo?.gstNumber}
+      companyAddress={item.companyInfo?.address}
     />,
   )
 }
@@ -340,7 +343,7 @@ const OrdersCard = ({
       const responseData = {
         grade: '',
         id: itemData.lead_id,
-        price: Number(itemData.lead?.price) - Number(itemData.lead?.bonusPrice),
+        price: Number(itemData.lead?.exactValue ?? itemData.lead?.price),
         uniqueCode: quoteId,
         bonus: Number(itemData.lead?.bonusPrice),
       }
