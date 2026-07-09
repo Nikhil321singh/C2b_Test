@@ -68,7 +68,7 @@ const Price = () => {
     signatureFile &&
     customerPhoto &&
     ceirImage
-    && isAadharVerified &&
+    // && isAadharVerified &&
     imeiVerified &&
     !isImeiBlocked
 
