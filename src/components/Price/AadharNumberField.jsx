@@ -12,6 +12,7 @@ const AadharNumberField = ({
   setAadharNumber,
   isVerified,
   setIsVerified,
+  isVerificationRequired = true,
 }) => {
   const [error, setError] = useState(true)
   const [isSendingOtp, setIsSendingOtp] = useState(false)
@@ -151,6 +152,9 @@ const AadharNumberField = ({
     if (isVerified) {
       return 'bg-green-500 cursor-not-allowed'
     }
+    if (!isVerificationRequired) {
+      return 'bg-gray-400 cursor-not-allowed'
+    }
     if (!error && !isSendingOtp) {
       return pink
     }
@@ -190,10 +194,13 @@ const AadharNumberField = ({
         <button
           className={`px-4 py-2 font-bold text-white rounded ${getButtonClass()}`}
           onClick={handleSendOtp}
-          disabled={!!error || isSendingOtp || otpSent}
+          disabled={!isVerificationRequired || !!error || isSendingOtp || otpSent}
         >
           {getButtonText()}
         </button>
+        {!isVerificationRequired && (
+          <span className='text-sm text-primary'>Note: Verification not needed. You can submit directly.</span>
+        )}
       </div>
 
       {otpSent && !isVerified && (
