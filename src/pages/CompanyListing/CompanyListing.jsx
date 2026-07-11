@@ -157,6 +157,7 @@ const CompanyListing = () => {
 
   const [showPrice, setShowPrice] = useState(false);
   const [maskInfo, setMaskInfo] = useState(false);
+  const [aadharVerificationRequired, setAadharVerificationRequired] = useState(true);
   const [emailConfiguration, setEmailConfiguration] = useState({
     enabled: false,
     recipients: [],
@@ -205,6 +206,7 @@ const CompanyListing = () => {
         remarks: remarks,
         showPrice: showPrice,
         maskInfo: maskInfo,
+        aadharVerificationRequired: aadharVerificationRequired,
         emailConfiguration: emailConfiguration,
         attachedDocuments: uploadedDocuments,
       };
@@ -238,7 +240,7 @@ const CompanyListing = () => {
         { headers: { Authorization: userToken } }
       );
 
-      toast.success("Company Added Successfully!");
+      toast.success("Company added successfully!");
 
       if (response.data.result && response.data.result.companyCode) {
         setGeneratedCompanyCode(response.data.result.companyCode);
@@ -266,6 +268,7 @@ const CompanyListing = () => {
     remarks,
     showPrice,
     maskInfo,
+    aadharVerificationRequired,
     emailConfiguration,
     attachedFiles,
     dynamicPricingEnabled,
@@ -283,6 +286,7 @@ const CompanyListing = () => {
     setRemarks,
     setShowPrice,
     setMaskInfo,
+    setAadharVerificationRequired,
     setEmailConfiguration,
     setDynamicPricingEnabled,
     setSlabs,
@@ -389,6 +393,7 @@ const CompanyListingForm = ({
     remarks,
     showPrice,
     maskInfo,
+    aadharVerificationRequired,
     emailConfiguration,
     attachedFiles,
     dynamicPricingEnabled,
@@ -406,6 +411,7 @@ const CompanyListingForm = ({
     setRemarks,
     setShowPrice,
     setMaskInfo,
+    setAadharVerificationRequired,
     setEmailConfiguration,
     setDynamicPricingEnabled,
     setSlabs,
@@ -466,6 +472,18 @@ const CompanyListingForm = ({
           className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
           value={maskInfo.toString()}
           onChange={(e) => setMaskInfo(e.target.value === "true")}
+        >
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      </div>
+
+      <div className="flex flex-col w-[70%] gap-2">
+        <span className="font-medium text-xl">Aadhaar Verification</span>
+        <select
+          className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
+          value={aadharVerificationRequired.toString()}
+          onChange={(e) => setAadharVerificationRequired(e.target.value === "true")}
         >
           <option value="true">True</option>
           <option value="false">False</option>
