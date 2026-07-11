@@ -51,7 +51,9 @@ const Price = () => {
       try {
         const profile = JSON.parse(sessionStorage.getItem('profile'))
         const companyId = profile?.companyId
-        if (!companyId) return
+        if (!companyId) {
+          return
+        }
 
         const token = sessionStorage.getItem('authToken')
         const res = await axios.get(
