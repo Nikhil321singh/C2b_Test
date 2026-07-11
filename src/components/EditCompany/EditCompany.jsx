@@ -373,7 +373,13 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
           <FormField label='Remarks' name='remarks' value={formValues.remarks} onChange={handleChange} />
           <SelectField label='Show Price' name='showPrice' value={formValues.showPrice?.toString() || 'false'} onChange={handleChange} options={booleanOptions} />
           <SelectField label='Mask Info' name='maskInfo' value={formValues.maskInfo?.toString() || 'false'} onChange={handleChange} options={booleanOptions} />
-          <SelectField label='Aadhaar Verification' name='aadharVerificationRequired' value={formValues.aadharVerificationRequired?.toString() || 'true'} onChange={handleChange} options={booleanOptions} />
+          <SelectField
+            label='Aadhaar Verification'
+            name='aadharVerificationRequired'
+            value={formValues.aadharVerificationRequired?.toString() || 'true'}
+            onChange={handleChange}
+            options={booleanOptions}
+          />
         </div>
 
         <div className='border border-gray-200 rounded-lg p-4'>
