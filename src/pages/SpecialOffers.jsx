@@ -290,6 +290,14 @@ const SpecialOffers = () => {
       )
       .then((response) => {
         setAnswers([]);
+        if (response.data.payout) {
+          sessionStorage.setItem(
+            "activePayout",
+            JSON.stringify(response.data.payout)
+          );
+        } else {
+          sessionStorage.removeItem("activePayout");
+        }
         sessionStorage.setItem("messageReceived", response.data.message);
         sessionStorage.setItem("disableBtn", JSON.stringify(true));
         setDisableBtn(true);

@@ -244,10 +244,19 @@ const DynamicPricingSection = ({
 )
 
 const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
+  const profile = JSON.parse(sessionStorage.getItem('profile') || '{}')
+  const canConfigurePayout = profile?.role === 'Super Admin'
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     ...companyData,
-    emailConfiguration: companyData.emailConfiguration || { enabled: false, recipients: [], notificationTypes: ['paymentReceipt'] }
+    emailConfiguration: companyData.emailConfiguration || { enabled: false, recipients: [], notificationTypes: ['paymentReceipt'] },
+    buybackPayoutSettings: {
+      enabled: false,
+      deviceCooldownDays: 0,
+      customerSellLimitCount: 0,
+      customerSellLimitWindowDays: 0,
+      ...companyData.buybackPayoutSettings,
+    },
   })
   const [dynamicPricingEnabled, setDynamicPricingEnabled] = useState(false)
   const [prevDynamicPricingEnabled, setPrevDynamicPricingEnabled] = useState(false)
@@ -338,6 +347,23 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
       formData.append('maskInfo', formValues.maskInfo)
       formData.append('aadharVerificationRequired', formValues.aadharVerificationRequired)
       formData.append('emailConfiguration', JSON.stringify(formValues.emailConfiguration))
+      if (canConfigurePayout) {
+        formData.append(
+          'buybackPayoutSettings',
+          JSON.stringify({
+            ...formValues.buybackPayoutSettings,
+            deviceCooldownDays: Number(
+              formValues.buybackPayoutSettings.deviceCooldownDays || 0
+            ),
+            customerSellLimitCount: Number(
+              formValues.buybackPayoutSettings.customerSellLimitCount || 0
+            ),
+            customerSellLimitWindowDays: Number(
+              formValues.buybackPayoutSettings.customerSellLimitWindowDays || 0
+            ),
+          })
+        )
+      }
       formData.append('id', formValues._id)
 
       await axios.put(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/edit`, formData, { headers: { Authorization: token } })
@@ -380,6 +406,62 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
             onChange={handleChange}
             options={booleanOptions}
           />
+        </div>
+
+        <div className='border border-gray-200 rounded-lg p-4 space-y-4'>
+          <div>
+            {sectionTitle('HSBC UPI Customer Payout')}
+            <p className='text-xs text-gray-500 mt-1'>
+              Company master control and fraud limits. Store-level payout mode
+              and ceiling are configured from Store Listing.
+            </p>
+          </div>
+          <label className='flex items-center gap-3'>
+            <input
+              type='checkbox'
+              checked={formValues.buybackPayoutSettings.enabled}
+              disabled={!canConfigurePayout}
+              onChange={(event) =>
+                setFormValues((previous) => ({
+                  ...previous,
+                  buybackPayoutSettings: {
+                    ...previous.buybackPayoutSettings,
+                    enabled: event.target.checked,
+                  },
+                }))
+              }
+            />
+            Enable HSBC UPI payout for this company
+          </label>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            {[
+              ['Device cooldown (days)', 'deviceCooldownDays'],
+              ['Customer device limit', 'customerSellLimitCount'],
+              ['Customer limit window (days)', 'customerSellLimitWindowDays'],
+            ].map(([label, field]) => (
+              <FormField
+                key={field}
+                label={label}
+                name={field}
+                type='number'
+                value={formValues.buybackPayoutSettings[field]}
+                readOnly={!canConfigurePayout}
+                onChange={(event) =>
+                  setFormValues((previous) => ({
+                    ...previous,
+                    buybackPayoutSettings: {
+                      ...previous.buybackPayoutSettings,
+                      [field]: event.target.value,
+                    },
+                  }))
+                }
+              />
+            ))}
+          </div>
+          <p className='text-xs text-gray-500'>
+            Set a limit to 0 to disable that validation. Only Super Admin can
+            change these settings.
+          </p>
         </div>
 
         <div className='border border-gray-200 rounded-lg p-4'>

@@ -16,6 +16,7 @@ const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
       navigate('/adminmodels')
     } else if (
       profile.role === USER_ROLES.ADMIN_MANAGER ||
+      profile.role === USER_ROLES.MANAGER ||
       profile.role === USER_ROLES.COMPANY_ADMIN
     ) {
       navigate('/customertable')
@@ -52,6 +53,7 @@ const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
     handleQuoteTracking: createNavigationHandler('/quotetrackingdashboard'),
     handleCouponManagement: createNavigationHandler('/coupondetails'),
     handleDynamicPricing: createNavigationHandler('/dynamic-pricing'),
+    handlePayoutManagement: createNavigationHandler('/payout-management'),
     handleLogout,
   }
 }
@@ -68,6 +70,7 @@ function SideMenu({ setsideMenu, sideMenu }) {
         <SuperAdminProfile sideMenu={sideMenu} profile={profile} {...handlers} />
       )}
       {(profile.role === USER_ROLES.ADMIN_MANAGER ||
+        profile.role === USER_ROLES.MANAGER ||
         profile.role === USER_ROLES.ADMIN_MANAGER_UNICORN) && (
         <AdminManagerMenu sideMenu={sideMenu} {...handlers} />
       )}
@@ -96,6 +99,7 @@ const AdminManagerMenu = ({
   handleQuoteTracking,
   handleTechnician,
   adminDashboard,
+  handlePayoutManagement,
   handleLogout,
 }) => (
   <div
@@ -113,6 +117,7 @@ const AdminManagerMenu = ({
       <MenuItem onClick={handleQuoteTracking}>Quote Tracking</MenuItem>
       <MenuItem onClick={handleTechnician}>Technician Report</MenuItem>
       <MenuItem onClick={adminDashboard}>Admin Dashboard</MenuItem>
+      <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
       <MenuItem onClick={handleLogout}>Logout</MenuItem>
     </ul>
   </div>
@@ -152,6 +157,7 @@ const SuperAdminProfile = ({
   handleQuoteTracking,
   handleCouponManagement,
   handleDynamicPricing,
+  handlePayoutManagement,
 }) => {
   const isCompanyAdmin = profile.role === USER_ROLES.COMPANY_ADMIN
   return (
@@ -169,6 +175,7 @@ const SuperAdminProfile = ({
         <MenuItem onClick={handleBulkUploadHistory}>Bulk Upload History</MenuItem>
         <MenuItem onClick={handleStoreListing}>Store Listing</MenuItem>
         <MenuItem onClick={handleStoreReport}>Store Report</MenuItem>
+        <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
         <MenuItem onClick={handleQuoteTracking}>Quote Tracking</MenuItem>
         {!isCompanyAdmin && <MenuItem onClick={handleCouponManagement}>Coupon Management</MenuItem>}
         <MenuItem onClick={handleTable}>Customer Table</MenuItem>

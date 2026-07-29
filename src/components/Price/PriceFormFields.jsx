@@ -18,6 +18,7 @@ const PriceFormFields = ({
   setImei2,
   onImeiVerificationComplete,
   aadharVerificationRequired,
+  isDevelopmentMode,
 }) => {
   const {
     file,
@@ -74,13 +75,17 @@ const PriceFormFields = ({
         imei2={imei2}
         setImei2={setImei2}
         onImeiVerificationComplete={onImeiVerificationComplete}
+        isDevelopmentMode={isDevelopmentMode}
       />
       <AadharNumberField
         setAadharNumber={setAadharNumber}
         aadharNumber={aadharNumber}
         isVerified={isAadharVerified}
         setIsVerified={setIsAadharVerified}
-        isVerificationRequired={aadharVerificationRequired}
+        isVerificationRequired={
+          !isDevelopmentMode && aadharVerificationRequired
+        }
+        isDevelopmentMode={isDevelopmentMode}
       />
       <AdharField
         handleChange={handleFileChange}
@@ -93,6 +98,7 @@ const PriceFormFields = ({
         idproofBackRef={idproofBackRef}
         prod={prod}
         uploadStatus={uploadStatus}
+        isDevelopmentMode={isDevelopmentMode}
       />
       <div className='grid grid-cols-2 gap-3'>
         <PhoneBill
@@ -105,6 +111,7 @@ const PriceFormFields = ({
           isBillRequired={isBillRequired}
           prod={prod}
           uploadStatus={uploadStatus}
+          isDevelopmentMode={isDevelopmentMode}
         />
         <CeirField
           handleChange={handleFileChange}
@@ -113,6 +120,7 @@ const PriceFormFields = ({
           ceirImageRef={ceirImageRef}
           ceirImage={ceirImage}
           uploadStatus={uploadStatus}
+          isDevelopmentMode={isDevelopmentMode}
         />
       </div>
       <PhonePhotos1
@@ -138,6 +146,7 @@ const PriceFormFields = ({
         phoneLeftRef={phoneLeftRef}
         prod={prod}
         uploadStatus={uploadStatus}
+        isDevelopmentMode={isDevelopmentMode}
       />
       <DigitalSignatureField
         signatureFile={signatureFile}
@@ -146,6 +155,7 @@ const PriceFormFields = ({
         uploadIndividualFile={uploadIndividualFile}
         imeinumber={imeinumber}
         prod={prod}
+        isDevelopmentMode={isDevelopmentMode}
       />
       <CustomerPhotoField
         customerPhoto={customerPhoto}
@@ -156,6 +166,7 @@ const PriceFormFields = ({
         prod={prod}
         fileInputRef={customerPhotoRef}
         handleCameraButtonClick={handleCameraButtonClick}
+        isDevelopmentMode={isDevelopmentMode}
       />
     </div>
   )
