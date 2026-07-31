@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { IoMdPerson } from 'react-icons/io'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../utils/axiosInterceptor'
+import NotificationBell from './NotificationBell/NotificationBell'
 const currentDomain = window.location.origin
 const DEFAULT_LOGO = '/Grest_Logo.jpg'
 const BUYBACK_LOGO = '/Grest_Logo_2.jpg' // Use your actual buyback logo
@@ -62,7 +63,8 @@ function AdminNavbar({ setsideMenu, sideMenu }) {
         </div>
 
         {/* Admin Section with Logout */}
-        <div className='flex right relative'>
+        <div className='flex items-center right relative'>
+          <NotificationBell />
           <div
             className='flex items-center admin w-[200px] cursor-pointer relative'
             onClick={() => setShowLogout(!showLogout)}

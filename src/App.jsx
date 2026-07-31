@@ -70,6 +70,7 @@ import CustomerPayout from './pages/CustomerPayout'
 import PayoutManagement from './pages/PayoutManagement'
 import StorePayments from './pages/StorePayments'
 import Warehouse from './pages/Warehouse'
+import Notifications from './pages/Notifications'
 
 function App() {
   // Setup global axios interceptors on app mount
@@ -150,6 +151,7 @@ function App() {
                   element={<StorePayments />}
                 ></Route>
                 <Route path='/warehouse' element={<Warehouse />}></Route>
+                <Route path='/notifications' element={<Notifications />}></Route>
                 <Route
                   path='/devicepickupdashboard'
                   element={<DevicePickupDashboard />}
