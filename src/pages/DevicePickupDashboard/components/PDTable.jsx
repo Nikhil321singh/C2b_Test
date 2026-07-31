@@ -129,6 +129,7 @@ const PDTable = ({
         selectedStatus={selectedStatus}
         handleStatusUpdate={handleStatusUpdate}
         confHandler={confHandler}
+        userRole={userRole}
       />
       <div className="flex justify-center my-4">
         <button

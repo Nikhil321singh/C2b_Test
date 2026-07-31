@@ -3,6 +3,14 @@ import axios from 'axios'
 import { useParams } from 'react-router-dom'
 import { CgSpinner } from 'react-icons/cg'
 
+// Customer payout links are public. Keep these requests isolated from the
+// authenticated application's global interceptor, which redirects 401
+// responses to the login page.
+const publicPayoutApi = axios.create({
+  baseURL: import.meta.env.VITE_REACT_APP_ENDPOINT,
+  timeout: 30000,
+})
+
 const CustomerPayout = () => {
   const { token } = useParams()
   const [payout, setPayout] = useState(null)
@@ -14,11 +22,8 @@ const CustomerPayout = () => {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    axios
-      .get(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/buyback-payouts/public/${token}`,
-        { headers: { 'X-Skip-Interceptor': 'true' } }
-      )
+    publicPayoutApi
+      .get(`/api/buyback-payouts/public/${token}`)
       .then((response) => setPayout(response.data.data))
       .catch((requestError) =>
         setError(requestError.response?.data?.message || 'Invalid payment link')
@@ -31,10 +36,9 @@ const CustomerPayout = () => {
     setSubmitting(true)
     setError('')
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/buyback-payouts/public/${token}/vpa`,
-        { vpa },
-        { headers: { 'X-Skip-Interceptor': 'true' } }
+      const response = await publicPayoutApi.post(
+        `/api/buyback-payouts/public/${token}/vpa`,
+        { vpa }
       )
       setPayout(response.data.data)
     } catch (requestError) {

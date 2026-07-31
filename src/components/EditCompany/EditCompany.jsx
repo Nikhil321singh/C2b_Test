@@ -43,7 +43,7 @@ const FormField = ({ label, name, value, onChange, required = false, readOnly = 
   </div>
 );
 
-const SelectField = ({ label, name, value, onChange, options }) => (
+const SelectField = ({ label, name, value, onChange, options, disabled = false }) => (
   <div className='flex flex-col gap-1.5'>
     <span className='font-medium text-sm text-gray-700'>{label}</span>
     <select
@@ -51,6 +51,7 @@ const SelectField = ({ label, name, value, onChange, options }) => (
       name={name}
       value={value}
       onChange={onChange}
+      disabled={disabled}
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -257,6 +258,10 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
       customerSellLimitWindowDays: 0,
       ...companyData.buybackPayoutSettings,
     },
+    storePaymentSettings: {
+      mode: 'COMPANY_ACCOUNTS',
+      ...companyData.storePaymentSettings,
+    },
   })
   const [dynamicPricingEnabled, setDynamicPricingEnabled] = useState(false)
   const [prevDynamicPricingEnabled, setPrevDynamicPricingEnabled] = useState(false)
@@ -363,6 +368,10 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
             ),
           })
         )
+        formData.append(
+          'storePaymentSettings',
+          JSON.stringify(formValues.storePaymentSettings)
+        )
       }
       formData.append('id', formValues._id)
 
@@ -462,6 +471,50 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
             Set a limit to 0 to disable that validation. Only Super Admin can
             change these settings.
           </p>
+        </div>
+
+        <div className='border border-gray-200 rounded-lg p-4 space-y-3'>
+          <div>
+            {sectionTitle('Store Payment Permission')}
+            <p className='text-xs text-gray-500 mt-1'>
+              Controls who records the store payout after a payment request.
+              Only Super Admin can change this setting.
+            </p>
+          </div>
+          <SelectField
+            label='Payment mode'
+            name='storePaymentMode'
+            value={formValues.storePaymentSettings.mode}
+            disabled={!canConfigurePayout}
+            onChange={(event) =>
+              setFormValues((previous) => ({
+                ...previous,
+                storePaymentSettings: {
+                  ...previous.storePaymentSettings,
+                  mode: event.target.value,
+                },
+              }))
+            }
+            options={[
+              {
+                value: 'COMPANY_ACCOUNTS',
+                label: 'Mode 1 - Company Accounts pays store',
+              },
+              {
+                value: 'MANAGER_FUNDS',
+                label: 'Mode 2 - Manager pays from personal funds',
+              },
+              {
+                value: 'PREPAID_DEFERRED',
+                label: 'Mode 3 - Pre-paid / deferred (no pickup payout)',
+              },
+            ]}
+          />
+          {!canConfigurePayout && (
+            <p className='text-xs text-amber-700'>
+              Read only: ask a Super Admin to change the payment permission.
+            </p>
+          )}
         </div>
 
         <div className='border border-gray-200 rounded-lg p-4'>

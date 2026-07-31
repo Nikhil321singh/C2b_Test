@@ -68,6 +68,8 @@ import SessionTimeoutWarning from './components/SessionTimeoutWarning'
 import DeleteMyData from './pages/DeleteMyData'
 import CustomerPayout from './pages/CustomerPayout'
 import PayoutManagement from './pages/PayoutManagement'
+import StorePayments from './pages/StorePayments'
+import Warehouse from './pages/Warehouse'
 
 function App() {
   // Setup global axios interceptors on app mount
@@ -143,6 +145,11 @@ function App() {
                   path='/payout-management'
                   element={<PayoutManagement />}
                 ></Route>
+                <Route
+                  path='/store-payments'
+                  element={<StorePayments />}
+                ></Route>
+                <Route path='/warehouse' element={<Warehouse />}></Route>
                 <Route
                   path='/devicepickupdashboard'
                   element={<DevicePickupDashboard />}

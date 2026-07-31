@@ -6,6 +6,7 @@ const StatusSelector = ({
   selectedStatus,
   handleStatusUpdate,
   confHandler,
+  userRole,
 }) => (
   <div className='mx-2 flex gap-2'>
     <select
@@ -20,12 +21,16 @@ const StatusSelector = ({
       <option value='On Hold'>On Hold</option>
       <option value='Cancelled'>Cancelled</option>
     </select>
-    <button
-      onClick={confHandler}
-      className='border-2 w-1/2 border-primary bg-primary text-white text-[12px] px-4 py-2 rounded'
-    >
-      Request For Payment
-    </button>
+    {['Super Admin', 'Company Admin', 'Manager', 'Store Admin', 'Admin'].includes(
+      userRole
+    ) && (
+      <button
+        onClick={confHandler}
+        className='border-2 w-1/2 border-primary bg-primary text-white text-[12px] px-4 py-2 rounded'
+      >
+        Request For Payment
+      </button>
+    )}
   </div>
 )
 
