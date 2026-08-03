@@ -4,8 +4,10 @@ import { submitFormData } from '../utils/formSubmissionUtils'
 import { retryFailedUploads } from '../utils/retryUtils'
 import toast from 'react-hot-toast'
 import { FILE_KEYS } from '../constants/priceConstants'
+import { RELAX_KYC_VALIDATION } from '../config/featureFlags'
 
 export const usePriceUpload = (formState) => {
+  const isDevelopmentMode = RELAX_KYC_VALIDATION
   const {
     file,
     idProofBack,
@@ -50,15 +52,19 @@ export const usePriceUpload = (formState) => {
       ceirImage, // add CEIR image state to validation
     }
 
-    if (!validateFormData(formData)) {
+    if (!isDevelopmentMode && !validateFormData(formData)) {
       setIsLoading(false)
       return
     }
 
     // Get required files and check upload status
-    const requiredFiles = getRequiredFiles(isBillRequired)
-    requiredFiles.push(FILE_KEYS.SIGNATURE); // Add signature to required files
-    requiredFiles.push(FILE_KEYS.CEIR); // Add CEIR to required files
+    const requiredFiles = isDevelopmentMode
+      ? []
+      : getRequiredFiles(isBillRequired)
+    if (!isDevelopmentMode) {
+      requiredFiles.push(FILE_KEYS.SIGNATURE)
+      requiredFiles.push(FILE_KEYS.CEIR)
+    }
 
     const failedUploads = getFailedUploads(requiredFiles, uploadStatus)
 

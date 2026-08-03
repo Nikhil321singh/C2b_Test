@@ -12,6 +12,7 @@ const PhoneBill = ({
   isBillRequired,
   prod,
   uploadStatus,
+  isDevelopmentMode = false,
 }) => {
   return (
     <div className='flex flex-col adharcard mt-[10px]'>
@@ -20,7 +21,14 @@ const PhoneBill = ({
         <div className='flex items-center'>
           <p className='text-base font-medium three'>
             Upload your {prod[0]?.categoryName} bill
-            {isBillRequired && <span className='text-red-500'>*</span>}
+            {isBillRequired &&
+              (isDevelopmentMode ? (
+                <span className='text-gray-400 text-sm ml-1'>
+                  (optional in development)
+                </span>
+              ) : (
+                <span className='text-red-500'>*</span>
+              ))}
           </p>
         </div>
       </div>

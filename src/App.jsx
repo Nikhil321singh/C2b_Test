@@ -66,6 +66,11 @@ import CreateCoupon from './pages/CreateCoupon'
 import CouponDetails from './pages/CouponDetails'
 import SessionTimeoutWarning from './components/SessionTimeoutWarning'
 import DeleteMyData from './pages/DeleteMyData'
+import CustomerPayout from './pages/CustomerPayout'
+import PayoutManagement from './pages/PayoutManagement'
+import StorePayments from './pages/StorePayments'
+import Warehouse from './pages/Warehouse'
+import Notifications from './pages/Notifications'
 
 function App() {
   // Setup global axios interceptors on app mount
@@ -136,6 +141,17 @@ function App() {
                   element={<NewDeviceqs />}
                 ></Route>
                 <Route path='/productsold' element={<ProductSold />}></Route>
+                <Route path='/payout/:token' element={<CustomerPayout />}></Route>
+                <Route
+                  path='/payout-management'
+                  element={<PayoutManagement />}
+                ></Route>
+                <Route
+                  path='/store-payments'
+                  element={<StorePayments />}
+                ></Route>
+                <Route path='/warehouse' element={<Warehouse />}></Route>
+                <Route path='/notifications' element={<Notifications />}></Route>
                 <Route
                   path='/devicepickupdashboard'
                   element={<DevicePickupDashboard />}

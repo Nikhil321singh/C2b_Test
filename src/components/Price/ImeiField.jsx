@@ -4,7 +4,7 @@ import { IMEI_LENGTH } from '../../constants/priceConstants'
 import Scanner from '../Scanner'
 import ImeiVerificationResult from '../IvsVerification/ImeiVerificationResult'
 
-const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVerificationComplete }) => {
+const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVerificationComplete, isDevelopmentMode = false }) => {
   const [error, setError] = useState('')
   const [imei2Error, setImei2Error] = useState('')
   const [isScanOpen, setIsScanOpen] = useState(false)
@@ -17,6 +17,9 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVer
   const leadId = sessionStorage.getItem('LeadId') || ''
 
   const validateImeiNumber = (value) => {
+    if (isDevelopmentMode) {
+      return ''
+    }
     if (value && value.length !== IMEI_LENGTH) {
       return 'IMEI number must be exactly 15 digits.'
     } else if (value && !/^\d{15}$/.test(value)) {
@@ -42,7 +45,11 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVer
     setIsScanOpen(false)
   }
 
-  const canVerify = imeinumber && imeinumber.length === IMEI_LENGTH && /^\d{15}$/.test(imeinumber)
+  const canVerify =
+    !isDevelopmentMode &&
+    imeinumber &&
+    imeinumber.length === IMEI_LENGTH &&
+    /^\d{15}$/.test(imeinumber)
 
   return (
     <div className='flex flex-col gap-4'>
@@ -51,7 +58,13 @@ const ImeiField = ({ imeinumber, setImeiNumber, prod, imei2, setImei2, onImeiVer
           <p className='text-base font-medium'>1.</p>
           <p className='text-base font-medium three'>
             Enter your {prod?.[0]?.categoryName} IMEI No./serial no.
-            <span className='text-red-500'>*</span>
+            {isDevelopmentMode ? (
+              <span className='text-gray-400 text-sm ml-1'>
+                (optional in development)
+              </span>
+            ) : (
+              <span className='text-red-500'>*</span>
+            )}
           </p>
         </div>
 

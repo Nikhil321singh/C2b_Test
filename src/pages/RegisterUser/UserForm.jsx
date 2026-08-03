@@ -9,13 +9,28 @@ const defaultRoles = [
   'Admin Manager',
   'Technician',
   'Sale User',
+  'Manager',
+  'Store Admin',
+  'Accounts User',
+  'Warehouse User',
+  'Logistic User',
   'Super_Admin_Unicorn',
   'Admin_Manager_Unicorn',
 ]
 
-const role = import.meta.env.VITE_REACT_APP_ROLES
+const configuredRoles = import.meta.env.VITE_REACT_APP_ROLES
   ? import.meta.env.VITE_REACT_APP_ROLES.split(',').map((item) => item.trim())
   : defaultRoles
+const role = [
+  ...new Set([
+    ...configuredRoles,
+    'Manager',
+    'Store Admin',
+    'Accounts User',
+    'Warehouse User',
+    'Logistic User',
+  ]),
+]
 
 // Helper function to filter roles based on logged-in user
 const getFilteredRoles = (isSuperAdmin, isCompanyAdmin, isAdminManager) => {
@@ -25,6 +40,11 @@ const getFilteredRoles = (isSuperAdmin, isCompanyAdmin, isAdminManager) => {
     return role.filter(
       (r) =>
         r === USER_ROLES.ADMIN_MANAGER ||
+        r === USER_ROLES.MANAGER ||
+        r === USER_ROLES.STORE_ADMIN ||
+        r === USER_ROLES.ACCOUNTS_USER ||
+        r === USER_ROLES.WAREHOUSE_USER ||
+        r === USER_ROLES.LOGISTIC_USER ||
         r === USER_ROLES.TECHNICIAN ||
         r === USER_ROLES.SALE_USER
     )
@@ -276,15 +296,23 @@ const SingleStoreSelect = ({ formData, stores, handleChange }) => (
 )
 
 const shouldShowMultiStore = (userRole, formDataRole) =>
-  userRole && (formDataRole === USER_ROLES.ADMIN_MANAGER || formDataRole === USER_ROLES.TECHNICIAN)
+  userRole && (
+    formDataRole === USER_ROLES.ADMIN_MANAGER ||
+    formDataRole === USER_ROLES.MANAGER ||
+    formDataRole === USER_ROLES.TECHNICIAN
+  )
 
 const shouldShowSingleStore = (userRole, formDataRole) =>
   userRole &&
   formDataRole &&
   formDataRole !== USER_ROLES.ADMIN_MANAGER &&
+  formDataRole !== USER_ROLES.MANAGER &&
   formDataRole !== USER_ROLES.TECHNICIAN &&
   formDataRole !== USER_ROLES.SUPER_ADMIN &&
-  formDataRole !== USER_ROLES.COMPANY_ADMIN
+  formDataRole !== USER_ROLES.COMPANY_ADMIN &&
+  formDataRole !== USER_ROLES.ACCOUNTS_USER &&
+  formDataRole !== USER_ROLES.WAREHOUSE_USER &&
+  formDataRole !== USER_ROLES.LOGISTIC_USER
 
 const StoreSelectionFields = ({
   formData,

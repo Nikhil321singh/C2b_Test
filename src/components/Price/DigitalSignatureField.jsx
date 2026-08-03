@@ -20,6 +20,7 @@ const DigitalSignatureField = ({
   uploadIndividualFile,
   imeinumber,
   prod,
+  isDevelopmentMode = false,
 }) => {
   const [isDrawing, setIsDrawing] = useState(!signatureFile)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
@@ -173,13 +174,24 @@ const DigitalSignatureField = ({
         <p className='text-base font-medium'>{sectionNumber}.</p>
         <div className='flex items-center'>
           <p className='text-base font-medium three'>
-            Digital Signature Required <span className='text-red-500'>*</span>
+            {isDevelopmentMode
+              ? 'Digital Signature '
+              : 'Digital Signature Required '}
+            {isDevelopmentMode ? (
+              <span className='text-gray-400 text-sm'>
+                (optional in development)
+              </span>
+            ) : (
+              <span className='text-red-500'>*</span>
+            )}
           </p>
         </div>
       </div>
 
       <p className='mt-2 text-sm text-gray-600 ml-[19px]'>
-        Please sign to confirm your Aadhaar verification and consent.
+        {isDevelopmentMode
+          ? 'Optional during development.'
+          : 'Please sign to confirm your Aadhaar verification and consent.'}
       </p>
 
       <div className='flex justify-start ml-3 inputAADHAR'>
