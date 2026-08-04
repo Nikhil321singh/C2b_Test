@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
+import toast from 'react-hot-toast'
 import AdminNavbar from '../components/Admin_Navbar'
 import SideMenu from '../components/SideMenu'
 import { generateExcelFile } from '../utils/excelHelper'
@@ -37,16 +38,18 @@ const PayoutManagement = () => {
     setBusyId(id)
     setError('')
     try {
-      await axios.post(
+      const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/buyback-payouts/${id}/${path}`,
         body,
         { headers: { Authorization: token } }
       )
       await load()
+      toast.success(response.data?.message || 'Payout updated')
     } catch (requestError) {
-      setError(
+      const message =
         requestError.response?.data?.message || 'Unable to update payout'
-      )
+      setError(message)
+      toast.error(message)
     } finally {
       setBusyId('')
     }
@@ -59,7 +62,9 @@ const PayoutManagement = () => {
       Store: item.storeId?.storeName || '',
       Amount: Number(item.amount || 0),
       Status: item.status,
+      Provider: item.provider || '',
       'Masked UPI': item.beneficiaryVpaMasked || '',
+      'Masked Account': item.beneficiaryAccountMasked || '',
       'Approval Required': item.approval?.required ? 'Yes' : 'No',
       'Approval Status': item.approval?.status || '',
       'Merchant Order Number': item.merchantOrderNo || '',
@@ -111,7 +116,7 @@ const PayoutManagement = () => {
                 <th className='p-3'>Lead</th>
                 <th className='p-3'>Store</th>
                 <th className='p-3'>Amount</th>
-                <th className='p-3'>UPI</th>
+                <th className='p-3'>Payout to</th>
                 <th className='p-3'>Status</th>
                 <th className='p-3'>Approval</th>
                 <th className='p-3'>Order / RRN</th>
@@ -125,7 +130,11 @@ const PayoutManagement = () => {
                   <td className='p-3'>{item.leadId?.uniqueCode || item.leadId?._id}</td>
                   <td className='p-3'>{item.storeId?.storeName || '-'}</td>
                   <td className='p-3'>₹{Number(item.amount).toFixed(2)}</td>
-                  <td className='p-3'>{item.beneficiaryVpaMasked || '-'}</td>
+                  <td className='p-3'>
+                    {['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
+                      ? item.beneficiaryAccountMasked || '-'
+                      : item.beneficiaryVpaMasked || '-'}
+                  </td>
                   <td className='p-3'>{item.status.replaceAll('_', ' ')}</td>
                   <td className='p-3'>
                     {item.approval?.required
