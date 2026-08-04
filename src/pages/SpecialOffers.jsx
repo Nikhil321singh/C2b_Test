@@ -242,18 +242,6 @@ const SpecialOffers = () => {
         console.log(err);
       });
   };
-  const navigateHome = () => {
-    if (disableBtn) {
-      setTimeout(() => {
-        navigate("/selectDeviceType");
-        sessionStorage.setItem("disableBtn", JSON.stringify(false));
-        sessionStorage.setItem("myMessageKey", "");
-      }, 30000);
-    } else {
-      console.log("clicked");
-    }
-  };
-
   const handleSubmit = () => {
     setIsLoading(true);
     const userIdToken = sessionStorage.getItem("authToken");
@@ -302,7 +290,6 @@ const SpecialOffers = () => {
         sessionStorage.setItem("disableBtn", JSON.stringify(true));
         setDisableBtn(true);
         navigate("/productsold");
-        navigateHome();
       })
       .catch((err) => {
         console.log(err);
