@@ -15,6 +15,9 @@ const activeToasts = {
 // Track if a redirect is already happening
 let isRedirecting = false
 
+const isPublicPayoutPage = () =>
+  window.location.pathname.startsWith('/payout/')
+
 // Helper: show toast once per key
 const showToastOnce = (key, message, options) => {
   if (activeToasts[key]) {
@@ -55,6 +58,9 @@ const handleLogout = (message) => {
 
   setTimeout(() => {
     isRedirecting = false
+    if (isPublicPayoutPage()) {
+      return
+    }
     window.location.href = '/'
   }, 1500)
 }
