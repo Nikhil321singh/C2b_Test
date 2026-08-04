@@ -190,7 +190,9 @@ const PayoutManagement = () => {
                         className='border border-primary text-primary px-3 py-1 rounded disabled:opacity-60'
                       >
                         {item.status === 'FAILED'
-                          ? 'Re-enter UPI'
+                          ? ['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
+                            ? 'Re-enter bank details'
+                            : 'Re-enter UPI'
                           : item.linkNotificationState === 'FAILED'
                           ? 'Retry Link'
                           : 'Send Link'}

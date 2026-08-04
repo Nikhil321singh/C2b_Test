@@ -296,6 +296,8 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
                 >
                   <option value='MANUAL'>Manual payment</option>
                   <option value='HSBC_UPI'>HSBC UPI payout</option>
+                  <option value='HSBC_IMPS'>HSBC IMPS (bank transfer)</option>
+                  <option value='HSBC_NEFT'>HSBC NEFT (bank transfer)</option>
                 </select>
               </div>
               <label className='flex items-center gap-3'>
