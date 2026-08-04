@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import App from './App.jsx'
+import CustomerPayout from './pages/CustomerPayout.jsx'
 import './index.css'
 import { DataProvider } from './components/dataContext.jsx'
 import logger from './utils/logger.js'
@@ -36,10 +38,24 @@ const updateFavicon = (faviconPath) => {
 // Set favicon based on domain
 updateFavicon(isBuybackDomain ? BUYBACK_FAVICON : DEFAULT_FAVICON)
 
+const isPublicPayoutPath = window.location.pathname.startsWith('/payout/')
+
+// The customer payout page is intentionally rendered outside the authenticated
+// application shell. This prevents session timers, role redirects and global
+// Axios interceptors from navigating a customer away while their UPI ID is
+// being verified.
+const root = isPublicPayoutPath ? (
+  <BrowserRouter>
+    <Routes>
+      <Route path='/payout/:token' element={<CustomerPayout />} />
+    </Routes>
+  </BrowserRouter>
+) : (
+  <DataProvider>
+    <App />
+  </DataProvider>
+)
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <DataProvider>
-      <App />
-    </DataProvider>
-  </React.StrictMode>,
+  <React.StrictMode>{root}</React.StrictMode>,
 )

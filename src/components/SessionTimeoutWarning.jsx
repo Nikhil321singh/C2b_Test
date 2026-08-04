@@ -101,6 +101,14 @@ export function SessionTimeoutWarning({
   }
 
   const performLogout = () => {
+    // A timer created on an authenticated page may fire just after navigation.
+    // Never clear storage or redirect while a public customer payout is open.
+    if (window.location.pathname.startsWith('/payout/')) {
+      clearAllTimers()
+      setShowWarning(false)
+      return
+    }
+
     // Clear all storage
     localStorage.clear()
     sessionStorage.clear()
