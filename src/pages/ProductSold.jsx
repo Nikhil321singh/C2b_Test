@@ -171,7 +171,9 @@ const ProductSold = () => {
             className='border-2 border-primary text-primary rounded-lg px-8 py-3 text-lg disabled:opacity-60'
           >
             {payout.status === 'FAILED'
-              ? 'Send Link to Re-enter UPI ID'
+              ? ['HSBC_IMPS', 'HSBC_NEFT'].includes(payout.provider)
+                ? 'Send Link to Re-enter Bank Details'
+                : 'Send Link to Re-enter UPI ID'
               : payout.status === 'AWAITING_VPA'
               ? payout.linkNotificationState === 'FAILED'
                 ? 'Retry Sending Payment Link'
