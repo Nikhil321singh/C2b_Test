@@ -79,7 +79,7 @@ const PayoutManagement = () => {
         ? new Date(item.paidAt).toLocaleString('en-IN')
         : '',
     }))
-    generateExcelFile(rows, 'HSBC_UPI_Payouts_UAT')
+    generateExcelFile(rows, 'HSBC_Payouts_UAT')
   }
 
   return (
@@ -91,7 +91,8 @@ const PayoutManagement = () => {
           <div>
             <h1 className='text-3xl font-semibold'>Customer Payouts</h1>
             <p className='text-gray-600'>
-              Approve, initiate and reconcile HSBC UPI payouts.
+              Approve, initiate and reconcile HSBC payouts (UPI, IMPS &amp;
+              NEFT).
             </p>
           </div>
           <button
