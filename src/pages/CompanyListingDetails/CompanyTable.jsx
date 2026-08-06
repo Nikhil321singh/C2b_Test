@@ -31,6 +31,19 @@ const AadharBadge = ({ required }) => {
   return <span className='px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500'>OFF</span>
 }
 
+const PayoutEnabledBadge = ({ enabled }) => {
+  if (enabled) {
+    return <span className='px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700'>ON</span>
+  }
+  return <span className='px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500'>OFF</span>
+}
+
+const STORE_PAYMENT_MODE_LABELS = {
+  COMPANY_ACCOUNTS: 'Company Accounts',
+  MANAGER_FUNDS: 'Manager Funds',
+  PREPAID_DEFERRED: 'Pre-paid / Deferred',
+}
+
 const CompanyTable = ({
   tableData,
   editHandler,
@@ -79,6 +92,11 @@ const CompanyTable = ({
               <th className='p-2 text-sm md:p-3 md:text-base'>Remarks</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Dynamic Pricing</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Aadhaar Verify</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Payout Enabled</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Cooldown (days)</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Device Limit</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Limit Window (days)</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Store Payment Mode</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Documents</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Price Sheets</th>
             </tr>
@@ -156,6 +174,23 @@ const CompanyTable = ({
                     </td>
                     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                       <AadharBadge required={data.aadharVerificationRequired !== false} />
+                    </td>
+                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                      <PayoutEnabledBadge enabled={data.buybackPayoutSettings?.enabled === true} />
+                    </td>
+                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                      {data.buybackPayoutSettings?.deviceCooldownDays ?? '-'}
+                    </td>
+                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                      {data.buybackPayoutSettings?.customerSellLimitCount ?? '-'}
+                    </td>
+                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                      {data.buybackPayoutSettings?.customerSellLimitWindowDays ?? '-'}
+                    </td>
+                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                      {data.storePaymentSettings?.mode
+                        ? STORE_PAYMENT_MODE_LABELS[data.storePaymentSettings.mode] || data.storePaymentSettings.mode
+                        : '-'}
                     </td>
                     <td
                       className='p-2 text-sm text-center md:p-3 md:text-base'

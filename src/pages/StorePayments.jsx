@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
+import { BeatLoader } from 'react-spinners'
 import AdminNavbar from '../components/Admin_Navbar'
 import SideMenu from '../components/SideMenu'
 import { USER_ROLES } from '../constants/roleConstants'
+import { FaAngleDown } from 'react-icons/fa'
+import { IoMdSearch } from 'react-icons/io'
+import { IoRefresh } from 'react-icons/io5'
+import styles from './CompanyListingDetails/CompanyListingDetails.module.css'
+import styless from './QuotesCreatedAdmin/QuotesCreatedAdmin.module.css'
 
 const STATUS_LABELS = {
   PAYMENT_REQUESTED: 'Payment Requested',
@@ -16,17 +22,61 @@ const MODE_LABELS = {
   PREPAID_DEFERRED: 'Pre-paid / Deferred',
 }
 
+const STATUS_FILTERS = [
+  { value: '', label: 'All statuses' },
+  { value: 'PAYMENT_REQUESTED', label: 'Payment Requested' },
+  { value: 'FLAGGED', label: 'Flagged' },
+  { value: 'PAYMENT_DONE', label: 'Payment Done' },
+]
+
+const BADGE = 'inline-block px-2 py-0.5 rounded-md text-xs font-medium'
+
+const PAYMENT_STATUS_BADGES = {
+  PAYMENT_REQUESTED: 'bg-amber-100 text-amber-700 border border-amber-300',
+  FLAGGED: 'bg-red-100 text-red-700 border border-red-300',
+  PAYMENT_DONE: 'bg-green-100 text-green-700 border border-green-300',
+}
+
+const WAREHOUSE_BADGES = {
+  IN_WAREHOUSE: 'bg-green-100 text-green-700 border border-green-300',
+  NOT_READY: 'bg-amber-100 text-amber-700 border border-amber-300',
+}
+
+const EMAIL_BADGES = {
+  DELIVERED: 'bg-green-100 text-green-700 border border-green-300',
+  FAILED: 'bg-red-100 text-red-700 border border-red-300',
+}
+
 const StorePayments = () => {
   const [sideMenu, setSideMenu] = useState(false)
   const [items, setItems] = useState([])
   const [status, setStatus] = useState('')
+  const [statusDrop, setStatusDrop] = useState(false)
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState('')
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [selected, setSelected] = useState(null)
+  const [search, setSearch] = useState('')
   const token = sessionStorage.getItem('authToken')
   const profile = JSON.parse(sessionStorage.getItem('profile') || '{}')
+
+  const filteredItems = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return items
+    return items.filter((item) => {
+      const haystack = [
+        item.uniqueCode || '',
+        item.storeId?.storeName || '',
+        MODE_LABELS[item.paymentMode] || item.paymentMode || '',
+        STATUS_LABELS[item.paymentStatus] || item.paymentStatus || '',
+        String(item.totalAmount || ''),
+      ]
+        .join(' ')
+        .toLowerCase()
+      return haystack.includes(q)
+    })
+  }, [items, search])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -124,159 +174,212 @@ const StorePayments = () => {
     profile.role === USER_ROLES.SUPER_ADMIN
 
   return (
-    <div className='min-h-screen bg-[#F5F4F9]'>
+    <div>
+      {loading && (
+        <div className='fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50'>
+          <BeatLoader color='var(--primary-color)' size={15} />
+        </div>
+      )}
+
       <AdminNavbar setsideMenu={setSideMenu} sideMenu={sideMenu} />
       <SideMenu setsideMenu={setSideMenu} sideMenu={sideMenu} />
-      <main className='p-4 md:p-8'>
-        <div className='flex flex-wrap justify-between items-end gap-4 mb-6'>
-          <div>
-            <h1 className='text-3xl font-semibold'>Store Payments</h1>
-            <p className='text-gray-600'>
-              Accounts queue, payment confirmation and Warehouse handoff.
-            </p>
-          </div>
-          <div className='flex gap-3'>
-            <select
-              value={status}
-              onChange={(event) => setStatus(event.target.value)}
-              className='border rounded-lg px-3 py-2 bg-white'
-            >
-              <option value=''>All statuses</option>
-              <option value='PAYMENT_REQUESTED'>Payment Requested</option>
-              <option value='FLAGGED'>Flagged</option>
-              <option value='PAYMENT_DONE'>Payment Done</option>
-            </select>
-            <button
-              onClick={load}
-              className='border border-primary text-primary px-4 py-2 rounded-lg'
-            >
-              Refresh
-            </button>
-          </div>
+
+      <div className='pt-1 pb-2 px-4 md:pt-2 md:px-8'>
+        <h1 className='text-3xl font-semibold'>Store Payments</h1>
+        <p className='text-gray-600'>
+          Accounts queue, payment confirmation and Warehouse handoff.
+        </p>
+      </div>
+
+      {/* TOP FILTER BAR */}
+      <div className='flex flex-wrap gap-2 items-center justify-center mt-5'>
+        <div className={styles.search_bar_wrap}>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className='text-sm'
+            placeholder='Search...'
+          />
+          <IoMdSearch size={25} />
         </div>
-
-        {error && <p className='mb-4 text-red-600'>{error}</p>}
-        {message && <p className='mb-4 text-green-700'>{message}</p>}
-        {items.some((item) => item.notification?.state === 'FAILED') && (
-          <div className='mb-4 rounded-lg border border-red-300 bg-red-50 p-3 text-red-800'>
-            One or more completed payments have email delivery failures after
-            the configured retries. Open the affected row for recipient and
-            audit details.
+        <div className='relative w-[250px]'>
+          <div
+            className={styless.filter_button}
+            onClick={() => setStatusDrop(!statusDrop)}
+          >
+            <p className='truncate'>
+              {STATUS_FILTERS.find((s) => s.value === status)?.label ||
+                'All statuses'}
+            </p>
+            <FaAngleDown
+              size={17}
+              className={statusDrop ? 'rotate-180' : ''}
+            />
           </div>
-        )}
+          {statusDrop && (
+            <div className='absolute w-full bg-white shadow-md'>
+              <div
+                className={`${styless.filter_drop} max-h-[200px] overflow-y-scroll`}
+              >
+                {STATUS_FILTERS.map((s) => (
+                  <div
+                    key={s.value}
+                    className={styless.filter_option}
+                    onClick={() => {
+                      setStatus(s.value)
+                      setStatusDrop(false)
+                    }}
+                  >
+                    {s.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className={styles.icons_box}>
+          <IoRefresh size={25} onClick={load} />
+        </div>
+      </div>
 
-        <div className='overflow-x-auto bg-white rounded-xl shadow'>
-          <table className='min-w-full text-sm'>
-            <thead className='bg-gray-100 text-left'>
-              <tr>
-                <th className='p-3'>Request</th>
-                <th className='p-3'>Store</th>
-                <th className='p-3'>Devices</th>
-                <th className='p-3'>Amount</th>
-                <th className='p-3'>Mode</th>
-                <th className='p-3'>Status</th>
-                <th className='p-3'>Warehouse</th>
-                <th className='p-3'>Email</th>
-                <th className='p-3'>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item._id} className='border-t align-top'>
-                  <td className='p-3'>
-                    <p className='font-medium'>{item.uniqueCode}</p>
-                    <p className='text-xs text-gray-500'>
-                      {item.requestedAt
-                        ? new Date(item.requestedAt).toLocaleString('en-IN')
-                        : '-'}
+      {error && <p className='m-4 text-red-600'>{error}</p>}
+      {message && <p className='m-4 text-green-700'>{message}</p>}
+      {items.some((item) => item.notification?.state === 'FAILED') && (
+        <div className='m-4 rounded-lg border border-red-300 bg-red-50 p-3 text-red-800'>
+          One or more completed payments have email delivery failures after
+          the configured retries. Open the affected row for recipient and
+          audit details.
+        </div>
+      )}
+
+      <div className='m-2 overflow-x-auto md:m-5'>
+        <table className='w-full border border-primary'>
+          <thead className='bg-primary text-white'>
+            <tr className='align-top'>
+              <th className='p-2 min-w-[160px] text-sm md:p-3 md:text-base text-left'>Request</th>
+              <th className='p-2 min-w-[120px] text-sm md:p-3 md:text-base'>Store</th>
+              <th className='p-2 min-w-[90px] text-sm md:p-3 md:text-base'>Devices</th>
+              <th className='p-2 min-w-[110px] text-sm md:p-3 md:text-base'>Amount</th>
+              <th className='p-2 min-w-[170px] text-sm md:p-3 md:text-base'>Mode</th>
+              <th className='p-2 min-w-[160px] text-sm md:p-3 md:text-base'>Status</th>
+              <th className='p-2 min-w-[130px] text-sm md:p-3 md:text-base'>Warehouse</th>
+              <th className='p-2 min-w-[110px] text-sm md:p-3 md:text-base'>Email</th>
+              <th className='p-2 min-w-[300px] text-sm md:p-3 md:text-base'>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredItems.map((item, index) => (
+              <tr key={item._id} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
+                <td className='p-2 text-sm text-left md:p-3 md:text-base'>
+                  <p className='font-medium whitespace-nowrap'>{item.uniqueCode}</p>
+                  {item.requestedAt && (
+                    <p className='text-xs text-gray-500 whitespace-nowrap'>
+                      {new Date(item.requestedAt).toLocaleString('en-IN')}
                     </p>
-                  </td>
-                  <td className='p-3'>{item.storeId?.storeName || '-'}</td>
-                  <td className='p-3'>{item.totalDevice}</td>
-                  <td className='p-3'>
+                  )}
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  {item.storeId?.storeName || '-'}
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  <span className='font-medium'>{item.totalDevice}</span>
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  <span className='font-semibold whitespace-nowrap'>
                     ₹{Number(item.totalAmount || 0).toFixed(2)}
-                  </td>
-                  <td className='p-3'>
-                    {MODE_LABELS[item.paymentMode] || item.paymentMode}
-                  </td>
-                  <td className='p-3'>
+                  </span>
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  {MODE_LABELS[item.paymentMode] || item.paymentMode}
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  <span
+                    className={`${BADGE} ${
+                      PAYMENT_STATUS_BADGES[item.paymentStatus] ||
+                      'bg-gray-100 text-gray-700 border border-gray-300'
+                    }`}
+                  >
                     {STATUS_LABELS[item.paymentStatus] || item.paymentStatus}
-                    {item.flag?.reason && (
-                      <p className='text-xs text-red-600'>
-                        {item.flag.reason}
-                      </p>
-                    )}
-                  </td>
-                  <td className='p-3'>
+                  </span>
+                  {item.flag?.reason && (
+                    <p className='mt-1 text-xs text-red-600'>{item.flag.reason}</p>
+                  )}
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  <span
+                    className={`${BADGE} ${
+                      item.warehouseStatus === 'IN_WAREHOUSE'
+                        ? WAREHOUSE_BADGES.IN_WAREHOUSE
+                        : WAREHOUSE_BADGES.NOT_READY
+                    }`}
+                  >
                     {item.warehouseStatus === 'IN_WAREHOUSE'
                       ? 'In Warehouse'
                       : 'Not ready'}
-                  </td>
-                  <td className='p-3'>
-                    <span
-                      className={
-                        item.notification?.state === 'FAILED'
-                          ? 'text-red-600'
-                          : ''
-                      }
+                  </span>
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  <span
+                    className={`${BADGE} ${
+                      EMAIL_BADGES[item.notification?.state] ||
+                      'bg-gray-100 text-gray-700 border border-gray-300'
+                    }`}
+                  >
+                    {item.notification?.state || 'NOT SENT'}
+                  </span>
+                </td>
+                <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+                  <div className='flex justify-center gap-1.5 whitespace-nowrap'>
+                    <button
+                      onClick={() => view(item)}
+                      className='border border-primary text-primary px-2 py-1 text-xs font-medium rounded-md'
                     >
-                      {item.notification?.state || 'NOT SENT'}
-                    </span>
-                  </td>
-                  <td className='p-3'>
-                    <div className='flex flex-wrap gap-2'>
-                      <button
-                        onClick={() => view(item)}
-                        className='border border-gray-400 px-3 py-1 rounded'
-                      >
-                        View
-                      </button>
-                      {canAccountAction &&
-                        item.paymentStatus === 'PAYMENT_REQUESTED' && (
-                          <button
-                            disabled={busyId === item._id}
-                            onClick={() => flag(item)}
-                            className='border border-amber-600 text-amber-700 px-3 py-1 rounded disabled:opacity-50'
-                          >
-                            Flag
-                          </button>
-                        )}
-                      {canAccountAction &&
-                        item.paymentStatus === 'FLAGGED' && (
-                          <button
-                            disabled={busyId === item._id}
-                            onClick={() => unflag(item)}
-                            className='border border-primary text-primary px-3 py-1 rounded disabled:opacity-50'
-                          >
-                            Unflag
-                          </button>
-                        )}
-                      {canMarkPaid(item) &&
-                        item.paymentStatus === 'PAYMENT_REQUESTED' && (
-                          <button
-                            disabled={busyId === item._id}
-                            onClick={() => markPaid(item)}
-                            className='bg-green-700 text-white px-3 py-1 rounded disabled:opacity-50'
-                          >
-                            Mark Paid
-                          </button>
-                        )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {!loading && items.length === 0 && (
-                <tr>
-                  <td colSpan='9' className='p-8 text-center text-gray-500'>
-                    No store payment requests found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          {loading && <p className='p-8 text-center'>Loading payments…</p>}
-        </div>
-      </main>
+                      View
+                    </button>
+                    {canAccountAction &&
+                      item.paymentStatus === 'PAYMENT_REQUESTED' && (
+                        <button
+                          disabled={busyId === item._id}
+                          onClick={() => flag(item)}
+                          className='border border-amber-600 text-amber-700 px-2 py-1 text-xs font-medium rounded-md disabled:opacity-50'
+                        >
+                          Flag
+                        </button>
+                      )}
+                    {canAccountAction &&
+                      item.paymentStatus === 'FLAGGED' && (
+                        <button
+                          disabled={busyId === item._id}
+                          onClick={() => unflag(item)}
+                          className='border border-primary text-primary px-2 py-1 text-xs font-medium rounded-md disabled:opacity-50'
+                        >
+                          Unflag
+                        </button>
+                      )}
+                    {canMarkPaid(item) &&
+                      item.paymentStatus === 'PAYMENT_REQUESTED' && (
+                        <button
+                          disabled={busyId === item._id}
+                          onClick={() => markPaid(item)}
+                          className='bg-green-700 text-white px-2 py-1 text-xs font-medium rounded-md disabled:opacity-50'
+                        >
+                          Mark Paid
+                        </button>
+                      )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {!loading && filteredItems.length === 0 && (
+              <tr>
+                <td colSpan='9' className='p-8 text-center text-gray-500'>
+                  No store payment requests found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {selected && (
         <div className='fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4'>
