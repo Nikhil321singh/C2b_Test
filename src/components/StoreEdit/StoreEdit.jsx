@@ -103,7 +103,18 @@ const FormField = ({ label, name, type, disabled, value, onChange }) => (
 
 const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
   const [isTableLoaded, setIsTableLoaded] = useState(false)
-  const [formData, setFormData] = useState(storeData)
+  const [formData, setFormData] = useState({
+    ...storeData,
+    payoutSettings: {
+      enabled: false,
+      mode: 'MANUAL',
+      approvalEnabled: false,
+      approvalThreshold: 0,
+      payoutCeiling: 0,
+      customerLinkExpiryMinutes: 30,
+      ...storeData?.payoutSettings,
+    },
+  })
   const [response, setResponse] = useState('')
   const [companies, setCompanies] = useState([])
 
@@ -155,6 +166,18 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
       region: formData.region,
       address: formData.address,
       companyId: formData?.companyId?._id,
+      payoutSettings: {
+        ...formData.payoutSettings,
+        approvalThreshold: Number(
+          formData.payoutSettings.approvalThreshold || 0
+        ),
+        payoutCeiling: Number(
+          formData.payoutSettings.payoutCeiling || 0
+        ),
+        customerLinkExpiryMinutes: Number(
+          formData.payoutSettings.customerLinkExpiryMinutes || 30
+        ),
+      },
     }
 
     const config = {
@@ -237,6 +260,129 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
                 onChange={handleChange}
               />
             ))}
+
+            <div className='w-full md:w-[70%] mt-4 border-t pt-5 space-y-4'>
+              <h3 className='font-semibold text-xl'>Customer Payout</h3>
+              <label className='flex items-center gap-3'>
+                <input
+                  type='checkbox'
+                  checked={formData.payoutSettings.enabled}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      payoutSettings: {
+                        ...formData.payoutSettings,
+                        enabled: event.target.checked,
+                      },
+                    })
+                  }
+                />
+                Enable payout configuration
+              </label>
+              <div className='flex flex-col gap-2'>
+                <label className='font-medium'>Payment mode</label>
+                <select
+                  className='border-2 px-3 py-2 rounded-lg'
+                  value={formData.payoutSettings.mode}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      payoutSettings: {
+                        ...formData.payoutSettings,
+                        mode: event.target.value,
+                      },
+                    })
+                  }
+                >
+                  <option value='MANUAL'>Manual payment</option>
+                  <option value='HSBC_UPI'>HSBC UPI payout</option>
+                  <option value='HSBC_IMPS'>HSBC IMPS (bank transfer)</option>
+                  <option value='HSBC_NEFT'>HSBC NEFT (bank transfer)</option>
+                </select>
+              </div>
+              <label className='flex items-center gap-3'>
+                <input
+                  type='checkbox'
+                  checked={formData.payoutSettings.approvalEnabled}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      payoutSettings: {
+                        ...formData.payoutSettings,
+                        approvalEnabled: event.target.checked,
+                      },
+                    })
+                  }
+                />
+                Require approval above configured amount
+              </label>
+              <div className='flex flex-col gap-2'>
+                <label className='font-medium'>Store payout ceiling (₹)</label>
+                <input
+                  className='border-2 px-3 py-2 rounded-lg'
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={formData.payoutSettings.payoutCeiling}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      payoutSettings: {
+                        ...formData.payoutSettings,
+                        payoutCeiling: event.target.value,
+                      },
+                    })
+                  }
+                />
+                <p className='text-sm text-gray-500'>
+                  Use 0 for no ceiling. Payouts above a configured ceiling are
+                  blocked before the customer link is created.
+                </p>
+              </div>
+              <div className='flex flex-col gap-2'>
+                <label className='font-medium'>Approval amount (₹)</label>
+                <input
+                  className='border-2 px-3 py-2 rounded-lg'
+                  type='number'
+                  min='0'
+                  step='0.01'
+                  value={formData.payoutSettings.approvalThreshold}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      payoutSettings: {
+                        ...formData.payoutSettings,
+                        approvalThreshold: event.target.value,
+                      },
+                    })
+                  }
+                />
+                <p className='text-sm text-gray-500'>
+                  Use 0 to require approval for every HSBC payout.
+                </p>
+              </div>
+              <div className='flex flex-col gap-2'>
+                <label className='font-medium'>
+                  Customer link expiry (minutes)
+                </label>
+                <input
+                  className='border-2 px-3 py-2 rounded-lg'
+                  type='number'
+                  min='5'
+                  max='1440'
+                  value={formData.payoutSettings.customerLinkExpiryMinutes}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      payoutSettings: {
+                        ...formData.payoutSettings,
+                        customerLinkExpiryMinutes: event.target.value,
+                      },
+                    })
+                  }
+                />
+              </div>
+            </div>
 
             <div className='mt-8 flex flex-row flex-wrap items-center gap-4'>
               <button

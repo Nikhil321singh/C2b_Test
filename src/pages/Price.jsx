@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CgSpinner } from 'react-icons/cg'
 import axios from 'axios'
@@ -14,8 +14,14 @@ import {
   getRequiredFiles,
   isAllUploadsSuccessful,
 } from '../utils/validationUtils'
+import {
+  KYC_TEST_DATA,
+  KYC_TEST_MODE,
+  RELAX_KYC_VALIDATION,
+} from '../config/featureFlags'
 
 const pink = 'bg-primary'
+const isDevelopmentMode = RELAX_KYC_VALIDATION
 
 const Price = () => {
   const navigate = useNavigate()
@@ -54,6 +60,14 @@ const Price = () => {
 
   useEffect(() => {
     const fetchAadharSetting = async () => {
+      if (KYC_TEST_MODE) {
+        setAadharVerificationRequired(true)
+        return
+      }
+      if (isDevelopmentMode) {
+        setAadharVerificationRequired(false)
+        return
+      }
       try {
         const profile = JSON.parse(sessionStorage.getItem('profile'))
         const companyId = profile?.companyId
@@ -103,20 +117,21 @@ const Price = () => {
   )
 
   const canSubmit =
-    (isMobile ? imeinumber : true) &&
-    phoneFront &&
-    phoneBack &&
-    phoneLeft &&
-    phoneRight &&
-    phoneTop &&
-    phoneBottom &&
-    allUploadsSuccessful &&
-    signatureFile &&
-    customerPhoto &&
-    ceirImage &&
-    imeiVerified &&
-    !isImeiBlocked &&
-    (aadharVerificationRequired ? isAadharVerified : true)
+    isDevelopmentMode ||
+    ((isMobile ? imeinumber : true) &&
+      phoneFront &&
+      phoneBack &&
+      phoneLeft &&
+      phoneRight &&
+      phoneTop &&
+      phoneBottom &&
+      allUploadsSuccessful &&
+      signatureFile &&
+      customerPhoto &&
+      ceirImage &&
+      imeiVerified &&
+      !isImeiBlocked &&
+      (aadharVerificationRequired ? isAadharVerified : true))
 
   const handleImeiVerificationComplete = (result) => {
     setImeiVerificationResult(result)
@@ -132,9 +147,23 @@ const Price = () => {
           <div className='mt-3 text-center relative'>
             <h1 className='text-2xl font-semibold'>Upload Documents</h1>
             <p className='mt-4 text-gray-600'>
-              Regulations require you to upload a national identity card. Don't
-              worry, your data will stay safe and private.
+              Regulations require you to upload a national identity card.
+              Don&apos;t worry, your data will stay safe and private.
             </p>
+            {isDevelopmentMode && (
+              <p className='mt-2 text-amber-600 font-medium'>
+                Test configuration: KYC verification and document uploads are
+                optional. Do not enable this setting in UAT or production.
+              </p>
+            )}
+            {KYC_TEST_MODE && (
+              <div className='mt-2 rounded border border-blue-300 bg-blue-50 p-2 text-sm text-blue-800'>
+                Required-flow test mode — Aadhaar:{' '}
+                <strong>{KYC_TEST_DATA.aadhaarNumber}</strong>, OTP:{' '}
+                <strong>{KYC_TEST_DATA.aadhaarOtp}</strong>, IMEI:{' '}
+                <strong>{KYC_TEST_DATA.imei}</strong>
+              </div>
+            )}
           </div>
           <PriceFormFields
             formState={formState}
@@ -146,16 +175,19 @@ const Price = () => {
             setImei2={setImei2}
             onImeiVerificationComplete={handleImeiVerificationComplete}
             aadharVerificationRequired={aadharVerificationRequired}
+            isDevelopmentMode={isDevelopmentMode}
           />
         </div>
       </div>
       <div className='flex-shrink-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2'>
-        {aadharVerificationRequired && !isAadharVerified && (
+        {!isDevelopmentMode &&
+          aadharVerificationRequired &&
+          !isAadharVerified && (
           <p className='text-sm text-center text-red-500'>
             Please verify your Aadhar number before submitting
           </p>
-        )}
-        {isMobile && isImeiBlocked && (
+          )}
+        {!isDevelopmentMode && isMobile && isImeiBlocked && (
           <p className='text-sm text-center text-red-500'>
             This device IMEI is reported as{' '}
             {imeiVerificationResult.imei1Status === IVS_STATUS.BLOCKED
@@ -164,11 +196,14 @@ const Price = () => {
             . Transaction cannot proceed.
           </p>
         )}
-        {isMobile && imeinumber && !imeiVerificationResult && (
+        {!isDevelopmentMode &&
+          isMobile &&
+          imeinumber &&
+          !imeiVerificationResult && (
           <p className='text-sm text-center text-amber-500'>
             Please verify IMEI with Sanchar Saathi before submitting
           </p>
-        )}
+          )}
         <div
           onClick={() => canSubmit && uploadAllImages(navigate)}
           className={`relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${

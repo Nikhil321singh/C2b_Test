@@ -1,4 +1,8 @@
 import axios from 'axios'
+import {
+  KYC_TEST_DATA,
+  KYC_TEST_MODE,
+} from '../config/featureFlags'
 
 const API_BASE_URL = import.meta.env.VITE_REACT_APP_ENDPOINT
 
@@ -59,6 +63,20 @@ export const STATUS_CONFIG = {
 }
 
 export async function verifyIMEI({ imei1, imei2, deviceModel, storeId, agentId, leadId }) {
+  if (KYC_TEST_MODE) {
+    if (imei1 !== KYC_TEST_DATA.imei) {
+      throw new Error(`Use test IMEI ${KYC_TEST_DATA.imei}`)
+    }
+    return {
+      imei1Status: IVS_STATUS.CLEAN,
+      imei2Status: imei2 ? IVS_STATUS.CLEAN : null,
+      allowTransaction: true,
+      message: 'IMEI verified successfully in local test mode.',
+      referenceId: `LOCAL-IVS-${Date.now()}`,
+      verifiedAt: new Date().toISOString(),
+    }
+  }
+
   const token = sessionStorage.getItem('authToken')
   if (!token) {
     throw new Error('Authentication token not found')
@@ -94,4 +112,3 @@ export async function verifyIMEI({ imei1, imei2, deviceModel, storeId, agentId, 
 
   return response.data?.data
 }
-

@@ -16,7 +16,9 @@ const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
       navigate('/adminmodels')
     } else if (
       profile.role === USER_ROLES.ADMIN_MANAGER ||
-      profile.role === USER_ROLES.COMPANY_ADMIN
+      profile.role === USER_ROLES.MANAGER ||
+      profile.role === USER_ROLES.COMPANY_ADMIN ||
+      profile.role === USER_ROLES.STORE_ADMIN
     ) {
       navigate('/customertable')
     } else if (profile.role === USER_ROLES.TECHNICIAN) {
@@ -52,6 +54,9 @@ const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
     handleQuoteTracking: createNavigationHandler('/quotetrackingdashboard'),
     handleCouponManagement: createNavigationHandler('/coupondetails'),
     handleDynamicPricing: createNavigationHandler('/dynamic-pricing'),
+    handlePayoutManagement: createNavigationHandler('/payout-management'),
+    handleStorePayments: createNavigationHandler('/store-payments'),
+    handleWarehouse: createNavigationHandler('/warehouse'),
     handleLogout,
   }
 }
@@ -68,11 +73,22 @@ function SideMenu({ setsideMenu, sideMenu }) {
         <SuperAdminProfile sideMenu={sideMenu} profile={profile} {...handlers} />
       )}
       {(profile.role === USER_ROLES.ADMIN_MANAGER ||
+        profile.role === USER_ROLES.MANAGER ||
         profile.role === USER_ROLES.ADMIN_MANAGER_UNICORN) && (
         <AdminManagerMenu sideMenu={sideMenu} {...handlers} />
       )}
       {profile.role === USER_ROLES.TECHNICIAN && (
         <TechnicianMenu sideMenu={sideMenu} {...handlers} />
+      )}
+      {profile.role === USER_ROLES.ACCOUNTS_USER && (
+        <AccountsMenu sideMenu={sideMenu} {...handlers} />
+      )}
+      {profile.role === USER_ROLES.STORE_ADMIN && (
+        <StoreAdminMenu sideMenu={sideMenu} {...handlers} />
+      )}
+      {(profile.role === USER_ROLES.WAREHOUSE_USER ||
+        profile.role === USER_ROLES.LOGISTIC_USER) && (
+        <WarehouseMenu sideMenu={sideMenu} {...handlers} />
       )}
     </>
   )
@@ -96,6 +112,8 @@ const AdminManagerMenu = ({
   handleQuoteTracking,
   handleTechnician,
   adminDashboard,
+  handlePayoutManagement,
+  handleStorePayments,
   handleLogout,
 }) => (
   <div
@@ -113,6 +131,8 @@ const AdminManagerMenu = ({
       <MenuItem onClick={handleQuoteTracking}>Quote Tracking</MenuItem>
       <MenuItem onClick={handleTechnician}>Technician Report</MenuItem>
       <MenuItem onClick={adminDashboard}>Admin Dashboard</MenuItem>
+      <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
+      <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
       <MenuItem onClick={handleLogout}>Logout</MenuItem>
     </ul>
   </div>
@@ -127,6 +147,70 @@ const TechnicianMenu = ({ sideMenu, handleHome, handleProfile, handleLogout }) =
   >
     <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
       <MenuItem onClick={handleHome}>Home</MenuItem>
+      <MenuItem onClick={handleProfile}>Profile</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+    </ul>
+  </div>
+)
+
+const AccountsMenu = ({
+  sideMenu,
+  handleStorePayments,
+  handleProfile,
+  handleLogout,
+}) => (
+  <div
+    className={
+      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      (sideMenu && 'left-[0]')
+    }
+  >
+    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
+      <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
+      <MenuItem onClick={handleProfile}>Profile</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+    </ul>
+  </div>
+)
+
+const StoreAdminMenu = ({
+  sideMenu,
+  handleHome,
+  handlpickup,
+  handleStorePayments,
+  handleProfile,
+  handleLogout,
+}) => (
+  <div
+    className={
+      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      (sideMenu && 'left-[0]')
+    }
+  >
+    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
+      <MenuItem onClick={handleHome}>Home</MenuItem>
+      <MenuItem onClick={handlpickup}>Pickup & Cancel Device</MenuItem>
+      <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
+      <MenuItem onClick={handleProfile}>Profile</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+    </ul>
+  </div>
+)
+
+const WarehouseMenu = ({
+  sideMenu,
+  handleWarehouse,
+  handleProfile,
+  handleLogout,
+}) => (
+  <div
+    className={
+      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      (sideMenu && 'left-[0]')
+    }
+  >
+    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
+      <MenuItem onClick={handleWarehouse}>Warehouse</MenuItem>
       <MenuItem onClick={handleProfile}>Profile</MenuItem>
       <MenuItem onClick={handleLogout}>Logout</MenuItem>
     </ul>
@@ -152,6 +236,9 @@ const SuperAdminProfile = ({
   handleQuoteTracking,
   handleCouponManagement,
   handleDynamicPricing,
+  handlePayoutManagement,
+  handleStorePayments,
+  handleWarehouse,
 }) => {
   const isCompanyAdmin = profile.role === USER_ROLES.COMPANY_ADMIN
   return (
@@ -169,6 +256,9 @@ const SuperAdminProfile = ({
         <MenuItem onClick={handleBulkUploadHistory}>Bulk Upload History</MenuItem>
         <MenuItem onClick={handleStoreListing}>Store Listing</MenuItem>
         <MenuItem onClick={handleStoreReport}>Store Report</MenuItem>
+        <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
+        <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
+        <MenuItem onClick={handleWarehouse}>Warehouse</MenuItem>
         <MenuItem onClick={handleQuoteTracking}>Quote Tracking</MenuItem>
         {!isCompanyAdmin && <MenuItem onClick={handleCouponManagement}>Coupon Management</MenuItem>}
         <MenuItem onClick={handleTable}>Customer Table</MenuItem>

@@ -59,6 +59,7 @@ const AadharNumberField = ({
   isVerified,
   setIsVerified,
   isVerificationRequired = true,
+  isDevelopmentMode = false,
 }) => {
   const [error, setError] = useState(true)
   const [isSendingOtp, setIsSendingOtp] = useState(false)
@@ -75,6 +76,11 @@ const AadharNumberField = ({
   }, [])
 
   const validateAadharNumber = (value) => {
+    if (isDevelopmentMode) {
+      setError('')
+      return true
+    }
+
     if (value.length !== AADHAR_LENGTH) {
       setError('Aadhar Number number must be exactly 12 digits.')
       return false
@@ -205,7 +211,13 @@ const AadharNumberField = ({
         <p className='text-base font-medium'>2.</p>
         <p className='text-base font-medium three'>
           Enter your Aadhar Number
-          <span className='text-red-500'>*</span>
+          {isDevelopmentMode ? (
+            <span className='text-gray-400 text-sm ml-1'>
+              (optional in development)
+            </span>
+          ) : (
+            <span className='text-red-500'>*</span>
+          )}
         </p>
       </div>
 
@@ -247,7 +259,7 @@ const AadharNumberField = ({
         <ConsentCheckbox
           consentType='aadhaar_collection'
           onConsentChange={setAadhaarConsent}
-          required={true}
+          required={!isDevelopmentMode}
         />
       </div>
     </div>

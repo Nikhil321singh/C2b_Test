@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export function SessionTimeoutWarning({
   sessionTimeout = 30,
@@ -8,6 +8,8 @@ export function SessionTimeoutWarning({
   const [showWarning, setShowWarning] = useState(false)
   const [countdown, setCountdown] = useState(warningTime * 60) // seconds
   const navigate = useNavigate()
+  const location = useLocation()
+  const isPublicPayoutRoute = location.pathname.startsWith('/payout/')
 
   const idleTimerRef = useRef(null)
   const warningTimerRef = useRef(null)
@@ -19,6 +21,12 @@ export function SessionTimeoutWarning({
   const idleTimeMs = sessionTimeoutMs - warningTimeMs
 
   useEffect(() => {
+    if (isPublicPayoutRoute) {
+      setShowWarning(false)
+      clearAllTimers()
+      return clearAllTimers
+    }
+
     // Start idle timer on mount
     startIdleTimer()
 
@@ -43,7 +51,7 @@ export function SessionTimeoutWarning({
         document.removeEventListener(event, handleUserActivity)
       })
     }
-  }, [])
+  }, [isPublicPayoutRoute])
 
   const startIdleTimer = () => {
     clearAllTimers()
@@ -93,6 +101,14 @@ export function SessionTimeoutWarning({
   }
 
   const performLogout = () => {
+    // A timer created on an authenticated page may fire just after navigation.
+    // Never clear storage or redirect while a public customer payout is open.
+    if (window.location.pathname.startsWith('/payout/')) {
+      clearAllTimers()
+      setShowWarning(false)
+      return
+    }
+
     // Clear all storage
     localStorage.clear()
     sessionStorage.clear()
@@ -127,7 +143,7 @@ export function SessionTimeoutWarning({
   }
 
   // Don't render anything if warning not shown
-  if (!showWarning) {
+  if (isPublicPayoutRoute || !showWarning) {
     return null
   }
 

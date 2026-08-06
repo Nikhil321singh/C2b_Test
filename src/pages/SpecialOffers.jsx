@@ -242,18 +242,6 @@ const SpecialOffers = () => {
         console.log(err);
       });
   };
-  const navigateHome = () => {
-    if (disableBtn) {
-      setTimeout(() => {
-        navigate("/selectDeviceType");
-        sessionStorage.setItem("disableBtn", JSON.stringify(false));
-        sessionStorage.setItem("myMessageKey", "");
-      }, 30000);
-    } else {
-      console.log("clicked");
-    }
-  };
-
   const handleSubmit = () => {
     setIsLoading(true);
     const userIdToken = sessionStorage.getItem("authToken");
@@ -290,11 +278,18 @@ const SpecialOffers = () => {
       )
       .then((response) => {
         setAnswers([]);
+        if (response.data.payout) {
+          sessionStorage.setItem(
+            "activePayout",
+            JSON.stringify(response.data.payout)
+          );
+        } else {
+          sessionStorage.removeItem("activePayout");
+        }
         sessionStorage.setItem("messageReceived", response.data.message);
         sessionStorage.setItem("disableBtn", JSON.stringify(true));
         setDisableBtn(true);
         navigate("/productsold");
-        navigateHome();
       })
       .catch((err) => {
         console.log(err);

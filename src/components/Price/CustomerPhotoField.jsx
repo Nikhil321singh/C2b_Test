@@ -95,6 +95,7 @@ const CustomerPhotoField = ({
   prod,
   fileInputRef,
   handleCameraButtonClick,
+  isDevelopmentMode = false,
 }) => {
   const [showWebcam, setShowWebcam] = useState(false)
   const [previewUrl, setPreviewUrl] = useState(null)
@@ -232,8 +233,16 @@ const CustomerPhotoField = ({
         <p className='text-base font-medium'>{sectionNumber}.</p>
         <div className='flex items-center'>
           <p className='text-base font-medium three'>
-            Upload Your Photo (Mandatory){' '}
-            <span className='text-red-500'>*</span>
+            Upload Your Photo{' '}
+            {isDevelopmentMode ? (
+              <span className='text-gray-400 text-sm'>
+                (optional in development)
+              </span>
+            ) : (
+              <>
+                (Mandatory) <span className='text-red-500'>*</span>
+              </>
+            )}
           </p>
         </div>
       </div>
