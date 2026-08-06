@@ -1,9 +1,28 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { BeatLoader } from 'react-spinners'
 import AdminNavbar from '../components/Admin_Navbar'
 import SideMenu from '../components/SideMenu'
 import { generateExcelFile } from '../utils/excelHelper'
+import { FaDownload } from 'react-icons/fa'
+import { IoMdSearch } from 'react-icons/io'
+import { IoRefresh } from 'react-icons/io5'
+import styles from './CompanyListingDetails/CompanyListingDetails.module.css'
+
+const STATUS_BADGES = {
+  PENDING_APPROVAL: 'bg-amber-100 text-amber-800',
+  READY_FOR_PAYMENT: 'bg-blue-100 text-blue-800',
+  PROCESSING: 'bg-indigo-100 text-indigo-800',
+  STATUS_UNKNOWN: 'bg-gray-100 text-gray-800',
+  EXPIRED: 'bg-red-100 text-red-800',
+  FAILED: 'bg-red-100 text-red-800',
+  AWAITING_VPA: 'bg-amber-100 text-amber-800',
+  PAID: 'bg-green-100 text-green-800',
+  COMPLETED: 'bg-green-100 text-green-800',
+}
+
+const STATUS_BADGE = 'inline-block px-2.5 py-0.5 rounded text-xs font-semibold'
 
 const PayoutManagement = () => {
   const [sideMenu, setSideMenu] = useState(false)
@@ -11,7 +30,26 @@ const PayoutManagement = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [busyId, setBusyId] = useState('')
+  const [search, setSearch] = useState('')
   const token = sessionStorage.getItem('authToken')
+
+  const filteredItems = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return items
+    return items.filter((item) => {
+      const haystack = [
+        item.leadId?.uniqueCode || item.leadId?._id || '',
+        item.storeId?.storeName || '',
+        item.status || '',
+        item.provider || '',
+        item.merchantOrderNo || '',
+        item.providerTransactionRrn || '',
+      ]
+        .join(' ')
+        .toLowerCase()
+      return haystack.includes(q)
+    })
+  }, [items, search])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -107,74 +145,123 @@ const PayoutManagement = () => {
     generateExcelFile(rows, 'HSBC_Payouts_UAT')
   }
 
+  const handleRefresh = async () => {
+    await load()
+    toast.success('Payouts refreshed')
+  }
+
   return (
-    <div className='min-h-screen bg-[#F5F4F9]'>
+    <div>
+      {loading && (
+        <div className='fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50'>
+          <BeatLoader color='var(--primary-color)' size={15} />
+        </div>
+      )}
+
       <AdminNavbar setsideMenu={setSideMenu} sideMenu={sideMenu} />
       <SideMenu setsideMenu={setSideMenu} sideMenu={sideMenu} />
-      <main className='p-4 md:p-8'>
-        <div className='flex justify-between items-center mb-6'>
-          <div>
-            <h1 className='text-3xl font-semibold'>Customer Payouts</h1>
-            <p className='text-gray-600'>
-              Approve, initiate and reconcile HSBC payouts (UPI, IMPS &amp;
-              NEFT).
-            </p>
-          </div>
-          <button
-            onClick={load}
-            className='border border-primary text-primary px-4 py-2 rounded-lg'
-          >
-            Refresh
-          </button>
-          <button
-            onClick={exportPayouts}
-            disabled={items.length === 0}
-            className='border border-primary text-primary px-4 py-2 rounded-lg disabled:opacity-50'
-          >
-            Export
-          </button>
+
+      <div className='pt-1 pb-2 px-4 md:pt-2 md:px-8'>
+        <h1 className='text-3xl font-semibold'>Customer Payouts</h1>
+        <p className='text-gray-600'>
+          Approve, initiate and reconcile HSBC payouts (UPI, IMPS &amp; NEFT).
+        </p>
+      </div>
+
+      {/* TOP FILTER BAR */}
+      <div className='flex flex-wrap gap-2 items-center justify-center mt-2'>
+        <div className={styles.search_bar_wrap}>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className='text-sm'
+            placeholder='Search...'
+          />
+          <IoMdSearch size={25} />
         </div>
-        {error && <p className='mb-4 text-red-600'>{error}</p>}
-        <div className='overflow-x-auto bg-white rounded-xl shadow'>
-          <table className='min-w-full text-sm'>
-            <thead className='bg-gray-100 text-left'>
-              <tr>
-                <th className='p-3'>Lead</th>
-                <th className='p-3'>Store</th>
-                <th className='p-3'>Amount</th>
-                <th className='p-3'>Payout to</th>
-                <th className='p-3'>Status</th>
-                <th className='p-3'>Approval</th>
-                <th className='p-3'>Order / RRN</th>
-                <th className='p-3'>Receipt</th>
-                <th className='p-3'>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item._id} className='border-t'>
-                  <td className='p-3'>{item.leadId?.uniqueCode || item.leadId?._id}</td>
-                  <td className='p-3'>{item.storeId?.storeName || '-'}</td>
-                  <td className='p-3'>₹{Number(item.amount).toFixed(2)}</td>
-                  <td className='p-3'>
-                    {['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
-                      ? item.beneficiaryAccountMasked || '-'
-                      : item.beneficiaryVpaMasked || '-'}
-                  </td>
-                  <td className='p-3'>{item.status.replaceAll('_', ' ')}</td>
-                  <td className='p-3'>
-                    {item.approval?.required
-                      ? item.approval?.status || 'PENDING'
-                      : 'Not required'}
-                  </td>
-                  <td className='p-3'>
-                    <p>{item.merchantOrderNo || '-'}</p>
-                    <p className='text-xs text-gray-500'>
-                      RRN: {item.providerTransactionRrn || '-'}
-                    </p>
-                  </td>
-                  <td className='p-3'>{item.receiptState || '-'}</td>
-                  <td className='p-3 flex flex-wrap gap-2'>
+        <button
+          type='button'
+          onClick={handleRefresh}
+          title='Refresh'
+          className={`${styles.icons_box} cursor-pointer border-0 hover:opacity-80`}
+        >
+          <IoRefresh size={25} />
+        </button>
+        <button
+          type='button'
+          onClick={exportPayouts}
+          disabled={items.length === 0}
+          className={`${styles.bulkdown_button} disabled:opacity-50`}
+        >
+          <FaDownload /> Export
+        </button>
+      </div>
+
+      {error && <p className='m-4 text-red-600'>{error}</p>}
+
+      <div className='m-2 md:m-5'>
+        <div className='overflow-x-auto border border-gray-300 rounded-md'>
+        <table className='w-full'>
+          <thead className='bg-primary text-white'>
+            <tr className='align-top'>
+              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Lead</th>
+              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Store</th>
+              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Amount</th>
+              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Status</th>
+              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Approve</th>
+              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Payout to</th>
+              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Order / RRN</th>
+              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Receipt</th>
+              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredItems.map((item, index) => (
+              <tr
+                key={item._id}
+                className={index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}
+              >
+                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+                  <p className='font-medium'>{item.leadId?.uniqueCode || item.leadId?._id}</p>
+                </td>
+                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+                  {item.storeId?.storeName || '-'}
+                </td>
+                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+                  <span className='font-semibold'>₹{Number(item.amount).toFixed(2)}</span>
+                </td>
+                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+                  <span
+                    className={`${STATUS_BADGE} ${
+                      STATUS_BADGES[item.status] || 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {item.status.replaceAll('_', ' ')}
+                  </span>
+                </td>
+                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+                  {item.approval?.required ? (
+                    <p className='font-medium text-black'>{item.approval?.status || 'PENDING'}</p>
+                  ) : (
+                    'Not required'
+                  )}
+                </td>
+                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+                  {['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
+                    ? item.beneficiaryAccountMasked || '-'
+                    : item.beneficiaryVpaMasked || '-'}
+                </td>
+                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+                  <p className='font-medium'>{item.merchantOrderNo || '-'}</p>
+                  <p className='text-sm text-gray-500'>
+                    RRN: {item.providerTransactionRrn || '-'}
+                  </p>
+                </td>
+                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+                  {item.receiptState || '-'}
+                </td>
+                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+                  <div className='flex justify-center gap-1.5 whitespace-nowrap'>
                     {item.status === 'PENDING_APPROVAL' && (
                       <>
                         <button
@@ -182,7 +269,7 @@ const PayoutManagement = () => {
                           onClick={() =>
                             action(item._id, 'approval', { approved: true })
                           }
-                          className='bg-green-600 text-white px-3 py-1 rounded disabled:opacity-60'
+                          className='bg-green-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
                         >
                           Approve
                         </button>
@@ -191,7 +278,7 @@ const PayoutManagement = () => {
                           onClick={() =>
                             action(item._id, 'approval', { approved: false })
                           }
-                          className='bg-red-600 text-white px-3 py-1 rounded disabled:opacity-60'
+                          className='bg-red-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
                         >
                           Reject
                         </button>
@@ -201,7 +288,7 @@ const PayoutManagement = () => {
                       <button
                         disabled={busyId === item._id}
                         onClick={() => action(item._id, 'pay')}
-                        className='bg-primary text-white px-3 py-1 rounded disabled:opacity-60'
+                        className='bg-primary text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
                       >
                         Make Payment
                       </button>
@@ -210,7 +297,7 @@ const PayoutManagement = () => {
                       <button
                         disabled={busyId === item._id}
                         onClick={() => action(item._id, 'status')}
-                        className='border border-primary text-primary px-3 py-1 rounded disabled:opacity-60'
+                        className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
                       >
                         Check Status
                       </button>
@@ -222,7 +309,7 @@ const PayoutManagement = () => {
                       <button
                         disabled={busyId === item._id}
                         onClick={() => action(item._id, 'resend-link')}
-                        className='border border-primary text-primary px-3 py-1 rounded disabled:opacity-60'
+                        className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
                       >
                         {item.status === 'FAILED'
                           ? ['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
@@ -233,21 +320,21 @@ const PayoutManagement = () => {
                           : 'Send Link'}
                       </button>
                     )}
-                  </td>
-                </tr>
-              ))}
-              {!loading && items.length === 0 && (
-                <tr>
-                  <td colSpan='10' className='p-8 text-center text-gray-500'>
-                    No payouts found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          {loading && <p className='p-8 text-center'>Loading payouts…</p>}
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {!loading && filteredItems.length === 0 && (
+              <tr>
+                <td colSpan='9' className='p-8 text-center text-gray-500'>
+                  No payouts found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
         </div>
-      </main>
+      </div>
     </div>
   )
 }
