@@ -146,6 +146,8 @@ const SuccessNotification = ({ show, companyCode }) => {
 };
 
 const CompanyListing = () => {
+  const profile = JSON.parse(sessionStorage.getItem("profile") || "{}");
+  const canConfigurePayout = profile?.role === "Super Admin";
   const [sideMenu, setsideMenu] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [companyName, setCompanyName] = useState("");
@@ -162,6 +164,15 @@ const CompanyListing = () => {
     enabled: false,
     recipients: [],
     notificationTypes: ["paymentReceipt"],
+  });
+  const [buybackPayoutSettings, setBuybackPayoutSettings] = useState({
+    enabled: false,
+    deviceCooldownDays: 0,
+    customerSellLimitCount: 0,
+    customerSellLimitWindowDays: 0,
+  });
+  const [storePaymentSettings, setStorePaymentSettings] = useState({
+    mode: "COMPANY_ACCOUNTS",
   });
 
   const [dynamicPricingEnabled, setDynamicPricingEnabled] = useState(false);
@@ -210,6 +221,22 @@ const CompanyListing = () => {
         emailConfiguration: emailConfiguration,
         attachedDocuments: uploadedDocuments,
       };
+
+      if (canConfigurePayout) {
+        payload.buybackPayoutSettings = {
+          ...buybackPayoutSettings,
+          deviceCooldownDays: Number(
+            buybackPayoutSettings.deviceCooldownDays || 0
+          ),
+          customerSellLimitCount: Number(
+            buybackPayoutSettings.customerSellLimitCount || 0
+          ),
+          customerSellLimitWindowDays: Number(
+            buybackPayoutSettings.customerSellLimitWindowDays || 0
+          ),
+        };
+        payload.storePaymentSettings = storePaymentSettings;
+      }
 
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/create`,
@@ -275,6 +302,9 @@ const CompanyListing = () => {
     slabs,
     effectiveFrom,
     pricingNotes,
+    buybackPayoutSettings,
+    storePaymentSettings,
+    canConfigurePayout,
   };
 
   const setters = {
@@ -292,6 +322,8 @@ const CompanyListing = () => {
     setSlabs,
     setEffectiveFrom,
     setPricingNotes,
+    setBuybackPayoutSettings,
+    setStorePaymentSettings,
   };
 
   return (
@@ -493,6 +525,9 @@ const CompanyListingForm = ({
     slabs,
     effectiveFrom,
     pricingNotes,
+    buybackPayoutSettings,
+    storePaymentSettings,
+    canConfigurePayout,
   } = formData;
 
   const {
@@ -510,6 +545,8 @@ const CompanyListingForm = ({
     setSlabs,
     setEffectiveFrom,
     setPricingNotes,
+    setBuybackPayoutSettings,
+    setStorePaymentSettings,
   } = setters;
 
   const handleSlabChange = (index, field, value) => {
@@ -588,6 +625,91 @@ const CompanyListingForm = ({
           value={emailConfiguration}
           onChange={setEmailConfiguration}
         />
+      </div>
+
+      <div className="w-[70%] mt-2 p-4 border border-gray-200 rounded-lg space-y-4">
+        <div>
+          <span className="font-semibold text-base text-gray-800">HSBC UPI Customer Payout</span>
+          <p className="text-xs text-gray-500 mt-1">
+            Company master control and fraud limits. Store-level payout mode
+            and ceiling are configured from Store Listing.
+          </p>
+        </div>
+        <label className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={buybackPayoutSettings.enabled}
+            disabled={!canConfigurePayout}
+            onChange={(event) =>
+              setBuybackPayoutSettings({
+                ...buybackPayoutSettings,
+                enabled: event.target.checked,
+              })
+            }
+          />
+          Enable HSBC UPI payout for this company
+        </label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            ["Device cooldown (days)", "deviceCooldownDays"],
+            ["Customer device limit", "customerSellLimitCount"],
+            ["Customer limit window (days)", "customerSellLimitWindowDays"],
+          ].map(([label, field]) => (
+            <div key={field} className="flex flex-col gap-1.5">
+              <span className="font-medium text-sm text-gray-700">{label}</span>
+              <input
+                type="number"
+                min="0"
+                className="border border-gray-300 px-3 py-2 rounded-lg outline-none focus:border-[var(--primary-color)] transition text-sm"
+                value={buybackPayoutSettings[field]}
+                disabled={!canConfigurePayout}
+                onChange={(event) =>
+                  setBuybackPayoutSettings({
+                    ...buybackPayoutSettings,
+                    [field]: event.target.value,
+                  })
+                }
+              />
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500">
+          Set a limit to 0 to disable that validation. Only Super Admin can
+          change these settings.
+        </p>
+      </div>
+
+      <div className="w-[70%] mt-2 p-4 border border-gray-200 rounded-lg space-y-3">
+        <div>
+          <span className="font-semibold text-base text-gray-800">Store Payment Permission</span>
+          <p className="text-xs text-gray-500 mt-1">
+            Controls who records the store payout after a payment request.
+            Only Super Admin can change this setting.
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <span className="font-medium text-sm text-gray-700">Payment mode</span>
+          <select
+            className="border border-gray-300 px-3 py-2 rounded-lg outline-none bg-white focus:border-[var(--primary-color)] transition text-sm"
+            value={storePaymentSettings.mode}
+            disabled={!canConfigurePayout}
+            onChange={(event) =>
+              setStorePaymentSettings({
+                ...storePaymentSettings,
+                mode: event.target.value,
+              })
+            }
+          >
+            <option value="COMPANY_ACCOUNTS">Mode 1 - Company Accounts pays store</option>
+            <option value="MANAGER_FUNDS">Mode 2 - Manager pays from personal funds</option>
+            <option value="PREPAID_DEFERRED">Mode 3 - Pre-paid / deferred (no pickup payout)</option>
+          </select>
+        </div>
+        {!canConfigurePayout && (
+          <p className="text-xs text-amber-700">
+            Read only: ask a Super Admin to change the payment permission.
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col w-[70%] gap-1.5">

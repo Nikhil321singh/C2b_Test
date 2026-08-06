@@ -110,7 +110,7 @@ const SearchActionBar = ({
   </div>
 )
 
-const BulkActionBar = ({ selectedIds, handleBulkToggle, handleBulkAadharToggle, isBulkLoading, setSelectedIds }) => {
+const BulkActionBar = ({ selectedIds, handleBulkToggle, handleBulkAadharToggle, handleBulkPayoutToggle, isBulkLoading, setSelectedIds }) => {
   if (selectedIds.length === 0) {
     return null
   }
@@ -143,6 +143,20 @@ const BulkActionBar = ({ selectedIds, handleBulkToggle, handleBulkAadharToggle, 
         className='bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 flex items-center gap-1'
       >
         <FaToggleOff size={16} /> Disable Aadhaar Verify
+      </button>
+      <button
+        onClick={() => handleBulkPayoutToggle(true)}
+        disabled={isBulkLoading}
+        className='bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 flex items-center gap-1'
+      >
+        <FaToggleOn size={16} /> Enable Payment
+      </button>
+      <button
+        onClick={() => handleBulkPayoutToggle(false)}
+        disabled={isBulkLoading}
+        className='bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 flex items-center gap-1'
+      >
+        <FaToggleOff size={16} /> Disable Payment
       </button>
       <button
         onClick={() => setSelectedIds([])}
@@ -219,6 +233,38 @@ const AadhBulkConfirmModal = ({ aadhBulkConfirmAction, selectedIds, isBulkLoadin
   )
 }
 
+const PayoutBulkConfirmModal = ({ payoutBulkConfirmAction, selectedIds, isBulkLoading, setPayoutBulkConfirmAction, doBulkPayoutToggle }) => {
+  if (payoutBulkConfirmAction === null) {
+    return null
+  }
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
+      <div className='bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl'>
+        <p className='text-lg font-semibold mb-2'>{payoutBulkConfirmAction ? 'Enable' : 'Disable'} HSBC UPI Payout?</p>
+        <p className='text-sm text-gray-600 mb-4'>
+          This will {payoutBulkConfirmAction ? 'enable' : 'disable'} HSBC UPI payout
+          for <strong>{selectedIds.length}</strong> selected {selectedIds.length === 1 ? 'company' : 'companies'}. Continue?
+        </p>
+        <div className='flex gap-3 justify-end'>
+          <button type='button' onClick={() => setPayoutBulkConfirmAction(null)} className='border-2 border-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50'>
+            Cancel
+          </button>
+          <button
+            type='button'
+            onClick={doBulkPayoutToggle}
+            disabled={isBulkLoading}
+            className={`font-medium text-sm text-white px-4 py-2 rounded ${
+              payoutBulkConfirmAction ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
+            } disabled:opacity-50`}
+          >
+            {isBulkLoading ? 'Processing...' : 'Confirm'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const CompanyTableSection = ({
   tableData, pricingFilter, pricingStatusMap, editHandler, deleteConfHandler,
   openViewDocsModal, openUploadPriceModal, setCurrentPage, currentPage, maxPages,
@@ -284,6 +330,7 @@ const CompanyListingDetails = () => {
   const [pricingStatusMap, setPricingStatusMap] = useState({})
   const [bulkConfirmAction, setBulkConfirmAction] = useState(null)
   const [aadhBulkConfirmAction, setAadhBulkConfirmAction] = useState(null)
+  const [payoutBulkConfirmAction, setPayoutBulkConfirmAction] = useState(null)
 
   const loadStatuses = useCallback(
     () => fetchPricingStatuses(token, setPricingStatusMap),
@@ -399,6 +446,35 @@ const CompanyListingDetails = () => {
     }
   }
 
+  const handleBulkPayoutToggle = (enabled) => {
+    if (selectedIds.length === 0) {
+      return
+    }
+    setPayoutBulkConfirmAction(enabled)
+  }
+
+  const doBulkPayoutToggle = async () => {
+    if (payoutBulkConfirmAction === null) {
+      return
+    }
+    setIsBulkLoading(true)
+    setPayoutBulkConfirmAction(null)
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/bulk-toggle-payout`,
+        { companyIds: selectedIds, enabled: payoutBulkConfirmAction },
+        { headers: { Authorization: token } }
+      )
+      toast.success(res.data.message)
+      setSelectedIds([])
+      fetchTableData()
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Something went wrong. Please try again.')
+    } finally {
+      setIsBulkLoading(false)
+    }
+  }
+
   const handleBulkAadharToggle = (isRequired) => {
     if (selectedIds.length === 0) {
       return
@@ -446,7 +522,7 @@ const CompanyListingDetails = () => {
           loadStatuses, onExportConfig, totalCount }}
       />
 
-      <BulkActionBar {...{ selectedIds, handleBulkToggle, handleBulkAadharToggle, isBulkLoading, setSelectedIds }} />
+      <BulkActionBar {...{ selectedIds, handleBulkToggle, handleBulkAadharToggle, handleBulkPayoutToggle, isBulkLoading, setSelectedIds }} />
 
       <BulkConfirmModal
         {...{ bulkConfirmAction, selectedIds, isBulkLoading, setBulkConfirmAction, doBulkToggle }}
@@ -454,6 +530,10 @@ const CompanyListingDetails = () => {
 
       <AadhBulkConfirmModal
         {...{ aadhBulkConfirmAction, selectedIds, isBulkLoading, setAadhBulkConfirmAction, doBulkAadharToggle }}
+      />
+
+      <PayoutBulkConfirmModal
+        {...{ payoutBulkConfirmAction, selectedIds, isBulkLoading, setPayoutBulkConfirmAction, doBulkPayoutToggle }}
       />
 
       <CompanyTableSection

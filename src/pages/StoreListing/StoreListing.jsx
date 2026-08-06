@@ -17,6 +17,14 @@ const initStoreForm = {
   contactNumber: "",
   address: "",
   companyId: "",
+  payoutSettings: {
+    enabled: false,
+    mode: "MANUAL",
+    approvalEnabled: false,
+    approvalThreshold: 0,
+    payoutCeiling: 0,
+    customerLinkExpiryMinutes: 30,
+  },
 };
 
 const StoreListing = () => {
@@ -75,6 +83,18 @@ const StoreListing = () => {
       region: formData.region,
       address: formData.address,
       companyId: formData.companyId,
+      payoutSettings: {
+        ...formData.payoutSettings,
+        approvalThreshold: Number(
+          formData.payoutSettings.approvalThreshold || 0
+        ),
+        payoutCeiling: Number(
+          formData.payoutSettings.payoutCeiling || 0
+        ),
+        customerLinkExpiryMinutes: Number(
+          formData.payoutSettings.customerLinkExpiryMinutes || 30
+        ),
+      },
     };
     const config = {
       method: "post",
@@ -261,6 +281,126 @@ const StoreListingForm = ({ submitHandler, formData, handleChange, companies }) 
           value={formData.address}
           required={true}
         />
+      </div>
+      <div className="w-full md:w-[70%] mt-2 p-4 border border-gray-200 rounded-lg space-y-4">
+        <h3 className="font-semibold text-xl">Customer Payout</h3>
+        <label className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={formData.payoutSettings.enabled}
+            onChange={(event) =>
+              setFormData({
+                ...formData,
+                payoutSettings: {
+                  ...formData.payoutSettings,
+                  enabled: event.target.checked,
+                },
+              })
+            }
+          />
+          Enable payout configuration
+        </label>
+        <div className="flex flex-col gap-2">
+          <label className="font-medium">Payment mode</label>
+          <select
+            className="border-2 px-3 py-2 rounded-lg"
+            value={formData.payoutSettings.mode}
+            onChange={(event) =>
+              setFormData({
+                ...formData,
+                payoutSettings: {
+                  ...formData.payoutSettings,
+                  mode: event.target.value,
+                },
+              })
+            }
+          >
+            <option value="MANUAL">Manual payment</option>
+            <option value="HSBC_UPI">HSBC UPI payout</option>
+            <option value="HSBC_IMPS">HSBC IMPS (bank transfer)</option>
+            <option value="HSBC_NEFT">HSBC NEFT (bank transfer)</option>
+          </select>
+        </div>
+        <label className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={formData.payoutSettings.approvalEnabled}
+            onChange={(event) =>
+              setFormData({
+                ...formData,
+                payoutSettings: {
+                  ...formData.payoutSettings,
+                  approvalEnabled: event.target.checked,
+                },
+              })
+            }
+          />
+          Require approval above configured amount
+        </label>
+        <div className="flex flex-col gap-2">
+          <label className="font-medium">Store payout ceiling (₹)</label>
+          <input
+            className="border-2 px-3 py-2 rounded-lg"
+            type="number"
+            min="0"
+            step="0.01"
+            value={formData.payoutSettings.payoutCeiling}
+            onChange={(event) =>
+              setFormData({
+                ...formData,
+                payoutSettings: {
+                  ...formData.payoutSettings,
+                  payoutCeiling: event.target.value,
+                },
+              })
+            }
+          />
+          <p className="text-sm text-gray-500">
+            Use 0 for no ceiling. Payouts above a configured ceiling are
+            blocked before the customer link is created.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="font-medium">Approval amount (₹)</label>
+          <input
+            className="border-2 px-3 py-2 rounded-lg"
+            type="number"
+            min="0"
+            step="0.01"
+            value={formData.payoutSettings.approvalThreshold}
+            onChange={(event) =>
+              setFormData({
+                ...formData,
+                payoutSettings: {
+                  ...formData.payoutSettings,
+                  approvalThreshold: event.target.value,
+                },
+              })
+            }
+          />
+          <p className="text-sm text-gray-500">
+            Use 0 to require approval for every HSBC payout.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="font-medium">Customer link expiry (minutes)</label>
+          <input
+            className="border-2 px-3 py-2 rounded-lg"
+            type="number"
+            min="5"
+            max="1440"
+            value={formData.payoutSettings.customerLinkExpiryMinutes}
+            onChange={(event) =>
+              setFormData({
+                ...formData,
+                payoutSettings: {
+                  ...formData.payoutSettings,
+                  customerLinkExpiryMinutes: event.target.value,
+                },
+              })
+            }
+          />
+        </div>
       </div>
       <div className="mt-8">
         <button
