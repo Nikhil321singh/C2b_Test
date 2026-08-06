@@ -44,6 +44,31 @@ const PayoutManagement = () => {
         { headers: { Authorization: token } }
       )
       await load()
+      // Reconcile the acted-on row from the authoritative response, so the
+      // action buttons (e.g. Make Payment) update even if the list reload is
+      // served stale/cached.
+      const updated = response.data?.data
+      const updatedId = updated && String(updated._id || updated.id || '')
+      if (updatedId) {
+        setItems((prev) =>
+          prev.map((item) =>
+            String(item._id) === updatedId
+              ? {
+                  ...item,
+                  status: updated.status ?? item.status,
+                  statusMessage: updated.statusMessage ?? item.statusMessage,
+                  merchantOrderNo:
+                    updated.merchantOrderNo ?? item.merchantOrderNo,
+                  providerTransactionRrn:
+                    updated.providerTransactionRrn ??
+                    item.providerTransactionRrn,
+                  receiptState: updated.receiptState ?? item.receiptState,
+                  approval: updated.approval ?? item.approval,
+                }
+              : item
+          )
+        )
+      }
       toast.success(response.data?.message || 'Payout updated')
     } catch (requestError) {
       const message =

@@ -14,6 +14,22 @@ const HOME_PATH = '/selectdevicetype'
 const normalizePayout = (data) =>
   data ? { ...data, id: data.id || data._id } : data
 
+// Ordering of payout statuses. Background polling must never move the status
+// backward (a stale/cached read must not resurrect "Make Payment" after a
+// payment). User actions (runAction) are always authoritative.
+const STATUS_RANK = {
+  AWAITING_VPA: 0,
+  PENDING_APPROVAL: 1,
+  READY_FOR_PAYMENT: 2,
+  PROCESSING: 3,
+  STATUS_UNKNOWN: 3,
+  FAILED: 4,
+  REJECTED: 4,
+  EXPIRED: 4,
+  SUCCESS: 5,
+}
+const rankOf = (status) => STATUS_RANK[status] ?? 0
+
 const ProductSold = () => {
   const navigate = useNavigate()
   const profile = JSON.parse(sessionStorage.getItem('profile'))
@@ -37,11 +53,14 @@ const ProductSold = () => {
         { headers: { Authorization: token } }
       )
       const nextPayout = normalizePayout(response.data.data)
-      setPayout(nextPayout)
-      sessionStorage.setItem(
-        'activePayout',
-        JSON.stringify(nextPayout)
-      )
+      setPayout((prev) => {
+        // Ignore a poll result that would regress the status (stale read).
+        if (prev && rankOf(nextPayout?.status) < rankOf(prev.status)) {
+          return prev
+        }
+        sessionStorage.setItem('activePayout', JSON.stringify(nextPayout))
+        return nextPayout
+      })
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Unable to load payout')
     }

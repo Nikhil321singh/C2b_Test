@@ -13,6 +13,8 @@ const publicPayoutApi = axios.create({
 
 const BANK_PROVIDERS = ['HSBC_IMPS', 'HSBC_NEFT']
 const IFSC_PATTERN = /^[A-Za-z]{4}0[A-Za-z0-9]{6}$/
+// Mirrors the backend UPI VPA pattern so a malformed UPI ID is caught before submit.
+const VPA_PATTERN = /^[a-zA-Z0-9._-]{2,256}@[a-zA-Z][a-zA-Z0-9.-]{1,63}$/
 
 const CustomerPayout = () => {
   const { token } = useParams()
@@ -42,8 +44,12 @@ const CustomerPayout = () => {
 
   const submitVpa = async (event) => {
     event.preventDefault()
-    setSubmitting(true)
     setError('')
+    if (!VPA_PATTERN.test(vpa.trim())) {
+      setError('Enter a valid UPI ID (e.g. name@bank)')
+      return
+    }
+    setSubmitting(true)
     try {
       const response = await publicPayoutApi.post(
         `/api/buyback-payouts/public/${token}/vpa`,
