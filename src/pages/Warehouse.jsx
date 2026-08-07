@@ -140,6 +140,30 @@ const Warehouse = () => {
     }
   }
 
+  const refreshTracking = async () => {
+    if (busy) return
+    setBusy('track')
+    setError('')
+    setMessage('')
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/warehouse/refresh-tracking`,
+        {},
+        { headers: { Authorization: token } }
+      )
+      setMessage(
+        `${response.data.data.tracked} updated, ${response.data.data.failed} unavailable`
+      )
+      await load()
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message || 'Unable to refresh courier tracking'
+      )
+    } finally {
+      setBusy('')
+    }
+  }
+
   return (
     <div className='min-h-screen bg-[#F5F4F9]'>
       <AdminNavbar setsideMenu={setSideMenu} sideMenu={sideMenu} />
@@ -153,18 +177,32 @@ const Warehouse = () => {
             </p>
           </div>
           {isWarehouse && (
-            <button
-              onClick={pushToLogistics}
-              disabled={busy === 'push' || !courier.configured}
-              title={
-                courier.configured
-                  ? ''
-                  : 'Configure the courier server credentials and endpoint first'
-              }
-              className='bg-primary text-white rounded-lg px-4 py-2 disabled:opacity-50'
-            >
-              {busy === 'push' ? 'Pushing…' : 'Push to Logistics'}
-            </button>
+            <div className='flex flex-wrap gap-2'>
+              <button
+                onClick={pushToLogistics}
+                disabled={busy === 'push' || !courier.configured}
+                title={
+                  courier.configured
+                    ? ''
+                    : 'Configure the courier server credentials and endpoint first'
+                }
+                className='bg-primary text-white rounded-lg px-4 py-2 disabled:opacity-50'
+              >
+                {busy === 'push' ? 'Pushing…' : 'Push to Logistics'}
+              </button>
+              <button
+                onClick={refreshTracking}
+                disabled={busy === 'track' || !courier.trackingConfigured}
+                title={
+                  courier.trackingConfigured
+                    ? ''
+                    : 'Configure the courier tracking credentials first'
+                }
+                className='border border-primary text-primary rounded-lg px-4 py-2 disabled:opacity-50'
+              >
+                {busy === 'track' ? 'Refreshing…' : 'Refresh Tracking'}
+              </button>
+            </div>
           )}
         </div>
 
@@ -240,9 +278,31 @@ const Warehouse = () => {
                   </td>
                   <td className='p-3'>
                     <p>{lead.courier?.provider || '-'}</p>
-                    <p className='text-xs text-gray-500'>
-                      {lead.courier?.orderId || lead.courier?.lastError || ''}
-                    </p>
+                    {lead.courier?.orderId && (
+                      <p className='text-xs text-gray-500'>
+                        AWB {lead.courier.orderId}
+                      </p>
+                    )}
+                    {lead.courier?.trackingStatus && (
+                      <p className='text-xs text-gray-700'>
+                        {lead.courier.trackingStatus}
+                      </p>
+                    )}
+                    {lead.courier?.labelUrl && (
+                      <a
+                        href={lead.courier.labelUrl}
+                        target='_blank'
+                        rel='noreferrer'
+                        className='text-xs text-primary underline'
+                      >
+                        Download label
+                      </a>
+                    )}
+                    {lead.courier?.lastError && (
+                      <p className='text-xs text-red-600'>
+                        {lead.courier.lastError}
+                      </p>
+                    )}
                   </td>
                   {!isLogistic && (
                     <td className='p-3'>
