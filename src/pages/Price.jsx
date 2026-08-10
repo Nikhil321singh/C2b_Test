@@ -116,22 +116,35 @@ const Price = () => {
     uploadStatus
   )
 
+  // Submit is gated on many conditions; name the unmet ones so a disabled
+  // button is never a dead end.
+  const missingRequirements = isDevelopmentMode
+    ? []
+    : [
+        [isMobile ? imeinumber : true, 'IMEI number'],
+        [phoneFront, 'front photo'],
+        [phoneBack, 'back photo'],
+        [phoneLeft, 'left photo'],
+        [phoneRight, 'right photo'],
+        [phoneTop, 'top photo'],
+        [phoneBottom, 'bottom photo'],
+        [signatureFile, 'signature'],
+        [customerPhoto, 'customer photo'],
+        [ceirImage, 'CEIR image'],
+        [allUploadsSuccessful, 'all uploads to finish successfully'],
+        [imeiVerified, 'IMEI verification'],
+        [aadharVerificationRequired ? isAadharVerified : true, 'Aadhaar verification'],
+      ]
+        .filter(([met]) => !met)
+        .map(([, label]) => label)
+
   const canSubmit =
-    isDevelopmentMode ||
-    ((isMobile ? imeinumber : true) &&
-      phoneFront &&
-      phoneBack &&
-      phoneLeft &&
-      phoneRight &&
-      phoneTop &&
-      phoneBottom &&
-      allUploadsSuccessful &&
-      signatureFile &&
-      customerPhoto &&
-      ceirImage &&
-      imeiVerified &&
-      !isImeiBlocked &&
-      (aadharVerificationRequired ? isAadharVerified : true))
+    isDevelopmentMode || (missingRequirements.length === 0 && !isImeiBlocked)
+
+  // The Sanchar Saathi prompt below already calls out IMEI verification.
+  const otherMissingRequirements = missingRequirements.filter(
+    (requirement) => requirement !== 'IMEI verification',
+  )
 
   const handleImeiVerificationComplete = (result) => {
     setImeiVerificationResult(result)
@@ -204,6 +217,11 @@ const Price = () => {
             Please verify IMEI with Sanchar Saathi before submitting
           </p>
           )}
+        {!isImeiBlocked && otherMissingRequirements.length > 0 && (
+          <p className='text-sm text-center text-amber-500'>
+            Still needed: {otherMissingRequirements.join(', ')}
+          </p>
+        )}
         <div
           onClick={() => canSubmit && uploadAllImages(navigate)}
           className={`relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
