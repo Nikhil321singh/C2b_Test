@@ -2,6 +2,11 @@ import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../utils/axiosInterceptor'
 import { USER_ROLES } from '../constants/roleConstants'
 
+const MENU_CLASS =
+  'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in '
+const ADMIN_MENU_CLASS =
+  'menu fixed justify-center left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start overflow-y-auto transition-all duration-950 ease-in '
+
 const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
   const navigate = useNavigate()
 
@@ -118,7 +123,7 @@ const AdminManagerMenu = ({
 }) => (
   <div
     className={
-      'menu fixed justify-center left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start overflow-y-auto transition-all duration-950 ease-in ' +
+      ADMIN_MENU_CLASS +
       (sideMenu && 'left-[0]')
     }
   >
@@ -141,7 +146,7 @@ const AdminManagerMenu = ({
 const TechnicianMenu = ({ sideMenu, handleHome, handleProfile, handleLogout }) => (
   <div
     className={
-      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      MENU_CLASS +
       (sideMenu && 'left-[0]')
     }
   >
@@ -161,7 +166,7 @@ const AccountsMenu = ({
 }) => (
   <div
     className={
-      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      MENU_CLASS +
       (sideMenu && 'left-[0]')
     }
   >
@@ -183,7 +188,7 @@ const StoreAdminMenu = ({
 }) => (
   <div
     className={
-      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      MENU_CLASS +
       (sideMenu && 'left-[0]')
     }
   >
@@ -205,7 +210,7 @@ const WarehouseMenu = ({
 }) => (
   <div
     className={
-      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      MENU_CLASS +
       (sideMenu && 'left-[0]')
     }
   >
@@ -244,7 +249,7 @@ const SuperAdminProfile = ({
   return (
     <div
       className={
-        'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+        MENU_CLASS +
         (sideMenu && 'left-[0]')
       }
     >

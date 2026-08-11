@@ -128,6 +128,45 @@ const NotificationBell = () => {
     return null
   }
 
+  let listContent
+  if (loading) {
+    listContent = (
+      <div className='px-4 py-6 text-sm text-center text-gray-500'>
+        Loading…
+      </div>
+    )
+  } else if (items.length === 0) {
+    listContent = (
+      <div className='px-4 py-6 text-sm text-center text-gray-500'>
+        No notifications
+      </div>
+    )
+  } else {
+    listContent = items.map((item) => (
+      <button
+        type='button'
+        key={item._id}
+        onClick={() => onItemClick(item)}
+        className={
+          'w-full text-left px-4 py-3 border-b last:border-b-0 hover:bg-gray-50 ' +
+          (item.read ? 'bg-white' : 'bg-blue-50')
+        }
+      >
+        <div className='flex items-start justify-between gap-2'>
+          <span className='text-sm font-medium text-gray-900'>
+            {item.title}
+          </span>
+          <span className='text-[11px] text-gray-400 whitespace-nowrap'>
+            {timeAgo(item.createdAt)}
+          </span>
+        </div>
+        {item.body && (
+          <p className='mt-0.5 text-xs text-gray-600'>{item.body}</p>
+        )}
+      </button>
+    ))
+  }
+
   return (
     <div ref={containerRef} className='relative mr-4'>
       <button
@@ -159,41 +198,7 @@ const NotificationBell = () => {
             )}
           </div>
 
-          <div className='max-h-96 overflow-y-auto'>
-            {loading ? (
-              <div className='px-4 py-6 text-sm text-center text-gray-500'>
-                Loading…
-              </div>
-            ) : items.length === 0 ? (
-              <div className='px-4 py-6 text-sm text-center text-gray-500'>
-                No notifications
-              </div>
-            ) : (
-              items.map((item) => (
-                <button
-                  type='button'
-                  key={item._id}
-                  onClick={() => onItemClick(item)}
-                  className={
-                    'w-full text-left px-4 py-3 border-b last:border-b-0 hover:bg-gray-50 ' +
-                    (item.read ? 'bg-white' : 'bg-blue-50')
-                  }
-                >
-                  <div className='flex items-start justify-between gap-2'>
-                    <span className='text-sm font-medium text-gray-900'>
-                      {item.title}
-                    </span>
-                    <span className='text-[11px] text-gray-400 whitespace-nowrap'>
-                      {timeAgo(item.createdAt)}
-                    </span>
-                  </div>
-                  {item.body && (
-                    <p className='mt-0.5 text-xs text-gray-600'>{item.body}</p>
-                  )}
-                </button>
-              ))
-            )}
-          </div>
+          <div className='max-h-96 overflow-y-auto'>{listContent}</div>
 
           <button
             type='button'

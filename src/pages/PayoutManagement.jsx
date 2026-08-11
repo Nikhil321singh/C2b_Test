@@ -24,6 +24,139 @@ const STATUS_BADGES = {
 
 const STATUS_BADGE = 'inline-block px-2.5 py-0.5 rounded text-xs font-semibold'
 
+const formatPayoutDate = (value) =>
+  value ? new Date(value).toLocaleString('en-IN') : ''
+
+const getResendLinkLabel = (item) => {
+  if (item.status === 'FAILED') {
+    return ['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
+      ? 'Re-enter bank details'
+      : 'Re-enter UPI'
+  }
+  if (item.linkNotificationState === 'FAILED') {
+    return 'Retry Link'
+  }
+  return 'Send Link'
+}
+
+const shouldShowResendLink = (item) =>
+  item.status === 'EXPIRED' ||
+  item.status === 'FAILED' ||
+  (item.status === 'AWAITING_VPA' && item.linkNotificationState !== 'DELIVERED')
+
+const toExportRow = (item) => ({
+  'Payout ID': item._id,
+  Lead: item.leadId?.uniqueCode || item.leadId?._id || '',
+  Store: item.storeId?.storeName || '',
+  Amount: Number(item.amount || 0),
+  Status: item.status,
+  Provider: item.provider || '',
+  'Masked UPI': item.beneficiaryVpaMasked || '',
+  'Masked Account': item.beneficiaryAccountMasked || '',
+  'Approval Required': item.approval?.required ? 'Yes' : 'No',
+  'Approval Status': item.approval?.status || '',
+  'Merchant Order Number': item.merchantOrderNo || '',
+  RRN: item.providerTransactionRrn || '',
+  'Provider Message': item.providerMessage || '',
+  Attempts: item.attempts?.length || 0,
+  'Receipt State': item.receiptState || '',
+  Created: formatPayoutDate(item.createdAt),
+  Paid: formatPayoutDate(item.paidAt),
+})
+
+const PayoutRow = ({ item, index, busyId, onAction }) => (
+  <tr className={index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}>
+    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+      <p className='font-medium'>{item.leadId?.uniqueCode || item.leadId?._id}</p>
+    </td>
+    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+      {item.storeId?.storeName || '-'}
+    </td>
+    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+      <span className='font-semibold'>₹{Number(item.amount).toFixed(2)}</span>
+    </td>
+    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+      <span
+        className={`${STATUS_BADGE} ${
+          STATUS_BADGES[item.status] || 'bg-gray-100 text-gray-800'
+        }`}
+      >
+        {item.status.replaceAll('_', ' ')}
+      </span>
+    </td>
+    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+      {item.approval?.required ? (
+        <p className='font-medium text-black'>{item.approval?.status || 'PENDING'}</p>
+      ) : (
+        'Not required'
+      )}
+    </td>
+    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+      {['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
+        ? item.beneficiaryAccountMasked || '-'
+        : item.beneficiaryVpaMasked || '-'}
+    </td>
+    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+      <p className='font-medium'>{item.merchantOrderNo || '-'}</p>
+      <p className='text-sm text-gray-500'>
+        RRN: {item.providerTransactionRrn || '-'}
+      </p>
+    </td>
+    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+      {item.receiptState || '-'}
+    </td>
+    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+      <div className='flex justify-center gap-1.5 whitespace-nowrap'>
+        {item.status === 'PENDING_APPROVAL' && (
+          <>
+            <button
+              disabled={busyId === item._id}
+              onClick={() => onAction(item._id, 'approval', { approved: true })}
+              className='bg-green-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+            >
+              Approve
+            </button>
+            <button
+              disabled={busyId === item._id}
+              onClick={() => onAction(item._id, 'approval', { approved: false })}
+              className='bg-red-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+            >
+              Reject
+            </button>
+          </>
+        )}
+        {item.status === 'READY_FOR_PAYMENT' && (
+          <button
+            disabled={busyId === item._id}
+            onClick={() => onAction(item._id, 'pay')}
+            className='bg-primary text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+          >
+            Make Payment
+          </button>
+        )}
+        {['PROCESSING', 'STATUS_UNKNOWN'].includes(item.status) && (
+          <button
+            disabled={busyId === item._id}
+            onClick={() => onAction(item._id, 'status')}
+            className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+          >
+            Check Status
+          </button>
+        )}
+        {shouldShowResendLink(item) && (
+          <button
+            disabled={busyId === item._id}
+            onClick={() => onAction(item._id, 'resend-link')}
+            className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+          >
+            {getResendLinkLabel(item)}
+          </button>
+        )}
+      </div>
+    </td>
+  </tr>
+)
+
 const PayoutManagement = () => {
   const [sideMenu, setSideMenu] = useState(false)
   const [items, setItems] = useState([])
@@ -35,7 +168,9 @@ const PayoutManagement = () => {
 
   const filteredItems = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return items
+    if (!q) {
+      return items
+    }
     return items.filter((item) => {
       const haystack = [
         item.leadId?.uniqueCode || item.leadId?._id || '',
@@ -72,7 +207,9 @@ const PayoutManagement = () => {
   }, [load])
 
   const action = async (id, path, body = {}) => {
-    if (busyId) return
+    if (busyId) {
+      return
+    }
     setBusyId(id)
     setError('')
     try {
@@ -119,29 +256,7 @@ const PayoutManagement = () => {
   }
 
   const exportPayouts = () => {
-    const rows = items.map((item) => ({
-      'Payout ID': item._id,
-      Lead: item.leadId?.uniqueCode || item.leadId?._id || '',
-      Store: item.storeId?.storeName || '',
-      Amount: Number(item.amount || 0),
-      Status: item.status,
-      Provider: item.provider || '',
-      'Masked UPI': item.beneficiaryVpaMasked || '',
-      'Masked Account': item.beneficiaryAccountMasked || '',
-      'Approval Required': item.approval?.required ? 'Yes' : 'No',
-      'Approval Status': item.approval?.status || '',
-      'Merchant Order Number': item.merchantOrderNo || '',
-      RRN: item.providerTransactionRrn || '',
-      'Provider Message': item.providerMessage || '',
-      Attempts: item.attempts?.length || 0,
-      'Receipt State': item.receiptState || '',
-      Created: item.createdAt
-        ? new Date(item.createdAt).toLocaleString('en-IN')
-        : '',
-      Paid: item.paidAt
-        ? new Date(item.paidAt).toLocaleString('en-IN')
-        : '',
-    }))
+    const rows = items.map(toExportRow)
     generateExcelFile(rows, 'HSBC_Payouts_UAT')
   }
 
@@ -217,112 +332,13 @@ const PayoutManagement = () => {
           </thead>
           <tbody>
             {filteredItems.map((item, index) => (
-              <tr
+              <PayoutRow
                 key={item._id}
-                className={index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}
-              >
-                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  <p className='font-medium'>{item.leadId?.uniqueCode || item.leadId?._id}</p>
-                </td>
-                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  {item.storeId?.storeName || '-'}
-                </td>
-                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  <span className='font-semibold'>₹{Number(item.amount).toFixed(2)}</span>
-                </td>
-                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  <span
-                    className={`${STATUS_BADGE} ${
-                      STATUS_BADGES[item.status] || 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {item.status.replaceAll('_', ' ')}
-                  </span>
-                </td>
-                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  {item.approval?.required ? (
-                    <p className='font-medium text-black'>{item.approval?.status || 'PENDING'}</p>
-                  ) : (
-                    'Not required'
-                  )}
-                </td>
-                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  {['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
-                    ? item.beneficiaryAccountMasked || '-'
-                    : item.beneficiaryVpaMasked || '-'}
-                </td>
-                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  <p className='font-medium'>{item.merchantOrderNo || '-'}</p>
-                  <p className='text-sm text-gray-500'>
-                    RRN: {item.providerTransactionRrn || '-'}
-                  </p>
-                </td>
-                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  {item.receiptState || '-'}
-                </td>
-                <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-                  <div className='flex justify-center gap-1.5 whitespace-nowrap'>
-                    {item.status === 'PENDING_APPROVAL' && (
-                      <>
-                        <button
-                          disabled={busyId === item._id}
-                          onClick={() =>
-                            action(item._id, 'approval', { approved: true })
-                          }
-                          className='bg-green-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-                        >
-                          Approve
-                        </button>
-                        <button
-                          disabled={busyId === item._id}
-                          onClick={() =>
-                            action(item._id, 'approval', { approved: false })
-                          }
-                          className='bg-red-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    {item.status === 'READY_FOR_PAYMENT' && (
-                      <button
-                        disabled={busyId === item._id}
-                        onClick={() => action(item._id, 'pay')}
-                        className='bg-primary text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-                      >
-                        Make Payment
-                      </button>
-                    )}
-                    {['PROCESSING', 'STATUS_UNKNOWN'].includes(item.status) && (
-                      <button
-                        disabled={busyId === item._id}
-                        onClick={() => action(item._id, 'status')}
-                        className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-                      >
-                        Check Status
-                      </button>
-                    )}
-                    {(item.status === 'EXPIRED' ||
-                      item.status === 'FAILED' ||
-                      (item.status === 'AWAITING_VPA' &&
-                        item.linkNotificationState !== 'DELIVERED')) && (
-                      <button
-                        disabled={busyId === item._id}
-                        onClick={() => action(item._id, 'resend-link')}
-                        className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-                      >
-                        {item.status === 'FAILED'
-                          ? ['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
-                            ? 'Re-enter bank details'
-                            : 'Re-enter UPI'
-                          : item.linkNotificationState === 'FAILED'
-                          ? 'Retry Link'
-                          : 'Send Link'}
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
+                item={item}
+                index={index}
+                busyId={busyId}
+                onAction={action}
+              />
             ))}
             {!loading && filteredItems.length === 0 && (
               <tr>
