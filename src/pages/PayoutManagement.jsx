@@ -106,56 +106,83 @@ const PayoutRow = ({ item, index, busyId, onAction }) => (
       {item.receiptState || '-'}
     </td>
     <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-      <div className='flex justify-center gap-1.5 whitespace-nowrap'>
-        {item.status === 'PENDING_APPROVAL' && (
-          <>
-            <button
-              disabled={busyId === item._id}
-              onClick={() => onAction(item._id, 'approval', { approved: true })}
-              className='bg-green-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-            >
-              Approve
-            </button>
-            <button
-              disabled={busyId === item._id}
-              onClick={() => onAction(item._id, 'approval', { approved: false })}
-              className='bg-red-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-            >
-              Reject
-            </button>
-          </>
-        )}
-        {item.status === 'READY_FOR_PAYMENT' && (
-          <button
-            disabled={busyId === item._id}
-            onClick={() => onAction(item._id, 'pay')}
-            className='bg-primary text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-          >
-            Make Payment
-          </button>
-        )}
-        {['PROCESSING', 'STATUS_UNKNOWN'].includes(item.status) && (
-          <button
-            disabled={busyId === item._id}
-            onClick={() => onAction(item._id, 'status')}
-            className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-          >
-            Check Status
-          </button>
-        )}
-        {shouldShowResendLink(item) && (
-          <button
-            disabled={busyId === item._id}
-            onClick={() => onAction(item._id, 'resend-link')}
-            className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
-          >
-            {getResendLinkLabel(item)}
-          </button>
-        )}
-      </div>
+      <PayoutActions item={item} busyId={busyId} onAction={onAction} />
     </td>
   </tr>
 )
+
+const getActedRowId = (updated) =>
+  updated && String(updated._id || updated.id || '')
+
+const reconcileActedRow = (updated, updatedId, items) =>
+  items.map((item) =>
+    String(item._id) === updatedId
+      ? {
+          ...item,
+          status: updated.status ?? item.status,
+          statusMessage: updated.statusMessage ?? item.statusMessage,
+          merchantOrderNo:
+            updated.merchantOrderNo ?? item.merchantOrderNo,
+          providerTransactionRrn:
+            updated.providerTransactionRrn ?? item.providerTransactionRrn,
+          receiptState: updated.receiptState ?? item.receiptState,
+          approval: updated.approval ?? item.approval,
+        }
+      : item
+  )
+
+const PayoutActions = ({ item, busyId, onAction }) => {
+  const disabled = busyId === item._id
+  return (
+    <div className='flex justify-center gap-1.5 whitespace-nowrap'>
+      {item.status === 'PENDING_APPROVAL' && (
+        <>
+          <button
+            disabled={disabled}
+            onClick={() => onAction(item._id, 'approval', { approved: true })}
+            className='bg-green-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+          >
+            Approve
+          </button>
+          <button
+            disabled={disabled}
+            onClick={() => onAction(item._id, 'approval', { approved: false })}
+            className='bg-red-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+          >
+            Reject
+          </button>
+        </>
+      )}
+      {item.status === 'READY_FOR_PAYMENT' && (
+        <button
+          disabled={disabled}
+          onClick={() => onAction(item._id, 'pay')}
+          className='bg-primary text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+        >
+          Make Payment
+        </button>
+      )}
+      {['PROCESSING', 'STATUS_UNKNOWN'].includes(item.status) && (
+        <button
+          disabled={disabled}
+          onClick={() => onAction(item._id, 'status')}
+          className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+        >
+          Check Status
+        </button>
+      )}
+      {shouldShowResendLink(item) && (
+        <button
+          disabled={disabled}
+          onClick={() => onAction(item._id, 'resend-link')}
+          className='border border-primary text-primary px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+        >
+          {getResendLinkLabel(item)}
+        </button>
+      )}
+    </div>
+  )
+}
 
 const PayoutManagement = () => {
   const [sideMenu, setSideMenu] = useState(false)
@@ -223,26 +250,9 @@ const PayoutManagement = () => {
       // action buttons (e.g. Make Payment) update even if the list reload is
       // served stale/cached.
       const updated = response.data?.data
-      const updatedId = updated && String(updated._id || updated.id || '')
+      const updatedId = getActedRowId(updated)
       if (updatedId) {
-        setItems((prev) =>
-          prev.map((item) =>
-            String(item._id) === updatedId
-              ? {
-                  ...item,
-                  status: updated.status ?? item.status,
-                  statusMessage: updated.statusMessage ?? item.statusMessage,
-                  merchantOrderNo:
-                    updated.merchantOrderNo ?? item.merchantOrderNo,
-                  providerTransactionRrn:
-                    updated.providerTransactionRrn ??
-                    item.providerTransactionRrn,
-                  receiptState: updated.receiptState ?? item.receiptState,
-                  approval: updated.approval ?? item.approval,
-                }
-              : item
-          )
-        )
+        setItems((prev) => reconcileActedRow(updated, updatedId, prev))
       }
       toast.success(response.data?.message || 'Payout updated')
     } catch (requestError) {

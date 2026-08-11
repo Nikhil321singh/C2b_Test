@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { BsCartCheckFill } from 'react-icons/bs'
@@ -30,56 +31,42 @@ const STATUS_RANK = {
 }
 const rankOf = (status) => STATUS_RANK[status] ?? 0
 
-const ProductSold = () => {
-  const navigate = useNavigate()
-  const profile = JSON.parse(sessionStorage.getItem('profile'))
-  const savedPayout = JSON.parse(
-    sessionStorage.getItem('activePayout') || 'null'
-  )
-  const [payout, setPayout] = useState(savedPayout)
-  const [message, setMessage] = useState(
-    sessionStorage.getItem('messageReceived') || ''
-  )
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
+const isBankTransfer = (payout) =>
+  ['HSBC_IMPS', 'HSBC_NEFT'].includes(payout?.provider)
+
+const isReadyForPayment = (payout) => payout?.status === 'READY_FOR_PAYMENT'
+
+const isProcessingStatus = (payout) =>
+  ['PROCESSING', 'STATUS_UNKNOWN'].includes(payout?.status)
+
+const canResendLink = (payout) =>
+  payout?.status === 'EXPIRED' ||
+  payout?.status === 'FAILED' ||
+  (payout?.status === 'AWAITING_VPA' &&
+    payout?.linkNotificationState !== 'DELIVERED')
+
+const getResendLinkLabel = (payout) => {
+  if (payout.status === 'FAILED') {
+    return isBankTransfer(payout)
+      ? 'Send Link to Re-enter Bank Details'
+      : 'Send Link to Re-enter UPI ID'
+  }
+  if (payout.status === 'AWAITING_VPA') {
+    return payout.linkNotificationState === 'FAILED'
+      ? 'Retry Sending Payment Link'
+      : 'Pay Now – Send Customer Link'
+  }
+  return 'Resend Customer Link'
+}
+
+const getBeneficiaryLabel = (payout) =>
+  isBankTransfer(payout) ? 'bank details' : 'UPI ID'
+
+const shouldAcceptPollResult = (prev, next) =>
+  !prev || rankOf(next?.status) >= rankOf(prev.status)
+
+const useAutoReturn = (shouldAutoReturn, navigate) => {
   const [countdown, setCountdown] = useState(10)
-  const token = sessionStorage.getItem('authToken')
-
-  const loadPayout = useCallback(async () => {
-    if (!payout?.id) return
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/buyback-payouts/${payout.id}`,
-        { headers: { Authorization: token } }
-      )
-      const nextPayout = normalizePayout(response.data.data)
-      setPayout((prev) => {
-        // Ignore a poll result that would regress the status (stale read).
-        if (prev && rankOf(nextPayout?.status) < rankOf(prev.status)) {
-          return prev
-        }
-        sessionStorage.setItem('activePayout', JSON.stringify(nextPayout))
-        return nextPayout
-      })
-    } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Unable to load payout')
-    }
-  }, [payout?.id, token])
-
-  useEffect(() => {
-    if (!payout?.id || payout.status === 'SUCCESS') return undefined
-    loadPayout()
-    const timer = setInterval(loadPayout, 5000)
-    return () => clearInterval(timer)
-  }, [loadPayout, payout?.id, payout?.status])
-
-  const isManualComplete =
-    !payout &&
-    message.startsWith(
-      'Item Sold Successfully'
-    )
-  const shouldAutoReturn =
-    payout?.status === 'SUCCESS' || isManualComplete
   useEffect(() => {
     if (!shouldAutoReturn) {
       setCountdown(10)
@@ -97,6 +84,135 @@ const ProductSold = () => {
     }, 1000)
     return () => clearInterval(timer)
   }, [shouldAutoReturn, navigate])
+  return countdown
+}
+
+const PayoutStatusPanel = ({ payout, statusMessage, busy, error, onAction }) => {
+  const canPay = isReadyForPayment(payout)
+  const canCheck = isProcessingStatus(payout)
+  const canResend = canResendLink(payout)
+  const awaitingDelivered =
+    payout?.status === 'AWAITING_VPA' &&
+    payout?.linkNotificationState === 'DELIVERED'
+  return (
+    <div className='flex flex-col items-center justify-center gap-4 min-h-[65vh] px-5 text-center'>
+      <BsCartCheckFill size={84} color='var(--primary-color)' />
+      <p className='font-medium text-2xl'>{statusMessage}</p>
+      {payout && (
+        <>
+          <p className='text-lg'>
+            Payout amount: <strong>₹{Number(payout.amount || 0).toFixed(2)}</strong>
+          </p>
+          <p className='text-sm text-gray-600'>
+            Status: {String(payout.status || '').replaceAll('_', ' ')}
+          </p>
+        </>
+      )}
+      {canPay && (
+        <button
+          disabled={busy}
+          onClick={() => onAction('pay')}
+          className='bg-primary text-white rounded-lg px-8 py-3 text-xl disabled:opacity-60'
+        >
+          {busy ? (
+            <span className='flex items-center gap-2'>
+              <CgSpinner className='animate-spin' /> Processing
+            </span>
+          ) : (
+            'Make Payment'
+          )}
+        </button>
+      )}
+      {canCheck && (
+        <button
+          disabled={busy}
+          onClick={() => onAction('status')}
+          className='border-2 border-primary text-primary rounded-lg px-8 py-3 text-lg disabled:opacity-60'
+        >
+          Check Payment Status
+        </button>
+      )}
+      {canResend && (
+        <button
+          disabled={busy}
+          onClick={() => onAction('resend-link')}
+          className='border-2 border-primary text-primary rounded-lg px-8 py-3 text-lg disabled:opacity-60'
+        >
+          {getResendLinkLabel(payout)}
+        </button>
+      )}
+      {awaitingDelivered && (
+        <p className='text-sm text-green-700'>
+          Payment link sent. Waiting for the customer to provide their{' '}
+          {getBeneficiaryLabel(payout)}.
+        </p>
+      )}
+      {error && <p className='text-red-600'>{error}</p>}
+    </div>
+  )
+}
+
+PayoutStatusPanel.propTypes = {
+  payout: PropTypes.object,
+  statusMessage: PropTypes.string.isRequired,
+  busy: PropTypes.bool.isRequired,
+  error: PropTypes.string.isRequired,
+  onAction: PropTypes.func.isRequired,
+}
+
+const ProductSold = () => {
+  const navigate = useNavigate()
+  const profile = JSON.parse(sessionStorage.getItem('profile'))
+  const savedPayout = JSON.parse(
+    sessionStorage.getItem('activePayout') || 'null'
+  )
+  const [payout, setPayout] = useState(savedPayout)
+  const [message, setMessage] = useState(
+    sessionStorage.getItem('messageReceived') || ''
+  )
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const token = sessionStorage.getItem('authToken')
+
+  const loadPayout = useCallback(async () => {
+    if (!payout?.id) {
+      return
+    }
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/buyback-payouts/${payout.id}`,
+        { headers: { Authorization: token } }
+      )
+      const nextPayout = normalizePayout(response.data.data)
+      setPayout((prev) => {
+        if (shouldAcceptPollResult(prev, nextPayout)) {
+          sessionStorage.setItem('activePayout', JSON.stringify(nextPayout))
+          return nextPayout
+        }
+        return prev
+      })
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Unable to load payout')
+    }
+  }, [payout?.id, token])
+
+  useEffect(() => {
+    if (!payout?.id || payout.status === 'SUCCESS') {
+      return undefined
+    }
+    loadPayout()
+    const timer = setInterval(loadPayout, 5000)
+    return () => clearInterval(timer)
+  }, [loadPayout, payout?.id, payout?.status])
+
+  const isManualComplete =
+    !payout &&
+    message.startsWith(
+      'Item Sold Successfully'
+    )
+  const shouldAutoReturn =
+    payout?.status === 'SUCCESS' || isManualComplete
+  const countdown = useAutoReturn(shouldAutoReturn, navigate)
 
   const runAction = async (path) => {
     setBusy(true)
@@ -121,13 +237,6 @@ const ProductSold = () => {
   }
 
   const statusMessage = payout?.statusMessage || message
-  const canPay = payout?.status === 'READY_FOR_PAYMENT'
-  const canCheck = ['PROCESSING', 'STATUS_UNKNOWN'].includes(payout?.status)
-  const canResend =
-    payout?.status === 'EXPIRED' ||
-    payout?.status === 'FAILED' ||
-    (payout?.status === 'AWAITING_VPA' &&
-      payout?.linkNotificationState !== 'DELIVERED')
 
   return (
     <div className='bg-white min-h-screen'>
@@ -146,72 +255,13 @@ const ProductSold = () => {
         </div>
       </div>
 
-      <div className='flex flex-col items-center justify-center gap-4 min-h-[65vh] px-5 text-center'>
-        <BsCartCheckFill size={84} color='var(--primary-color)' />
-        <p className='font-medium text-2xl'>{statusMessage}</p>
-        {payout && (
-          <>
-            <p className='text-lg'>
-              Payout amount: <strong>₹{Number(payout.amount || 0).toFixed(2)}</strong>
-            </p>
-            <p className='text-sm text-gray-600'>
-              Status: {String(payout.status || '').replaceAll('_', ' ')}
-            </p>
-          </>
-        )}
-        {canPay && (
-          <button
-            disabled={busy}
-            onClick={() => runAction('pay')}
-            className='bg-primary text-white rounded-lg px-8 py-3 text-xl disabled:opacity-60'
-          >
-            {busy ? (
-              <span className='flex items-center gap-2'>
-                <CgSpinner className='animate-spin' /> Processing
-              </span>
-            ) : (
-              'Make Payment'
-            )}
-          </button>
-        )}
-        {canCheck && (
-          <button
-            disabled={busy}
-            onClick={() => runAction('status')}
-            className='border-2 border-primary text-primary rounded-lg px-8 py-3 text-lg disabled:opacity-60'
-          >
-            Check Payment Status
-          </button>
-        )}
-        {canResend && (
-          <button
-            disabled={busy}
-            onClick={() => runAction('resend-link')}
-            className='border-2 border-primary text-primary rounded-lg px-8 py-3 text-lg disabled:opacity-60'
-          >
-            {payout.status === 'FAILED'
-              ? ['HSBC_IMPS', 'HSBC_NEFT'].includes(payout.provider)
-                ? 'Send Link to Re-enter Bank Details'
-                : 'Send Link to Re-enter UPI ID'
-              : payout.status === 'AWAITING_VPA'
-              ? payout.linkNotificationState === 'FAILED'
-                ? 'Retry Sending Payment Link'
-                : 'Pay Now – Send Customer Link'
-              : 'Resend Customer Link'}
-          </button>
-        )}
-        {payout?.status === 'AWAITING_VPA' &&
-          payout?.linkNotificationState === 'DELIVERED' && (
-            <p className='text-sm text-green-700'>
-              Payment link sent. Waiting for the customer to provide their{' '}
-              {['HSBC_IMPS', 'HSBC_NEFT'].includes(payout.provider)
-                ? 'bank details'
-                : 'UPI ID'}
-              .
-            </p>
-          )}
-        {error && <p className='text-red-600'>{error}</p>}
-      </div>
+      <PayoutStatusPanel
+        payout={payout}
+        statusMessage={statusMessage}
+        busy={busy}
+        error={error}
+        onAction={runAction}
+      />
 
       {shouldAutoReturn && (
         <div className='fixed bottom-0 w-full'>
