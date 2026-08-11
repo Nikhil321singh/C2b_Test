@@ -155,7 +155,7 @@ const SpecialOffers = () => {
   const Price = useSelector((state) => state.responseData.price);
   const [isSelected, setIsSelected] = useState(null);
   const [extraBonus, setExtraBonus] = useState(0);
-  const [disableBtn, setDisableBtn] = useState(initialDisableBtn);
+  const [, setDisableBtn] = useState(initialDisableBtn);
   const dispatch = useDispatch(false);
   const { setAnswers } = useQuestionContext();
   const leadId = sessionStorage.getItem("LeadId");

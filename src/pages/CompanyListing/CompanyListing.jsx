@@ -63,6 +63,74 @@ const uploadDocumentsToS3 = async (attachedFiles, userToken) => {
   return uploadedDocuments;
 };
 
+const createCompany = async ({ token, canConfigurePayout, formData }) => {
+  const uploadedDocuments = await uploadDocumentsToS3(
+    formData.attachedFiles,
+    token,
+  );
+
+  const payload = {
+    name: formData.companyName,
+    contactNumber: formData.contactNumber,
+    address: formData.address,
+    gstNumber: formData.gstNumber.toUpperCase(),
+    panNumber: formData.panNumber.toUpperCase(),
+    remarks: formData.remarks,
+    showPrice: formData.showPrice,
+    maskInfo: formData.maskInfo,
+    aadharVerificationRequired: formData.aadharVerificationRequired,
+    emailConfiguration: formData.emailConfiguration,
+    attachedDocuments: uploadedDocuments,
+  };
+
+  if (canConfigurePayout) {
+    payload.buybackPayoutSettings = {
+      ...formData.buybackPayoutSettings,
+      deviceCooldownDays: Number(
+        formData.buybackPayoutSettings.deviceCooldownDays || 0
+      ),
+      customerSellLimitCount: Number(
+        formData.buybackPayoutSettings.customerSellLimitCount || 0
+      ),
+      customerSellLimitWindowDays: Number(
+        formData.buybackPayoutSettings.customerSellLimitWindowDays || 0
+      ),
+    };
+    payload.storePaymentSettings = formData.storePaymentSettings;
+  }
+
+  const response = await axios.post(
+    `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/create`,
+    payload,
+    {
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  const companyId = response.data.result._id;
+
+  await axios.post(
+    `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/dynamic-pricing/config`,
+    {
+      companyId,
+      isEnabled: formData.dynamicPricingEnabled,
+      slabs: formData.slabs.map(s => ({
+        minValue: Number(s.minValue),
+        maxValue: Number(s.maxValue),
+        bonusAmount: Number(s.bonusAmount)
+      })),
+      effectiveFrom: formData.effectiveFrom || new Date().toISOString().split('T')[0],
+      notes: formData.pricingNotes
+    },
+    { headers: { Authorization: token } }
+  );
+
+  return response.data.result?.companyCode;
+};
+
 const FormInput = ({ label, value, onChange, required = false }) => (
    <div className="flex flex-col w-[70%] gap-2">
     <span className="font-medium text-xl">
@@ -203,74 +271,16 @@ const CompanyListing = () => {
     const userToken = sessionStorage.getItem("authToken");
 
     try {
-      const uploadedDocuments = await uploadDocumentsToS3(
-        attachedFiles,
-        userToken,
-      );
-
-      const payload = {
-        name: companyName,
-        contactNumber: contactNumber,
-        address: address,
-        gstNumber: gstNumber.toUpperCase(),
-        panNumber: panNumber.toUpperCase(),
-        remarks: remarks,
-        showPrice: showPrice,
-        maskInfo: maskInfo,
-        aadharVerificationRequired: aadharVerificationRequired,
-        emailConfiguration: emailConfiguration,
-        attachedDocuments: uploadedDocuments,
-      };
-
-      if (canConfigurePayout) {
-        payload.buybackPayoutSettings = {
-          ...buybackPayoutSettings,
-          deviceCooldownDays: Number(
-            buybackPayoutSettings.deviceCooldownDays || 0
-          ),
-          customerSellLimitCount: Number(
-            buybackPayoutSettings.customerSellLimitCount || 0
-          ),
-          customerSellLimitWindowDays: Number(
-            buybackPayoutSettings.customerSellLimitWindowDays || 0
-          ),
-        };
-        payload.storePaymentSettings = storePaymentSettings;
-      }
-
-      const response = await axios.post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/create`,
-        payload,
-        {
-          headers: {
-            Authorization: userToken,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      const companyId = response.data.result._id;
-
-      await axios.post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/dynamic-pricing/config`,
-        {
-          companyId,
-          isEnabled: dynamicPricingEnabled,
-          slabs: slabs.map(s => ({
-            minValue: Number(s.minValue),
-            maxValue: Number(s.maxValue),
-            bonusAmount: Number(s.bonusAmount)
-          })),
-          effectiveFrom: effectiveFrom || new Date().toISOString().split('T')[0],
-          notes: pricingNotes
-        },
-        { headers: { Authorization: userToken } }
-      );
+      const companyCode = await createCompany({
+        token: userToken,
+        canConfigurePayout,
+        formData,
+      });
 
       toast.success("Company added successfully!");
 
-      if (response.data.result && response.data.result.companyCode) {
-        setGeneratedCompanyCode(response.data.result.companyCode);
+      if (companyCode) {
+        setGeneratedCompanyCode(companyCode);
         setShowSuccess(true);
       }
 
@@ -503,6 +513,109 @@ const DynamicPricingConfig = ({
   </div>
 )
 
+const BooleanSelectField = ({ label, value, onChange }) => (
+  <div className="flex flex-col w-[70%] gap-2">
+    <span className="font-medium text-xl">{label}</span>
+    <select
+      className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
+      value={value.toString()}
+      onChange={(e) => onChange(e.target.value === "true")}
+    >
+      <option value="true">True</option>
+      <option value="false">False</option>
+    </select>
+  </div>
+);
+
+const PayoutSettingsSection = ({ settings, onChange, canConfigurePayout }) => (
+  <div className="w-[70%] mt-2 p-4 border border-gray-200 rounded-lg space-y-4">
+    <div>
+      <span className="font-semibold text-base text-gray-800">HSBC UPI Customer Payout</span>
+      <p className="text-xs text-gray-500 mt-1">
+        Company master control and fraud limits. Store-level payout mode
+        and ceiling are configured from Store Listing.
+      </p>
+    </div>
+    <label className="flex items-center gap-3">
+      <input
+        type="checkbox"
+        checked={settings.enabled}
+        disabled={!canConfigurePayout}
+        onChange={(event) =>
+          onChange({
+            ...settings,
+            enabled: event.target.checked,
+          })
+        }
+      />
+      Enable HSBC UPI payout for this company
+    </label>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {[
+        ["Device cooldown (days)", "deviceCooldownDays"],
+        ["Customer device limit", "customerSellLimitCount"],
+        ["Customer limit window (days)", "customerSellLimitWindowDays"],
+      ].map(([label, field]) => (
+        <div key={field} className="flex flex-col gap-1.5">
+          <span className="font-medium text-sm text-gray-700">{label}</span>
+          <input
+            type="number"
+            min="0"
+            className="border border-gray-300 px-3 py-2 rounded-lg outline-none focus:border-[var(--primary-color)] transition text-sm"
+            value={settings[field]}
+            disabled={!canConfigurePayout}
+            onChange={(event) =>
+              onChange({
+                ...settings,
+                [field]: event.target.value,
+              })
+            }
+          />
+        </div>
+      ))}
+    </div>
+    <p className="text-xs text-gray-500">
+      Set a limit to 0 to disable that validation. Only Super Admin can
+      change these settings.
+    </p>
+  </div>
+);
+
+const StorePaymentSection = ({ settings, onChange, canConfigurePayout }) => (
+  <div className="w-[70%] mt-2 p-4 border border-gray-200 rounded-lg space-y-3">
+    <div>
+      <span className="font-semibold text-base text-gray-800">Store Payment Permission</span>
+      <p className="text-xs text-gray-500 mt-1">
+        Controls who records the store payout after a payment request.
+        Only Super Admin can change this setting.
+      </p>
+    </div>
+    <div className="flex flex-col gap-1.5">
+      <span className="font-medium text-sm text-gray-700">Payment mode</span>
+      <select
+        className="border border-gray-300 px-3 py-2 rounded-lg outline-none bg-white focus:border-[var(--primary-color)] transition text-sm"
+        value={settings.mode}
+        disabled={!canConfigurePayout}
+        onChange={(event) =>
+          onChange({
+            ...settings,
+            mode: event.target.value,
+          })
+        }
+      >
+        <option value="COMPANY_ACCOUNTS">Mode 1 - Company Accounts pays store</option>
+        <option value="MANAGER_FUNDS">Mode 2 - Manager pays from personal funds</option>
+        <option value="PREPAID_DEFERRED">Mode 3 - Pre-paid / deferred (no pickup payout)</option>
+      </select>
+    </div>
+    {!canConfigurePayout && (
+      <p className="text-xs text-amber-700">
+        Read only: ask a Super Admin to change the payment permission.
+      </p>
+    )}
+  </div>
+);
+
 const CompanyListingForm = ({
   formData,
   setters,
@@ -584,41 +697,23 @@ const CompanyListingForm = ({
       <FormInput label="PAN Number" value={panNumber} onChange={setPanNumber} />
       <FormInput label="Remarks" value={remarks} onChange={setRemarks} />
 
-      <div className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Show Price</span>
-        <select
-          className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
-          value={showPrice.toString()}
-          onChange={(e) => setShowPrice(e.target.value === "true")}
-        >
-          <option value="true">True</option>
-          <option value="false">False</option>
-        </select>
-      </div>
+      <BooleanSelectField
+        label="Show Price"
+        value={showPrice}
+        onChange={setShowPrice}
+      />
 
-      <div className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Mask Info</span>
-        <select
-          className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
-          value={maskInfo.toString()}
-          onChange={(e) => setMaskInfo(e.target.value === "true")}
-        >
-          <option value="true">True</option>
-          <option value="false">False</option>
-        </select>
-      </div>
+      <BooleanSelectField
+        label="Mask Info"
+        value={maskInfo}
+        onChange={setMaskInfo}
+      />
 
-      <div className="flex flex-col w-[70%] gap-2">
-        <span className="font-medium text-xl">Aadhaar Verification</span>
-        <select
-          className="border-2 px-2 py-2 rounded-lg outline-none bg-white"
-          value={aadharVerificationRequired.toString()}
-          onChange={(e) => setAadharVerificationRequired(e.target.value === "true")}
-        >
-          <option value="true">True</option>
-          <option value="false">False</option>
-        </select>
-      </div>
+      <BooleanSelectField
+        label="Aadhaar Verification"
+        value={aadharVerificationRequired}
+        onChange={setAadharVerificationRequired}
+      />
 
      <div className="w-[70%]">
         <EmailConfiguration
@@ -627,90 +722,17 @@ const CompanyListingForm = ({
         />
       </div>
 
-      <div className="w-[70%] mt-2 p-4 border border-gray-200 rounded-lg space-y-4">
-        <div>
-          <span className="font-semibold text-base text-gray-800">HSBC UPI Customer Payout</span>
-          <p className="text-xs text-gray-500 mt-1">
-            Company master control and fraud limits. Store-level payout mode
-            and ceiling are configured from Store Listing.
-          </p>
-        </div>
-        <label className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={buybackPayoutSettings.enabled}
-            disabled={!canConfigurePayout}
-            onChange={(event) =>
-              setBuybackPayoutSettings({
-                ...buybackPayoutSettings,
-                enabled: event.target.checked,
-              })
-            }
-          />
-          Enable HSBC UPI payout for this company
-        </label>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            ["Device cooldown (days)", "deviceCooldownDays"],
-            ["Customer device limit", "customerSellLimitCount"],
-            ["Customer limit window (days)", "customerSellLimitWindowDays"],
-          ].map(([label, field]) => (
-            <div key={field} className="flex flex-col gap-1.5">
-              <span className="font-medium text-sm text-gray-700">{label}</span>
-              <input
-                type="number"
-                min="0"
-                className="border border-gray-300 px-3 py-2 rounded-lg outline-none focus:border-[var(--primary-color)] transition text-sm"
-                value={buybackPayoutSettings[field]}
-                disabled={!canConfigurePayout}
-                onChange={(event) =>
-                  setBuybackPayoutSettings({
-                    ...buybackPayoutSettings,
-                    [field]: event.target.value,
-                  })
-                }
-              />
-            </div>
-          ))}
-        </div>
-        <p className="text-xs text-gray-500">
-          Set a limit to 0 to disable that validation. Only Super Admin can
-          change these settings.
-        </p>
-      </div>
+      <PayoutSettingsSection
+        settings={buybackPayoutSettings}
+        onChange={setBuybackPayoutSettings}
+        canConfigurePayout={canConfigurePayout}
+      />
 
-      <div className="w-[70%] mt-2 p-4 border border-gray-200 rounded-lg space-y-3">
-        <div>
-          <span className="font-semibold text-base text-gray-800">Store Payment Permission</span>
-          <p className="text-xs text-gray-500 mt-1">
-            Controls who records the store payout after a payment request.
-            Only Super Admin can change this setting.
-          </p>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <span className="font-medium text-sm text-gray-700">Payment mode</span>
-          <select
-            className="border border-gray-300 px-3 py-2 rounded-lg outline-none bg-white focus:border-[var(--primary-color)] transition text-sm"
-            value={storePaymentSettings.mode}
-            disabled={!canConfigurePayout}
-            onChange={(event) =>
-              setStorePaymentSettings({
-                ...storePaymentSettings,
-                mode: event.target.value,
-              })
-            }
-          >
-            <option value="COMPANY_ACCOUNTS">Mode 1 - Company Accounts pays store</option>
-            <option value="MANAGER_FUNDS">Mode 2 - Manager pays from personal funds</option>
-            <option value="PREPAID_DEFERRED">Mode 3 - Pre-paid / deferred (no pickup payout)</option>
-          </select>
-        </div>
-        {!canConfigurePayout && (
-          <p className="text-xs text-amber-700">
-            Read only: ask a Super Admin to change the payment permission.
-          </p>
-        )}
-      </div>
+      <StorePaymentSection
+        settings={storePaymentSettings}
+        onChange={setStorePaymentSettings}
+        canConfigurePayout={canConfigurePayout}
+      />
 
       <div className="flex flex-col w-[70%] gap-1.5">
         <span className="font-medium text-sm text-gray-700">Attach Documents</span>

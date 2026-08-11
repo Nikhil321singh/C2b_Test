@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import AdminNavbar from '../components/Admin_Navbar'
 import SideMenu from '../components/SideMenu'
@@ -19,6 +20,335 @@ const STATUS_LABELS = {
   CANCELLED: 'Cancelled',
   PUSHED_TO_LOGISTICS: 'Pushed to Logistics',
   DELIVERED: 'Delivered',
+}
+
+const WarehouseToolbar = ({
+  isWarehouse,
+  courier,
+  busy,
+  onPushToLogistics,
+  onRefreshTracking,
+}) => {
+  if (!isWarehouse) {
+    return null
+  }
+  return (
+    <div className='flex flex-wrap gap-2'>
+      <button
+        onClick={onPushToLogistics}
+        disabled={busy === 'push' || !courier.configured}
+        title={
+          courier.configured
+            ? ''
+            : 'Configure the courier server credentials and endpoint first'
+        }
+        className='bg-primary text-white rounded-lg px-4 py-2 disabled:opacity-50'
+      >
+        {busy === 'push' ? 'Pushing…' : 'Push to Logistics'}
+      </button>
+      <button
+        onClick={onRefreshTracking}
+        disabled={busy === 'track' || !courier.trackingConfigured}
+        title={
+          courier.trackingConfigured
+            ? ''
+            : 'Configure the courier tracking credentials first'
+        }
+        className='border border-primary text-primary rounded-lg px-4 py-2 disabled:opacity-50'
+      >
+        {busy === 'track' ? 'Refreshing…' : 'Refresh Tracking'}
+      </button>
+    </div>
+  )
+}
+
+WarehouseToolbar.propTypes = {
+  isWarehouse: PropTypes.bool.isRequired,
+  courier: PropTypes.shape({
+    configured: PropTypes.bool,
+    trackingConfigured: PropTypes.bool,
+  }).isRequired,
+  busy: PropTypes.string.isRequired,
+  onPushToLogistics: PropTypes.func.isRequired,
+  onRefreshTracking: PropTypes.func.isRequired,
+}
+
+const TabBar = ({ tab, onSelectTab }) => (
+  <div className='flex flex-wrap gap-2 mb-5'>
+    {TABS.map(([value, label]) => (
+      <button
+        key={value}
+        onClick={() => onSelectTab(value)}
+        className={`rounded-lg px-4 py-2 ${
+          tab === value
+            ? 'bg-primary text-white'
+            : 'bg-white border text-gray-700'
+        }`}
+      >
+        {label}
+      </button>
+    ))}
+  </div>
+)
+
+TabBar.propTypes = {
+  tab: PropTypes.string.isRequired,
+  onSelectTab: PropTypes.func.isRequired,
+}
+
+const TableHeader = ({ isLogistic }) => (
+  <thead className='bg-gray-100 text-left'>
+    <tr>
+      <th className='p-3'>Lead</th>
+      <th className='p-3'>Store</th>
+      <th className='p-3'>Device</th>
+      <th className='p-3'>Status</th>
+      <th className='p-3'>Logistic Agent</th>
+      <th className='p-3'>Courier</th>
+      {!isLogistic && <th className='p-3'>Actions</th>}
+    </tr>
+  </thead>
+)
+
+TableHeader.propTypes = {
+  isLogistic: PropTypes.bool.isRequired,
+}
+
+const CourierCell = ({ courier }) => (
+  <td className='p-3'>
+    <p>{courier?.provider || '-'}</p>
+    {courier?.orderId && (
+      <p className='text-xs text-gray-500'>AWB {courier.orderId}</p>
+    )}
+    {courier?.trackingStatus && (
+      <p className='text-xs text-gray-700'>{courier.trackingStatus}</p>
+    )}
+    {courier?.labelUrl && (
+      <a
+        href={courier.labelUrl}
+        target='_blank'
+        rel='noreferrer'
+        className='text-xs text-primary underline'
+      >
+        Download label
+      </a>
+    )}
+    {courier?.lastError && (
+      <p className='text-xs text-red-600'>{courier.lastError}</p>
+    )}
+  </td>
+)
+
+CourierCell.propTypes = {
+  courier: PropTypes.shape({
+    provider: PropTypes.string,
+    orderId: PropTypes.string,
+    trackingStatus: PropTypes.string,
+    labelUrl: PropTypes.string,
+    lastError: PropTypes.string,
+  }),
+}
+
+const ActionsCell = ({
+  lead,
+  isWarehouse,
+  canCancel,
+  canRestore,
+  agents,
+  selection,
+  busy,
+  setSelection,
+  assign,
+  action,
+  cancel,
+}) => {
+  const buttons = []
+
+  if (isWarehouse && lead.deliveryStatus === 'UNASSIGNED') {
+    buttons.push(
+      <Fragment key='assign'>
+        <select
+          value={selection[lead._id] || ''}
+          onChange={(event) =>
+            setSelection((previous) => ({
+              ...previous,
+              [lead._id]: event.target.value,
+            }))
+          }
+          className='border rounded px-2 py-1'
+        >
+          <option value=''>Select agent</option>
+          {agents.map((agent) => (
+            <option key={agent._id} value={agent._id}>
+              {agent.name ||
+                `${agent.firstName || ''} ${agent.lastName || ''}`}
+            </option>
+          ))}
+        </select>
+        <button
+          disabled={busy === lead._id}
+          onClick={() => assign(lead)}
+          className='bg-primary text-white rounded px-3 py-1 disabled:opacity-50'
+        >
+          Assign
+        </button>
+      </Fragment>
+    )
+  }
+
+  if (isWarehouse && lead.deliveryStatus === 'OUT_FOR_PICKUP') {
+    buttons.push(
+      <button
+        key='pickup'
+        disabled={busy === lead._id}
+        onClick={() =>
+          action(lead, 'status', {
+            deliveryStatus: 'PICKUP_COMPLETE',
+          })
+        }
+        className='border border-green-700 text-green-700 rounded px-3 py-1'
+      >
+        Pickup Complete
+      </button>
+    )
+  }
+
+  if (
+    isWarehouse &&
+    ['PICKUP_COMPLETE', 'PUSHED_TO_LOGISTICS'].includes(lead.deliveryStatus)
+  ) {
+    buttons.push(
+      <button
+        key='delivered'
+        disabled={busy === lead._id}
+        onClick={() =>
+          action(lead, 'status', {
+            deliveryStatus: 'DELIVERED',
+          })
+        }
+        className='border border-green-700 text-green-700 rounded px-3 py-1'
+      >
+        Delivered
+      </button>
+    )
+  }
+
+  if (canCancel && !['CANCELLED', 'DELIVERED'].includes(lead.deliveryStatus)) {
+    buttons.push(
+      <button
+        key='cancel'
+        disabled={busy === lead._id}
+        onClick={() => cancel(lead)}
+        className='border border-red-600 text-red-600 rounded px-3 py-1'
+      >
+        Cancel
+      </button>
+    )
+  }
+
+  if (canRestore && lead.deliveryStatus === 'CANCELLED') {
+    buttons.push(
+      <button
+        key='restore'
+        disabled={busy === lead._id}
+        onClick={() => action(lead, 'restore')}
+        className='border border-primary text-primary rounded px-3 py-1'
+      >
+        Restore
+      </button>
+    )
+  }
+
+  return (
+    <td className='p-3'>
+      <div className='flex flex-wrap gap-2'>{buttons}</div>
+    </td>
+  )
+}
+
+ActionsCell.propTypes = {
+  lead: PropTypes.object.isRequired,
+  isWarehouse: PropTypes.bool.isRequired,
+  canCancel: PropTypes.bool.isRequired,
+  canRestore: PropTypes.bool.isRequired,
+  agents: PropTypes.array.isRequired,
+  selection: PropTypes.object.isRequired,
+  busy: PropTypes.string.isRequired,
+  setSelection: PropTypes.func.isRequired,
+  assign: PropTypes.func.isRequired,
+  action: PropTypes.func.isRequired,
+  cancel: PropTypes.func.isRequired,
+}
+
+const LeadRow = ({
+  lead,
+  isLogistic,
+  isWarehouse,
+  canCancel,
+  canRestore,
+  agents,
+  selection,
+  busy,
+  setSelection,
+  assign,
+  action,
+  cancel,
+}) => (
+  <tr className='border-t align-top'>
+    <td className='p-3'>
+      <p className='font-medium'>{lead.uniqueCode || lead._id}</p>
+      <p className='text-xs text-gray-500'>{lead.name || '-'}</p>
+    </td>
+    <td className='p-3'>{lead.storeId?.storeName || '-'}</td>
+    <td className='p-3'>{lead.modelId?.name || '-'}</td>
+    <td className='p-3'>
+      {STATUS_LABELS[lead.deliveryStatus] || lead.deliveryStatus}
+      {lead.cancellation?.reason && (
+        <p className='text-xs text-red-600'>{lead.cancellation.reason}</p>
+      )}
+    </td>
+    <td className='p-3'>
+      {lead.logisticAgentId?.name ||
+        [
+          lead.logisticAgentId?.firstName,
+          lead.logisticAgentId?.lastName,
+        ]
+          .filter(Boolean)
+          .join(' ') ||
+        '-'}
+    </td>
+    <CourierCell courier={lead.courier} />
+    {!isLogistic && (
+      <ActionsCell
+        lead={lead}
+        isWarehouse={isWarehouse}
+        canCancel={canCancel}
+        canRestore={canRestore}
+        agents={agents}
+        selection={selection}
+        busy={busy}
+        setSelection={setSelection}
+        assign={assign}
+        action={action}
+        cancel={cancel}
+      />
+    )}
+  </tr>
+)
+
+LeadRow.propTypes = {
+  lead: PropTypes.object.isRequired,
+  isLogistic: PropTypes.bool.isRequired,
+  isWarehouse: PropTypes.bool.isRequired,
+  canCancel: PropTypes.bool.isRequired,
+  canRestore: PropTypes.bool.isRequired,
+  agents: PropTypes.array.isRequired,
+  selection: PropTypes.object.isRequired,
+  busy: PropTypes.string.isRequired,
+  setSelection: PropTypes.func.isRequired,
+  assign: PropTypes.func.isRequired,
+  action: PropTypes.func.isRequired,
+  cancel: PropTypes.func.isRequired,
 }
 
 const Warehouse = () => {
@@ -71,7 +401,9 @@ const Warehouse = () => {
   }, [load])
 
   useEffect(() => {
-    if (isLogistic) return
+    if (isLogistic) {
+      return
+    }
     axios
       .get(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/warehouse/logistic-agents`,
@@ -82,7 +414,9 @@ const Warehouse = () => {
   }, [isLogistic, token])
 
   const action = async (lead, path, body = {}) => {
-    if (busy) return
+    if (busy) {
+      return
+    }
     setBusy(lead._id)
     setError('')
     setMessage('')
@@ -112,11 +446,15 @@ const Warehouse = () => {
 
   const cancel = (lead) => {
     const reason = window.prompt('Cancellation reason')
-    if (reason?.trim()) action(lead, 'cancel', { reason: reason.trim() })
+    if (reason?.trim()) {
+      action(lead, 'cancel', { reason: reason.trim() })
+    }
   }
 
   const pushToLogistics = async () => {
-    if (busy) return
+    if (busy) {
+      return
+    }
     setBusy('push')
     setError('')
     setMessage('')
@@ -141,7 +479,9 @@ const Warehouse = () => {
   }
 
   const refreshTracking = async () => {
-    if (busy) return
+    if (busy) {
+      return
+    }
     setBusy('track')
     setError('')
     setMessage('')
@@ -176,53 +516,16 @@ const Warehouse = () => {
               Logistic assignment, delivery tracking and courier handoff.
             </p>
           </div>
-          {isWarehouse && (
-            <div className='flex flex-wrap gap-2'>
-              <button
-                onClick={pushToLogistics}
-                disabled={busy === 'push' || !courier.configured}
-                title={
-                  courier.configured
-                    ? ''
-                    : 'Configure the courier server credentials and endpoint first'
-                }
-                className='bg-primary text-white rounded-lg px-4 py-2 disabled:opacity-50'
-              >
-                {busy === 'push' ? 'Pushing…' : 'Push to Logistics'}
-              </button>
-              <button
-                onClick={refreshTracking}
-                disabled={busy === 'track' || !courier.trackingConfigured}
-                title={
-                  courier.trackingConfigured
-                    ? ''
-                    : 'Configure the courier tracking credentials first'
-                }
-                className='border border-primary text-primary rounded-lg px-4 py-2 disabled:opacity-50'
-              >
-                {busy === 'track' ? 'Refreshing…' : 'Refresh Tracking'}
-              </button>
-            </div>
-          )}
+          <WarehouseToolbar
+            isWarehouse={isWarehouse}
+            courier={courier}
+            busy={busy}
+            onPushToLogistics={pushToLogistics}
+            onRefreshTracking={refreshTracking}
+          />
         </div>
 
-        {!isLogistic && (
-          <div className='flex flex-wrap gap-2 mb-5'>
-            {TABS.map(([value, label]) => (
-              <button
-                key={value}
-                onClick={() => setTab(value)}
-                className={`rounded-lg px-4 py-2 ${
-                  tab === value
-                    ? 'bg-primary text-white'
-                    : 'bg-white border text-gray-700'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
+        {!isLogistic && <TabBar tab={tab} onSelectTab={setTab} />}
 
         {isWarehouse && !courier.configured && (
           <p className='mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-amber-800'>
@@ -236,163 +539,24 @@ const Warehouse = () => {
 
         <div className='overflow-x-auto rounded-xl bg-white shadow'>
           <table className='min-w-full text-sm'>
-            <thead className='bg-gray-100 text-left'>
-              <tr>
-                <th className='p-3'>Lead</th>
-                <th className='p-3'>Store</th>
-                <th className='p-3'>Device</th>
-                <th className='p-3'>Status</th>
-                <th className='p-3'>Logistic Agent</th>
-                <th className='p-3'>Courier</th>
-                {!isLogistic && <th className='p-3'>Actions</th>}
-              </tr>
-            </thead>
+            <TableHeader isLogistic={isLogistic} />
             <tbody>
               {items.map((lead) => (
-                <tr key={lead._id} className='border-t align-top'>
-                  <td className='p-3'>
-                    <p className='font-medium'>
-                      {lead.uniqueCode || lead._id}
-                    </p>
-                    <p className='text-xs text-gray-500'>{lead.name || '-'}</p>
-                  </td>
-                  <td className='p-3'>{lead.storeId?.storeName || '-'}</td>
-                  <td className='p-3'>{lead.modelId?.name || '-'}</td>
-                  <td className='p-3'>
-                    {STATUS_LABELS[lead.deliveryStatus] || lead.deliveryStatus}
-                    {lead.cancellation?.reason && (
-                      <p className='text-xs text-red-600'>
-                        {lead.cancellation.reason}
-                      </p>
-                    )}
-                  </td>
-                  <td className='p-3'>
-                    {lead.logisticAgentId?.name ||
-                      [
-                        lead.logisticAgentId?.firstName,
-                        lead.logisticAgentId?.lastName,
-                      ]
-                        .filter(Boolean)
-                        .join(' ') ||
-                      '-'}
-                  </td>
-                  <td className='p-3'>
-                    <p>{lead.courier?.provider || '-'}</p>
-                    {lead.courier?.orderId && (
-                      <p className='text-xs text-gray-500'>
-                        AWB {lead.courier.orderId}
-                      </p>
-                    )}
-                    {lead.courier?.trackingStatus && (
-                      <p className='text-xs text-gray-700'>
-                        {lead.courier.trackingStatus}
-                      </p>
-                    )}
-                    {lead.courier?.labelUrl && (
-                      <a
-                        href={lead.courier.labelUrl}
-                        target='_blank'
-                        rel='noreferrer'
-                        className='text-xs text-primary underline'
-                      >
-                        Download label
-                      </a>
-                    )}
-                    {lead.courier?.lastError && (
-                      <p className='text-xs text-red-600'>
-                        {lead.courier.lastError}
-                      </p>
-                    )}
-                  </td>
-                  {!isLogistic && (
-                    <td className='p-3'>
-                      <div className='flex flex-wrap gap-2'>
-                        {isWarehouse &&
-                          lead.deliveryStatus === 'UNASSIGNED' && (
-                            <>
-                              <select
-                                value={selection[lead._id] || ''}
-                                onChange={(event) =>
-                                  setSelection((previous) => ({
-                                    ...previous,
-                                    [lead._id]: event.target.value,
-                                  }))
-                                }
-                                className='border rounded px-2 py-1'
-                              >
-                                <option value=''>Select agent</option>
-                                {agents.map((agent) => (
-                                  <option key={agent._id} value={agent._id}>
-                                    {agent.name ||
-                                      `${agent.firstName || ''} ${agent.lastName || ''}`}
-                                  </option>
-                                ))}
-                              </select>
-                              <button
-                                disabled={busy === lead._id}
-                                onClick={() => assign(lead)}
-                                className='bg-primary text-white rounded px-3 py-1 disabled:opacity-50'
-                              >
-                                Assign
-                              </button>
-                            </>
-                          )}
-                        {isWarehouse &&
-                          lead.deliveryStatus === 'OUT_FOR_PICKUP' && (
-                            <button
-                              disabled={busy === lead._id}
-                              onClick={() =>
-                                action(lead, 'status', {
-                                  deliveryStatus: 'PICKUP_COMPLETE',
-                                })
-                              }
-                              className='border border-green-700 text-green-700 rounded px-3 py-1'
-                            >
-                              Pickup Complete
-                            </button>
-                          )}
-                        {isWarehouse &&
-                          ['PICKUP_COMPLETE', 'PUSHED_TO_LOGISTICS'].includes(
-                            lead.deliveryStatus
-                          ) && (
-                            <button
-                              disabled={busy === lead._id}
-                              onClick={() =>
-                                action(lead, 'status', {
-                                  deliveryStatus: 'DELIVERED',
-                                })
-                              }
-                              className='border border-green-700 text-green-700 rounded px-3 py-1'
-                            >
-                              Delivered
-                            </button>
-                          )}
-                        {canCancel &&
-                          !['CANCELLED', 'DELIVERED'].includes(
-                            lead.deliveryStatus
-                          ) && (
-                            <button
-                              disabled={busy === lead._id}
-                              onClick={() => cancel(lead)}
-                              className='border border-red-600 text-red-600 rounded px-3 py-1'
-                            >
-                              Cancel
-                            </button>
-                          )}
-                        {canRestore &&
-                          lead.deliveryStatus === 'CANCELLED' && (
-                            <button
-                              disabled={busy === lead._id}
-                              onClick={() => action(lead, 'restore')}
-                              className='border border-primary text-primary rounded px-3 py-1'
-                            >
-                              Restore
-                            </button>
-                          )}
-                      </div>
-                    </td>
-                  )}
-                </tr>
+                <LeadRow
+                  key={lead._id}
+                  lead={lead}
+                  isLogistic={isLogistic}
+                  isWarehouse={isWarehouse}
+                  canCancel={canCancel}
+                  canRestore={canRestore}
+                  agents={agents}
+                  selection={selection}
+                  busy={busy}
+                  setSelection={setSelection}
+                  assign={assign}
+                  action={action}
+                  cancel={cancel}
+                />
               ))}
               {!loading && items.length === 0 && (
                 <tr>
@@ -414,4 +578,3 @@ const Warehouse = () => {
 }
 
 export default Warehouse
-

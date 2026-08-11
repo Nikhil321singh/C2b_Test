@@ -244,6 +244,103 @@ const DynamicPricingSection = ({
   </div>
 )
 
+const PayoutSettingsSection = ({ settings, canConfigurePayout, onChange }) => {
+  const updateField = (field, value) =>
+    onChange({ ...settings, [field]: value })
+  return (
+    <div className='border border-gray-200 rounded-lg p-4 space-y-4'>
+      <div>
+        {sectionTitle('HSBC UPI Customer Payout')}
+        <p className='text-xs text-gray-500 mt-1'>
+          Company master control and fraud limits. Store-level payout mode
+          and ceiling are configured from Store Listing.
+        </p>
+      </div>
+      <label className='flex items-center gap-3'>
+        <input
+          type='checkbox'
+          checked={settings.enabled}
+          disabled={!canConfigurePayout}
+          onChange={(event) => updateField('enabled', event.target.checked)}
+        />
+        Enable HSBC UPI payout for this company
+      </label>
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+        {[
+          ['Device cooldown (days)', 'deviceCooldownDays'],
+          ['Customer device limit', 'customerSellLimitCount'],
+          ['Customer limit window (days)', 'customerSellLimitWindowDays'],
+        ].map(([label, field]) => (
+          <FormField
+            key={field}
+            label={label}
+            name={field}
+            type='number'
+            value={settings[field]}
+            readOnly={!canConfigurePayout}
+            onChange={(event) => updateField(field, event.target.value)}
+          />
+        ))}
+      </div>
+      <p className='text-xs text-gray-500'>
+        Set a limit to 0 to disable that validation. Only Super Admin can
+        change these settings.
+      </p>
+    </div>
+  )
+}
+
+const StorePaymentSection = ({ settings, canConfigurePayout, onChange }) => (
+  <div className='border border-gray-200 rounded-lg p-4 space-y-3'>
+    <div>
+      {sectionTitle('Store Payment Permission')}
+      <p className='text-xs text-gray-500 mt-1'>
+        Controls who records the store payout after a payment request.
+        Only Super Admin can change this setting.
+      </p>
+    </div>
+    <SelectField
+      label='Payment mode'
+      name='storePaymentMode'
+      value={settings.mode}
+      disabled={!canConfigurePayout}
+      onChange={(event) => onChange({ ...settings, mode: event.target.value })}
+      options={[
+        {
+          value: 'COMPANY_ACCOUNTS',
+          label: 'Mode 1 - Company Accounts pays store',
+        },
+        {
+          value: 'MANAGER_FUNDS',
+          label: 'Mode 2 - Manager pays from personal funds',
+        },
+        {
+          value: 'PREPAID_DEFERRED',
+          label: 'Mode 3 - Pre-paid / deferred (no pickup payout)',
+        },
+      ]}
+    />
+    {!canConfigurePayout && (
+      <p className='text-xs text-amber-700'>
+        Read only: ask a Super Admin to change the payment permission.
+      </p>
+    )}
+  </div>
+)
+
+const FormActions = ({ onCancel }) => (
+  <div className='sticky bottom-0 bg-white pt-2 pb-1 flex justify-end gap-3 border-t border-gray-100'>
+    <button
+      type='button'
+      onClick={onCancel}
+      className='border border-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition'
+    >
+      Cancel
+    </button>
+    <button type='submit' className='bg-[var(--primary-color)] text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition'>Update Details</button>
+  </div>
+)
+
 const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
   const profile = JSON.parse(sessionStorage.getItem('profile') || '{}')
   const canConfigurePayout = profile?.role === 'Super Admin'
@@ -417,105 +514,27 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
           />
         </div>
 
-        <div className='border border-gray-200 rounded-lg p-4 space-y-4'>
-          <div>
-            {sectionTitle('HSBC UPI Customer Payout')}
-            <p className='text-xs text-gray-500 mt-1'>
-              Company master control and fraud limits. Store-level payout mode
-              and ceiling are configured from Store Listing.
-            </p>
-          </div>
-          <label className='flex items-center gap-3'>
-            <input
-              type='checkbox'
-              checked={formValues.buybackPayoutSettings.enabled}
-              disabled={!canConfigurePayout}
-              onChange={(event) =>
-                setFormValues((previous) => ({
-                  ...previous,
-                  buybackPayoutSettings: {
-                    ...previous.buybackPayoutSettings,
-                    enabled: event.target.checked,
-                  },
-                }))
-              }
-            />
-            Enable HSBC UPI payout for this company
-          </label>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-            {[
-              ['Device cooldown (days)', 'deviceCooldownDays'],
-              ['Customer device limit', 'customerSellLimitCount'],
-              ['Customer limit window (days)', 'customerSellLimitWindowDays'],
-            ].map(([label, field]) => (
-              <FormField
-                key={field}
-                label={label}
-                name={field}
-                type='number'
-                value={formValues.buybackPayoutSettings[field]}
-                readOnly={!canConfigurePayout}
-                onChange={(event) =>
-                  setFormValues((previous) => ({
-                    ...previous,
-                    buybackPayoutSettings: {
-                      ...previous.buybackPayoutSettings,
-                      [field]: event.target.value,
-                    },
-                  }))
-                }
-              />
-            ))}
-          </div>
-          <p className='text-xs text-gray-500'>
-            Set a limit to 0 to disable that validation. Only Super Admin can
-            change these settings.
-          </p>
-        </div>
+        <PayoutSettingsSection
+          settings={formValues.buybackPayoutSettings}
+          canConfigurePayout={canConfigurePayout}
+          onChange={(next) =>
+            setFormValues((previous) => ({
+              ...previous,
+              buybackPayoutSettings: next,
+            }))
+          }
+        />
 
-        <div className='border border-gray-200 rounded-lg p-4 space-y-3'>
-          <div>
-            {sectionTitle('Store Payment Permission')}
-            <p className='text-xs text-gray-500 mt-1'>
-              Controls who records the store payout after a payment request.
-              Only Super Admin can change this setting.
-            </p>
-          </div>
-          <SelectField
-            label='Payment mode'
-            name='storePaymentMode'
-            value={formValues.storePaymentSettings.mode}
-            disabled={!canConfigurePayout}
-            onChange={(event) =>
-              setFormValues((previous) => ({
-                ...previous,
-                storePaymentSettings: {
-                  ...previous.storePaymentSettings,
-                  mode: event.target.value,
-                },
-              }))
-            }
-            options={[
-              {
-                value: 'COMPANY_ACCOUNTS',
-                label: 'Mode 1 - Company Accounts pays store',
-              },
-              {
-                value: 'MANAGER_FUNDS',
-                label: 'Mode 2 - Manager pays from personal funds',
-              },
-              {
-                value: 'PREPAID_DEFERRED',
-                label: 'Mode 3 - Pre-paid / deferred (no pickup payout)',
-              },
-            ]}
-          />
-          {!canConfigurePayout && (
-            <p className='text-xs text-amber-700'>
-              Read only: ask a Super Admin to change the payment permission.
-            </p>
-          )}
-        </div>
+        <StorePaymentSection
+          settings={formValues.storePaymentSettings}
+          canConfigurePayout={canConfigurePayout}
+          onChange={(next) =>
+            setFormValues((previous) => ({
+              ...previous,
+              storePaymentSettings: next,
+            }))
+          }
+        />
 
         <div className='border border-gray-200 rounded-lg p-4'>
           <EmailConfiguration value={formValues.emailConfiguration} onChange={(config) => setFormValues(prev => ({ ...prev, emailConfiguration: config }))} />
@@ -534,16 +553,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
           setPricingNotes={setPricingNotes}
         />
 
-        <div className='sticky bottom-0 bg-white pt-2 pb-1 flex justify-end gap-3 border-t border-gray-100'>
-          <button
-            type='button'
-            onClick={() => setEditBoxOpen(false)}
-            className='border border-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition'
-          >
-            Cancel
-          </button>
-          <button type='submit' className='bg-[var(--primary-color)] text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition'>Update Details</button>
-        </div>
+        <FormActions onCancel={() => setEditBoxOpen(false)} />
       </form>
     </>
   )

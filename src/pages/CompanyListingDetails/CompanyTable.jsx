@@ -44,6 +44,133 @@ const STORE_PAYMENT_MODE_LABELS = {
   PREPAID_DEFERRED: 'Pre-paid / Deferred',
 }
 
+const CompanyTableRow = ({
+  data,
+  index,
+  selectedIds,
+  onSelectId,
+  editHandler,
+  deleteConfHandler,
+  openUploadPriceModal,
+  openViewDocsModal,
+}) => (
+  <tr
+    key={data._id || index}
+    className={`${index % 2 === 0 ? 'bg-gray-200' : ''} ${selectedIds.includes(data._id) ? 'bg-blue-100' : ''}`}
+  >
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <input
+        type='checkbox'
+        checked={selectedIds.includes(data._id)}
+        onChange={() => onSelectId(data._id)}
+        className='cursor-pointer'
+      />
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <div className='flex flex-col gap-1'>
+        <button
+          className={`${styles.view_btn}`}
+          onClick={() => {
+            editHandler(data)
+          }}
+        >
+          Edit
+        </button>
+        <button
+          className={`${styles.acpt_btn}`}
+          onClick={() => {
+            deleteConfHandler(data)
+          }}
+        >
+          Delete
+        </button>
+        <button
+          className='bg-blue-500 text-white px-2 py-1 text-xs rounded hover:bg-blue-600 flex items-center justify-center gap-1'
+          onClick={() => {
+            openUploadPriceModal(data)
+          }}
+        >
+          <FaUpload size={12} /> Price Sheet
+        </button>
+      </div>
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.name}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.companyCode}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.address}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.contactNumber}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.gstNumber}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.panNumber}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.remarks}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusBadgeClass(data.dynamicPricingStatus)}`}>
+        {getStatusLabel(data.dynamicPricingStatus)}
+      </span>
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <AadharBadge required={data.aadharVerificationRequired !== false} />
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <PayoutEnabledBadge enabled={data.buybackPayoutSettings?.enabled === true} />
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.buybackPayoutSettings?.deviceCooldownDays ?? '-'}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.buybackPayoutSettings?.customerSellLimitCount ?? '-'}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.buybackPayoutSettings?.customerSellLimitWindowDays ?? '-'}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.storePaymentSettings?.mode
+        ? STORE_PAYMENT_MODE_LABELS[data.storePaymentSettings.mode] || data.storePaymentSettings.mode
+        : '-'}
+    </td>
+    <td
+      className='p-2 text-sm text-center md:p-3 md:text-base'
+      onClick={() => openViewDocsModal(data)}
+      style={{ cursor: 'pointer' }}
+    >
+      View Docs
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.priceSheets && data.priceSheets.length > 0 ? (
+        <div className='flex flex-col gap-1'>
+          {data.priceSheets.map((sheet, idx) => (
+            <a
+              key={idx}
+              href={sheet.fileUrl}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-blue-600 hover:text-blue-800 text-sm underline flex items-center justify-center gap-1'
+            >
+              <FaDownload size={10} />
+              {sheet.fileName} (
+              {new Date(sheet.uploadedAt).toLocaleDateString()})
+            </a>
+          ))}
+        </div>
+      ) : (
+        <span className='text-gray-400 text-sm'>No files</span>
+      )}
+    </td>
+  </tr>
+)
+
 const CompanyTable = ({
   tableData,
   editHandler,
@@ -106,121 +233,17 @@ const CompanyTable = ({
               [...tableData]
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .map((data, index) => (
-                  <tr
+                  <CompanyTableRow
                     key={data._id || index}
-                    className={`${index % 2 === 0 ? 'bg-gray-200' : ''} ${selectedIds.includes(data._id) ? 'bg-blue-100' : ''}`}
-                  >
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      <input
-                        type='checkbox'
-                        checked={selectedIds.includes(data._id)}
-                        onChange={() => onSelectId(data._id)}
-                        className='cursor-pointer'
-                      />
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      <div className='flex flex-col gap-1'>
-                        <button
-                          className={`${styles.view_btn}`}
-                          onClick={() => {
-                            editHandler(data)
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className={`${styles.acpt_btn}`}
-                          onClick={() => {
-                            deleteConfHandler(data)
-                          }}
-                        >
-                          Delete
-                        </button>
-                        <button
-                          className='bg-blue-500 text-white px-2 py-1 text-xs rounded hover:bg-blue-600 flex items-center justify-center gap-1'
-                          onClick={() => {
-                            openUploadPriceModal(data)
-                          }}
-                        >
-                          <FaUpload size={12} /> Price Sheet
-                        </button>
-                      </div>
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.name}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.companyCode}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.address}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.contactNumber}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.gstNumber}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.panNumber}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.remarks}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusBadgeClass(data.dynamicPricingStatus)}`}>
-                        {getStatusLabel(data.dynamicPricingStatus)}
-                      </span>
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      <AadharBadge required={data.aadharVerificationRequired !== false} />
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      <PayoutEnabledBadge enabled={data.buybackPayoutSettings?.enabled === true} />
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.buybackPayoutSettings?.deviceCooldownDays ?? '-'}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.buybackPayoutSettings?.customerSellLimitCount ?? '-'}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.buybackPayoutSettings?.customerSellLimitWindowDays ?? '-'}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.storePaymentSettings?.mode
-                        ? STORE_PAYMENT_MODE_LABELS[data.storePaymentSettings.mode] || data.storePaymentSettings.mode
-                        : '-'}
-                    </td>
-                    <td
-                      className='p-2 text-sm text-center md:p-3 md:text-base'
-                      onClick={() => openViewDocsModal(data)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      View Docs
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.priceSheets && data.priceSheets.length > 0 ? (
-                        <div className='flex flex-col gap-1'>
-                          {data.priceSheets.map((sheet, idx) => (
-                            <a
-                              key={idx}
-                              href={sheet.fileUrl}
-                              target='_blank'
-                              rel='noopener noreferrer'
-                              className='text-blue-600 hover:text-blue-800 text-sm underline flex items-center justify-center gap-1'
-                            >
-                              <FaDownload size={10} />
-                              {sheet.fileName} (
-                              {new Date(sheet.uploadedAt).toLocaleDateString()})
-                            </a>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className='text-gray-400 text-sm'>No files</span>
-                      )}
-                    </td>
-                  </tr>
+                    data={data}
+                    index={index}
+                    selectedIds={selectedIds}
+                    onSelectId={onSelectId}
+                    editHandler={editHandler}
+                    deleteConfHandler={deleteConfHandler}
+                    openUploadPriceModal={openUploadPriceModal}
+                    openViewDocsModal={openViewDocsModal}
+                  />
                 ))}
           </tbody>
         </table>
