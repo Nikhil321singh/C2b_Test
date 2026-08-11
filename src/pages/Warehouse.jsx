@@ -351,27 +351,14 @@ LeadRow.propTypes = {
   cancel: PropTypes.func.isRequired,
 }
 
-const Warehouse = () => {
-  const [sideMenu, setSideMenu] = useState(false)
-  const [tab, setTab] = useState('')
+const useWarehouseOps = ({ token, tab }) => {
   const [items, setItems] = useState([])
-  const [agents, setAgents] = useState([])
-  const [selection, setSelection] = useState({})
   const [courier, setCourier] = useState({ configured: false })
   const [loading, setLoading] = useState(true)
+  const [selection, setSelection] = useState({})
   const [busy, setBusy] = useState('')
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const token = sessionStorage.getItem('authToken')
-  const profile = JSON.parse(sessionStorage.getItem('profile') || '{}')
-  const isWarehouse =
-    profile.role === USER_ROLES.WAREHOUSE_USER ||
-    profile.role === USER_ROLES.SUPER_ADMIN
-  const canRestore =
-    profile.role === USER_ROLES.COMPANY_ADMIN ||
-    profile.role === USER_ROLES.SUPER_ADMIN
-  const canCancel = isWarehouse || canRestore
-  const isLogistic = profile.role === USER_ROLES.LOGISTIC_USER
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -400,6 +387,151 @@ const Warehouse = () => {
     load()
   }, [load])
 
+  const run = useCallback(
+    async (busyKey, request, getMessage, fallbackError) => {
+      if (busy) {
+        return
+      }
+      setBusy(busyKey)
+      setError('')
+      setMessage('')
+      try {
+        const response = await request()
+        if (getMessage) {
+          setMessage(getMessage(response))
+        }
+        await load()
+      } catch (requestError) {
+        setError(
+          requestError.response?.data?.message || fallbackError
+        )
+      } finally {
+        setBusy('')
+      }
+    },
+    [busy, load]
+  )
+
+  const action = useCallback(
+    (lead, path, body = {}) =>
+      run(
+        lead._id,
+        () =>
+          axios.post(
+            `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/warehouse/leads/${lead._id}/${path}`,
+            body,
+            { headers: { Authorization: token } }
+          ),
+        () => 'Warehouse lead updated successfully',
+        'Warehouse action failed'
+      ),
+    [run, token]
+  )
+
+  const assign = useCallback(
+    (lead) => {
+      const logisticAgentId = selection[lead._id]
+      if (!logisticAgentId) {
+        setError('Select an active Logistic agent first')
+        return
+      }
+      action(lead, 'assign', { logisticAgentId })
+    },
+    [action, selection]
+  )
+
+  const cancel = useCallback(
+    (lead) => {
+      const reason = window.prompt('Cancellation reason')
+      if (reason?.trim()) {
+        action(lead, 'cancel', { reason: reason.trim() })
+      }
+    },
+    [action]
+  )
+
+  const pushToLogistics = useCallback(
+    () =>
+      run(
+        'push',
+        () =>
+          axios.post(
+            `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/warehouse/push-to-logistics`,
+            {},
+            { headers: { Authorization: token } }
+          ),
+        (response) =>
+          `${response.data.data.pushed} pushed, ${response.data.data.failed} failed`,
+        'Unable to push leads to Logistics'
+      ),
+    [run, token]
+  )
+
+  const refreshTracking = useCallback(
+    () =>
+      run(
+        'track',
+        () =>
+          axios.post(
+            `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/warehouse/refresh-tracking`,
+            {},
+            { headers: { Authorization: token } }
+          ),
+        (response) =>
+          `${response.data.data.tracked} updated, ${response.data.data.failed} unavailable`,
+        'Unable to refresh courier tracking'
+      ),
+    [run, token]
+  )
+
+  return {
+    items,
+    courier,
+    loading,
+    selection,
+    setSelection,
+    busy,
+    error,
+    message,
+    action,
+    assign,
+    cancel,
+    pushToLogistics,
+    refreshTracking,
+  }
+}
+
+const Warehouse = () => {
+  const [sideMenu, setSideMenu] = useState(false)
+  const [tab, setTab] = useState('')
+  const [agents, setAgents] = useState([])
+  const token = sessionStorage.getItem('authToken')
+  const profile = JSON.parse(sessionStorage.getItem('profile') || '{}')
+  const isWarehouse =
+    profile.role === USER_ROLES.WAREHOUSE_USER ||
+    profile.role === USER_ROLES.SUPER_ADMIN
+  const canRestore =
+    profile.role === USER_ROLES.COMPANY_ADMIN ||
+    profile.role === USER_ROLES.SUPER_ADMIN
+  const canCancel = isWarehouse || canRestore
+  const isLogistic = profile.role === USER_ROLES.LOGISTIC_USER
+
+  const {
+    items,
+    courier,
+    loading,
+    selection,
+    setSelection,
+    busy,
+    error,
+    message,
+    action,
+    assign,
+    cancel,
+    pushToLogistics,
+    refreshTracking,
+  } = useWarehouseOps({ token, tab })
+
   useEffect(() => {
     if (isLogistic) {
       return
@@ -412,97 +544,6 @@ const Warehouse = () => {
       .then((response) => setAgents(response.data.data || []))
       .catch(() => setAgents([]))
   }, [isLogistic, token])
-
-  const action = async (lead, path, body = {}) => {
-    if (busy) {
-      return
-    }
-    setBusy(lead._id)
-    setError('')
-    setMessage('')
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/warehouse/leads/${lead._id}/${path}`,
-        body,
-        { headers: { Authorization: token } }
-      )
-      setMessage('Warehouse lead updated successfully')
-      await load()
-    } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Warehouse action failed')
-    } finally {
-      setBusy('')
-    }
-  }
-
-  const assign = (lead) => {
-    const logisticAgentId = selection[lead._id]
-    if (!logisticAgentId) {
-      setError('Select an active Logistic agent first')
-      return
-    }
-    action(lead, 'assign', { logisticAgentId })
-  }
-
-  const cancel = (lead) => {
-    const reason = window.prompt('Cancellation reason')
-    if (reason?.trim()) {
-      action(lead, 'cancel', { reason: reason.trim() })
-    }
-  }
-
-  const pushToLogistics = async () => {
-    if (busy) {
-      return
-    }
-    setBusy('push')
-    setError('')
-    setMessage('')
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/warehouse/push-to-logistics`,
-        {},
-        { headers: { Authorization: token } }
-      )
-      setMessage(
-        `${response.data.data.pushed} pushed, ${response.data.data.failed} failed`
-      )
-      await load()
-    } catch (requestError) {
-      setError(
-        requestError.response?.data?.message ||
-          'Unable to push leads to Logistics'
-      )
-    } finally {
-      setBusy('')
-    }
-  }
-
-  const refreshTracking = async () => {
-    if (busy) {
-      return
-    }
-    setBusy('track')
-    setError('')
-    setMessage('')
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/warehouse/refresh-tracking`,
-        {},
-        { headers: { Authorization: token } }
-      )
-      setMessage(
-        `${response.data.data.tracked} updated, ${response.data.data.failed} unavailable`
-      )
-      await load()
-    } catch (requestError) {
-      setError(
-        requestError.response?.data?.message || 'Unable to refresh courier tracking'
-      )
-    } finally {
-      setBusy('')
-    }
-  }
 
   return (
     <div className='min-h-screen bg-[#F5F4F9]'>

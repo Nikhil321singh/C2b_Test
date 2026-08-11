@@ -341,6 +341,43 @@ const FormActions = ({ onCancel }) => (
   </div>
 )
 
+const buildCompanyFormData = (formValues, canConfigurePayout) => {
+  const formData = new FormData()
+  formData.append('name', formValues.name)
+  formData.append('contactNumber', formValues.contactNumber)
+  formData.append('address', formValues.address)
+  formData.append('gstNumber', formValues.gstNumber)
+  formData.append('panNumber', formValues.panNumber)
+  formData.append('remarks', formValues.remarks)
+  formData.append('showPrice', formValues.showPrice)
+  formData.append('maskInfo', formValues.maskInfo)
+  formData.append('aadharVerificationRequired', formValues.aadharVerificationRequired)
+  formData.append('emailConfiguration', JSON.stringify(formValues.emailConfiguration))
+  if (canConfigurePayout) {
+    formData.append(
+      'buybackPayoutSettings',
+      JSON.stringify({
+        ...formValues.buybackPayoutSettings,
+        deviceCooldownDays: Number(
+          formValues.buybackPayoutSettings.deviceCooldownDays || 0
+        ),
+        customerSellLimitCount: Number(
+          formValues.buybackPayoutSettings.customerSellLimitCount || 0
+        ),
+        customerSellLimitWindowDays: Number(
+          formValues.buybackPayoutSettings.customerSellLimitWindowDays || 0
+        ),
+      })
+    )
+    formData.append(
+      'storePaymentSettings',
+      JSON.stringify(formValues.storePaymentSettings)
+    )
+  }
+  formData.append('id', formValues._id)
+  return formData
+}
+
 const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
   const profile = JSON.parse(sessionStorage.getItem('profile') || '{}')
   const canConfigurePayout = profile?.role === 'Super Admin'
@@ -438,39 +475,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
     setIsTableLoading(true)
     const token = sessionStorage.getItem('authToken')
     try {
-      const formData = new FormData()
-      formData.append('name', formValues.name)
-      formData.append('contactNumber', formValues.contactNumber)
-      formData.append('address', formValues.address)
-      formData.append('gstNumber', formValues.gstNumber)
-      formData.append('panNumber', formValues.panNumber)
-      formData.append('remarks', formValues.remarks)
-      formData.append('showPrice', formValues.showPrice)
-      formData.append('maskInfo', formValues.maskInfo)
-      formData.append('aadharVerificationRequired', formValues.aadharVerificationRequired)
-      formData.append('emailConfiguration', JSON.stringify(formValues.emailConfiguration))
-      if (canConfigurePayout) {
-        formData.append(
-          'buybackPayoutSettings',
-          JSON.stringify({
-            ...formValues.buybackPayoutSettings,
-            deviceCooldownDays: Number(
-              formValues.buybackPayoutSettings.deviceCooldownDays || 0
-            ),
-            customerSellLimitCount: Number(
-              formValues.buybackPayoutSettings.customerSellLimitCount || 0
-            ),
-            customerSellLimitWindowDays: Number(
-              formValues.buybackPayoutSettings.customerSellLimitWindowDays || 0
-            ),
-          })
-        )
-        formData.append(
-          'storePaymentSettings',
-          JSON.stringify(formValues.storePaymentSettings)
-        )
-      }
-      formData.append('id', formValues._id)
+      const formData = buildCompanyFormData(formValues, canConfigurePayout)
 
       await axios.put(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/edit`, formData, { headers: { Authorization: token } })
       await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/dynamic-pricing/config`, {
