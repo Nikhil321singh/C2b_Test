@@ -203,8 +203,11 @@ const ProductSold = () => {
         {payout?.status === 'AWAITING_VPA' &&
           payout?.linkNotificationState === 'DELIVERED' && (
             <p className='text-sm text-green-700'>
-              Payment link sent. Waiting for the customer to verify their UPI
-              ID.
+              Payment link sent. Waiting for the customer to provide their{' '}
+              {['HSBC_IMPS', 'HSBC_NEFT'].includes(payout.provider)
+                ? 'bank details'
+                : 'UPI ID'}
+              .
             </p>
           )}
         {error && <p className='text-red-600'>{error}</p>}

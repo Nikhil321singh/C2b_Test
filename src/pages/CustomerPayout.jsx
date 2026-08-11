@@ -106,13 +106,19 @@ const CustomerPayout = () => {
   }
 
   const canSubmit = payout?.status === 'AWAITING_VPA'
-  const isSuccessfulState = [
-    'READY_FOR_PAYMENT',
-    'PENDING_APPROVAL',
-    'PROCESSING',
-    'STATUS_UNKNOWN',
-    'SUCCESS',
-  ].includes(payout?.status)
+  // Only a confirmed payment may look like one. An in-flight or unconfirmed
+  // payout reads as "in progress", never as money received.
+  const statusTone = (() => {
+    if (payout?.status === 'SUCCESS') return 'bg-green-50 text-green-800'
+    if (
+      ['READY_FOR_PAYMENT', 'PENDING_APPROVAL', 'PROCESSING', 'STATUS_UNKNOWN'].includes(
+        payout?.status,
+      )
+    ) {
+      return 'bg-amber-50 text-amber-800'
+    }
+    return 'bg-red-50 text-red-700'
+  })()
 
   return (
     <main className='min-h-screen bg-gray-50 px-4 py-10'>
@@ -215,13 +221,7 @@ const CustomerPayout = () => {
             </button>
           </form>
         ) : payout ? (
-          <div
-            className={`mt-7 rounded-lg p-4 text-center ${
-              isSuccessfulState
-                ? 'bg-green-50 text-green-800'
-                : 'bg-red-50 text-red-700'
-            }`}
-          >
+          <div className={`mt-7 rounded-lg p-4 text-center ${statusTone}`}>
             <p className='font-semibold'>{payout.statusMessage}</p>
             {payout.beneficiaryVpaMasked && (
               <p className='mt-2 text-gray-600'>
