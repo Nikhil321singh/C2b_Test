@@ -37,6 +37,8 @@ export const notificationTargetPath = (item) => {
   switch (item?.entityType) {
     case 'storePayment':
       return '/store-payments'
+    case 'buybackPayout':
+      return '/payout-management'
     case 'lead':
       return '/warehouse'
     default:

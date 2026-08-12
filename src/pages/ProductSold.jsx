@@ -5,6 +5,10 @@ import { useNavigate } from 'react-router-dom'
 import { BsCartCheckFill } from 'react-icons/bs'
 import { CgSpinner } from 'react-icons/cg'
 import User_Logo from '../assets/User_Logo.jpg'
+import {
+  formatStatusCheckedAt,
+  getPayoutDisplayState,
+} from '../utils/payoutDisplay'
 
 const currentDomain = window.location.origin
 const DEFAULT_LOGO = '/Grest_Logo.jpg'
@@ -59,9 +63,6 @@ const getResendLinkLabel = (payout) => {
   return 'Resend Customer Link'
 }
 
-const getBeneficiaryLabel = (payout) =>
-  isBankTransfer(payout) ? 'bank details' : 'UPI ID'
-
 const shouldAcceptPollResult = (prev, next) =>
   !prev || rankOf(next?.status) >= rankOf(prev.status)
 
@@ -87,25 +88,42 @@ const useAutoReturn = (shouldAutoReturn, navigate) => {
   return countdown
 }
 
-const PayoutStatusPanel = ({ payout, statusMessage, busy, error, onAction }) => {
+const PayoutStatusPanel = ({
+  payout,
+  statusMessage,
+  actionFeedback,
+  busy,
+  error,
+  onAction,
+}) => {
   const canPay = isReadyForPayment(payout)
   const canCheck = isProcessingStatus(payout)
   const canResend = canResendLink(payout)
-  const awaitingDelivered =
-    payout?.status === 'AWAITING_VPA' &&
-    payout?.linkNotificationState === 'DELIVERED'
+  const displayState = getPayoutDisplayState(payout)
+  const checkedAt = formatStatusCheckedAt(payout?.lastStatusCheckedAt)
   return (
     <div className='flex flex-col items-center justify-center gap-4 min-h-[65vh] px-5 text-center'>
       <BsCartCheckFill size={84} color='var(--primary-color)' />
-      <p className='font-medium text-2xl'>{statusMessage}</p>
+      <p className='font-medium text-2xl'>
+        {displayState.statusMessage || statusMessage}
+      </p>
       {payout && (
         <>
           <p className='text-lg'>
             Payout amount: <strong>₹{Number(payout.amount || 0).toFixed(2)}</strong>
           </p>
           <p className='text-sm text-gray-600'>
-            Status: {String(payout.status || '').replaceAll('_', ' ')}
+            Status: {displayState.statusLabel}
           </p>
+          {payout.providerStatus && (
+            <p className='text-sm text-gray-600'>
+              Provider status: {payout.providerStatus}
+              {payout.providerMessage ? ` — ${payout.providerMessage}` : ''}
+            </p>
+          )}
+          {checkedAt && (
+            <p className='text-sm text-gray-600'>Last checked: {checkedAt}</p>
+          )}
         </>
       )}
       {canPay && (
@@ -141,13 +159,10 @@ const PayoutStatusPanel = ({ payout, statusMessage, busy, error, onAction }) => 
           {getResendLinkLabel(payout)}
         </button>
       )}
-      {awaitingDelivered && (
-        <p className='text-sm text-green-700'>
-          Payment link sent. Waiting for the customer to provide their{' '}
-          {getBeneficiaryLabel(payout)}.
-        </p>
-      )}
       {error && <p className='text-red-600'>{error}</p>}
+      {actionFeedback && !error && (
+        <p className='text-sm text-blue-700'>{actionFeedback}</p>
+      )}
     </div>
   )
 }
@@ -155,6 +170,7 @@ const PayoutStatusPanel = ({ payout, statusMessage, busy, error, onAction }) => 
 PayoutStatusPanel.propTypes = {
   payout: PropTypes.object,
   statusMessage: PropTypes.string.isRequired,
+  actionFeedback: PropTypes.string.isRequired,
   busy: PropTypes.bool.isRequired,
   error: PropTypes.string.isRequired,
   onAction: PropTypes.func.isRequired,
@@ -172,6 +188,7 @@ const ProductSold = () => {
   )
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [actionFeedback, setActionFeedback] = useState('')
   const token = sessionStorage.getItem('authToken')
 
   const loadPayout = useCallback(async () => {
@@ -217,6 +234,7 @@ const ProductSold = () => {
   const runAction = async (path) => {
     setBusy(true)
     setError('')
+    setActionFeedback('')
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/buyback-payouts/${payout.id}/${path}`,
@@ -227,6 +245,9 @@ const ProductSold = () => {
       setPayout(nextPayout)
       sessionStorage.setItem('activePayout', JSON.stringify(nextPayout))
       setMessage(response.data.message)
+      if (path === 'status') {
+        setActionFeedback(response.data.message || 'Payment status checked.')
+      }
     } catch (requestError) {
       setError(
         requestError.response?.data?.message || 'Unable to process payment'
@@ -258,6 +279,7 @@ const ProductSold = () => {
       <PayoutStatusPanel
         payout={payout}
         statusMessage={statusMessage}
+        actionFeedback={actionFeedback}
         busy={busy}
         error={error}
         onAction={runAction}
