@@ -266,21 +266,23 @@ FormField.propTypes = {
 
 const PayoutSettingsSection = ({ formData, setFormData }) => {
   const updatePayout = (field, value) =>
-    setFormData({
-      ...formData,
+    setFormData((currentFormData) => ({
+      ...currentFormData,
       payoutSettings: {
-        ...formData.payoutSettings,
+        ...currentFormData.payoutSettings,
         [field]: value,
       },
-    });
+    }));
 
   return (
     <div className="w-full md:w-[70%] mt-2 p-4 border border-gray-200 rounded-lg space-y-4">
       <h3 className="font-semibold text-xl">Customer Payout</h3>
       <label className="flex items-center gap-3">
         <input
+          id="store-payout-enabled"
           type="checkbox"
-          checked={formData.payoutSettings.enabled}
+          className="h-5 w-5 cursor-pointer accent-[var(--primary-color)]"
+          checked={Boolean(formData.payoutSettings.enabled)}
           onChange={(event) => updatePayout("enabled", event.target.checked)}
         />
         Enable payout configuration
@@ -300,8 +302,10 @@ const PayoutSettingsSection = ({ formData, setFormData }) => {
       </div>
       <label className="flex items-center gap-3">
         <input
+          id="store-payout-approval-enabled"
           type="checkbox"
-          checked={formData.payoutSettings.approvalEnabled}
+          className="h-5 w-5 cursor-pointer accent-[var(--primary-color)]"
+          checked={Boolean(formData.payoutSettings.approvalEnabled)}
           onChange={(event) =>
             updatePayout("approvalEnabled", event.target.checked)
           }

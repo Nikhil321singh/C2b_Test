@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
 import { CgSpinner } from 'react-icons/cg'
+import { getVpaVerificationError } from '../utils/payoutErrorMessages'
 
 // Customer payout links are public. Keep these requests isolated from the
 // authenticated application's global interceptor, which redirects 401
@@ -206,7 +207,12 @@ const CustomerPayout = () => {
       )
       setPayout(response.data.data)
     } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Unable to verify UPI ID')
+      setError(
+        getVpaVerificationError(
+          requestError,
+          import.meta.env.VITE_HSBC_UAT_TEST_VPA,
+        ),
+      )
     } finally {
       setSubmitting(false)
     }

@@ -26,9 +26,9 @@ const FormHeader = ({ onClose }) => (
   </div>
 );
 
-const FormField = ({ label, name, value, onChange, required = false, readOnly = false, type = 'text' }) => (
+const FormField = ({ label, name, value, onChange, required = false, readOnly = false, type = 'text', labelClassName = '' }) => (
   <div className='flex flex-col gap-1.5'>
-    <span className='font-medium text-sm text-gray-700'>
+    <span className={`font-medium text-sm text-gray-700 ${labelClassName}`}>
       {label}{required && <span className='text-red-500 ml-0.5'>*</span>}
     </span>
     <input
@@ -277,6 +277,7 @@ const PayoutSettingsSection = ({ settings, canConfigurePayout, onChange }) => {
             name={field}
             type='number'
             value={settings[field]}
+            labelClassName='min-h-10 flex items-end'
             readOnly={!canConfigurePayout}
             onChange={(event) => updateField(field, event.target.value)}
           />
