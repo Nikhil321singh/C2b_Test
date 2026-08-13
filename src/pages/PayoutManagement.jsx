@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { BeatLoader } from 'react-spinners'
@@ -9,6 +10,10 @@ import { FaDownload } from 'react-icons/fa'
 import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
 import styles from './CompanyListingDetails/CompanyListingDetails.module.css'
+import {
+  formatStatusCheckedAt,
+  getPayoutDisplayState,
+} from '../utils/payoutDisplay'
 
 const STATUS_BADGES = {
   PENDING_APPROVAL: 'bg-amber-100 text-amber-800',
@@ -64,7 +69,7 @@ const toExportRow = (item) => ({
   Paid: formatPayoutDate(item.paidAt),
 })
 
-const PayoutRow = ({ item, index, busyId, onAction }) => (
+const PayoutRow = ({ item, index, busyId, onAction, onReject }) => (
   <tr className={index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}>
     <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
       <p className='font-medium'>{item.leadId?.uniqueCode || item.leadId?._id}</p>
@@ -81,8 +86,19 @@ const PayoutRow = ({ item, index, busyId, onAction }) => (
           STATUS_BADGES[item.status] || 'bg-gray-100 text-gray-800'
         }`}
       >
-        {item.status.replaceAll('_', ' ')}
+        {getPayoutDisplayState(item).statusLabel}
       </span>
+      {item.providerStatus && (
+        <p className='mt-1 max-w-52 whitespace-normal text-xs text-gray-600'>
+          HSBC: {item.providerStatus}
+          {item.providerMessage ? ` — ${item.providerMessage}` : ''}
+        </p>
+      )}
+      {item.lastStatusCheckedAt && (
+        <p className='mt-1 text-xs text-gray-500'>
+          Checked: {formatStatusCheckedAt(item.lastStatusCheckedAt)}
+        </p>
+      )}
     </td>
     <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
       {item.approval?.required ? (
@@ -106,10 +122,23 @@ const PayoutRow = ({ item, index, busyId, onAction }) => (
       {item.receiptState || '-'}
     </td>
     <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-      <PayoutActions item={item} busyId={busyId} onAction={onAction} />
+      <PayoutActions
+        item={item}
+        busyId={busyId}
+        onAction={onAction}
+        onReject={onReject}
+      />
     </td>
   </tr>
 )
+
+PayoutRow.propTypes = {
+  item: PropTypes.object.isRequired,
+  index: PropTypes.number.isRequired,
+  busyId: PropTypes.string.isRequired,
+  onAction: PropTypes.func.isRequired,
+  onReject: PropTypes.func.isRequired,
+}
 
 const getActedRowId = (updated) =>
   updated && String(updated._id || updated.id || '')
@@ -125,13 +154,17 @@ const reconcileActedRow = (updated, updatedId, items) =>
             updated.merchantOrderNo ?? item.merchantOrderNo,
           providerTransactionRrn:
             updated.providerTransactionRrn ?? item.providerTransactionRrn,
+          providerStatus: updated.providerStatus ?? item.providerStatus,
+          providerMessage: updated.providerMessage ?? item.providerMessage,
+          lastStatusCheckedAt:
+            updated.lastStatusCheckedAt ?? item.lastStatusCheckedAt,
           receiptState: updated.receiptState ?? item.receiptState,
           approval: updated.approval ?? item.approval,
         }
       : item
   )
 
-const PayoutActions = ({ item, busyId, onAction }) => {
+const PayoutActions = ({ item, busyId, onAction, onReject }) => {
   const disabled = busyId === item._id
   return (
     <div className='flex justify-center gap-1.5 whitespace-nowrap'>
@@ -146,7 +179,7 @@ const PayoutActions = ({ item, busyId, onAction }) => {
           </button>
           <button
             disabled={disabled}
-            onClick={() => onAction(item._id, 'approval', { approved: false })}
+            onClick={() => onReject(item)}
             className='bg-red-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
           >
             Reject
@@ -184,6 +217,67 @@ const PayoutActions = ({ item, busyId, onAction }) => {
   )
 }
 
+PayoutActions.propTypes = {
+  item: PropTypes.object.isRequired,
+  busyId: PropTypes.string.isRequired,
+  onAction: PropTypes.func.isRequired,
+  onReject: PropTypes.func.isRequired,
+}
+
+const RejectPayoutModal = ({ item, remarks, setRemarks, busy, onClose, onSubmit }) => {
+  if (!item) {
+    return null
+  }
+  return (
+    <div className='fixed inset-0 z-[60] grid place-items-center bg-black/50 px-4'>
+      <div className='w-full max-w-md rounded-lg bg-white p-5 shadow-xl'>
+        <h2 className='text-xl font-semibold'>Reject customer payout</h2>
+        <p className='mt-2 text-sm text-gray-600'>
+          Enter the reason for rejecting {item.leadId?.uniqueCode || 'this payout'}.
+          The customer and Sales Person will be notified.
+        </p>
+        <textarea
+          value={remarks}
+          onChange={(event) => setRemarks(event.target.value)}
+          maxLength={250}
+          rows={4}
+          autoFocus
+          className='mt-4 w-full rounded-md border border-gray-300 p-3'
+          placeholder='Rejection remark (required)'
+        />
+        <p className='mt-1 text-right text-xs text-gray-500'>{remarks.length}/250</p>
+        <div className='mt-4 flex justify-end gap-2'>
+          <button
+            type='button'
+            disabled={busy}
+            onClick={onClose}
+            className='rounded-md border px-4 py-2 disabled:opacity-60'
+          >
+            Cancel
+          </button>
+          <button
+            type='button'
+            disabled={busy || !remarks.trim()}
+            onClick={onSubmit}
+            className='rounded-md bg-red-600 px-4 py-2 text-white disabled:opacity-60'
+          >
+            Reject payout
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+RejectPayoutModal.propTypes = {
+  item: PropTypes.object,
+  remarks: PropTypes.string.isRequired,
+  setRemarks: PropTypes.func.isRequired,
+  busy: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+}
+
 const PayoutManagement = () => {
   const [sideMenu, setSideMenu] = useState(false)
   const [items, setItems] = useState([])
@@ -191,6 +285,8 @@ const PayoutManagement = () => {
   const [error, setError] = useState('')
   const [busyId, setBusyId] = useState('')
   const [search, setSearch] = useState('')
+  const [rejectingItem, setRejectingItem] = useState(null)
+  const [rejectionRemarks, setRejectionRemarks] = useState('')
   const token = sessionStorage.getItem('authToken')
 
   const filteredItems = useMemo(() => {
@@ -255,13 +351,43 @@ const PayoutManagement = () => {
         setItems((prev) => reconcileActedRow(updated, updatedId, prev))
       }
       toast.success(response.data?.message || 'Payout updated')
+      return true
     } catch (requestError) {
       const message =
         requestError.response?.data?.message || 'Unable to update payout'
       setError(message)
       toast.error(message)
+      return false
     } finally {
       setBusyId('')
+    }
+  }
+
+  const openRejectModal = (item) => {
+    setRejectingItem(item)
+    setRejectionRemarks('')
+  }
+
+  const closeRejectModal = () => {
+    if (!busyId) {
+      setRejectingItem(null)
+      setRejectionRemarks('')
+    }
+  }
+
+  const rejectPayout = async () => {
+    const remarks = rejectionRemarks.trim()
+    if (!remarks) {
+      toast.error('Rejection remark is required')
+      return
+    }
+    const updated = await action(rejectingItem._id, 'approval', {
+      approved: false,
+      remarks,
+    })
+    if (updated) {
+      setRejectingItem(null)
+      setRejectionRemarks('')
     }
   }
 
@@ -348,6 +474,7 @@ const PayoutManagement = () => {
                 index={index}
                 busyId={busyId}
                 onAction={action}
+                onReject={openRejectModal}
               />
             ))}
             {!loading && filteredItems.length === 0 && (
@@ -361,6 +488,14 @@ const PayoutManagement = () => {
         </table>
         </div>
       </div>
+      <RejectPayoutModal
+        item={rejectingItem}
+        remarks={rejectionRemarks}
+        setRemarks={setRejectionRemarks}
+        busy={Boolean(busyId)}
+        onClose={closeRejectModal}
+        onSubmit={rejectPayout}
+      />
     </div>
   )
 }

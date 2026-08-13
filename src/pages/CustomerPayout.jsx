@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 import { useParams } from 'react-router-dom'
 import { CgSpinner } from 'react-icons/cg'
+import { getVpaVerificationError } from '../utils/payoutErrorMessages'
 
 // Customer payout links are public. Keep these requests isolated from the
 // authenticated application's global interceptor, which redirects 401
@@ -14,6 +15,8 @@ const publicPayoutApi = axios.create({
 
 const BANK_PROVIDERS = ['HSBC_IMPS', 'HSBC_NEFT']
 const IFSC_PATTERN = /^[A-Za-z]{4}0[A-Za-z0-9]{6}$/
+const ACCOUNT_PATTERN = /^\d{6,20}$/
+const ACCOUNT_HOLDER_PATTERN = /^[\p{L}][\p{L}\p{M} .'-]{1,99}$/u
 // Mirrors the backend UPI VPA pattern so a malformed UPI ID is caught before submit.
 const VPA_PATTERN = /^[a-zA-Z0-9._-]{2,256}@[a-zA-Z][a-zA-Z0-9.-]{1,63}$/
 
@@ -41,6 +44,8 @@ const BankDetailsForm = ({ bank, onBankChange, submitting, onSubmit }) => (
         value={bank.accountNumber}
         onChange={onBankChange('accountNumber')}
         inputMode='numeric'
+        minLength={6}
+        maxLength={20}
         autoComplete='off'
         required
         className='border-2 rounded-lg px-4 py-3 w-full'
@@ -52,6 +57,8 @@ const BankDetailsForm = ({ bank, onBankChange, submitting, onSubmit }) => (
         value={bank.confirmAccountNumber}
         onChange={onBankChange('confirmAccountNumber')}
         inputMode='numeric'
+        minLength={6}
+        maxLength={20}
         autoComplete='off'
         onPaste={(event) => event.preventDefault()}
         required
@@ -76,6 +83,8 @@ const BankDetailsForm = ({ bank, onBankChange, submitting, onSubmit }) => (
         value={bank.accountName}
         onChange={onBankChange('accountName')}
         autoComplete='off'
+        required
+        maxLength={100}
         className='border-2 rounded-lg px-4 py-3 w-full'
       />
     </div>
@@ -206,7 +215,12 @@ const CustomerPayout = () => {
       )
       setPayout(response.data.data)
     } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Unable to verify UPI ID')
+      setError(
+        getVpaVerificationError(
+          requestError,
+          import.meta.env.VITE_HSBC_UAT_TEST_VPA,
+        ),
+      )
     } finally {
       setSubmitting(false)
     }
@@ -219,8 +233,16 @@ const CustomerPayout = () => {
       setError('Account numbers do not match')
       return
     }
+    if (!ACCOUNT_PATTERN.test(bank.accountNumber.replace(/\s/g, ''))) {
+      setError('Enter a valid bank account number (6 to 20 digits)')
+      return
+    }
     if (!IFSC_PATTERN.test(bank.ifsc.trim())) {
       setError('Enter a valid IFSC code (e.g. HDFC0000007)')
+      return
+    }
+    if (!ACCOUNT_HOLDER_PATTERN.test(bank.accountName.trim().replace(/\s+/g, ' '))) {
+      setError('Enter a valid account holder name')
       return
     }
     setSubmitting(true)

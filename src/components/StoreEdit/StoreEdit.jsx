@@ -108,8 +108,10 @@ const PayoutSettingsSection = ({ settings, onChange }) => {
       <h3 className='font-semibold text-xl'>Customer Payout</h3>
       <label className='flex items-center gap-3'>
         <input
+          id='edit-store-payout-enabled'
           type='checkbox'
-          checked={settings.enabled}
+          className='h-5 w-5 cursor-pointer accent-[var(--primary-color)]'
+          checked={Boolean(settings.enabled)}
           onChange={(event) => update('enabled', event.target.checked)}
         />
         Enable payout configuration
@@ -129,8 +131,10 @@ const PayoutSettingsSection = ({ settings, onChange }) => {
       </div>
       <label className='flex items-center gap-3'>
         <input
+          id='edit-store-payout-approval-enabled'
           type='checkbox'
-          checked={settings.approvalEnabled}
+          className='h-5 w-5 cursor-pointer accent-[var(--primary-color)]'
+          checked={Boolean(settings.approvalEnabled)}
           onChange={(event) => update('approvalEnabled', event.target.checked)}
         />
         Require approval above configured amount
@@ -344,7 +348,10 @@ const StoreEdit = ({ storeData, setEditBoxOpen, setEditSuccess }) => {
             <PayoutSettingsSection
               settings={formData.payoutSettings}
               onChange={(next) =>
-                setFormData({ ...formData, payoutSettings: next })
+                setFormData((currentFormData) => ({
+                  ...currentFormData,
+                  payoutSettings: next,
+                }))
               }
             />
 

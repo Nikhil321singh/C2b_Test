@@ -19,6 +19,8 @@ import ReactDOMServer from "react-dom/server";
 import html2pdf from "html2pdf.js";
 import PurchaseReceipt from "../components/PurchaseReceipt";
 import { IoArrowBack } from "react-icons/io5";
+import { toast } from "react-hot-toast";
+import { getSellNowErrorMessage } from "../utils/payoutErrorMessages";
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
     <div
@@ -292,7 +294,7 @@ const SpecialOffers = () => {
         navigate("/productsold");
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(getSellNowErrorMessage(err));
         setIsLoading(false);
       });
   };
@@ -436,9 +438,11 @@ const SubSpecialOffers = ({
             View Summary
           </p>
         </div>
-        <div
+        <button
+          type="button"
           onClick={handleSubmit}
-          className={`bg-primary relative text-center py-1 px-2 rounded-lg flex justify-between text-white items-center cursor-pointer`}
+          disabled={isLoading}
+          className="bg-primary relative w-full text-center py-1 px-2 rounded-lg flex justify-between text-white items-center cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isLoading && (
             <CgSpinner
@@ -447,7 +451,7 @@ const SubSpecialOffers = ({
             />
           )}
           <p className="w-full p-1 text-xl font-medium">Sell Now</p>
-        </div>
+        </button>
       </div>
       <SummaryModal
         show={showModal}

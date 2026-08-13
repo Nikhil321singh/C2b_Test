@@ -557,7 +557,9 @@ const PayoutSettingsSection = ({ settings, onChange, canConfigurePayout }) => (
         ["Customer limit window (days)", "customerSellLimitWindowDays"],
       ].map(([label, field]) => (
         <div key={field} className="flex flex-col gap-1.5">
-          <span className="font-medium text-sm text-gray-700">{label}</span>
+          <span className="font-medium text-sm text-gray-700 min-h-10 flex items-end">
+            {label}
+          </span>
           <input
             type="number"
             min="0"

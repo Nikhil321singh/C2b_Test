@@ -149,18 +149,20 @@ const CompanyTableRow = ({
     </td>
     <td className='p-2 text-sm text-center md:p-3 md:text-base'>
       {data.priceSheets && data.priceSheets.length > 0 ? (
-        <div className='flex flex-col gap-1'>
+        <div className='flex max-h-24 min-w-[220px] max-w-[280px] flex-col gap-1 overflow-y-auto pr-1'>
           {data.priceSheets.map((sheet, idx) => (
             <a
               key={idx}
               href={sheet.fileUrl}
               target='_blank'
               rel='noopener noreferrer'
-              className='text-blue-600 hover:text-blue-800 text-sm underline flex items-center justify-center gap-1'
+              className='flex items-center gap-1 text-left text-sm text-blue-600 underline hover:text-blue-800'
+              title={`${sheet.fileName} (${new Date(sheet.uploadedAt).toLocaleDateString()})`}
             >
-              <FaDownload size={10} />
-              {sheet.fileName} (
-              {new Date(sheet.uploadedAt).toLocaleDateString()})
+              <FaDownload className='shrink-0' size={10} />
+              <span className='block truncate'>
+                {sheet.fileName} ({new Date(sheet.uploadedAt).toLocaleDateString()})
+              </span>
             </a>
           ))}
         </div>
