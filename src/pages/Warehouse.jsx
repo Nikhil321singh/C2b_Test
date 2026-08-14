@@ -303,9 +303,10 @@ const LeadRow = ({
     <td className='p-3'>{lead.modelId?.name || '-'}</td>
     <td className='p-3'>
       {STATUS_LABELS[lead.deliveryStatus] || lead.deliveryStatus}
-      {lead.cancellation?.reason && (
-        <p className='text-xs text-red-600'>{lead.cancellation.reason}</p>
-      )}
+      {lead.deliveryStatus === 'CANCELLED' &&
+        lead.cancellation?.reason && (
+          <p className='text-xs text-red-600'>{lead.cancellation.reason}</p>
+        )}
     </td>
     <td className='p-3'>
       {lead.logisticAgentId?.name ||
