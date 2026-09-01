@@ -1,6 +1,5 @@
 import axios from 'axios'
 import {
-  KYC_TEST_DATA,
   KYC_TEST_MODE,
 } from '../config/featureFlags'
 

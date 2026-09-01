@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
 import {
   initiateDigiLockerSession,
@@ -25,15 +25,18 @@ const DigilockerAadhaarField = ({
   const [isInitiating, setIsInitiating] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [aadhaarConsent, setAadhaarConsent] = useState(false)
-  const [refid, setRefid] = useState('')
   const [statusMessage, setStatusMessage] = useState('')
 
   const decodeJwtPayload = (token) => {
     try {
       const payload = token.split('.')[1]
-      if (!payload) return null
+      if (!payload) {
+        return null
+      }
       let base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
-      while (base64.length % 4) base64 += '='
+      while (base64.length % 4) {
+        base64 += '='
+      }
       return JSON.parse(atob(base64))
     } catch (e) {
       console.error('Failed to decode encdata JWT:', e)
@@ -64,7 +67,7 @@ const DigilockerAadhaarField = ({
     setStatusMessage('Completing DigiLocker verification...')
 
     try {
-      const tokenResult = await getDigiLockerAccessToken(callbackRefid)
+      await getDigiLockerAccessToken(callbackRefid)
 
       const files = await getDigiLockerIssuedFiles(callbackRefid)
 
@@ -78,7 +81,7 @@ const DigilockerAadhaarField = ({
         throw new Error('Aadhaar document not found in DigiLocker')
       }
 
-      const downloadResult = await downloadDigiLockerXml(
+      await downloadDigiLockerXml(
         callbackRefid,
         aadhaarDoc.uri,
       )
@@ -142,16 +145,28 @@ const DigilockerAadhaarField = ({
   }
 
   const getButtonClass = () => {
-    if (isVerified) return GREEN
-    if (!isVerificationRequired) return DISABLED_BTN
-    if (isInitiating || isProcessing) return DISABLED_BTN
+    if (isVerified) {
+      return GREEN
+    }
+    if (!isVerificationRequired) {
+      return DISABLED_BTN
+    }
+    if (isInitiating || isProcessing) {
+      return DISABLED_BTN
+    }
     return PINK
   }
 
   const getButtonText = () => {
-    if (isVerified) return 'Verified via DigiLocker'
-    if (isProcessing) return 'Processing...'
-    if (isInitiating) return 'Redirecting...'
+    if (isVerified) {
+      return 'Verified via DigiLocker'
+    }
+    if (isProcessing) {
+      return 'Processing...'
+    }
+    if (isInitiating) {
+      return 'Redirecting...'
+    }
     return 'Verify via DigiLocker'
   }
 
