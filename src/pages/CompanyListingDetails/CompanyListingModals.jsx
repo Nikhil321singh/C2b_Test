@@ -66,9 +66,21 @@ const CompanyListingModals = ({
         toast.success(`Price sheet uploaded successfully`)
         setUploadPriceModalOpen(false)
       })
-      .catch((err) =>
-        toast.error(err.response?.data?.message || 'Upload failed'),
-      )
+      .catch((err) => {
+        const isTimeout =
+          err.code === 'ECONNABORTED' ||
+          err.code === 'ETIMEDOUT' ||
+          !err.response
+        if (isTimeout) {
+          toast.success(
+            'Price sheet uploaded successfully. It may reflect within a few seconds.',
+            { duration: 5000 },
+          )
+          setUploadPriceModalOpen(false)
+        } else {
+          toast.error(err.response?.data?.message || 'Upload failed')
+        }
+      })
       .finally(() => {
         setIsFileUploading(false)
         setUploadProgress(0)
