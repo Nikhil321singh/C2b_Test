@@ -26,6 +26,8 @@ const DigilockerAadhaarField = ({
   const [isProcessing, setIsProcessing] = useState(false)
   const [aadhaarConsent, setAadhaarConsent] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
+  const [verifiedAadhaarNumber, setVerifiedAadhaarNumber] = useState('')
+  const [hasFailed, setHasFailed] = useState(false)
   const refidRef = useRef('')
   const setRefid = (value) => {
     refidRef.current = value
@@ -85,12 +87,17 @@ const DigilockerAadhaarField = ({
         throw new Error('Aadhaar document not found in DigiLocker')
       }
 
-      await downloadDigiLockerXml(
+      const kycResponse = await downloadDigiLockerXml(
         callbackRefid,
         aadhaarDoc.uri,
       )
 
-      setAadharNumber('DigiLocker Verified')
+      const maskedNumber = kycResponse?.aadhaarNumber
+      if (maskedNumber) {
+        setVerifiedAadhaarNumber(maskedNumber)
+      }
+
+      setAadharNumber(maskedNumber || 'DigiLocker Verified')
       setIsVerified(true)
       setError('')
       setStatusMessage('Aadhaar verified successfully via DigiLocker!')
@@ -104,6 +111,7 @@ const DigilockerAadhaarField = ({
         err.message ||
         'Failed to complete DigiLocker verification'
       setError(errorMessage)
+      setHasFailed(true)
       toast.error(errorMessage)
       setStatusMessage('')
     } finally {
@@ -119,6 +127,8 @@ const DigilockerAadhaarField = ({
 
     setIsInitiating(true)
     setError('')
+    setHasFailed(false)
+    setVerifiedAadhaarNumber('')
 
     try {
       const sessionId = `DL-${Date.now()}${Math.floor(Math.random() * 1e6)}`
@@ -190,6 +200,20 @@ const DigilockerAadhaarField = ({
         </p>
       </div>
 
+      {verifiedAadhaarNumber && (
+        <div className='flex items-center gap-4 mt-2 ml-[19px]'>
+          <div className='flex items-center p-2 border-2 border-gray-300 rounded'>
+            <input
+              type='text'
+              className='w-auto outline-none'
+              value={verifiedAadhaarNumber}
+              placeholder='Aadhaar No.'
+              readOnly
+            />
+          </div>
+        </div>
+      )}
+
       <div className='flex flex-wrap items-center gap-4 mt-2 ml-[19px]'>
         <button
           className={`px-4 py-2 font-bold text-white rounded ${getButtonClass()}`}
@@ -200,6 +224,16 @@ const DigilockerAadhaarField = ({
         >
           {getButtonText()}
         </button>
+
+        {hasFailed && !isVerified && (
+          <button
+            className='px-4 py-2 font-bold text-white rounded bg-primary hover:opacity-90'
+            onClick={handleInitiateDigiLocker}
+            disabled={isInitiating || isProcessing}
+          >
+            Retry
+          </button>
+        )}
 
         {!isVerificationRequired && (
           <span className='text-sm text-primary'>

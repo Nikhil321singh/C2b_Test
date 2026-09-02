@@ -4,8 +4,11 @@ import { AADHAR_LENGTH, FILE_KEYS, UPLOAD_STATUS } from '../constants/priceConst
 export const validateFormData = (formData) => {
   const { aadharNumber, imeinumber, phoneFront, phoneBack, phoneLeft, phoneRight, phoneTop, phoneBottom, phoneBill, isBillRequired } = formData
 
-  // Validate Aadhar number length
-  if (aadharNumber.length !== AADHAR_LENGTH) {
+  // Validate Aadhar number: accept either a full 12-digit Aadhaar or a
+  // DigiLocker-masked format (e.g. xxxxxxx3257)
+  const isFullAadhar = aadharNumber.length === AADHAR_LENGTH
+  const isDigiLockerMasked = /^[xX]{7,}\d{4}$/.test(aadharNumber)
+  if (!isFullAadhar && !isDigiLockerMasked) {
     toast.error(`Aadhar number must be exactly ${AADHAR_LENGTH} digits.`)
     return false
   }
