@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-hot-toast'
 import {
   initiateDigiLockerSession,
@@ -26,6 +26,10 @@ const DigilockerAadhaarField = ({
   const [isProcessing, setIsProcessing] = useState(false)
   const [aadhaarConsent, setAadhaarConsent] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
+  const refidRef = useRef('')
+  const setRefid = (value) => {
+    refidRef.current = value
+  }
 
   const decodeJwtPayload = (token) => {
     try {
