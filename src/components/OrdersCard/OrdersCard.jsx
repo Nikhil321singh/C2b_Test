@@ -340,12 +340,26 @@ const OrdersCard = ({
         customerName: customerName,
       }
       sessionStorage.setItem('dataModel', JSON.stringify(detail))
+      const lead = itemData.lead || {}
+      const basePrice = Number(lead.price ?? lead.exactValue ?? price)
+      const savedBonus = Number(lead.negotiatedAmount) || Number(lead.bonusPrice) || 0
+      const isSlabApplied = Boolean(lead.slabApplied)
       const responseData = {
-        grade: '',
+        grade: lead.grade || '',
         id: itemData.lead_id,
-        price: Number(itemData.lead?.exactValue ?? itemData.lead?.price),
+        price: basePrice,
         uniqueCode: quoteId,
-        bonus: Number(itemData.lead?.bonusPrice),
+        bonus: savedBonus,
+        slabBonusAmount: Number(lead.slabBonusAmount) || 0,
+        slabApplied: lead.slabApplied || '',
+        isSlabApplied,
+        exactValue: basePrice,
+        quotedPrice: Number(lead.quotedPrice ?? lead.finalPrice ?? basePrice),
+        dynamicPricingEnabled:
+          isSlabApplied || Number(lead.slabBonusAmount) > 0,
+        couponDiscount: Number(lead.couponDiscount) || 0,
+        mode: 'bonus',
+        couponCode: '',
       }
 
       dispatch(setResponseData(responseData))

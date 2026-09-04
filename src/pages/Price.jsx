@@ -21,13 +21,14 @@ const Price = () => {
   const navigate = useNavigate()
 
   const formState = usePriceForm()
+  const [aadharVerificationRequired, setAadharVerificationRequired] = useState(true)
   const {
     uploadStatus,
     handleFileChange,
     uploadAllImages,
     isLoading,
     uploadIndividualFile,
-  } = usePriceUpload(formState)
+  } = usePriceUpload(formState, aadharVerificationRequired)
 
   const {
     imeinumber,
