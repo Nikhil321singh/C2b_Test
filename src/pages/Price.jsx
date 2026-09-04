@@ -128,7 +128,7 @@ const Price = () => {
       <div className='flex-shrink-0'>
         <PriceHeader navigate={navigate} />
       </div>
-      <div className='flex-1 overflow-y-auto overflow-x-hidden -webkit-overflow-scrolling-touch'>
+      <div className='flex-1 overflow-y-auto overflow-x-hidden' style={{ WebkitOverflowScrolling: 'touch', scrollPaddingBottom: '120px' }}>
         <div className='w-[90%] md:w-[90%] mx-auto pb-4 mb-2'>
           <div className='mt-3 text-center relative'>
             <h1 className='text-2xl font-semibold'>Upload Documents</h1>
