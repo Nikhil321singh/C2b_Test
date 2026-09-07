@@ -13,6 +13,54 @@ const DISABLED_BTN = 'bg-gray-400 cursor-not-allowed'
 const PINK = 'bg-primary'
 const GREEN = 'bg-green-500 cursor-not-allowed'
 
+const decodeJwtPayload = (token) => {
+  try {
+    const payload = token.split('.')[1]
+    if (!payload) {
+      return null
+    }
+    let base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+    while (base64.length % 4) {
+      base64 += '='
+    }
+    return JSON.parse(atob(base64))
+  } catch (e) {
+    console.error('Failed to decode encdata JWT:', e)
+    return null
+  }
+}
+
+const getButtonClass = (
+  isVerified,
+  isVerificationRequired,
+  isInitiating,
+  isProcessing,
+) => {
+  if (isVerified) {
+    return GREEN
+  }
+  if (!isVerificationRequired) {
+    return DISABLED_BTN
+  }
+  if (isInitiating || isProcessing) {
+    return DISABLED_BTN
+  }
+  return PINK
+}
+
+const getButtonText = (isVerified, isProcessing, isInitiating) => {
+  if (isVerified) {
+    return 'Verified via DigiLocker'
+  }
+  if (isProcessing) {
+    return 'Processing...'
+  }
+  if (isInitiating) {
+    return 'Redirecting...'
+  }
+  return 'Verify via DigiLocker'
+}
+
 const DigilockerAadhaarField = ({
   aadharNumber,
   setAadharNumber,
@@ -31,23 +79,6 @@ const DigilockerAadhaarField = ({
   const refidRef = useRef('')
   const setRefid = (value) => {
     refidRef.current = value
-  }
-
-  const decodeJwtPayload = (token) => {
-    try {
-      const payload = token.split('.')[1]
-      if (!payload) {
-        return null
-      }
-      let base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
-      while (base64.length % 4) {
-        base64 += '='
-      }
-      return JSON.parse(atob(base64))
-    } catch (e) {
-      console.error('Failed to decode encdata JWT:', e)
-      return null
-    }
   }
 
   useEffect(() => {
@@ -158,32 +189,6 @@ const DigilockerAadhaarField = ({
     }
   }
 
-  const getButtonClass = () => {
-    if (isVerified) {
-      return GREEN
-    }
-    if (!isVerificationRequired) {
-      return DISABLED_BTN
-    }
-    if (isInitiating || isProcessing) {
-      return DISABLED_BTN
-    }
-    return PINK
-  }
-
-  const getButtonText = () => {
-    if (isVerified) {
-      return 'Verified via DigiLocker'
-    }
-    if (isProcessing) {
-      return 'Processing...'
-    }
-    if (isInitiating) {
-      return 'Redirecting...'
-    }
-    return 'Verify via DigiLocker'
-  }
-
   return (
     <div className='flex flex-col eminumber mt-[4px]'>
       <div className='flex gap-1 two'>
@@ -216,13 +221,18 @@ const DigilockerAadhaarField = ({
 
       <div className='flex flex-wrap items-center gap-4 mt-2 ml-[19px]'>
         <button
-          className={`px-4 py-2 font-bold text-white rounded ${getButtonClass()}`}
+          className={`px-4 py-2 font-bold text-white rounded ${getButtonClass(
+            isVerified,
+            isVerificationRequired,
+            isInitiating,
+            isProcessing,
+          )}`}
           onClick={handleInitiateDigiLocker}
           disabled={
             !isVerificationRequired || isVerified || isInitiating || isProcessing
           }
         >
-          {getButtonText()}
+          {getButtonText(isVerified, isProcessing, isInitiating)}
         </button>
 
         {hasFailed && !isVerified && (

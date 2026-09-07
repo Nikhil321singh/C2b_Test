@@ -14,7 +14,9 @@ const emit = () => {
   snapshot = job
     ? { ...job, skippedPages: [...job.skippedPages] }
     : null
-  for (const listener of listeners) listener(snapshot)
+  for (const listener of listeners) {
+    listener(snapshot)
+  }
 }
 
 const subscribe = (listener) => {
@@ -29,8 +31,7 @@ const getSnapshot = () => snapshot
 const fetchPageWithRetry = async (url, headers, retries = MAX_RETRIES) => {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const res = await axios.get(url, { headers, timeout: 25000 })
-      return res
+      return await axios.get(url, { headers, timeout: 25000 })
     } catch (err) {
       if (attempt < retries) {
         await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)))
@@ -39,6 +40,7 @@ const fetchPageWithRetry = async (url, headers, retries = MAX_RETRIES) => {
       }
     }
   }
+  throw new Error('Failed to fetch page')
 }
 
 const runDownload = async (jobStatus, params) => {
@@ -50,10 +52,9 @@ const runDownload = async (jobStatus, params) => {
       emit()
 
       try {
+        const baseUrl = `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/prospects/findAllSelled`
         const res = await fetchPageWithRetry(
-          `${
-            import.meta.env.VITE_REACT_APP_ENDPOINT
-          }/api/prospects/findAllSelled?page=${page}&limit=${BATCH_SIZE}&deviceType=${params.deviceType}&startDate=${params.fromDate}&endDate=${params.toDate}&store=${params.store}`,
+          `${baseUrl}?page=${page}&limit=${BATCH_SIZE}&deviceType=${params.deviceType}&startDate=${params.fromDate}&endDate=${params.toDate}&store=${params.store}`,
           { authorization: params.userToken1 },
         )
 

@@ -51,7 +51,6 @@ const Price = () => {
 
   const [imei2, setImei2] = useState('')
   const [imeiVerificationResult, setImeiVerificationResult] = useState(null)
-  const [aadharVerificationRequired, setAadharVerificationRequired] = useState(true)
 
   useEffect(() => {
     const fetchAadharSetting = async () => {
