@@ -147,7 +147,7 @@ const Price = () => {
             imei2={imei2}
             setImei2={setImei2}
             onImeiVerificationComplete={handleImeiVerificationComplete}
-            aadharVerificationRequired={aadharVerificationRequired}         
+            aadharVerificationRequired={aadharVerificationRequired}
           />
         </div>
       </div>
