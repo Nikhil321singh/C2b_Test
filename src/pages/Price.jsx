@@ -49,6 +49,8 @@ const Price = () => {
 
   const isMobile = prod?.[0]?.categoryCode === 'CTG1'
 
+
+
   const [imei2, setImei2] = useState('')
   const [imeiVerificationResult, setImeiVerificationResult] = useState(null)
 
@@ -145,7 +147,7 @@ const Price = () => {
             imei2={imei2}
             setImei2={setImei2}
             onImeiVerificationComplete={handleImeiVerificationComplete}
-            aadharVerificationRequired={aadharVerificationRequired}
+            aadharVerificationRequired={aadharVerificationRequired}         
           />
         </div>
       </div>

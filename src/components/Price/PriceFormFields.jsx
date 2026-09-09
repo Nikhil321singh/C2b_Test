@@ -68,7 +68,7 @@ const PriceFormFields = ({
 
   return (
     <div className='flex flex-col'>
-      <ImeiField
+     <ImeiField
         setImeiNumber={setImeiNumber}
         imeinumber={imeinumber}
         prod={prod}
@@ -76,7 +76,7 @@ const PriceFormFields = ({
         setImei2={setImei2}
         onImeiVerificationComplete={onImeiVerificationComplete}
       />
-      <DigilockerAadhaarField
+     <DigilockerAadhaarField
         setAadharNumber={setAadharNumber}
         aadharNumber={aadharNumber}
         isVerified={isAadharVerified}
@@ -152,6 +152,7 @@ const PriceFormFields = ({
         prod={prod}
       />
       <CustomerPhotoField
+        handleChange={handleFileChange}
         customerPhoto={customerPhoto}
         setCustomerPhoto={setCustomerPhoto}
         uploadStatus={uploadStatus}
