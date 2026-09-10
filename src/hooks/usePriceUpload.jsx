@@ -5,7 +5,7 @@ import { retryFailedUploads } from '../utils/retryUtils'
 import toast from 'react-hot-toast'
 import { FILE_KEYS } from '../constants/priceConstants'
 
-export const usePriceUpload = (formState) => {
+export const usePriceUpload = (formState, aadharVerificationRequired = true) => {
   const {
     file,
     idProofBack,
@@ -48,6 +48,7 @@ export const usePriceUpload = (formState) => {
       isBillRequired,
       signatureFile, // add signature state to validation
       ceirImage, // add CEIR image state to validation
+      isAadharRequired: aadharVerificationRequired,
     }
 
     if (!validateFormData(formData)) {

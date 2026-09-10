@@ -154,14 +154,20 @@ const applyDynamicPricingResult = (data, setters, initialDpFetchDone) => {
   }
 }
 
-const fetchDynamicPricing = async ({ Price, ResponseData, leadId, token, setters, initialDpFetchDone }) => {
+const fetchDynamicPricing = async ({ Price, leadId, token, setters, initialDpFetchDone }) => {
   const profile = JSON.parse(sessionStorage.getItem('profile'))
   const companyId = profile?.companyId
   if (!companyId || !leadId) {
     return
   }
   try {
-    const initialEV = Number(Price) + (ResponseData.bonus || 0)
+    // Do NOT add ResponseData.bonus here: every fresh-lead entry point into
+    // this page already dispatches bonus:0, so this only ever matters when
+    // resuming a previously-saved order (OrdersCard "Initiate Order"), which
+    // seeds the order's real negotiated bonus. That bonus is applied once,
+    // later, as `finalBonus` in computeQuotedPrice - folding it into the
+    // exactValue sent here too would double-count it in the final total.
+    const initialEV = Number(Price)
     const res = await axios.post(
       `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/dynamic-pricing/calculate-bonus`,
       { companyId, exactValue: initialEV, applyNegotiatedAmount: false, negotiatedAmount: 0, couponDiscount: 0 },
