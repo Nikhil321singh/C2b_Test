@@ -19,6 +19,7 @@ export const usePriceUpload = (formState, aadharVerificationRequired = true) => 
     signatureFile,  // new signature state
     ceirImage,  // new CEIR image state
     aadharNumber,
+    aadharVerificationReason,
     imeinumber,
     isBillRequired,
     isLoading,
@@ -115,7 +116,8 @@ export const usePriceUpload = (formState, aadharVerificationRequired = true) => 
       imeinumber,
       leadsubmitDATA,
       savedOtpData,
-      aadharNumber
+      aadharNumber,
+      aadharVerificationReason
     }
 
     await submitFormData(submissionData, token, navigate)

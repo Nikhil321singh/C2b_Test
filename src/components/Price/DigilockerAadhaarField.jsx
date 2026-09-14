@@ -8,6 +8,7 @@ import {
   DIGILOCKER_REDIRECT_URL,
 } from '../../services/digilockerAadhaarService'
 import ConsentCheckbox from '../ConsentCheckbox'
+import { AADHAR_LENGTH } from '../../constants/priceConstants'
 
 const DISABLED_BTN = 'bg-gray-400 cursor-not-allowed'
 const PINK = 'bg-primary'
@@ -48,9 +49,9 @@ const getButtonClass = (
   return PINK
 }
 
-const getButtonText = (isVerified, isProcessing, isInitiating) => {
+const getButtonText = (isVerified, isProcessing, isInitiating, isManualEntry) => {
   if (isVerified) {
-    return 'Verified via DigiLocker'
+    return isManualEntry ? 'Aadhaar Submitted Manually' : 'Verified via DigiLocker'
   }
   if (isProcessing) {
     return 'Processing...'
@@ -66,6 +67,8 @@ const DigilockerAadhaarField = ({
   setAadharNumber,
   isVerified,
   setIsVerified,
+  aadharVerificationReason,
+  setAadharVerificationReason,
   isVerificationRequired = true,
   isDevelopmentMode = false,
 }) => {
@@ -76,6 +79,10 @@ const DigilockerAadhaarField = ({
   const [statusMessage, setStatusMessage] = useState('')
   const [verifiedAadhaarNumber, setVerifiedAadhaarNumber] = useState('')
   const [hasFailed, setHasFailed] = useState(false)
+  const [isManualEntry, setIsManualEntry] = useState(false)
+  const [manualAadharNumber, setManualAadharNumber] = useState('')
+  const [showReasonModal, setShowReasonModal] = useState(false)
+  const [reasonInput, setReasonInput] = useState('')
   const refidRef = useRef('')
   const setRefid = (value) => {
     refidRef.current = value
@@ -97,6 +104,35 @@ const DigilockerAadhaarField = ({
       setRefid(callbackRefid)
       handleDigiLockerCallback(callbackRefid)
     }
+  }, [])
+
+  // The DigiLocker step is the only step that leaves the app via a real,
+  // full-page navigation (window.location.href to DigiLocker and back).
+  // That makes this page eligible for the browser's back-forward cache
+  // (bfcache): pressing the native Back/Forward buttons can restore this
+  // exact page instance frozen in time, complete with whichever Aadhaar
+  // record happened to be verified in it, instead of a fresh mount.
+  // Detect that restoration and reset verification state so a stale/old
+  // record is never shown as already verified for what should be a new flow.
+  useEffect(() => {
+    const handlePageShow = (event) => {
+      if (event.persisted) {
+        setIsVerified(false)
+        setAadharNumber('')
+        setVerifiedAadhaarNumber('')
+        setStatusMessage('')
+        setError('')
+        setHasFailed(false)
+        setRefid('')
+        setIsManualEntry(false)
+        setManualAadharNumber('')
+        setAadharVerificationReason('')
+        setShowReasonModal(false)
+        setReasonInput('')
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
   }, [])
 
   const handleDigiLockerCallback = async (callbackRefid) => {
@@ -160,6 +196,9 @@ const DigilockerAadhaarField = ({
     setError('')
     setHasFailed(false)
     setVerifiedAadhaarNumber('')
+    setIsManualEntry(false)
+    setManualAadharNumber('')
+    setAadharVerificationReason('')
 
     try {
       const sessionId = `DL-${Date.now()}${Math.floor(Math.random() * 1e6)}`
@@ -184,9 +223,36 @@ const DigilockerAadhaarField = ({
         err.message ||
         'Failed to initiate DigiLocker verification'
       setError(errorMessage)
+      setHasFailed(true)
       toast.error(errorMessage)
       setIsInitiating(false)
     }
+  }
+
+  const handleManualAadharChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '')
+    setManualAadharNumber(value)
+  }
+
+  const handleManualSubmit = () => {
+    const cleaned = manualAadharNumber.replace(/\D/g, '')
+    if (cleaned.length !== AADHAR_LENGTH) {
+      toast.error(`Aadhaar number must be exactly ${AADHAR_LENGTH} digits.`)
+      return
+    }
+    if (!reasonInput.trim()) {
+      toast.error('Please provide a reason for manual Aadhaar entry')
+      return
+    }
+
+    setAadharNumber(cleaned)
+    setVerifiedAadhaarNumber(cleaned)
+    setAadharVerificationReason(reasonInput.trim())
+    setIsManualEntry(true)
+    setIsVerified(true)
+    setError('')
+    setShowReasonModal(false)
+    toast.success('Aadhaar number submitted with reason')
   }
 
   return (
@@ -232,7 +298,7 @@ const DigilockerAadhaarField = ({
             !isVerificationRequired || isVerified || isInitiating || isProcessing
           }
         >
-          {getButtonText(isVerified, isProcessing, isInitiating)}
+          {getButtonText(isVerified, isProcessing, isInitiating, isManualEntry)}
         </button>
 
         {hasFailed && !isVerified && (
@@ -252,6 +318,68 @@ const DigilockerAadhaarField = ({
           </span>
         )}
       </div>
+
+      {/* Manual fallback: shown when Aadhaar verification is turned off for
+          this company, or DigiLocker failed/errored (session couldn't be
+          initiated, Aadhaar not found, etc.) so the flow is never blocked. */}
+      {(!isVerificationRequired || hasFailed) && !isVerified && (
+        <div className='flex flex-col mt-2 ml-[19px]'>
+          <div className='flex flex-wrap items-center gap-4'>
+            <input
+              type='text'
+              className='w-auto p-2 border-2 border-gray-300 rounded outline-none'
+              value={manualAadharNumber}
+              placeholder='Enter Aadhaar Number'
+              onChange={handleManualAadharChange}
+              maxLength={12}
+            />
+          </div>
+          <button
+            type='button'
+            className='text-sm text-primary underline mt-1 w-fit text-left'
+            onClick={() => setShowReasonModal(true)}
+          >
+            + Add Reason &amp; Submit Aadhaar
+          </button>
+        </div>
+      )}
+
+      {isManualEntry && aadharVerificationReason && (
+        <p className='text-xs text-gray-600 mt-1 ml-[19px]'>
+          Reason: {aadharVerificationReason}
+        </p>
+      )}
+
+      {showReasonModal && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40'>
+          <div className='relative p-4 mx-auto bg-white rounded shadow-lg w-80'>
+            <h2 className='text-lg font-bold'>Reason for Manual Aadhaar Entry</h2>
+            <textarea
+              value={reasonInput}
+              onChange={(e) => setReasonInput(e.target.value)}
+              className='w-full p-2 mt-2 border rounded outline-none'
+              rows={3}
+              placeholder='Why is Aadhaar being entered manually?'
+            />
+            <div className='flex justify-end mt-4 gap-2'>
+              <button
+                type='button'
+                onClick={() => setShowReasonModal(false)}
+                className='px-4 py-2 text-white bg-gray-500 rounded'
+              >
+                Cancel
+              </button>
+              <button
+                type='button'
+                onClick={handleManualSubmit}
+                className='px-4 py-2 font-bold text-white rounded bg-primary hover:opacity-90'
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {statusMessage && (
         <p className='text-green-600 mt-2 text-sm ml-[19px]'>{statusMessage}</p>

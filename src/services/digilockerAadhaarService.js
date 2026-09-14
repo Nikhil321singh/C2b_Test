@@ -114,4 +114,4 @@ export const verifyAadhaarViaDigiLocker = async (refid, uri) => {
   return response.data?.data
 }
 
-export const DIGILOCKER_REDIRECT_URL = 'https://main-temp.d1y8jgvhs28026.amplifyapp.com/pricepage'
+export const DIGILOCKER_REDIRECT_URL = `${window.location.origin}/pricepage`
