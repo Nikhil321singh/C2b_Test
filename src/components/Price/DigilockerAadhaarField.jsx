@@ -324,6 +324,23 @@ const createBfcacheResetHandler = (setters) => (event) => {
   setIsProcessing(false)
 }
 
+// Whenever the user comes back to this tab/page from DigiLocker - by any
+// means, not just the browser's native Back button (which pageshow/bfcache
+// already covers) - and we're still stuck showing "Redirecting..." because
+// nothing ever called back to confirm success or failure, treat it as
+// "came back without completing" so the button un-sticks and the manual
+// fallback (already unlocked via hasAttemptedBefore) becomes available
+// instead of leaving the user with nothing clickable.
+const createVisibilityResetEffect = (isInitiating, setIsInitiating) => () => {
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible' && isInitiating) {
+      setIsInitiating(false)
+    }
+  }
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+}
+
 // All state, effects and handlers for the field live here, so the
 // component itself only has to worry about rendering.
 const useDigilockerAadhaarField = ({
@@ -407,6 +424,11 @@ const useDigilockerAadhaarField = ({
     window.addEventListener('pageshow', handlePageShow)
     return () => window.removeEventListener('pageshow', handlePageShow)
   }, [])
+
+  useEffect(
+    createVisibilityResetEffect(isInitiating, setIsInitiating),
+    [isInitiating],
+  )
 
   const handleInitiateDigiLocker = createHandleInitiateDigiLocker({
     aadhaarConsent,
