@@ -49,9 +49,9 @@ const getButtonClass = (
   return PINK
 }
 
-const getButtonText = (isVerified, isProcessing, isInitiating, isManualEntry) => {
+const getButtonText = (isVerified, isProcessing, isInitiating) => {
   if (isVerified) {
-    return isManualEntry ? 'Aadhaar Submitted Manually' : 'Verified via DigiLocker'
+    return 'Verified via DigiLocker'
   }
   if (isProcessing) {
     return 'Processing...'
@@ -74,7 +74,18 @@ const DigilockerAadhaarField = ({
 }) => {
   const [error, setError] = useState('')
   const [isInitiating, setIsInitiating] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
+  // Starting this as a plain `false` leaves a one-render gap on a fresh
+  // page load coming back from DigiLocker: hasAttemptedBefore is already
+  // true (read from sessionStorage immediately), but isProcessing would
+  // only flip true once the mount effect below runs and calls
+  // handleDigiLockerCallback - which happens after the first paint. In
+  // that gap, isManualFlow's guard sees isProcessing still false and lets
+  // the manual box flash in for a frame before the callback takes over.
+  // Checking the URL here closes that gap immediately.
+  const [isProcessing, setIsProcessing] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    return !!(params.get('refid') || params.get('encdata'))
+  })
   const [aadhaarConsent, setAadhaarConsent] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
   const [verifiedAadhaarNumber, setVerifiedAadhaarNumber] = useState('')
@@ -83,6 +94,17 @@ const DigilockerAadhaarField = ({
   const [manualAadharNumber, setManualAadharNumber] = useState('')
   const [showReasonModal, setShowReasonModal] = useState(false)
   const [reasonInput, setReasonInput] = useState('')
+  // Persists across a remount (e.g. user navigates back to a previous
+  // screen, then forward again to this one) so that once DigiLocker has
+  // been attempted at least once, the manual fallback stays available on
+  // every later attempt too - even if that later attempt doesn't itself
+  // hit an explicit error (e.g. the user simply abandoned/cancelled
+  // DigiLocker without completing it). Cleared as soon as the lead is
+  // successfully submitted (see usePriceUpload.jsx), so the next lead
+  // always starts fresh - or on logout.
+  const [hasAttemptedBefore, setHasAttemptedBefore] = useState(
+    () => sessionStorage.getItem('digilockerAttempted') === 'true',
+  )
   const refidRef = useRef('')
   const setRefid = (value) => {
     refidRef.current = value
@@ -129,6 +151,14 @@ const DigilockerAadhaarField = ({
         setAadharVerificationReason('')
         setShowReasonModal(false)
         setReasonInput('')
+        // Without these two, closing/cancelling DigiLocker mid-flow (native
+        // browser Back, before finishing) restores this page frozen with
+        // isInitiating still true from the click that started the redirect -
+        // permanently disabling the button ("Redirecting...") and, since
+        // isManualFlow also checks these two flags, hiding the manual
+        // fallback too. A dead end with nothing left to click.
+        setIsInitiating(false)
+        setIsProcessing(false)
       }
     }
     window.addEventListener('pageshow', handlePageShow)
@@ -192,6 +222,9 @@ const DigilockerAadhaarField = ({
       return
     }
 
+    sessionStorage.setItem('digilockerAttempted', 'true')
+    setHasAttemptedBefore(true)
+
     setIsInitiating(true)
     setError('')
     setHasFailed(false)
@@ -199,6 +232,14 @@ const DigilockerAadhaarField = ({
     setIsManualEntry(false)
     setManualAadharNumber('')
     setAadharVerificationReason('')
+    // A fresh DigiLocker attempt invalidates any earlier manual entry -
+    // without this, a retry that fails before redirecting (e.g. the
+    // session-initiate call itself errors) would leave isVerified stuck
+    // true from the old manual submission while isManualEntry is now
+    // false, making the button falsely show green "Verified via
+    // DigiLocker" right next to the error message.
+    setIsVerified(false)
+    setAadharNumber('')
 
     try {
       const sessionId = `DL-${Date.now()}${Math.floor(Math.random() * 1e6)}`
@@ -236,6 +277,10 @@ const DigilockerAadhaarField = ({
 
   const handleManualSubmit = () => {
     const cleaned = manualAadharNumber.replace(/\D/g, '')
+    if (!cleaned) {
+      toast.error('Please enter your Aadhaar number before submitting.')
+      return
+    }
     if (cleaned.length !== AADHAR_LENGTH) {
       toast.error(`Aadhaar number must be exactly ${AADHAR_LENGTH} digits.`)
       return
@@ -252,15 +297,59 @@ const DigilockerAadhaarField = ({
     setIsVerified(true)
     setError('')
     setShowReasonModal(false)
-    toast.success('Aadhaar number submitted with reason')
+    toast.success('Reason submitted successfully')
   }
+
+  const handleOpenReasonModal = () => {
+    if (!aadhaarConsent) {
+      toast.error('Please provide consent for Aadhaar collection')
+      return
+    }
+    const cleaned = manualAadharNumber.replace(/\D/g, '')
+    if (!cleaned) {
+      toast.error('Please enter your Aadhaar number before submitting.')
+      return
+    }
+    if (cleaned.length !== AADHAR_LENGTH) {
+      toast.error(`Aadhaar number must be exactly ${AADHAR_LENGTH} digits.`)
+      return
+    }
+    setShowReasonModal(true)
+  }
+
+  // True whenever the manual fallback is in play - verification off for
+  // this company, DigiLocker failed/errored, or this is a repeat attempt
+  // (the user already went through "Verify via DigiLocker" at least once
+  // before, e.g. navigated back and came here again).
+  // hasAttemptedBefore only counts once the current attempt is actually
+  // settled (not while isInitiating/isProcessing): it's set the instant
+  // the button is clicked, before the redirect even happens, and stays
+  // set through the callback processing after returning from DigiLocker -
+  // without this guard the manual box would flash in during those windows
+  // even on a click that's still in flight or about to succeed.
+  const isManualFlow =
+    !isVerificationRequired ||
+    hasFailed ||
+    (hasAttemptedBefore && !isInitiating && !isProcessing)
+  // The DigiLocker button/row only ever reflects a real DigiLocker
+  // verification - a manual entry doesn't turn it green/"submitted" or
+  // disable it; it's left exactly as it looked before the manual submit.
+  const displayVerified = isVerified && !isManualEntry
+  // hasAttemptedBefore flips true the instant "Verify via DigiLocker" is
+  // clicked - including on a click that goes on to succeed. So a genuine,
+  // just-completed DigiLocker verification can have isManualFlow true too
+  // by the time the page reloads with the result. The read-only verified
+  // display must win in that case, or the box would wrongly render as the
+  // empty, editable manual input instead of the real verified number.
+  const showVerifiedReadOnly = displayVerified && !!verifiedAadhaarNumber
+  const showManualInput = isManualFlow && !showVerifiedReadOnly
 
   return (
     <div className='flex flex-col eminumber mt-[4px]'>
       <div className='flex gap-1 two'>
         <p className='text-base font-medium'>2.</p>
         <p className='text-base font-medium three'>
-          Aadhaar Verification via DigiLocker
+          Aadhaar Verification
           {isDevelopmentMode ? (
             <span className='text-gray-400 text-sm ml-1'>
               (optional in development)
@@ -271,37 +360,50 @@ const DigilockerAadhaarField = ({
         </p>
       </div>
 
-      {verifiedAadhaarNumber && (
-        <div className='flex items-center gap-4 mt-2 ml-[19px]'>
-          <div className='flex items-center p-2 border-2 border-gray-300 rounded'>
-            <input
-              type='text'
-              className='w-auto outline-none'
-              value={verifiedAadhaarNumber}
-              placeholder='Aadhaar No.'
-              readOnly
-            />
+      {(showVerifiedReadOnly || showManualInput) && (
+        <div className='flex flex-col mt-2 ml-[19px]'>
+          <div className='flex items-center gap-4'>
+            <div className='flex items-center p-2 border-2 border-gray-300 rounded'>
+              <input
+                type='text'
+                className='w-auto outline-none'
+                value={showVerifiedReadOnly ? verifiedAadhaarNumber : manualAadharNumber}
+                placeholder={showVerifiedReadOnly ? 'Aadhaar No.' : 'Enter Aadhaar Number'}
+                onChange={showVerifiedReadOnly ? undefined : handleManualAadharChange}
+                readOnly={showVerifiedReadOnly}
+                maxLength={12}
+              />
+            </div>
           </div>
+          {showManualInput && (
+            <button
+              type='button'
+              className='text-sm text-primary underline mt-1 w-fit text-left'
+              onClick={handleOpenReasonModal}
+            >
+              Add Reason &amp; Submit Aadhaar
+            </button>
+          )}
         </div>
       )}
 
       <div className='flex flex-wrap items-center gap-4 mt-2 ml-[19px]'>
         <button
           className={`px-4 py-2 font-bold text-white rounded ${getButtonClass(
-            isVerified,
+            displayVerified,
             isVerificationRequired,
             isInitiating,
             isProcessing,
           )}`}
           onClick={handleInitiateDigiLocker}
           disabled={
-            !isVerificationRequired || isVerified || isInitiating || isProcessing
+            !isVerificationRequired || displayVerified || isInitiating || isProcessing
           }
         >
-          {getButtonText(isVerified, isProcessing, isInitiating, isManualEntry)}
+          {getButtonText(displayVerified, isProcessing, isInitiating)}
         </button>
 
-        {hasFailed && !isVerified && (
+        {hasFailed && !displayVerified && (
           <button
             className='px-4 py-2 font-bold text-white rounded bg-primary hover:opacity-90'
             onClick={handleInitiateDigiLocker}
@@ -319,31 +421,6 @@ const DigilockerAadhaarField = ({
         )}
       </div>
 
-      {/* Manual fallback: shown when Aadhaar verification is turned off for
-          this company, or DigiLocker failed/errored (session couldn't be
-          initiated, Aadhaar not found, etc.) so the flow is never blocked. */}
-      {(!isVerificationRequired || hasFailed) && !isVerified && (
-        <div className='flex flex-col mt-2 ml-[19px]'>
-          <div className='flex flex-wrap items-center gap-4'>
-            <input
-              type='text'
-              className='w-auto p-2 border-2 border-gray-300 rounded outline-none'
-              value={manualAadharNumber}
-              placeholder='Enter Aadhaar Number'
-              onChange={handleManualAadharChange}
-              maxLength={12}
-            />
-          </div>
-          <button
-            type='button'
-            className='text-sm text-primary underline mt-1 w-fit text-left'
-            onClick={() => setShowReasonModal(true)}
-          >
-            + Add Reason &amp; Submit Aadhaar
-          </button>
-        </div>
-      )}
-
       {isManualEntry && aadharVerificationReason && (
         <p className='text-xs text-gray-600 mt-1 ml-[19px]'>
           Reason: {aadharVerificationReason}
@@ -352,7 +429,7 @@ const DigilockerAadhaarField = ({
 
       {showReasonModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40'>
-          <div className='relative p-4 mx-auto bg-white rounded shadow-lg w-80'>
+          <div className='relative p-4 mx-auto bg-white rounded shadow-lg w-[28rem] max-w-[90vw]'>
             <h2 className='text-lg font-bold'>Reason for Manual Aadhaar Entry</h2>
             <textarea
               value={reasonInput}
