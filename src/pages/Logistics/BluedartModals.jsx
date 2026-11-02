@@ -2,11 +2,14 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { BeatLoader } from 'react-spinners'
 import {
+  BulkResultsModal,
   DIMENSION_KEYS,
   Field,
   INPUT,
   Modal,
   NumberField,
+  packageErrors,
+  twoDecimals,
   useOncePerKey,
   useSubmitLock,
 } from './WarehouseModals'
@@ -114,7 +117,6 @@ const openLabel = async (leadId, setError) => {
 
 /* ------------------------------ Single booking ---------------------------- */
 
-const twoDecimals = (value) => /^\d+(\.\d{1,2})?$/.test(String(value))
 const PINCODE_PATTERN = /^[1-9]\d{5}$/
 
 const placeLabel = (city, state) => [city, state].filter(Boolean).join(', ')
@@ -147,19 +149,7 @@ const validateBookingForm = (form) => {
   if (!twoDecimals(form.amount) || Number(form.amount) <= 0) {
     next.amount = 'Above 0, up to 2 decimals'
   }
-  if (!/^\d+$/.test(form.quantity) || Number(form.quantity) < 1) {
-    next.quantity = 'At least 1'
-  }
-  if (!twoDecimals(form.weight) || Number(form.weight) <= 0) {
-    next.weight = 'Above 0 kg'
-  }
-  for (const key of DIMENSION_KEYS) {
-    const value = Number(form[key])
-    if (Number.isNaN(value) || value <= 0) {
-      next[key] = 'Above 0'
-    }
-  }
-  return next
+  return { ...next, ...packageErrors(form, { quantity: 'At least 1', weight: 'Above 0 kg' }) }
 }
 
 // Sunday or Bluedart holiday at the pickup location.
@@ -351,6 +341,25 @@ PackageSection.propTypes = {
   set: PropTypes.func.isRequired,
 }
 
+// Cancel and submit buttons; the submit button shows a spinner while busy.
+const FormButtons = ({ onClose, submitting, disabled, label }) => (
+  <div className='flex justify-end gap-2'>
+    <button type='button' onClick={onClose} className={SECONDARY_BTN}>
+      Cancel
+    </button>
+    <button type='submit' disabled={submitting || disabled} className={SUBMIT_BTN}>
+      {submitting ? <BeatLoader color='#fff' size={6} /> : label}
+    </button>
+  </div>
+)
+
+FormButtons.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  label: PropTypes.string.isRequired,
+}
+
 const BookingActions = ({ onUseManual, onClose, submitting, canSubmit }) => (
   <>
     <div className='flex flex-col-reverse sm:flex-row sm:justify-between gap-2 mt-6'>
@@ -361,14 +370,7 @@ const BookingActions = ({ onUseManual, onClose, submitting, canSubmit }) => (
       ) : (
         <span />
       )}
-      <div className='flex justify-end gap-2'>
-        <button type='button' onClick={onClose} className={SECONDARY_BTN}>
-          Cancel
-        </button>
-        <button type='submit' disabled={submitting || !canSubmit} className={SUBMIT_BTN}>
-          {submitting ? <BeatLoader color='#fff' size={6} /> : 'Confirm booking'}
-        </button>
-      </div>
+      <FormButtons onClose={onClose} submitting={submitting} disabled={!canSubmit} label='Confirm booking' />
     </div>
     {submitting && (
       <p className='text-xs text-gray-500 text-right mt-2'>
@@ -621,31 +623,19 @@ export const BulkBluedartModal = ({ leads, services, onClose, onDone }) => {
 
   if (results) {
     return (
-      <Modal title='Bulk booking results' onClose={() => onDone(results.message)} wide>
-        <Banner tone={results.rows.every((r) => r.success) ? 'green' : 'amber'}>{results.message}</Banner>
-        <ul className='mt-3 divide-y border rounded'>
-          {results.rows.map((row) => (
-            <li key={row.leadId} className='flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 px-3 py-2 text-sm'>
-              <span className='font-semibold text-gray-800 sm:w-36 shrink-0'>
-                {byId.get(row.leadId)?.leadCode || row.leadId}
-              </span>
-              {row.success ? (
-                <span className='text-green-700'>
-                  Booked · AWB {row.awbNo}
-                  {row.pickupFailed ? ' (pickup not registered)' : ''}
-                </span>
-              ) : (
-                <span className='text-red-600'>{row.message}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-        <div className='flex justify-end mt-5'>
-          <button type='button' className={SUBMIT_BTN} onClick={() => onDone(results.message)}>
-            Done
-          </button>
-        </div>
-      </Modal>
+      <BulkResultsModal
+        title='Bulk booking results'
+        message={results.message}
+        rows={results.rows.map((row) => ({
+          key: row.leadId,
+          code: byId.get(row.leadId)?.leadCode || row.leadId,
+          success: row.success,
+          successText: `Booked · AWB ${row.awbNo}` + (row.pickupFailed ? ' (pickup not registered)' : ''),
+          message: row.message,
+        }))}
+        onDone={onDone}
+        doneClassName={SUBMIT_BTN}
+      />
     )
   }
 
@@ -694,13 +684,13 @@ export const BulkBluedartModal = ({ leads, services, onClose, onDone }) => {
           </div>
         </Section>
         {error && <div className='mt-4'><Banner tone='red'>{error}</Banner></div>}
-        <div className='flex justify-end gap-2 mt-6'>
-          <button type='button' onClick={onClose} className={SECONDARY_BTN}>
-            Cancel
-          </button>
-          <button type='submit' disabled={submitting || isSunday || !serviceCode} className={SUBMIT_BTN}>
-            {submitting ? <BeatLoader color='#fff' size={6} /> : submitLabel}
-          </button>
+        <div className='mt-6'>
+          <FormButtons
+            onClose={onClose}
+            submitting={submitting}
+            disabled={isSunday || !serviceCode}
+            label={submitLabel}
+          />
         </div>
         {submitting && (
           <p className='text-xs text-gray-500 text-right mt-2'>

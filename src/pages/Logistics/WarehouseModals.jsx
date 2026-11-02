@@ -90,6 +90,74 @@ export const INPUT =
 
 export const DIMENSION_KEYS = ['length', 'width', 'height']
 
+export const twoDecimals = (value) => /^\d+(\.\d{1,2})?$/.test(String(value))
+
+// Quantity, weight and dimension errors, with the caller's messages.
+export const packageErrors = (form, { quantity, weight }) => {
+  const next = {}
+  if (!/^\d+$/.test(form.quantity) || Number(form.quantity) < 1) {
+    next.quantity = quantity
+  }
+  if (!twoDecimals(form.weight) || Number(form.weight) <= 0) {
+    next.weight = weight
+  }
+  for (const key of DIMENSION_KEYS) {
+    const value = Number(form[key])
+    if (Number.isNaN(value) || value <= 0) {
+      next[key] = 'Above 0'
+    }
+  }
+  return next
+}
+
+const RESULT_TONES = {
+  green: 'bg-green-50 border-green-200 text-green-800',
+  amber: 'bg-amber-50 border-amber-200 text-amber-800',
+}
+
+// Outcome of a bulk action, one line per item.
+export const BulkResultsModal = ({ title, message, rows, onDone, doneClassName }) => {
+  const tone = rows.every((r) => r.success) ? 'green' : 'amber'
+  return (
+    <Modal title={title} onClose={() => onDone(message)} wide>
+      <p className={`text-sm border rounded px-3 py-2 ${RESULT_TONES[tone]}`}>{message}</p>
+      <ul className='mt-3 divide-y border rounded'>
+        {rows.map((row) => (
+          <li key={row.key} className='flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 px-3 py-2 text-sm'>
+            <span className='font-semibold text-gray-800 sm:w-36 shrink-0'>{row.code}</span>
+            {row.success ? (
+              <span className='text-green-700'>{row.successText}</span>
+            ) : (
+              <span className='text-red-600'>{row.message}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+      <div className='flex justify-end mt-5'>
+        <button type='button' onClick={() => onDone(message)} className={doneClassName}>
+          Done
+        </button>
+      </div>
+    </Modal>
+  )
+}
+
+BulkResultsModal.propTypes = {
+  title: PropTypes.string.isRequired,
+  message: PropTypes.string,
+  rows: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string,
+      code: PropTypes.string,
+      success: PropTypes.bool,
+      successText: PropTypes.string,
+      message: PropTypes.string,
+    })
+  ).isRequired,
+  onDone: PropTypes.func.isRequired,
+  doneClassName: PropTypes.string.isRequired,
+}
+
 // Labelled numeric input bound to one key of a form ({ form, errors, set }).
 export const NumberField = ({ name, label, form, errors, set, hint, integer = false }) => (
   <Field label={label} error={errors[name]} hint={hint}>
@@ -339,38 +407,19 @@ export const BulkManualModal = ({ leads, onClose, onDone }) => {
 
   if (results) {
     return (
-      <Modal title='Manual logistics results' onClose={() => onDone(results.message)} wide>
-        <p
-          className={`text-sm border rounded px-3 py-2 ${
-            results.rows.every((r) => r.success)
-              ? 'bg-green-50 border-green-200 text-green-800'
-              : 'bg-amber-50 border-amber-200 text-amber-800'
-          }`}
-        >
-          {results.message}
-        </p>
-        <ul className='mt-3 divide-y border rounded'>
-          {results.rows.map((row) => (
-            <li key={row.lead._id} className='flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 px-3 py-2 text-sm'>
-              <span className='font-semibold text-gray-800 sm:w-36 shrink-0'>{row.lead.leadCode}</span>
-              {row.success ? (
-                <span className='text-green-700'>Saved · AWB {row.awbNo}</span>
-              ) : (
-                <span className='text-red-600'>{row.message}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-        <div className='flex justify-end mt-5'>
-          <button
-            type='button'
-            onClick={() => onDone(results.message)}
-            className='px-4 py-2 rounded bg-primary text-white text-sm font-medium min-w-[110px]'
-          >
-            Done
-          </button>
-        </div>
-      </Modal>
+      <BulkResultsModal
+        title='Manual logistics results'
+        message={results.message}
+        rows={results.rows.map((row) => ({
+          key: row.lead._id,
+          code: row.lead.leadCode,
+          success: row.success,
+          successText: `Saved · AWB ${row.awbNo}`,
+          message: row.message,
+        }))}
+        onDone={onDone}
+        doneClassName='px-4 py-2 rounded bg-primary text-white text-sm font-medium min-w-[110px]'
+      />
     )
   }
 
@@ -444,8 +493,6 @@ BulkManualModal.propTypes = {
 
 /* ---------------------------------- Edit --------------------------------- */
 
-const twoDecimals = (value) => /^\d+(\.\d{1,2})?$/.test(String(value))
-
 export const EditModal = ({ lead, onClose, onDone }) => {
   const [form, setForm] = useState({
     amount: String(lead.amount ?? ''),
@@ -468,18 +515,13 @@ export const EditModal = ({ lead, onClose, onDone }) => {
     if (!twoDecimals(form.amount) || Number(form.amount) <= 0) {
       next.amount = 'Enter an amount above 0 with up to 2 decimals'
     }
-    if (!/^\d+$/.test(form.quantity) || Number(form.quantity) < 1) {
-      next.quantity = 'Whole number, at least 1'
-    }
-    if (!twoDecimals(form.weight) || Number(form.weight) <= 0) {
-      next.weight = 'Weight above 0 kg, up to 2 decimals'
-    }
-    for (const key of DIMENSION_KEYS) {
-      const value = Number(form[key])
-      if (Number.isNaN(value) || value <= 0) {
-        next[key] = 'Above 0'
-      }
-    }
+    Object.assign(
+      next,
+      packageErrors(form, {
+        quantity: 'Whole number, at least 1',
+        weight: 'Weight above 0 kg, up to 2 decimals',
+      })
+    )
     setErrors(next)
     return Object.keys(next).length === 0
   }
