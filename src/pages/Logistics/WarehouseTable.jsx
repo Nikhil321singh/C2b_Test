@@ -127,6 +127,7 @@ const COLUMNS = [
 ]
 
 const STICKY_LEFT = 'sticky left-0 z-[1]'
+const FIRST_TH = `${TH} ${STICKY_LEFT} bg-primary text-left`
 
 const CHECKBOX = 'w-4 h-4 accent-[var(--primary-color)] cursor-pointer disabled:cursor-not-allowed'
 
@@ -142,7 +143,7 @@ export const WarehouseTable = ({ leads, onAction, selectedIds, onToggle, onToggl
           {COLUMNS.map((column, index) => (
             <th
               key={column}
-              className={`${TH} ${index === 0 ? `${STICKY_LEFT} bg-primary text-left` : ''}`}
+              className={index === 0 ? FIRST_TH : TH}
             >
               {index === 0 ? (
                 <span className='flex items-center gap-2'>

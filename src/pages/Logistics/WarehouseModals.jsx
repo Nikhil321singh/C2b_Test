@@ -88,6 +88,30 @@ Field.propTypes = {
 export const INPUT =
   'h-10 rounded border border-gray-300 px-3 text-sm outline-none focus:border-primary'
 
+export const DIMENSION_KEYS = ['length', 'width', 'height']
+
+// Labelled numeric input bound to one key of a form ({ form, errors, set }).
+export const NumberField = ({ name, label, form, errors, set, hint, integer = false }) => (
+  <Field label={label} error={errors[name]} hint={hint}>
+    <input
+      inputMode={integer ? 'numeric' : 'decimal'}
+      value={form[name]}
+      onChange={set(name)}
+      className={INPUT}
+    />
+  </Field>
+)
+
+NumberField.propTypes = {
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  form: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
+  set: PropTypes.func.isRequired,
+  hint: PropTypes.string,
+  integer: PropTypes.bool,
+}
+
 const FormFooter = ({ submitting, submitLabel, onClose, error }) => (
   <>
     {error && (
@@ -450,8 +474,9 @@ export const EditModal = ({ lead, onClose, onDone }) => {
     if (!twoDecimals(form.weight) || Number(form.weight) <= 0) {
       next.weight = 'Weight above 0 kg, up to 2 decimals'
     }
-    for (const key of ['length', 'width', 'height']) {
-      if (!(Number(form[key]) > 0)) {
+    for (const key of DIMENSION_KEYS) {
+      const value = Number(form[key])
+      if (Number.isNaN(value) || value <= 0) {
         next[key] = 'Above 0'
       }
     }
@@ -485,29 +510,23 @@ export const EditModal = ({ lead, onClose, onDone }) => {
     submit(body)
   }
 
+  const fieldProps = { form, errors, set }
+
   return (
     <Modal title='Edit details' onClose={onClose}>
       {leadSummary(lead)}
       <form onSubmit={onSubmit} noValidate>
         <div className='grid grid-cols-2 gap-3'>
           <div className='col-span-2'>
-            <Field label='Amount (₹)' error={errors.amount} hint='Used as the declared value'>
-              <input inputMode='decimal' value={form.amount} onChange={set('amount')} className={INPUT} />
-            </Field>
+            <NumberField name='amount' label='Amount (₹)' hint='Used as the declared value' {...fieldProps} />
           </div>
-          <Field label='Quantity' error={errors.quantity}>
-            <input inputMode='numeric' value={form.quantity} onChange={set('quantity')} className={INPUT} />
-          </Field>
-          <Field label='Weight (kg)' error={errors.weight}>
-            <input inputMode='decimal' value={form.weight} onChange={set('weight')} className={INPUT} />
-          </Field>
+          <NumberField name='quantity' label='Quantity' integer {...fieldProps} />
+          <NumberField name='weight' label='Weight (kg)' {...fieldProps} />
         </div>
         <p className='text-sm font-semibold text-gray-600 mt-3 mb-1'>Dimensions (cm)</p>
         <div className='grid grid-cols-3 gap-3'>
-          {['length', 'width', 'height'].map((key) => (
-            <Field key={key} label={key[0].toUpperCase() + key.slice(1)} error={errors[key]}>
-              <input inputMode='decimal' value={form[key]} onChange={set(key)} className={INPUT} />
-            </Field>
+          {DIMENSION_KEYS.map((key) => (
+            <NumberField key={key} name={key} label={key[0].toUpperCase() + key.slice(1)} {...fieldProps} />
           ))}
         </div>
         <FormFooter submitting={submitting} submitLabel='Save' onClose={onClose} error={error} />
@@ -819,7 +838,8 @@ const describeHistory = (entry) => {
     return `AWB ${entry.oldValue} — ${entry.note}`
   }
   if (entry.action === 'BOOKED' || entry.action === 'RE_TRANSIT') {
-    return `AWB ${entry.newValue}${entry.note ? ` — ${entry.note}` : ''}`
+    const note = entry.note ? ' — ' + entry.note : ''
+    return `AWB ${entry.newValue}${note}`
   }
   if (entry.field) {
     return `${entry.field}: ${orDash(entry.oldValue)} → ${orDash(entry.newValue)}`

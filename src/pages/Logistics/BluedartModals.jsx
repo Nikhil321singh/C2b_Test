@@ -1,7 +1,15 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { BeatLoader } from 'react-spinners'
-import { Field, INPUT, Modal, useOncePerKey, useSubmitLock } from './WarehouseModals'
+import {
+  DIMENSION_KEYS,
+  Field,
+  INPUT,
+  Modal,
+  NumberField,
+  useOncePerKey,
+  useSubmitLock,
+} from './WarehouseModals'
 import { formatDate, formatPrice, orDash } from './constants'
 import {
   bookWithBluedart,
@@ -107,6 +115,275 @@ const openLabel = async (leadId, setError) => {
 /* ------------------------------ Single booking ---------------------------- */
 
 const twoDecimals = (value) => /^\d+(\.\d{1,2})?$/.test(String(value))
+const PINCODE_PATTERN = /^[1-9]\d{5}$/
+
+const placeLabel = (city, state) => [city, state].filter(Boolean).join(', ')
+
+// Initial form values from the booking context.
+const formFromContext = (data) => ({
+  serviceCode: data.services.find((s) => s.available)?.code || '',
+  pickupPincode: data.pickup.pincode,
+  pickupDate: data.pickupDate.default,
+  amount: String(data.package.amount),
+  quantity: String(data.package.quantity),
+  weight: String(data.package.weight),
+  length: String(data.package.length),
+  width: String(data.package.width),
+  height: String(data.package.height),
+})
+
+// Field errors for the booking form; empty when valid.
+const validateBookingForm = (form) => {
+  const next = {}
+  if (!form.serviceCode) {
+    next.serviceCode = 'Choose a service'
+  }
+  if (!PINCODE_PATTERN.test(form.pickupPincode)) {
+    next.pickupPincode = 'Pickup pincode is required'
+  }
+  if (!form.pickupDate) {
+    next.pickupDate = 'Choose a pickup date'
+  }
+  if (!twoDecimals(form.amount) || Number(form.amount) <= 0) {
+    next.amount = 'Above 0, up to 2 decimals'
+  }
+  if (!/^\d+$/.test(form.quantity) || Number(form.quantity) < 1) {
+    next.quantity = 'At least 1'
+  }
+  if (!twoDecimals(form.weight) || Number(form.weight) <= 0) {
+    next.weight = 'Above 0 kg'
+  }
+  for (const key of DIMENSION_KEYS) {
+    const value = Number(form[key])
+    if (Number.isNaN(value) || value <= 0) {
+      next[key] = 'Above 0'
+    }
+  }
+  return next
+}
+
+// Sunday or Bluedart holiday at the pickup location.
+const pickupDateWarning = (form, ctx) => {
+  if (!form?.pickupDate) {
+    return ''
+  }
+  if (new Date(`${form.pickupDate}T00:00:00`).getDay() === 0) {
+    return 'Bluedart does not pick up on Sundays.'
+  }
+  if (ctx?.pickup.holidays?.includes(form.pickupDate)) {
+    return 'This is a Bluedart holiday at the pickup location.'
+  }
+  return ''
+}
+
+const bookingPayload = (form) => ({
+  serviceCode: form.serviceCode,
+  pickupDate: form.pickupDate,
+  pickupPincode: form.pickupPincode,
+  amount: Number(form.amount),
+  quantity: Number(form.quantity),
+  weight: Number(form.weight),
+  length: Number(form.length),
+  width: Number(form.width),
+  height: Number(form.height),
+})
+
+const BookedSummary = ({ booked, leadId, onDone }) => {
+  const [labelError, setLabelError] = useState('')
+  const { shipment } = booked
+  const done = () => onDone(booked.message)
+  return (
+    <Modal title='Booked with Bluedart' onClose={done}>
+      <Banner tone='green'>{booked.message}</Banner>
+      <div className='mt-4 grid grid-cols-2 gap-y-2 text-sm'>
+        <span className='text-gray-500'>AWB No.</span>
+        <span className='font-semibold text-gray-900'>{shipment.awbNo}</span>
+        <span className='text-gray-500'>Courier</span>
+        <span>{shipment.courierName}</span>
+        <span className='text-gray-500'>Service</span>
+        <span>{shipment.serviceType}</span>
+        <span className='text-gray-500'>Pickup date</span>
+        <span>{formatDate(shipment.pickupDate)}</span>
+        <span className='text-gray-500'>EDD</span>
+        <span>{shipment.edd ? formatDate(shipment.edd) : 'Shown once tracking is available'}</span>
+      </div>
+      {labelError && <p className='mt-3 text-sm text-red-600'>{labelError}</p>}
+      <div className='flex justify-end gap-2 mt-5'>
+        {shipment.labelKey && (
+          <button type='button' className={SECONDARY_BTN} onClick={() => openLabel(leadId, setLabelError)}>
+            View / print label
+          </button>
+        )}
+        <button type='button' className={SUBMIT_BTN} onClick={done}>
+          Done
+        </button>
+      </div>
+    </Modal>
+  )
+}
+
+BookedSummary.propTypes = {
+  booked: PropTypes.shape({ message: PropTypes.string, shipment: PropTypes.object }).isRequired,
+  leadId: PropTypes.string.isRequired,
+  onDone: PropTypes.func.isRequired,
+}
+
+const ContextNotices = ({ ctx, onUseManual }) => (
+  <>
+    {!ctx.configured && (
+      <div className='mt-4'>
+        <Banner tone='red'>Bluedart is not configured on the server. Use Manual for now.</Banner>
+      </div>
+    )}
+    {ctx.pickup.areaMessage && (
+      <div className='mt-4'>
+        <Banner>
+          {ctx.pickup.areaMessage}
+          {onUseManual && (
+            <button type='button' onClick={onUseManual} className='ml-2 underline font-medium'>
+              Use Manual
+            </button>
+          )}
+        </Banner>
+      </div>
+    )}
+  </>
+)
+
+ContextNotices.propTypes = {
+  ctx: PropTypes.object.isRequired,
+  onUseManual: PropTypes.func,
+}
+
+const PickupSection = ({ pickup, form, errors, pickupCheck, set, verifyPincode }) => (
+  <Section title='Pickup (store)'>
+    <ReadOnlyBox>
+      <div className='font-medium text-gray-800'>{orDash(pickup.name)}</div>
+      <div>{orDash(pickup.address)}</div>
+      <div>Contact: {orDash(pickup.contact)}</div>
+    </ReadOnlyBox>
+    <div className='mt-2'>
+      {pickup.pincode ? (
+        <p className='text-sm text-gray-700'>
+          Pincode <span className='font-semibold'>{pickup.pincode}</span>
+          {pickupCheck.city && <span className='text-gray-500'> · {pickupCheck.city}</span>}
+        </p>
+      ) : (
+        <Field
+          label='Pickup pincode*'
+          error={errors.pickupPincode || pickupCheck.error}
+          hint={pickupCheck.city || 'Not found in the store address — please enter it'}
+        >
+          <div className='flex gap-2'>
+            <input
+              inputMode='numeric'
+              maxLength={6}
+              value={form.pickupPincode}
+              onChange={set('pickupPincode')}
+              onBlur={verifyPincode}
+              className={`${INPUT} flex-1`}
+            />
+            <button type='button' onClick={verifyPincode} className={SECONDARY_BTN}>
+              {pickupCheck.checking ? 'Checking…' : 'Check'}
+            </button>
+          </div>
+        </Field>
+      )}
+      {pickup.pincode && pickupCheck.error && (
+        <p className='text-xs text-red-600 mt-1'>{pickupCheck.error}</p>
+      )}
+    </div>
+  </Section>
+)
+
+PickupSection.propTypes = {
+  pickup: PropTypes.object.isRequired,
+  form: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
+  pickupCheck: PropTypes.shape({
+    city: PropTypes.string,
+    error: PropTypes.string,
+    checking: PropTypes.bool,
+  }).isRequired,
+  set: PropTypes.func.isRequired,
+  verifyPincode: PropTypes.func.isRequired,
+}
+
+const DeliverySection = ({ drop }) => (
+  <Section title='Delivery (warehouse)'>
+    <ReadOnlyBox>
+      <div className='font-medium text-gray-800'>{orDash(drop.name)}</div>
+      <div>{orDash([drop.address1, drop.address2, drop.address3].filter(Boolean).join(', '))}</div>
+      <div>
+        Pincode {orDash(drop.pincode)}
+        {drop.city ? ` · ${drop.city}` : ''}
+      </div>
+      <div>Contact: {orDash(drop.mobile)}</div>
+    </ReadOnlyBox>
+  </Section>
+)
+
+DeliverySection.propTypes = { drop: PropTypes.object.isRequired }
+
+const PackageSection = ({ form, errors, set }) => (
+  <Section title='Package'>
+    <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
+      <NumberField name='amount' label='Declared value (₹)' form={form} errors={errors} set={set} />
+      <NumberField name='quantity' label='Quantity' integer form={form} errors={errors} set={set} />
+      <NumberField name='weight' label='Weight (kg)' form={form} errors={errors} set={set} />
+      {DIMENSION_KEYS.map((key) => (
+        <NumberField
+          key={key}
+          name={key}
+          label={`${key[0].toUpperCase()}${key.slice(1)} (cm)`}
+          form={form}
+          errors={errors}
+          set={set}
+        />
+      ))}
+    </div>
+  </Section>
+)
+
+PackageSection.propTypes = {
+  form: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
+  set: PropTypes.func.isRequired,
+}
+
+const BookingActions = ({ onUseManual, onClose, submitting, canSubmit }) => (
+  <>
+    <div className='flex flex-col-reverse sm:flex-row sm:justify-between gap-2 mt-6'>
+      {onUseManual ? (
+        <button type='button' onClick={onUseManual} className='text-sm text-primary underline self-start'>
+          Arranged outside Bluedart? Use Manual
+        </button>
+      ) : (
+        <span />
+      )}
+      <div className='flex justify-end gap-2'>
+        <button type='button' onClick={onClose} className={SECONDARY_BTN}>
+          Cancel
+        </button>
+        <button type='submit' disabled={submitting || !canSubmit} className={SUBMIT_BTN}>
+          {submitting ? <BeatLoader color='#fff' size={6} /> : 'Confirm booking'}
+        </button>
+      </div>
+    </div>
+    {submitting && (
+      <p className='text-xs text-gray-500 text-right mt-2'>
+        Booking with Bluedart… this can take a few seconds. Please don&apos;t close this window.
+      </p>
+    )}
+  </>
+)
+
+BookingActions.propTypes = {
+  onUseManual: PropTypes.func,
+  onClose: PropTypes.func.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  canSubmit: PropTypes.bool.isRequired,
+}
 
 export const BluedartBookingModal = ({ lead, onClose, onDone, onUseManual }) => {
   const [ctx, setCtx] = useState(null)
@@ -131,22 +408,11 @@ export const BluedartBookingModal = ({ lead, onClose, onDone, onUseManual }) => 
         setCtx(data)
         setServices(data.services)
         setPickupCheck({
-          city: [data.pickup.city, data.pickup.state].filter(Boolean).join(', '),
+          city: placeLabel(data.pickup.city, data.pickup.state),
           error: data.pickup.pincodeError,
           checking: false,
         })
-        const firstAvailable = data.services.find((s) => s.available)
-        setForm({
-          serviceCode: firstAvailable?.code || '',
-          pickupPincode: data.pickup.pincode,
-          pickupDate: data.pickupDate.default,
-          amount: String(data.package.amount),
-          quantity: String(data.package.quantity),
-          weight: String(data.package.weight),
-          length: String(data.package.length),
-          width: String(data.package.width),
-          height: String(data.package.height),
-        })
+        setForm(formFromContext(data))
       })
       .catch((err) => setLoadError(errorMessage(err, 'Could not load booking details')))
   }, [lead._id])
@@ -156,7 +422,7 @@ export const BluedartBookingModal = ({ lead, onClose, onDone, onUseManual }) => 
 
   // When the store address has no pincode, the user types it and we check it.
   const verifyPincode = async () => {
-    if (!/^[1-9]\d{5}$/.test(form.pickupPincode)) {
+    if (!PINCODE_PATTERN.test(form.pickupPincode)) {
       setPickupCheck({ city: '', error: 'Enter a valid 6-digit pincode', checking: false })
       return
     }
@@ -168,7 +434,7 @@ export const BluedartBookingModal = ({ lead, onClose, onDone, onUseManual }) => 
     try {
       const info = await checkPincode(form.pickupPincode, form.amount)
       setServices(info.options)
-      setPickupCheck({ city: [info.city, info.state].filter(Boolean).join(', '), error: '', checking: false })
+      setPickupCheck({ city: placeLabel(info.city, info.state), error: '', checking: false })
       if (!info.options.find((s) => s.code === form.serviceCode)?.available) {
         setForm((f) => ({ ...f, serviceCode: info.options.find((s) => s.available)?.code || '' }))
       }
@@ -179,72 +445,13 @@ export const BluedartBookingModal = ({ lead, onClose, onDone, onUseManual }) => 
     }
   }
 
-  const pickupDay = form?.pickupDate ? new Date(`${form.pickupDate}T00:00:00`) : null
-  const dateWarning = useMemo(() => {
-    if (!pickupDay) {
-      return ''
-    }
-    if (pickupDay.getDay() === 0) {
-      return 'Bluedart does not pick up on Sundays.'
-    }
-    if (ctx?.pickup.holidays?.includes(form.pickupDate)) {
-      return 'This is a Bluedart holiday at the pickup location.'
-    }
-    return ''
-  }, [pickupDay, ctx, form])
-
-  const validateForm = () => {
-    const next = {}
-    if (!form.serviceCode) {
-      next.serviceCode = 'Choose a service'
-    }
-    if (!/^[1-9]\d{5}$/.test(form.pickupPincode)) {
-      next.pickupPincode = 'Pickup pincode is required'
-    }
-    if (!form.pickupDate) {
-      next.pickupDate = 'Choose a pickup date'
-    }
-    if (!twoDecimals(form.amount) || Number(form.amount) <= 0) {
-      next.amount = 'Above 0, up to 2 decimals'
-    }
-    if (!/^\d+$/.test(form.quantity) || Number(form.quantity) < 1) {
-      next.quantity = 'At least 1'
-    }
-    if (!twoDecimals(form.weight) || Number(form.weight) <= 0) {
-      next.weight = 'Above 0 kg'
-    }
-    for (const key of ['length', 'width', 'height']) {
-      if (!(Number(form[key]) > 0)) {
-        next[key] = 'Above 0'
-      }
-    }
-    setErrors(next)
-    return Object.keys(next).length === 0 && !dateWarning
-  }
-
-  const submit = (e) => {
-    e.preventDefault()
-    if (!validateForm()) {
-      return
-    }
-    withLock(book)
-  }
+  const dateWarning = useMemo(() => pickupDateWarning(form, ctx), [form, ctx])
 
   const book = async () => {
     setSubmitting(true)
     setSubmitError('')
     try {
-      const result = await bookWithBluedart(lead._id, {
-        serviceCode: form.serviceCode,
-        pickupDate: form.pickupDate,
-        pickupPincode: form.pickupPincode,
-        amount: Number(form.amount),
-        quantity: Number(form.quantity),
-        weight: Number(form.weight),
-        length: Number(form.length),
-        width: Number(form.width),
-        height: Number(form.height),
-      })
+      const result = await bookWithBluedart(lead._id, bookingPayload(form))
       setBooked({ message: result.message, shipment: result.data.shipment })
     } catch (err) {
       setSubmitError(errorMessage(err, 'Bluedart booking failed. Please try again.'))
@@ -253,39 +460,20 @@ export const BluedartBookingModal = ({ lead, onClose, onDone, onUseManual }) => 
     }
   }
 
-  const title = lead.logisticsStatus === 'Cancelled' ? 'Re-transit — Via Bluedart' : 'Request Logistics — Via Bluedart'
+  const submit = (e) => {
+    e.preventDefault()
+    const next = validateBookingForm(form)
+    setErrors(next)
+    if (Object.keys(next).length === 0 && !dateWarning) {
+      withLock(book)
+    }
+  }
 
   if (booked) {
-    const { shipment } = booked
-    return (
-      <Modal title='Booked with Bluedart' onClose={() => onDone(booked.message)}>
-        <Banner tone='green'>{booked.message}</Banner>
-        <div className='mt-4 grid grid-cols-2 gap-y-2 text-sm'>
-          <span className='text-gray-500'>AWB No.</span>
-          <span className='font-semibold text-gray-900'>{shipment.awbNo}</span>
-          <span className='text-gray-500'>Courier</span>
-          <span>{shipment.courierName}</span>
-          <span className='text-gray-500'>Service</span>
-          <span>{shipment.serviceType}</span>
-          <span className='text-gray-500'>Pickup date</span>
-          <span>{formatDate(shipment.pickupDate)}</span>
-          <span className='text-gray-500'>EDD</span>
-          <span>{shipment.edd ? formatDate(shipment.edd) : 'Shown once tracking is available'}</span>
-        </div>
-        {submitError && <p className='mt-3 text-sm text-red-600'>{submitError}</p>}
-        <div className='flex justify-end gap-2 mt-5'>
-          {shipment.labelKey && (
-            <button type='button' className={SECONDARY_BTN} onClick={() => openLabel(lead._id, setSubmitError)}>
-              View / print label
-            </button>
-          )}
-          <button type='button' className={SUBMIT_BTN} onClick={() => onDone(booked.message)}>
-            Done
-          </button>
-        </div>
-      </Modal>
-    )
+    return <BookedSummary booked={booked} leadId={lead._id} onDone={onDone} />
   }
+
+  const title = lead.logisticsStatus === 'Cancelled' ? 'Re-transit — Via Bluedart' : 'Request Logistics — Via Bluedart'
 
   return (
     <Modal title={title} onClose={onClose} wide>
@@ -304,23 +492,7 @@ export const BluedartBookingModal = ({ lead, onClose, onDone, onUseManual }) => 
 
       {ctx && form && (
         <form onSubmit={submit} noValidate>
-          {!ctx.configured && (
-            <div className='mt-4'>
-              <Banner tone='red'>Bluedart is not configured on the server. Use Manual for now.</Banner>
-            </div>
-          )}
-          {ctx.pickup.areaMessage && (
-            <div className='mt-4'>
-              <Banner>
-                {ctx.pickup.areaMessage}
-                {onUseManual && (
-                  <button type='button' onClick={onUseManual} className='ml-2 underline font-medium'>
-                    Use Manual
-                  </button>
-                )}
-              </Banner>
-            </div>
-          )}
+          <ContextNotices ctx={ctx} onUseManual={onUseManual} />
 
           <Section title='Service type*'>
             <ServicePicker
@@ -332,76 +504,18 @@ export const BluedartBookingModal = ({ lead, onClose, onDone, onUseManual }) => 
           </Section>
 
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-            <Section title='Pickup (store)'>
-              <ReadOnlyBox>
-                <div className='font-medium text-gray-800'>{orDash(ctx.pickup.name)}</div>
-                <div>{orDash(ctx.pickup.address)}</div>
-                <div>Contact: {orDash(ctx.pickup.contact)}</div>
-              </ReadOnlyBox>
-              <div className='mt-2'>
-                {ctx.pickup.pincode ? (
-                  <p className='text-sm text-gray-700'>
-                    Pincode <span className='font-semibold'>{ctx.pickup.pincode}</span>
-                    {pickupCheck.city && <span className='text-gray-500'> · {pickupCheck.city}</span>}
-                  </p>
-                ) : (
-                  <Field
-                    label='Pickup pincode*'
-                    error={errors.pickupPincode || pickupCheck.error}
-                    hint={pickupCheck.city || 'Not found in the store address — please enter it'}
-                  >
-                    <div className='flex gap-2'>
-                      <input
-                        inputMode='numeric'
-                        maxLength={6}
-                        value={form.pickupPincode}
-                        onChange={set('pickupPincode')}
-                        onBlur={verifyPincode}
-                        className={`${INPUT} flex-1`}
-                      />
-                      <button type='button' onClick={verifyPincode} className={SECONDARY_BTN}>
-                        {pickupCheck.checking ? 'Checking…' : 'Check'}
-                      </button>
-                    </div>
-                  </Field>
-                )}
-                {ctx.pickup.pincode && pickupCheck.error && (
-                  <p className='text-xs text-red-600 mt-1'>{pickupCheck.error}</p>
-                )}
-              </div>
-            </Section>
-
-            <Section title='Delivery (warehouse)'>
-              <ReadOnlyBox>
-                <div className='font-medium text-gray-800'>{orDash(ctx.drop.name)}</div>
-                <div>{orDash([ctx.drop.address1, ctx.drop.address2, ctx.drop.address3].filter(Boolean).join(', '))}</div>
-                <div>
-                  Pincode {orDash(ctx.drop.pincode)}
-                  {ctx.drop.city ? ` · ${ctx.drop.city}` : ''}
-                </div>
-                <div>Contact: {orDash(ctx.drop.mobile)}</div>
-              </ReadOnlyBox>
-            </Section>
+            <PickupSection
+              pickup={ctx.pickup}
+              form={form}
+              errors={errors}
+              pickupCheck={pickupCheck}
+              set={set}
+              verifyPincode={verifyPincode}
+            />
+            <DeliverySection drop={ctx.drop} />
           </div>
 
-          <Section title='Package'>
-            <div className='grid grid-cols-2 sm:grid-cols-3 gap-3'>
-              <Field label='Declared value (₹)' error={errors.amount}>
-                <input inputMode='decimal' value={form.amount} onChange={set('amount')} className={INPUT} />
-              </Field>
-              <Field label='Quantity' error={errors.quantity}>
-                <input inputMode='numeric' value={form.quantity} onChange={set('quantity')} className={INPUT} />
-              </Field>
-              <Field label='Weight (kg)' error={errors.weight}>
-                <input inputMode='decimal' value={form.weight} onChange={set('weight')} className={INPUT} />
-              </Field>
-              {['length', 'width', 'height'].map((key) => (
-                <Field key={key} label={`${key[0].toUpperCase()}${key.slice(1)} (cm)`} error={errors[key]}>
-                  <input inputMode='decimal' value={form[key]} onChange={set(key)} className={INPUT} />
-                </Field>
-              ))}
-            </div>
-          </Section>
+          <PackageSection form={form} errors={errors} set={set} />
 
           <Section title='Pickup date*'>
             <div className='max-w-xs'>
@@ -424,32 +538,12 @@ export const BluedartBookingModal = ({ lead, onClose, onDone, onUseManual }) => 
             </div>
           )}
 
-          <div className='flex flex-col-reverse sm:flex-row sm:justify-between gap-2 mt-6'>
-            {onUseManual ? (
-              <button type='button' onClick={onUseManual} className='text-sm text-primary underline self-start'>
-                Arranged outside Bluedart? Use Manual
-              </button>
-            ) : (
-              <span />
-            )}
-            <div className='flex justify-end gap-2'>
-              <button type='button' onClick={onClose} className={SECONDARY_BTN}>
-                Cancel
-              </button>
-              <button
-                type='submit'
-                disabled={submitting || !ctx.configured || !services.some((s) => s.available)}
-                className={SUBMIT_BTN}
-              >
-                {submitting ? <BeatLoader color='#fff' size={6} /> : `Confirm booking`}
-              </button>
-            </div>
-          </div>
-          {submitting && (
-            <p className='text-xs text-gray-500 text-right mt-2'>
-              Booking with Bluedart… this can take a few seconds. Please don&apos;t close this window.
-            </p>
-          )}
+          <BookingActions
+            onUseManual={onUseManual}
+            onClose={onClose}
+            submitting={submitting}
+            canSubmit={ctx.configured && services.some((s) => s.available)}
+          />
         </form>
       )}
     </Modal>
@@ -556,11 +650,13 @@ export const BulkBluedartModal = ({ leads, services, onClose, onDone }) => {
   }
 
   const totalValue = leads.reduce((sum, l) => sum + Number(l.amount || 0), 0)
+  const itemsWord = leads.length === 1 ? 'item' : 'items'
+  const submitLabel = `Book ${leads.length} ${itemsWord}`
 
   return (
     <Modal title='Request Logistics — Via Bluedart (bulk)' onClose={onClose} wide>
       <p className='text-sm text-gray-600'>
-        {leads.length} item{leads.length === 1 ? '' : 's'} selected · total value {formatPrice(totalValue)}.
+        {leads.length} {itemsWord} selected · total value {formatPrice(totalValue)}.
         Each item uses its own saved amount, weight and dimensions; items that cannot be booked are reported
         individually.
       </p>
@@ -603,7 +699,7 @@ export const BulkBluedartModal = ({ leads, services, onClose, onDone }) => {
             Cancel
           </button>
           <button type='submit' disabled={submitting || isSunday || !serviceCode} className={SUBMIT_BTN}>
-            {submitting ? <BeatLoader color='#fff' size={6} /> : `Book ${leads.length} item${leads.length === 1 ? '' : 's'}`}
+            {submitting ? <BeatLoader color='#fff' size={6} /> : submitLabel}
           </button>
         </div>
         {submitting && (

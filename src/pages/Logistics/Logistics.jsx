@@ -90,6 +90,137 @@ Pagination.propTypes = {
   setPage: PropTypes.func.isRequired,
 }
 
+// Loading, error, empty or the table/cards with pagination.
+const ListContent = ({ loading, error, leads, selection, onAction, onToggleAll, page, totalPages, setPage }) => {
+  if (loading) {
+    return (
+      <div className='flex justify-center items-center h-64'>
+        <BeatLoader color='var(--primary-color)' />
+      </div>
+    )
+  }
+  if (error) {
+    return <div className='text-center py-10 text-red-500 bg-red-50 rounded-lg'>{error}</div>
+  }
+  if (leads.length === 0) {
+    return (
+      <p className='text-center py-10 text-gray-500 bg-white rounded-lg'>
+        No items match the selected filters.
+      </p>
+    )
+  }
+  return (
+    <>
+      <WarehouseTable leads={leads} onAction={onAction} onToggleAll={onToggleAll} {...selection} />
+      <WarehouseCards leads={leads} onAction={onAction} {...selection} />
+      <Pagination page={page} totalPages={totalPages} setPage={setPage} />
+    </>
+  )
+}
+
+ListContent.propTypes = {
+  loading: PropTypes.bool.isRequired,
+  error: PropTypes.string.isRequired,
+  leads: PropTypes.arrayOf(PropTypes.object).isRequired,
+  selection: PropTypes.shape({ selectedIds: PropTypes.array, onToggle: PropTypes.func }).isRequired,
+  onAction: PropTypes.func.isRequired,
+  onToggleAll: PropTypes.func.isRequired,
+  page: PropTypes.number.isRequired,
+  totalPages: PropTypes.number.isRequired,
+  setPage: PropTypes.func.isRequired,
+}
+
+// Bulk flows started from the selection bar.
+const BulkModals = ({ modal, leads, services, onClose, onDone, setModal }) => {
+  if (modal?.type === 'bulkChoice') {
+    return (
+      <LogisticsChoiceModal
+        count={leads.length}
+        onClose={onClose}
+        onChoose={(type) => setModal({ type: type === 'bluedart' ? 'bulkBluedart' : 'bulkManual' })}
+      />
+    )
+  }
+  if (modal?.type === 'bulkBluedart') {
+    return <BulkBluedartModal leads={leads} services={services} onClose={onClose} onDone={onDone} />
+  }
+  if (modal?.type === 'bulkManual') {
+    return <BulkManualModal leads={leads} onClose={onClose} onDone={onDone} />
+  }
+  return null
+}
+
+BulkModals.propTypes = {
+  modal: PropTypes.shape({ type: PropTypes.string }),
+  leads: PropTypes.arrayOf(PropTypes.object).isRequired,
+  services: PropTypes.array.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onDone: PropTypes.func.isRequired,
+  setModal: PropTypes.func.isRequired,
+}
+
+const Notice = ({ notice }) => {
+  if (!notice.text) {
+    return null
+  }
+  const tone = notice.tone === 'red' ? 'bg-red-600' : 'bg-green-600'
+  return (
+    <div
+      role='status'
+      className={`fixed top-20 right-4 z-50 max-w-sm text-white text-sm px-4 py-2 rounded-lg shadow-lg ${tone}`}
+    >
+      {notice.text}
+    </div>
+  )
+}
+
+Notice.propTypes = {
+  notice: PropTypes.shape({ text: PropTypes.string, tone: PropTypes.string }).isRequired,
+}
+
+const BULK_BAR_CLASS = [
+  'fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-xl',
+  'bg-white border border-primary rounded-lg shadow-xl px-4 py-3',
+  'flex flex-col sm:flex-row items-center justify-between gap-3',
+].join(' ')
+
+// Bar shown while rows are ticked: clear the selection or request logistics.
+const BulkActionBar = ({ count, onClear, onRequest }) => {
+  if (count === 0) {
+    return null
+  }
+  return (
+    <div className={BULK_BAR_CLASS}>
+      <span className='text-sm text-gray-700'>
+        <span className='font-semibold'>{count}</span> item
+        {count === 1 ? '' : 's'} selected
+      </span>
+      <div className='flex gap-2'>
+        <button
+          type='button'
+          onClick={onClear}
+          className='px-3 py-1.5 rounded border border-gray-300 text-sm text-gray-700'
+        >
+          Clear
+        </button>
+        <button
+          type='button'
+          onClick={onRequest}
+          className='px-3 py-1.5 rounded bg-primary text-white text-sm font-medium'
+        >
+          Request Logistics
+        </button>
+      </div>
+    </div>
+  )
+}
+
+BulkActionBar.propTypes = {
+  count: PropTypes.number.isRequired,
+  onClear: PropTypes.func.isRequired,
+  onRequest: PropTypes.func.isRequired,
+}
+
 const Logistics = () => {
   const [sideMenu, setSideMenu] = useState(false)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
@@ -218,39 +349,6 @@ const Logistics = () => {
   const selectedLeads = leads.filter((l) => selectedIds.includes(l._id))
   const ActiveModal = modal && MODALS[modal.type] ? MODALS[modal.type] : null
 
-  let content
-  if (loading) {
-    content = (
-      <div className='flex justify-center items-center h-64'>
-        <BeatLoader color='var(--primary-color)' />
-      </div>
-    )
-  } else if (error) {
-    content = (
-      <div className='text-center py-10 text-red-500 bg-red-50 rounded-lg'>{error}</div>
-    )
-  } else if (leads.length === 0) {
-    content = (
-      <p className='text-center py-10 text-gray-500 bg-white rounded-lg'>
-        No items match the selected filters.
-      </p>
-    )
-  } else {
-    const selection = { selectedIds, onToggle: toggleSelected }
-    content = (
-      <>
-        <WarehouseTable
-          leads={leads}
-          onAction={handleAction}
-          onToggleAll={toggleAll}
-          {...selection}
-        />
-        <WarehouseCards leads={leads} onAction={handleAction} {...selection} />
-        <Pagination page={page} totalPages={pagination.totalPages || 0} setPage={setPage} />
-      </>
-    )
-  }
-
   return (
     <div className='min-h-screen pb-8 bg-[#F5F4F9]'>
       <AdminNavbar setsideMenu={setSideMenu} sideMenu={sideMenu} />
@@ -265,60 +363,22 @@ const Logistics = () => {
           onChoose={(type) => setModal({ type, lead: modal.lead })}
         />
       )}
-      {modal?.type === 'bulkChoice' && (
-        <LogisticsChoiceModal
-          count={selectedLeads.length}
-          onClose={closeModal}
-          onChoose={(type) => setModal({ type: type === 'bluedart' ? 'bulkBluedart' : 'bulkManual' })}
-        />
-      )}
-      {modal?.type === 'bulkBluedart' && (
-        <BulkBluedartModal
-          leads={selectedLeads}
-          services={options.services}
-          onClose={closeModal}
-          onDone={actionDone}
-        />
-      )}
-      {modal?.type === 'bulkManual' && (
-        <BulkManualModal leads={selectedLeads} onClose={closeModal} onDone={actionDone} />
-      )}
+      <BulkModals
+        modal={modal}
+        leads={selectedLeads}
+        services={options.services}
+        onClose={closeModal}
+        onDone={actionDone}
+        setModal={setModal}
+      />
 
-      {notice.text && (
-        <div
-          role='status'
-          className={`fixed top-20 right-4 z-50 max-w-sm text-white text-sm px-4 py-2 rounded-lg shadow-lg ${
-            notice.tone === 'red' ? 'bg-red-600' : 'bg-green-600'
-          }`}
-        >
-          {notice.text}
-        </div>
-      )}
+      <Notice notice={notice} />
 
-      {selectedIds.length > 0 && (
-        <div className='fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-xl bg-white border border-primary rounded-lg shadow-xl px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3'>
-          <span className='text-sm text-gray-700'>
-            <span className='font-semibold'>{selectedIds.length}</span> item
-            {selectedIds.length === 1 ? '' : 's'} selected
-          </span>
-          <div className='flex gap-2'>
-            <button
-              type='button'
-              onClick={() => setSelectedIds([])}
-              className='px-3 py-1.5 rounded border border-gray-300 text-sm text-gray-700'
-            >
-              Clear
-            </button>
-            <button
-              type='button'
-              onClick={() => setModal({ type: 'bulkChoice' })}
-              className='px-3 py-1.5 rounded bg-primary text-white text-sm font-medium'
-            >
-              Request Logistics
-            </button>
-          </div>
-        </div>
-      )}
+      <BulkActionBar
+        count={selectedIds.length}
+        onClear={() => setSelectedIds([])}
+        onRequest={() => setModal({ type: 'bulkChoice' })}
+      />
 
       <div className='mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 mt-4 md:mt-8'>
         <div className='flex items-end justify-between gap-3 mb-4'>
@@ -346,7 +406,17 @@ const Logistics = () => {
           onClear={clearFilters}
         />
 
-        {content}
+        <ListContent
+          loading={loading}
+          error={error}
+          leads={leads}
+          selection={{ selectedIds, onToggle: toggleSelected }}
+          onAction={handleAction}
+          onToggleAll={toggleAll}
+          page={page}
+          totalPages={pagination.totalPages || 0}
+          setPage={setPage}
+        />
       </div>
     </div>
   )

@@ -86,6 +86,10 @@ function SideMenu({ setsideMenu, sideMenu }) {
 
 export default SideMenu
 
+// Slide-in side menu panel; shifted on screen when the menu is open.
+const MENU_PANEL_CLASS =
+  'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in '
+
 const MenuItem = ({ onClick, children }) => (
   <li className='text-[20px] font-[300] cursor-pointer' onClick={onClick}>
     {children}
@@ -133,7 +137,7 @@ const WarehouseMenu = ({
 }) => (
   <div
     className={
-      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      MENU_PANEL_CLASS +
       (sideMenu && 'left-[0]')
     }
   >
@@ -149,7 +153,7 @@ const WarehouseMenu = ({
 const TechnicianMenu = ({ sideMenu, handleHome, handleProfile, handleLogout }) => (
   <div
     className={
-      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      MENU_PANEL_CLASS +
       (sideMenu && 'left-[0]')
     }
   >
@@ -187,7 +191,7 @@ const SuperAdminProfile = ({
   return (
     <div
       className={
-        'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+        MENU_PANEL_CLASS +
         (sideMenu && 'left-[0]')
       }
     >

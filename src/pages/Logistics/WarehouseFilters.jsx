@@ -4,6 +4,12 @@ import { IoMdSearch } from 'react-icons/io'
 import { FaAngleDown } from 'react-icons/fa6'
 import { SHADOW } from './constants'
 
+const CLEAR_BUTTON = [
+  'h-9 w-full rounded-[0.55rem] border border-primary text-primary text-sm font-medium',
+  'hover:bg-primary hover:text-white transition-colors',
+  'disabled:border-gray-300 disabled:text-gray-400 disabled:hover:bg-transparent disabled:cursor-not-allowed',
+].join(' ')
+
 const FIELD = `h-9 bg-white rounded-[0.55rem] px-3 text-sm outline-none border border-transparent focus:border-primary ${SHADOW}`
 
 const CompanyMultiSelect = ({ companies, selected, onChange }) => {
@@ -255,7 +261,7 @@ const WarehouseFilters = ({ options, filters, onChange, onClear }) => {
             type='button'
             onClick={onClear}
             disabled={!hasFilters}
-            className='h-9 w-full rounded-[0.55rem] border border-primary text-primary text-sm font-medium hover:bg-primary hover:text-white transition-colors disabled:border-gray-300 disabled:text-gray-400 disabled:hover:bg-transparent disabled:cursor-not-allowed'
+            className={CLEAR_BUTTON}
           >
             Clear all filters
           </button>
