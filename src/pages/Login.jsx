@@ -117,6 +117,9 @@ const redirectUser = (role, navigate) => {
     case 'Technician':
       navigate('/devicepickupdashboard')
       break
+    case 'Logistics Admin':
+      navigate('/logistics')
+      break
     case 'Sale User':
     default:
       navigate(homeroute)

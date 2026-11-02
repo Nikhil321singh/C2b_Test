@@ -21,6 +21,8 @@ const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
       navigate('/customertable')
     } else if (profile.role === USER_ROLES.TECHNICIAN) {
       navigate('/devicepickupdashboard')
+    } else if (profile.role === USER_ROLES.LOGISTICS_ADMIN) {
+      navigate('/logistics')
     }
   }
 
@@ -48,6 +50,7 @@ const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
     handleStoreReport: createNavigationHandler('/storewisereport'),
     adminDashboard: createNavigationHandler('/admindashboard'),
     handlpickup: createNavigationHandler('/devicepickupdashboard'),
+    handleLogistics: createNavigationHandler('/logistics'),
     handleBulkUploadHistory: createNavigationHandler('/bulkuploadhistory'),
     handleQuoteTracking: createNavigationHandler('/quotetrackingdashboard'),
     handleCouponManagement: createNavigationHandler('/coupondetails'),
@@ -73,6 +76,9 @@ function SideMenu({ setsideMenu, sideMenu }) {
       )}
       {profile.role === USER_ROLES.TECHNICIAN && (
         <TechnicianMenu sideMenu={sideMenu} {...handlers} />
+      )}
+      {profile.role === USER_ROLES.LOGISTICS_ADMIN && (
+        <WarehouseMenu sideMenu={sideMenu} {...handlers} />
       )}
     </>
   )
@@ -118,6 +124,28 @@ const AdminManagerMenu = ({
   </div>
 )
 
+const WarehouseMenu = ({
+  sideMenu,
+  handleHome,
+  handleProfile,
+  handleLogistics,
+  handleLogout,
+}) => (
+  <div
+    className={
+      'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in ' +
+      (sideMenu && 'left-[0]')
+    }
+  >
+    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
+      <MenuItem onClick={handleHome}>Home</MenuItem>
+      <MenuItem onClick={handleProfile}>Profile</MenuItem>
+      <MenuItem onClick={handleLogistics}>Warehouse</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+    </ul>
+  </div>
+)
+
 const TechnicianMenu = ({ sideMenu, handleHome, handleProfile, handleLogout }) => (
   <div
     className={
@@ -145,6 +173,7 @@ const SuperAdminProfile = ({
   handleTable,
   handleCompanyListing,
   handlpickup,
+  handleLogistics,
   handleTechnician,
   adminDashboard,
   handleLogout,
@@ -154,6 +183,7 @@ const SuperAdminProfile = ({
   handleDynamicPricing,
 }) => {
   const isCompanyAdmin = profile.role === USER_ROLES.COMPANY_ADMIN
+  const isSuperAdmin = profile.role === USER_ROLES.SUPER_ADMIN
   return (
     <div
       className={
@@ -175,6 +205,7 @@ const SuperAdminProfile = ({
         {!isCompanyAdmin && <MenuItem onClick={handleCompanyListing}>Company Listing</MenuItem>}
         {!isCompanyAdmin && <MenuItem onClick={handleDynamicPricing}>Dynamic Pricing</MenuItem>}
         <MenuItem onClick={handlpickup}>Pickup & Cancel Device</MenuItem>
+        {isSuperAdmin && <MenuItem onClick={handleLogistics}>Warehouse & Logistics</MenuItem>}
         <MenuItem onClick={handleTechnician}>Technician Report</MenuItem>
         <MenuItem onClick={adminDashboard}>Admin Dashboard</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
