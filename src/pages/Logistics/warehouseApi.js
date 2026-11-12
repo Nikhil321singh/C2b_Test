@@ -37,7 +37,8 @@ export const fetchItem = async (leadId) => {
 }
 
 export const updateItem = async (leadId, body) => {
-  const { data } = await axios.patch(`${BASE}/items/${leadId}`, body, authHeaders())
+  // POST, not PATCH: API Gateway's CORS preflight only allows GET/POST/OPTIONS.
+  const { data } = await axios.post(`${BASE}/items/${leadId}`, body, authHeaders())
   return data
 }
 
