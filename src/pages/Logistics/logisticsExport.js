@@ -9,7 +9,7 @@ const text = (value) => (value === 0 || value ? String(value) : '')
 
 const number = (value) => {
   const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : ''
+  return Number.isFinite(parsed) ? parsed : null
 }
 
 const dateOnly = (value) =>

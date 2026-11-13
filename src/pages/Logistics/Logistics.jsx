@@ -192,6 +192,52 @@ const BULK_BAR_CLASS = [
   'flex flex-col sm:flex-row items-center justify-between gap-3',
 ].join(' ')
 
+const EXPORT_BTN_CLASS = [
+  'flex items-center gap-2 bg-primary text-white rounded-[0.55rem] px-3 py-1.5',
+  'text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed',
+].join(' ')
+
+// Title, item count and the export/refresh toolbar above the filters.
+const LogisticsHeader = ({ total, exporting, onExport, onRefresh }) => (
+  <div className='flex items-end justify-between gap-3 mb-4'>
+    <div>
+      <h1 className='text-2xl md:text-3xl font-bold text-gray-800'>Warehouse</h1>
+      <p className='text-sm text-gray-500 mt-1'>
+        Items with confirmed payment
+        {total ? ` · ${total} items` : ''}
+      </p>
+    </div>
+    <div className='flex items-center gap-2'>
+      <button
+        type='button'
+        onClick={onExport}
+        disabled={exporting}
+        aria-label='Export warehouse items to Excel'
+        title='Download every item matching the current filters as an Excel file'
+        className={`${EXPORT_BTN_CLASS} ${SHADOW}`}
+      >
+        {exporting ? <BeatLoader color='white' size={6} /> : <FaDownload size={16} />}
+        {exporting ? 'Exporting…' : 'Export'}
+      </button>
+      <button
+        type='button'
+        onClick={onRefresh}
+        aria-label='Refresh'
+        className={`bg-primary text-white rounded-[0.55rem] p-1.5 ${SHADOW}`}
+      >
+        <IoRefresh size={22} />
+      </button>
+    </div>
+  </div>
+)
+
+LogisticsHeader.propTypes = {
+  total: PropTypes.number.isRequired,
+  exporting: PropTypes.bool.isRequired,
+  onExport: PropTypes.func.isRequired,
+  onRefresh: PropTypes.func.isRequired,
+}
+
 // Bar shown while rows are ticked: clear the selection or request logistics.
 const BulkActionBar = ({ count, onClear, onRequest }) => {
   if (count === 0) {
@@ -414,36 +460,12 @@ const Logistics = () => {
       />
 
       <div className='mx-auto max-w-[1600px] px-3 sm:px-4 md:px-6 mt-4 md:mt-8'>
-        <div className='flex items-end justify-between gap-3 mb-4'>
-          <div>
-            <h1 className='text-2xl md:text-3xl font-bold text-gray-800'>Warehouse</h1>
-            <p className='text-sm text-gray-500 mt-1'>
-              Items with confirmed payment
-              {pagination.total ? ` · ${pagination.total} items` : ''}
-            </p>
-          </div>
-          <div className='flex items-center gap-2'>
-            <button
-              type='button'
-              onClick={exportRows}
-              disabled={exporting}
-              aria-label='Export warehouse items to Excel'
-              title='Download every item matching the current filters as an Excel file'
-              className={`flex items-center gap-2 bg-primary text-white rounded-[0.55rem] px-3 py-1.5 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed ${SHADOW}`}
-            >
-              {exporting ? <BeatLoader color='white' size={6} /> : <FaDownload size={16} />}
-              {exporting ? 'Exporting…' : 'Export'}
-            </button>
-            <button
-              type='button'
-              onClick={refresh}
-              aria-label='Refresh'
-              className={`bg-primary text-white rounded-[0.55rem] p-1.5 ${SHADOW}`}
-            >
-              <IoRefresh size={22} />
-            </button>
-          </div>
-        </div>
+        <LogisticsHeader
+          total={pagination.total}
+          exporting={exporting}
+          onExport={exportRows}
+          onRefresh={refresh}
+        />
 
         <WarehouseFilters
           options={options}
