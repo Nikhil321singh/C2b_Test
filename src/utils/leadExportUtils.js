@@ -44,17 +44,26 @@ const getVariantInfo = (val) => {
   return '-'
 }
 
+const getCreatedAtTime = (item) => {
+  const time = new Date(item?.createdAt).getTime()
+  return Number.isNaN(time) ? 0 : time
+}
+
 export const downloadExcelLeadsompleted = (apiData) => {
   const fileType =
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
   const fileExtension = '.xlsx'
 
-  const formattedData = apiData.map((item) => {
+  const sortedData = [...(apiData || [])].sort(
+    (a, b) => getCreatedAtTime(b) - getCreatedAtTime(a),
+  )
+
+  const formattedData = sortedData.map((item) => {
     const questionData = processQNAData(item?.QNA)
     const deviceReportSummary = processDeviceReport(item.deviceReport)
 
     return {
-      'Date Created': new Date(item?.updatedAt).toLocaleDateString('en-IN'),
+      'Date Created': new Date(item?.createdAt).toLocaleDateString('en-IN'),
       'Company Name':
         item.companyId?.name || item.store?.companyId?.name || 'N/A',
       'Purchase Grade': item.purchaseGrade || 'N/A',
