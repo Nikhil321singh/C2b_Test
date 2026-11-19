@@ -3,6 +3,7 @@ export const PAGE_SIZE = 20
 export const STATUS = {
   NOT_BOOKED: 'Not Booked',
   BOOKED: 'Booked',
+  PICKUP_REGISTERED: 'Pickup Registered',
   OUT_FOR_PICKUP: 'Out For Pickup',
   PICKUP_COMPLETE: 'Pickup Complete',
   IN_TRANSIT: 'In Transit',
@@ -13,6 +14,7 @@ export const STATUS = {
 // Forward order a manual shipment moves through.
 export const STATUS_ORDER = [
   STATUS.BOOKED,
+  STATUS.PICKUP_REGISTERED,
   STATUS.OUT_FOR_PICKUP,
   STATUS.PICKUP_COMPLETE,
   STATUS.IN_TRANSIT,
@@ -20,11 +22,12 @@ export const STATUS_ORDER = [
 ]
 
 export const EDITABLE_STATUSES = [STATUS.NOT_BOOKED, STATUS.CANCELLED]
-export const CANCELLABLE_STATUSES = [STATUS.BOOKED, STATUS.OUT_FOR_PICKUP]
+export const CANCELLABLE_STATUSES = [STATUS.BOOKED, STATUS.PICKUP_REGISTERED, STATUS.OUT_FOR_PICKUP]
 
 export const STATUS_STYLES = {
   [STATUS.NOT_BOOKED]: 'bg-gray-100 text-gray-700 border-gray-300',
   [STATUS.BOOKED]: 'bg-blue-50 text-blue-700 border-blue-200',
+  [STATUS.PICKUP_REGISTERED]: 'bg-sky-50 text-sky-700 border-sky-200',
   [STATUS.OUT_FOR_PICKUP]: 'bg-amber-50 text-amber-700 border-amber-200',
   [STATUS.PICKUP_COMPLETE]: 'bg-indigo-50 text-indigo-700 border-indigo-200',
   [STATUS.IN_TRANSIT]: 'bg-purple-50 text-purple-700 border-purple-200',
@@ -87,3 +90,4 @@ export const statusLabel = (lead) =>
   lead.logisticsStatus === STATUS.BOOKED && lead.reTransitCount > 0
     ? 'Booked (Re-transit)'
     : lead.logisticsStatus
+
