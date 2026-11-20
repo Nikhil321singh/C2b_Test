@@ -47,10 +47,17 @@ const ExtComps = ({
 
   const reqPickupHandler = () => {
     setConfMod(false)
-    const statuschk = selectedIds.every((sId) =>
-      pendingTableData.some(
-        (device) => device._id === sId && device.status === PickupAvail
-      )
+    if (selectedIds.length === 0) {
+      setIsTableLoaded(false)
+      setErrorMsg('No device selected')
+      setFailMode(true)
+      return
+    }
+    const visibleSelected = pendingTableData.filter((device) =>
+      selectedIds.includes(device._id),
+    )
+    const statuschk = visibleSelected.every(
+      (device) => device.status === PickupAvail,
     )
     if (!statuschk) {
       setIsTableLoaded(false)
@@ -60,12 +67,9 @@ const ExtComps = ({
     }
     const address =
       allStore.find((store) => store.storeName === storeName)?._id ||
-      pendingTableData?.filter((obj) => selectedIds[0] === obj._id)[0]
-        ?.storeDetails?.storeId
+      visibleSelected[0]?.storeDetails?.storeId
 
-    const LDIds = pendingTableData
-      ?.filter((obj) => selectedIds.includes(obj._id))
-      .map((obj) => obj._id.toString())
+    const LDIds = selectedIds.map((id) => id.toString())
 
     const config = {
       method: 'post',

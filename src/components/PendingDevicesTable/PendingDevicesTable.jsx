@@ -45,14 +45,19 @@ const PendingDevicesTable = ({
       selectableRows.every((row) => selectedRows.includes(row._id))
 
     if (allSelectableSelected) {
-      setSelectedRows([])
-      setSelectedData([])
-      setSelectedIds([])
+      const idsToRemove = new Set(selectableRows.map((row) => row._id))
+      const remainingIds = selectedRows.filter((id) => !idsToRemove.has(id))
+      setSelectedRows(remainingIds)
+      setSelectedData(remainingIds)
+      setSelectedIds(remainingIds)
     } else {
       const idsOfSelectedRows = selectableRows.map((row) => row._id)
-      setSelectedRows(idsOfSelectedRows)
-      setSelectedData(idsOfSelectedRows)
-      setSelectedIds(idsOfSelectedRows)
+      const mergedIds = Array.from(
+        new Set([...selectedRows, ...idsOfSelectedRows]),
+      )
+      setSelectedRows(mergedIds)
+      setSelectedData(mergedIds)
+      setSelectedIds(mergedIds)
     }
   }
 
