@@ -14,17 +14,24 @@ const PendingDevicesTable = ({
   const [showModal, setShowModal] = useState(false)
   const [QNAData, setQNAData] = useState([])
 
-  const handleCheckboxChange = (val, index) => {
+  const selectableRows = pendingTableData.filter(
+    (row) => row.status !== 'Cancelled',
+  )
+
+  const handleCheckboxChange = (val) => {
+    if (val.status === 'Cancelled') {
+      return
+    }
     const newSelectedRows = [...selectedRows]
     const newSelectedData = [...selectedData]
-    if (newSelectedRows.includes(index)) {
-      newSelectedRows.splice(newSelectedRows.indexOf(index), 1)
+    if (newSelectedRows.includes(val._id)) {
+      newSelectedRows.splice(newSelectedRows.indexOf(val._id), 1)
       const dataIndex = newSelectedData.findIndex((item) => item === val._id)
       if (dataIndex !== -1) {
         newSelectedData.splice(dataIndex, 1)
       }
     } else {
-      newSelectedRows.push(index)
+      newSelectedRows.push(val._id)
       newSelectedData.push(val._id)
     }
     setSelectedRows(newSelectedRows)
@@ -33,18 +40,18 @@ const PendingDevicesTable = ({
   }
 
   const handleSelectAll = () => {
-    if (selectedRows.length === pendingTableData.length) {
+    const allSelectableSelected =
+      selectableRows.length > 0 &&
+      selectableRows.every((row) => selectedRows.includes(row._id))
+
+    if (allSelectableSelected) {
       setSelectedRows([])
       setSelectedData([])
       setSelectedIds([])
     } else {
-      setSelectedRows(
-        Array.from({ length: pendingTableData.length }, (_, i) => i),
-      )
-      const idsOfSelectedRows = pendingTableData.map((row) => row._id)
-      setSelectedData([])
+      const idsOfSelectedRows = selectableRows.map((row) => row._id)
+      setSelectedRows(idsOfSelectedRows)
       setSelectedData(idsOfSelectedRows)
-      setSelectedIds([])
       setSelectedIds(idsOfSelectedRows)
     }
   }
@@ -72,7 +79,10 @@ const PendingDevicesTable = ({
               <input
                 type='checkbox'
                 onChange={handleSelectAll}
-                checked={selectedRows.length === pendingTableData.length}
+                checked={
+                  selectableRows.length > 0 &&
+                  selectableRows.every((row) => selectedRows.includes(row._id))
+                }
               />
             </th>
             <th className='p-2 min-w-[100px] text-sm md:p-3 md:text-base'>
@@ -114,12 +124,21 @@ const PendingDevicesTable = ({
         </thead>
         <tbody>
           {pendingTableData.map((val, index) => (
-            <tr key={index} className={index % 2 === 0 ? 'bg-gray-200' : ''}>
+            <tr
+              key={val._id ?? index}
+              className={index % 2 === 0 ? 'bg-gray-200' : ''}
+            >
               <td className='p-2 text-sm text-center md:p-3 md:text-base'>
                 <input
                   type='checkbox'
-                  onChange={() => handleCheckboxChange(val, index)}
-                  checked={selectedRows.includes(index)}
+                  onChange={() => handleCheckboxChange(val)}
+                  checked={selectedRows.includes(val._id)}
+                  disabled={val?.status === 'Cancelled'}
+                  title={
+                    val?.status === 'Cancelled'
+                      ? 'Cancelled leads cannot be selected'
+                      : undefined
+                  }
                 />
               </td>
               <td className='p-2 text-sm text-center md:p-3 md:text-base'>
