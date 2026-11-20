@@ -7,13 +7,13 @@ export const useDevicePickupData = (token, region, storeName) => {
   const [devicesCount, setDevicesCount] = useState(0)
   const [devicesPrice, setDevicesPrice] = useState('0')
 
-  const getData = () => {
+  const getData = (page = 0) => {
     setIsTableLoaded(true)
     const config = {
       method: 'get',
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/all?region=${region}&storeName=${storeName}`,
+      }/api/pendingDevices/all?region=${region}&storeName=${storeName}&page=${page}&limit=10`,
       headers: { Authorization: token },
     }
     axios

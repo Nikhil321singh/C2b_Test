@@ -72,7 +72,7 @@ const usePickupHistory = () => {
       method: 'get',
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}`,
+      }/api/pickupDevices/history?region=${region}&storeName=${storeName}&userRole=${QRole}&page=0&limit=10`,
       headers: { Authorization: token },
     }
     axios
