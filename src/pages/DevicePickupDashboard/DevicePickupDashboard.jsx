@@ -115,9 +115,6 @@ const DevicePickupDashboard = () => {
       isFirstPageChange.current = false;
       return;
     }
-    setSelectedIds([]);
-    setSelectedRows([]);
-    setSelectedData([]);
     getDataBySearch(currentPage);
   }, [currentPage]);
 
