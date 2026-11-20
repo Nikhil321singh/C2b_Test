@@ -68,7 +68,9 @@ const DPFilter = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStores, setFilteredStores] = useState(storeData);
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
-  const isSuperAdmin = LoggedInUser?.role === "Super Admin";
+  const showRegionStoreFilters = ["Super Admin", "Company Admin"].includes(
+    LoggedInUser?.role,
+  );
   const dispatch = useDispatch();
 
   const handleRegionChange = (value) => {
@@ -121,16 +123,24 @@ const DPFilter = ({
     setSearchValue("");
     setSelectedStatus("");
     setDateValue("");
-    setRegion("chandigarh");
-    setStoreName(import.meta.env.VITE_USER_STORE_NAME);
+    setRegion("");
+    setStoreName("");
     setSearchTerm("");
+    const allStoreNames = allStore.map((store) => store.storeName);
+    setStoreData(allStoreNames);
+    dispatch(setStoreFilter({ selStore: "", selRegion: "" }));
   };
 
   useEffect(() => {
-    if (selectedStatus === "" && dateValue === "" && searchValue === "") {
+    if (
+      selectedStatus === "" &&
+      dateValue === "" &&
+      searchValue === "" &&
+      !statusValue
+    ) {
       getData();
     }
-  }, [dateValue, selectedStatus, searchValue]);
+  }, [dateValue, selectedStatus, searchValue, statusValue]);
 
   useEffect(() => {
     if (storeDrop && searchTerm.trim() === "") {
@@ -170,7 +180,7 @@ const DPFilter = ({
             onChange={(e) => setSearchValue(e.target.value)}
             className="text-sm"
             type="text"
-            placeholder="Search"
+            placeholder="Search Device Name (e.g. iPhone, Redmi, Samsung)"
             value={searchValue}
           />
           <IoMdSearch onClick={() => getDataBySearch()} size={34} />
@@ -205,7 +215,7 @@ const DPFilter = ({
         setStatusValue={setStatusValue}
         pendingTableData={pendingTableData}
       />
-      {isSuperAdmin && (
+      {showRegionStoreFilters && (
         <SuperAdminFilters
           region={region}
           regionDrop={regionDrop}
