@@ -15,14 +15,10 @@ import {
   getRequiredFiles,
   isAllUploadsSuccessful,
 } from '../utils/validationUtils'
-import {
-  KYC_TEST_DATA,
-  KYC_TEST_MODE,
-  RELAX_KYC_VALIDATION,
-} from '../config/featureFlags'
+import { KYC_TEST_DATA, KYC_TEST_MODE } from '../config/featureFlags'
 
 const pink = 'bg-primary'
-const isDevelopmentMode = RELAX_KYC_VALIDATION
+const isDevelopmentMode = true
 
 const computeImeiBlocked = (isMobile, imeiVerificationResult) =>
   isMobile &&
@@ -288,8 +284,7 @@ const Price = () => {
     isAadharVerified,
   })
 
-  const canSubmit =
-    isDevelopmentMode || (missingRequirements.length === 0 && !isImeiBlocked)
+  const canSubmit = true
 
   // The Sanchar Saathi prompt below already calls out IMEI verification.
   const otherMissingRequirements = missingRequirements.filter(

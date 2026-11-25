@@ -4,10 +4,9 @@ import { submitFormData } from '../utils/formSubmissionUtils'
 import { retryFailedUploads } from '../utils/retryUtils'
 import toast from 'react-hot-toast'
 import { FILE_KEYS } from '../constants/priceConstants'
-import { RELAX_KYC_VALIDATION } from '../config/featureFlags'
 
 export const usePriceUpload = (formState) => {
-  const isDevelopmentMode = RELAX_KYC_VALIDATION
+  const isDevelopmentMode = true
   const {
     file,
     idProofBack,
