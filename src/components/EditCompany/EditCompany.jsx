@@ -26,9 +26,9 @@ const FormHeader = ({ onClose }) => (
   </div>
 );
 
-const FormField = ({ label, name, value, onChange, required = false, readOnly = false, type = 'text' }) => (
+const FormField = ({ label, name, value, onChange, required = false, readOnly = false, type = 'text', labelClassName = '' }) => (
   <div className='flex flex-col gap-1.5'>
-    <span className='font-medium text-sm text-gray-700'>
+    <span className={`font-medium text-sm text-gray-700 ${labelClassName}`}>
       {label}{required && <span className='text-red-500 ml-0.5'>*</span>}
     </span>
     <input
@@ -43,7 +43,7 @@ const FormField = ({ label, name, value, onChange, required = false, readOnly = 
   </div>
 );
 
-const SelectField = ({ label, name, value, onChange, options }) => (
+const SelectField = ({ label, name, value, onChange, options, disabled = false }) => (
   <div className='flex flex-col gap-1.5'>
     <span className='font-medium text-sm text-gray-700'>{label}</span>
     <select
@@ -51,6 +51,7 @@ const SelectField = ({ label, name, value, onChange, options }) => (
       name={name}
       value={value}
       onChange={onChange}
+      disabled={disabled}
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -243,11 +244,159 @@ const DynamicPricingSection = ({
   </div>
 )
 
+const PayoutSettingsSection = ({ settings, canConfigurePayout, onChange }) => {
+  const updateField = (field, value) =>
+    onChange({ ...settings, [field]: value })
+  return (
+    <div className='border border-gray-200 rounded-lg p-4 space-y-4'>
+      <div>
+        {sectionTitle('HSBC UPI Customer Payout')}
+        <p className='text-xs text-gray-500 mt-1'>
+          Company master control and fraud limits. Store-level payout mode
+          and ceiling are configured from Store Listing.
+        </p>
+      </div>
+      <label className='flex items-center gap-3'>
+        <input
+          type='checkbox'
+          checked={settings.enabled}
+          disabled={!canConfigurePayout}
+          onChange={(event) => updateField('enabled', event.target.checked)}
+        />
+        Enable HSBC UPI payout for this company
+      </label>
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+        {[
+          ['Device cooldown (days)', 'deviceCooldownDays'],
+          ['Customer device limit', 'customerSellLimitCount'],
+          ['Customer limit window (days)', 'customerSellLimitWindowDays'],
+        ].map(([label, field]) => (
+          <FormField
+            key={field}
+            label={label}
+            name={field}
+            type='number'
+            value={settings[field]}
+            labelClassName='min-h-10 flex items-end'
+            readOnly={!canConfigurePayout}
+            onChange={(event) => updateField(field, event.target.value)}
+          />
+        ))}
+      </div>
+      <p className='text-xs text-gray-500'>
+        Set a limit to 0 to disable that validation. Only Super Admin can
+        change these settings.
+      </p>
+    </div>
+  )
+}
+
+const StorePaymentSection = ({ settings, canConfigurePayout, onChange }) => (
+  <div className='border border-gray-200 rounded-lg p-4 space-y-3'>
+    <div>
+      {sectionTitle('Store Payment Permission')}
+      <p className='text-xs text-gray-500 mt-1'>
+        Controls who records the store payout after a payment request.
+        Only Super Admin can change this setting.
+      </p>
+    </div>
+    <SelectField
+      label='Payment mode'
+      name='storePaymentMode'
+      value={settings.mode}
+      disabled={!canConfigurePayout}
+      onChange={(event) => onChange({ ...settings, mode: event.target.value })}
+      options={[
+        {
+          value: 'COMPANY_ACCOUNTS',
+          label: 'Mode 1 - Company Accounts pays store',
+        },
+        {
+          value: 'MANAGER_FUNDS',
+          label: 'Mode 2 - Manager pays from personal funds',
+        },
+        {
+          value: 'PREPAID_DEFERRED',
+          label: 'Mode 3 - Pre-paid / deferred (no pickup payout)',
+        },
+      ]}
+    />
+    {!canConfigurePayout && (
+      <p className='text-xs text-amber-700'>
+        Read only: ask a Super Admin to change the payment permission.
+      </p>
+    )}
+  </div>
+)
+
+const FormActions = ({ onCancel }) => (
+  <div className='sticky bottom-0 bg-white pt-2 pb-1 flex justify-end gap-3 border-t border-gray-100'>
+    <button
+      type='button'
+      onClick={onCancel}
+      className='border border-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition'
+    >
+      Cancel
+    </button>
+    <button type='submit' className='bg-[var(--primary-color)] text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition'>Update Details</button>
+  </div>
+)
+
+const buildCompanyFormData = (formValues, canConfigurePayout) => {
+  const formData = new FormData()
+  formData.append('name', formValues.name)
+  formData.append('contactNumber', formValues.contactNumber)
+  formData.append('address', formValues.address)
+  formData.append('gstNumber', formValues.gstNumber)
+  formData.append('panNumber', formValues.panNumber)
+  formData.append('remarks', formValues.remarks)
+  formData.append('showPrice', formValues.showPrice)
+  formData.append('maskInfo', formValues.maskInfo)
+  formData.append('aadharVerificationRequired', formValues.aadharVerificationRequired)
+  formData.append('emailConfiguration', JSON.stringify(formValues.emailConfiguration))
+  if (canConfigurePayout) {
+    formData.append(
+      'buybackPayoutSettings',
+      JSON.stringify({
+        ...formValues.buybackPayoutSettings,
+        deviceCooldownDays: Number(
+          formValues.buybackPayoutSettings.deviceCooldownDays || 0
+        ),
+        customerSellLimitCount: Number(
+          formValues.buybackPayoutSettings.customerSellLimitCount || 0
+        ),
+        customerSellLimitWindowDays: Number(
+          formValues.buybackPayoutSettings.customerSellLimitWindowDays || 0
+        ),
+      })
+    )
+    formData.append(
+      'storePaymentSettings',
+      JSON.stringify(formValues.storePaymentSettings)
+    )
+  }
+  formData.append('id', formValues._id)
+  return formData
+}
+
 const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
+  const profile = JSON.parse(sessionStorage.getItem('profile') || '{}')
+  const canConfigurePayout = profile?.role === 'Super Admin'
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     ...companyData,
-    emailConfiguration: companyData.emailConfiguration || { enabled: false, recipients: [], notificationTypes: ['paymentReceipt'] }
+    emailConfiguration: companyData.emailConfiguration || { enabled: false, recipients: [], notificationTypes: ['paymentReceipt'] },
+    buybackPayoutSettings: {
+      enabled: false,
+      deviceCooldownDays: 0,
+      customerSellLimitCount: 0,
+      customerSellLimitWindowDays: 0,
+      ...companyData.buybackPayoutSettings,
+    },
+    storePaymentSettings: {
+      mode: 'COMPANY_ACCOUNTS',
+      ...companyData.storePaymentSettings,
+    },
   })
   const [dynamicPricingEnabled, setDynamicPricingEnabled] = useState(false)
   const [prevDynamicPricingEnabled, setPrevDynamicPricingEnabled] = useState(false)
@@ -327,18 +476,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
     setIsTableLoading(true)
     const token = sessionStorage.getItem('authToken')
     try {
-      const formData = new FormData()
-      formData.append('name', formValues.name)
-      formData.append('contactNumber', formValues.contactNumber)
-      formData.append('address', formValues.address)
-      formData.append('gstNumber', formValues.gstNumber)
-      formData.append('panNumber', formValues.panNumber)
-      formData.append('remarks', formValues.remarks)
-      formData.append('showPrice', formValues.showPrice)
-      formData.append('maskInfo', formValues.maskInfo)
-      formData.append('aadharVerificationRequired', formValues.aadharVerificationRequired)
-      formData.append('emailConfiguration', JSON.stringify(formValues.emailConfiguration))
-      formData.append('id', formValues._id)
+      const formData = buildCompanyFormData(formValues, canConfigurePayout)
 
       await axios.put(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/company/edit`, formData, { headers: { Authorization: token } })
       await axios.post(`${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/dynamic-pricing/config`, {
@@ -382,6 +520,28 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
           />
         </div>
 
+        <PayoutSettingsSection
+          settings={formValues.buybackPayoutSettings}
+          canConfigurePayout={canConfigurePayout}
+          onChange={(next) =>
+            setFormValues((previous) => ({
+              ...previous,
+              buybackPayoutSettings: next,
+            }))
+          }
+        />
+
+        <StorePaymentSection
+          settings={formValues.storePaymentSettings}
+          canConfigurePayout={canConfigurePayout}
+          onChange={(next) =>
+            setFormValues((previous) => ({
+              ...previous,
+              storePaymentSettings: next,
+            }))
+          }
+        />
+
         <div className='border border-gray-200 rounded-lg p-4'>
           <EmailConfiguration value={formValues.emailConfiguration} onChange={(config) => setFormValues(prev => ({ ...prev, emailConfiguration: config }))} />
         </div>
@@ -399,16 +559,7 @@ const EditCompany = ({ companyData, setEditBoxOpen, setEditSuccess }) => {
           setPricingNotes={setPricingNotes}
         />
 
-        <div className='sticky bottom-0 bg-white pt-2 pb-1 flex justify-end gap-3 border-t border-gray-100'>
-          <button
-            type='button'
-            onClick={() => setEditBoxOpen(false)}
-            className='border border-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition'
-          >
-            Cancel
-          </button>
-          <button type='submit' className='bg-[var(--primary-color)] text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition'>Update Details</button>
-        </div>
+        <FormActions onCancel={() => setEditBoxOpen(false)} />
       </form>
     </>
   )

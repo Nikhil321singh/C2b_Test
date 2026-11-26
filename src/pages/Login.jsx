@@ -110,9 +110,14 @@ const redirectUser = (role, navigate) => {
       break
     case 'Admin Manager':
     case 'Company Admin':
+    case 'Manager':
+    case 'Store Admin':
     case 'Super_Admin_Unicorn':
     case 'Admin_Manager_Unicorn':
       navigate(customTable)
+      break
+    case 'Accounts User':
+      navigate('/store-payments')
       break
     case 'Technician':
       navigate('/devicepickupdashboard')

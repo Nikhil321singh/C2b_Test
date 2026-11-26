@@ -31,6 +31,151 @@ const AadharBadge = ({ required }) => {
   return <span className='px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500'>OFF</span>
 }
 
+const PayoutEnabledBadge = ({ enabled }) => {
+  if (enabled) {
+    return <span className='px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700'>ON</span>
+  }
+  return <span className='px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500'>OFF</span>
+}
+
+const STORE_PAYMENT_MODE_LABELS = {
+  COMPANY_ACCOUNTS: 'Company Accounts',
+  MANAGER_FUNDS: 'Manager Funds',
+  PREPAID_DEFERRED: 'Pre-paid / Deferred',
+}
+
+const CompanyTableRow = ({
+  data,
+  index,
+  selectedIds,
+  onSelectId,
+  editHandler,
+  deleteConfHandler,
+  openUploadPriceModal,
+  openViewDocsModal,
+}) => (
+  <tr
+    key={data._id || index}
+    className={`${index % 2 === 0 ? 'bg-gray-200' : ''} ${selectedIds.includes(data._id) ? 'bg-blue-100' : ''}`}
+  >
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <input
+        type='checkbox'
+        checked={selectedIds.includes(data._id)}
+        onChange={() => onSelectId(data._id)}
+        className='cursor-pointer'
+      />
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <div className='flex flex-col gap-1'>
+        <button
+          className={`${styles.view_btn}`}
+          onClick={() => {
+            editHandler(data)
+          }}
+        >
+          Edit
+        </button>
+        <button
+          className={`${styles.acpt_btn}`}
+          onClick={() => {
+            deleteConfHandler(data)
+          }}
+        >
+          Delete
+        </button>
+        <button
+          className='bg-blue-500 text-white px-2 py-1 text-xs rounded hover:bg-blue-600 flex items-center justify-center gap-1'
+          onClick={() => {
+            openUploadPriceModal(data)
+          }}
+        >
+          <FaUpload size={12} /> Price Sheet
+        </button>
+      </div>
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.name}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.companyCode}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.address}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.contactNumber}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.gstNumber}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.panNumber}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.remarks}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusBadgeClass(data.dynamicPricingStatus)}`}>
+        {getStatusLabel(data.dynamicPricingStatus)}
+      </span>
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <AadharBadge required={data.aadharVerificationRequired !== false} />
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      <PayoutEnabledBadge enabled={data.buybackPayoutSettings?.enabled === true} />
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.buybackPayoutSettings?.deviceCooldownDays ?? '-'}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.buybackPayoutSettings?.customerSellLimitCount ?? '-'}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.buybackPayoutSettings?.customerSellLimitWindowDays ?? '-'}
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.storePaymentSettings?.mode
+        ? STORE_PAYMENT_MODE_LABELS[data.storePaymentSettings.mode] || data.storePaymentSettings.mode
+        : '-'}
+    </td>
+    <td
+      className='p-2 text-sm text-center md:p-3 md:text-base'
+      onClick={() => openViewDocsModal(data)}
+      style={{ cursor: 'pointer' }}
+    >
+      View Docs
+    </td>
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {data.priceSheets && data.priceSheets.length > 0 ? (
+        <div className='flex max-h-24 min-w-[220px] max-w-[280px] flex-col gap-1 overflow-y-auto pr-1'>
+          {[...data.priceSheets]
+            .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
+            .slice(0, 2)
+            .map((sheet, idx) => (
+            <a
+              key={idx}
+              href={sheet.fileUrl}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='flex items-center gap-1 text-left text-sm text-blue-600 underline hover:text-blue-800'
+              title={`${sheet.fileName} (${new Date(sheet.uploadedAt).toLocaleDateString()})`}
+            >
+              <FaDownload className='shrink-0' size={10} />
+              <span className='block truncate'>
+                {sheet.fileName} ({new Date(sheet.uploadedAt).toLocaleDateString()})
+              </span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <span className='text-gray-400 text-sm'>No files</span>
+      )}
+    </td>
+  </tr>
+)
+
 const CompanyTable = ({
   tableData,
   editHandler,
@@ -79,6 +224,11 @@ const CompanyTable = ({
               <th className='p-2 text-sm md:p-3 md:text-base'>Remarks</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Dynamic Pricing</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Aadhaar Verify</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Payout Enabled</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Cooldown (days)</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Device Limit</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Limit Window (days)</th>
+              <th className='p-2 text-sm md:p-3 md:text-base'>Store Payment Mode</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Documents</th>
               <th className='p-2 text-sm md:p-3 md:text-base'>Price Sheets</th>
             </tr>
@@ -88,107 +238,17 @@ const CompanyTable = ({
               [...tableData]
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .map((data, index) => (
-                  <tr
+                  <CompanyTableRow
                     key={data._id || index}
-                    className={`${index % 2 === 0 ? 'bg-gray-200' : ''} ${selectedIds.includes(data._id) ? 'bg-blue-100' : ''}`}
-                  >
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      <input
-                        type='checkbox'
-                        checked={selectedIds.includes(data._id)}
-                        onChange={() => onSelectId(data._id)}
-                        className='cursor-pointer'
-                      />
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      <div className='flex flex-col gap-1'>
-                        <button
-                          className={`${styles.view_btn}`}
-                          onClick={() => {
-                            editHandler(data)
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className={`${styles.acpt_btn}`}
-                          onClick={() => {
-                            deleteConfHandler(data)
-                          }}
-                        >
-                          Delete
-                        </button>
-                        <button
-                          className='bg-blue-500 text-white px-2 py-1 text-xs rounded hover:bg-blue-600 flex items-center justify-center gap-1'
-                          onClick={() => {
-                            openUploadPriceModal(data)
-                          }}
-                        >
-                          <FaUpload size={12} /> Price Sheet
-                        </button>
-                      </div>
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.name}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.companyCode}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.address}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.contactNumber}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.gstNumber}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.panNumber}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.remarks}
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusBadgeClass(data.dynamicPricingStatus)}`}>
-                        {getStatusLabel(data.dynamicPricingStatus)}
-                      </span>
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      <AadharBadge required={data.aadharVerificationRequired !== false} />
-                    </td>
-                    <td
-                      className='p-2 text-sm text-center md:p-3 md:text-base'
-                      onClick={() => openViewDocsModal(data)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      View Docs
-                    </td>
-                    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-                      {data.priceSheets && data.priceSheets.length > 0 ? (
-                        <div className='flex flex-col gap-1'>
-                          {[...data.priceSheets]
-                            .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
-                            .slice(0, 2)
-                            .map((sheet, idx) => (
-                            <a
-                              key={idx}
-                              href={sheet.fileUrl}
-                              target='_blank'
-                              rel='noopener noreferrer'
-                              className='text-blue-600 hover:text-blue-800 text-sm underline flex items-center justify-center gap-1'
-                            >
-                              <FaDownload size={10} />
-                              {sheet.fileName} (
-                              {new Date(sheet.uploadedAt).toLocaleDateString()})
-                            </a>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className='text-gray-400 text-sm'>No files</span>
-                      )}
-                    </td>
-                  </tr>
+                    data={data}
+                    index={index}
+                    selectedIds={selectedIds}
+                    onSelectId={onSelectId}
+                    editHandler={editHandler}
+                    deleteConfHandler={deleteConfHandler}
+                    openUploadPriceModal={openUploadPriceModal}
+                    openViewDocsModal={openViewDocsModal}
+                  />
                 ))}
           </tbody>
         </table>

@@ -84,12 +84,14 @@ const buildRegisterUserPayload = (formData, LoggedInUser, isCompanyAdmin) => {
 
   if (
     formData.role === USER_ROLES.ADMIN_MANAGER ||
+    formData.role === USER_ROLES.MANAGER ||
     formData.role === USER_ROLES.TECHNICIAN
   ) {
     delete payload.storeId
   } else if (
     formData.role === USER_ROLES.SUPER_ADMIN ||
-    formData.role === USER_ROLES.COMPANY_ADMIN
+    formData.role === USER_ROLES.COMPANY_ADMIN ||
+    formData.role === USER_ROLES.ACCOUNTS_USER
   ) {
     delete payload.storeId
     delete payload.assignedStores

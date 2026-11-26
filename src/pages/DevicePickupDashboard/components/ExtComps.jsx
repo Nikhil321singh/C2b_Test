@@ -15,7 +15,6 @@ const buttonStyles = 'bg-primary text-white'
 const succTextColor = 'text-green-500'
 const failTextColor = 'text-primary'
 const PickupAvail = 'Available For Pickup'
-const LoggedInUser = JSON.parse(sessionStorage.getItem('profile'))
 
 const ExtComps = ({
   successMod,
@@ -35,15 +34,12 @@ const ExtComps = ({
   getData,
   selectedIds,
   pendingTableData,
-  allStore,
-  storeName,
   setSelectedIds,
   setSelectedData,
   setSelectedRows,
 }) => {
   const [sideMenu, setsideMenu] = useState(false)
   const token1 = sessionStorage.getItem('authToken')
-  const LoggedInUser1 = JSON.parse(sessionStorage.getItem('profile'))
 
   const reqPickupHandler = () => {
     setConfMod(false)
@@ -65,10 +61,6 @@ const ExtComps = ({
       setFailMode(true)
       return
     }
-    const address =
-      allStore.find((store) => store.storeName === storeName)?._id ||
-      visibleSelected[0]?.storeDetails?.storeId
-
     const LDIds = selectedIds.map((id) => id.toString())
 
     const config = {
@@ -76,14 +68,12 @@ const ExtComps = ({
       maxBodyLength: Infinity,
       url: `${
         import.meta.env.VITE_REACT_APP_ENDPOINT
-      }/api/pendingDevices/pickupreq`,
+      }/api/store-payments/requests`,
       headers: {
         Authorization: token1,
       },
       data: {
-        deviceIDs: LDIds,
-        storeid: address,
-        userid: LoggedInUser1?._id,
+        leadIds: LDIds,
       },
     }
     axios
@@ -100,7 +90,11 @@ const ExtComps = ({
         setIsTableLoaded(false)
       })
       .catch((error) => {
-        setErrorMsg(`Failed to create lot`)
+        setErrorMsg(
+          error.response?.data?.message ||
+            error.response?.data?.msg ||
+            `Failed to create payment request`
+        )
         setFailMode(true)
         setIsTableLoaded(false)
       })

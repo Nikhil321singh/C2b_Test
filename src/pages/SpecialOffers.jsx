@@ -19,6 +19,8 @@ import ReactDOMServer from "react-dom/server";
 import html2pdf from "html2pdf.js";
 import PurchaseReceipt from "../components/PurchaseReceipt";
 import { IoArrowBack } from "react-icons/io5";
+import { toast } from "react-hot-toast";
+import { getSellNowErrorMessage } from "../utils/payoutErrorMessages";
 export const CouponCard = ({ title, code, hanldePermanenet, isSelected }) => {
   return (
     <div
@@ -155,7 +157,7 @@ const SpecialOffers = () => {
   const Price = useSelector((state) => state.responseData.price);
   const [isSelected, setIsSelected] = useState(null);
   const [extraBonus, setExtraBonus] = useState(0);
-  const [disableBtn, setDisableBtn] = useState(initialDisableBtn);
+  const [, setDisableBtn] = useState(initialDisableBtn);
   const dispatch = useDispatch(false);
   const { setAnswers } = useQuestionContext();
   const leadId = sessionStorage.getItem("LeadId");
@@ -242,18 +244,6 @@ const SpecialOffers = () => {
         console.log(err);
       });
   };
-  const navigateHome = () => {
-    if (disableBtn) {
-      setTimeout(() => {
-        navigate("/selectDeviceType");
-        sessionStorage.setItem("disableBtn", JSON.stringify(false));
-        sessionStorage.setItem("myMessageKey", "");
-      }, 30000);
-    } else {
-      console.log("clicked");
-    }
-  };
-
   const handleSubmit = () => {
     setIsLoading(true);
     const userIdToken = sessionStorage.getItem("authToken");
@@ -290,14 +280,21 @@ const SpecialOffers = () => {
       )
       .then((response) => {
         setAnswers([]);
+        if (response.data.payout) {
+          sessionStorage.setItem(
+            "activePayout",
+            JSON.stringify(response.data.payout)
+          );
+        } else {
+          sessionStorage.removeItem("activePayout");
+        }
         sessionStorage.setItem("messageReceived", response.data.message);
         sessionStorage.setItem("disableBtn", JSON.stringify(true));
         setDisableBtn(true);
         navigate("/productsold");
-        navigateHome();
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(getSellNowErrorMessage(err));
         setIsLoading(false);
       });
   };
@@ -441,9 +438,11 @@ const SubSpecialOffers = ({
             View Summary
           </p>
         </div>
-        <div
+        <button
+          type="button"
           onClick={handleSubmit}
-          className={`bg-primary relative text-center py-1 px-2 rounded-lg flex justify-between text-white items-center cursor-pointer`}
+          disabled={isLoading}
+          className="bg-primary relative w-full text-center py-1 px-2 rounded-lg flex justify-between text-white items-center cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isLoading && (
             <CgSpinner
@@ -452,7 +451,7 @@ const SubSpecialOffers = ({
             />
           )}
           <p className="w-full p-1 text-xl font-medium">Sell Now</p>
-        </div>
+        </button>
       </div>
       <SummaryModal
         show={showModal}

@@ -31,6 +31,15 @@ const downloadExcel = (dataDown, curPage) => {
       "Company Code": item?.companyId?.companyCode || "N/A",
       "Store Name": item?.storeName,
       "Store Unique Id": item?.uniqueId,
+      "Company Payout Enabled":
+        item?.companyId?.buybackPayoutSettings?.enabled ? "Yes" : "No",
+      "Store Payout Enabled": item?.payoutSettings?.enabled ? "Yes" : "No",
+      "Payment Mode": item?.payoutSettings?.mode || "MANUAL",
+      "Payout Ceiling": item?.payoutSettings?.payoutCeiling || 0,
+      "Approval Enabled": item?.payoutSettings?.approvalEnabled ? "Yes" : "No",
+      "Approval Threshold": item?.payoutSettings?.approvalThreshold || 0,
+      "Link Expiry Minutes":
+        item?.payoutSettings?.customerLinkExpiryMinutes || 30,
       "Store Email": item.email,
       "Store Phone Number": item.contactNumber,
       Region: item.region,
@@ -587,6 +596,12 @@ const StoreTable = ({
               <th className="text-sm p-2 md:p-3 md:text-base">Unique Id</th>
               <th className="text-sm p-2 md:p-3 md:text-base">Company Name</th>
               <th className="text-sm p-2 md:p-3 md:text-base">Company Code</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Company Payout</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Store Payout</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Payment Mode</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Ceiling</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Approval</th>
+              <th className="text-sm p-2 md:p-3 md:text-base">Threshold</th>
               <th className="text-sm p-2 md:p-3 md:text-base">Email</th>
               <th className="text-sm p-2 md:p-3 md:text-base">Phone Number</th>
               <th className="text-sm p-2 md:p-3 md:text-base">Region</th>
@@ -627,6 +642,28 @@ const StoreTable = ({
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {val?.companyId?.companyCode || "N/A"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {val?.companyId?.buybackPayoutSettings?.enabled
+                    ? "Enabled"
+                    : "Disabled"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {val?.payoutSettings?.enabled ? "Enabled" : "Disabled"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {val?.payoutSettings?.mode || "MANUAL"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  ₹{Number(val?.payoutSettings?.payoutCeiling || 0).toFixed(2)}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  {val?.payoutSettings?.approvalEnabled ? "Yes" : "No"}
+                </td>
+                <td className="p-2 text-sm text-center md:p-3 md:text-base">
+                  ₹{Number(
+                    val?.payoutSettings?.approvalThreshold || 0
+                  ).toFixed(2)}
                 </td>
                 <td className="p-2 text-sm text-center md:p-3 md:text-base">
                   {val?.email}
