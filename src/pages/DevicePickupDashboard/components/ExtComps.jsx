@@ -5,6 +5,7 @@ import styles from '../DevicePickupDashboard.module.css'
 import SideMenu from '../../../components/SideMenu'
 import AdminNavbar from '../../../components/Admin_Navbar'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 const currentDomain = window.location.origin
 const DEFAULT_LOGO = '/Grest_Logo.jpg'
@@ -31,7 +32,6 @@ const ExtComps = ({
   setErrorMsg,
   setErrorMsg1,
   setErrorMsg2,
-  getData,
   selectedIds,
   pendingTableData,
   setSelectedIds,
@@ -40,6 +40,7 @@ const ExtComps = ({
 }) => {
   const [sideMenu, setsideMenu] = useState(false)
   const token1 = sessionStorage.getItem('authToken')
+  const navigate = useNavigate()
 
   const reqPickupHandler = () => {
     setConfMod(false)
@@ -82,12 +83,14 @@ const ExtComps = ({
         setSelectedIds([])
         setSelectedData([])
         setSelectedRows([])
-        getData()
-        setErrorMsg(`Successfully Created Lot`)
-        setErrorMsg1(`Lot No. :- ${response.data.data.uniqueCode}`)
-        setErrorMsg2(`Check it On Picked Up`)
-        setSuccessMod(true)
         setIsTableLoaded(false)
+        // The request is handled on Customer Payouts > Store Requests.
+        const code = response.data?.data?.uniqueCode || ''
+        navigate(
+          `/payout-management?tab=store-requests${
+            code ? `&created=${encodeURIComponent(code)}` : ''
+          }`
+        )
       })
       .catch((error) => {
         setErrorMsg(

@@ -10,6 +10,7 @@ import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
 import styles from './CompanyListingDetails/CompanyListingDetails.module.css'
 import styless from './QuotesCreatedAdmin/QuotesCreatedAdmin.module.css'
+import ConfirmPaymentModal from './StoreRequests/ConfirmPaymentModal'
 
 const STATUS_LABELS = {
   PAYMENT_REQUESTED: 'Payment Requested',
@@ -370,6 +371,8 @@ const StorePayments = () => {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [selected, setSelected] = useState(null)
+  const [confirming, setConfirming] = useState(null)
+  const [confirmError, setConfirmError] = useState('')
   const [search, setSearch] = useState('')
   const token = sessionStorage.getItem('authToken')
   const profile = JSON.parse(sessionStorage.getItem('profile') || '{}')
@@ -434,8 +437,11 @@ const StorePayments = () => {
       )
       setMessage(response.data.message)
       await load()
+      return ''
     } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Action failed')
+      const failure = requestError.response?.data?.message || 'Action failed'
+      setError(failure)
+      return failure
     } finally {
       setBusyId('')
     }
@@ -454,19 +460,26 @@ const StorePayments = () => {
     perform(item, 'unflag', { resolution })
   }
 
+  // Mark Paid opens the Confirm Payment form (receipt file + reference +
+  // remarks), the same form as Customer Payouts > Store Requests.
   const markPaid = (item) => {
-    const paymentReference =
-      window.prompt('Payment reference / transaction number (optional)') || ''
-    const paymentReceipt =
-      window.prompt(
-        'Existing receipt URL (optional; leave blank to auto-generate a PDF)'
-      ) || ''
-    const confirmed = window.confirm(
-      `Mark ${item.uniqueCode} as paid for ₹${Number(item.totalAmount).toFixed(2)}? This cannot be paid again.`
-    )
-    if (confirmed) {
-      perform(item, 'mark-paid', { paymentReference, paymentReceipt })
+    setConfirmError('')
+    setConfirming(item)
+  }
+
+  const confirmPayment = async ({ file, reference, remarks }) => {
+    const form = new FormData()
+    if (file) {
+      form.append('paymentReceipt', file)
     }
+    form.append('paymentReference', reference)
+    form.append('remarks', remarks)
+    const failure = await perform(confirming, 'mark-paid', form)
+    if (failure) {
+      setConfirmError(failure)
+      return
+    }
+    setConfirming(null)
   }
 
   const view = async (item) => {
@@ -561,6 +574,14 @@ const StorePayments = () => {
       <PaymentDetailModal
         selected={selected}
         onClose={() => setSelected(null)}
+      />
+      <ConfirmPaymentModal
+        key={confirming?._id || 'none'}
+        item={confirming}
+        busy={Boolean(busyId)}
+        error={confirmError}
+        onClose={() => !busyId && setConfirming(null)}
+        onSubmit={confirmPayment}
       />
     </div>
   )
