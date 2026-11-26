@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { IoMdSearch } from 'react-icons/io'
 import { FaAngleDown } from 'react-icons/fa6'
-import { SHADOW } from './constants'
+import { SHADOW, SOURCE, SOURCE_LABELS } from './constants'
 
 const CLEAR_BUTTON = [
   'h-9 w-full rounded-[0.55rem] border border-primary text-primary text-sm font-medium',
@@ -112,6 +112,59 @@ CompanyMultiSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
 }
 
+const SOURCE_TABS = [
+  { value: '', label: 'All', hint: 'Every lot' },
+  {
+    value: SOURCE.PAYOUT,
+    label: SOURCE_LABELS[SOURCE.PAYOUT],
+    hint: 'Customer paid via HSBC, sent from Customer Payouts',
+  },
+  {
+    value: SOURCE.MANUAL,
+    label: SOURCE_LABELS[SOURCE.MANUAL],
+    hint: 'Raised from the store / Pickup & Cancel flow',
+  },
+]
+
+const TAB = 'px-4 py-2 rounded-[0.55rem] text-sm font-medium whitespace-nowrap transition-colors'
+
+// Quick switch between payout and manual lots; drives the same Source filter.
+export const SourceTabs = ({ value, total, onChange }) => (
+  <div
+    role='tablist'
+    aria-label='Lot source'
+    className={`mb-3 inline-flex flex-wrap gap-1 rounded-lg bg-white p-1 ${SHADOW}`}
+  >
+    {SOURCE_TABS.map((tab) => {
+      const active = value === tab.value
+      return (
+        <button
+          key={tab.value || 'all'}
+          type='button'
+          role='tab'
+          aria-selected={active}
+          title={tab.hint}
+          onClick={() => onChange({ source: tab.value })}
+          className={`${TAB} ${
+            active ? 'bg-primary text-white' : 'text-gray-700 hover:bg-rose-50'
+          }`}
+        >
+          {tab.label}
+          {active && typeof total === 'number' && (
+            <span className='ml-2 rounded-full bg-white/25 px-2 py-0.5 text-xs'>{total}</span>
+          )}
+        </button>
+      )
+    })}
+  </div>
+)
+
+SourceTabs.propTypes = {
+  value: PropTypes.string.isRequired,
+  total: PropTypes.number,
+  onChange: PropTypes.func.isRequired,
+}
+
 const Labeled = ({ label, children }) => (
   <label className='flex flex-col gap-1 min-w-0'>
     <span className='text-xs font-semibold text-gray-600'>{label}</span>
@@ -158,6 +211,7 @@ const WarehouseFilters = ({ options, filters, onChange, onClear }) => {
     filters.companyIds.length ||
     filters.storeId ||
     filters.status ||
+    filters.source ||
     filters.fromDate ||
     filters.toDate
 
@@ -225,6 +279,18 @@ const WarehouseFilters = ({ options, filters, onChange, onClear }) => {
           </select>
         </Labeled>
 
+        <Labeled label='Source'>
+          <select
+            value={filters.source}
+            onChange={(e) => onChange({ source: e.target.value })}
+            className={FIELD}
+          >
+            <option value=''>All sources</option>
+            <option value={SOURCE.PAYOUT}>{SOURCE_LABELS[SOURCE.PAYOUT]}</option>
+            <option value={SOURCE.MANUAL}>{SOURCE_LABELS[SOURCE.MANUAL]}</option>
+          </select>
+        </Labeled>
+
         <Labeled label='Lot No.'>
           <input
             type='text'
@@ -288,6 +354,7 @@ WarehouseFilters.propTypes = {
     companyIds: PropTypes.arrayOf(PropTypes.string),
     storeId: PropTypes.string,
     status: PropTypes.string,
+    source: PropTypes.string,
     fromDate: PropTypes.string,
     toDate: PropTypes.string,
   }).isRequired,

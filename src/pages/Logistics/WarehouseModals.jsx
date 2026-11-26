@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { BeatLoader } from 'react-spinners'
 import {
   HISTORY_LABELS,
+  SOURCE,
+  SOURCE_LABELS,
   STATUS,
   STATUS_ORDER,
   describeLead,
@@ -13,6 +15,7 @@ import {
   formatPrice,
   isUrl,
   orDash,
+  sourceOf,
   statusLabel,
 } from './constants'
 import {
@@ -974,6 +977,17 @@ export const ViewModal = ({ lead, onClose }) => {
 
       <SectionTitle>Payment &amp; Lot</SectionTitle>
       <DetailRow label='Lot Number'>{orDash(lead.lotCode)}</DetailRow>
+      <DetailRow label='Source'>
+        {sourceOf(lead) === SOURCE.PAYOUT
+          ? `${SOURCE_LABELS[SOURCE.PAYOUT]} (customer already paid via HSBC)`
+          : SOURCE_LABELS[SOURCE.MANUAL]}
+      </DetailRow>
+      {sourceOf(lead) === SOURCE.PAYOUT && (
+        <>
+          <DetailRow label='Payment Reference'>{orDash(lead.paymentReference)}</DetailRow>
+          <DetailRow label='Customer Paid On'>{formatDateTime(lead.paidAt)}</DetailRow>
+        </>
+      )}
       <DetailRow label='Lot Status'>{orDash(lead.lotStatus)}</DetailRow>
       <DetailRow label='Payment Receipt'>
         {isUrl(lead.paymentReceipt) ? (

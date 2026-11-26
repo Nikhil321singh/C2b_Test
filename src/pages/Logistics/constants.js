@@ -21,6 +21,25 @@ export const STATUS_ORDER = [
   STATUS.DELIVERED,
 ]
 
+// Where a lot came from: raised manually (store / pickup flow) or sent from
+// Customer Payouts after the customer was paid through HSBC.
+export const SOURCE = {
+  MANUAL: 'MANUAL',
+  PAYOUT: 'PAYOUT',
+}
+
+export const SOURCE_LABELS = {
+  [SOURCE.MANUAL]: 'Manual',
+  [SOURCE.PAYOUT]: 'Customer Payout',
+}
+
+export const SOURCE_STYLES = {
+  [SOURCE.MANUAL]: 'bg-gray-100 text-gray-700 border-gray-300',
+  [SOURCE.PAYOUT]: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+}
+
+export const sourceOf = (lead) => (lead.source === SOURCE.PAYOUT ? SOURCE.PAYOUT : SOURCE.MANUAL)
+
 export const EDITABLE_STATUSES = [STATUS.NOT_BOOKED, STATUS.CANCELLED]
 export const CANCELLABLE_STATUSES = [STATUS.BOOKED, STATUS.PICKUP_REGISTERED, STATUS.OUT_FOR_PICKUP]
 
