@@ -131,6 +131,8 @@ const PaymentsTableHeader = () => (
       <th className='p-2 min-w-[110px] text-sm md:p-3 md:text-base'>Amount</th>
       <th className='p-2 min-w-[170px] text-sm md:p-3 md:text-base'>Mode</th>
       <th className='p-2 min-w-[160px] text-sm md:p-3 md:text-base'>Status</th>
+      <th className='p-2 min-w-[140px] text-sm md:p-3 md:text-base'>Requested By</th>
+      <th className='p-2 min-w-[170px] text-sm md:p-3 md:text-base'>Paid</th>
       <th className='p-2 min-w-[110px] text-sm md:p-3 md:text-base'>Email</th>
       <th className='p-2 min-w-[300px] text-sm md:p-3 md:text-base'>Actions</th>
     </tr>
@@ -153,6 +155,50 @@ const PaymentStatusCell = ({ item }) => (
 )
 
 PaymentStatusCell.propTypes = {
+  item: PropTypes.object.isRequired,
+}
+
+// Requester / payer name from the populated user (name, else first + last, else email).
+const personName = (user) =>
+  user?.name ||
+  [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+  user?.email ||
+  ''
+
+const isUrl = (value) => /^https?:\/\//i.test(String(value || ''))
+
+// When, by whom and with which reference / receipt the store was paid.
+const PaidCell = ({ item }) => (
+  <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+    {item.paymentStatus === 'PAYMENT_DONE' ? (
+      <>
+        <p className='whitespace-nowrap'>
+          {item.paidAt ? new Date(item.paidAt).toLocaleString('en-IN') : '-'}
+        </p>
+        {item.paidBy && (
+          <p className='text-xs text-gray-500'>by {personName(item.paidBy)}</p>
+        )}
+        {item.paymentReference && (
+          <p className='text-xs text-gray-500'>Ref: {item.paymentReference}</p>
+        )}
+        {isUrl(item.paymentReceipt) && (
+          <a
+            href={item.paymentReceipt}
+            target='_blank'
+            rel='noreferrer'
+            className='text-xs text-primary underline'
+          >
+            View receipt
+          </a>
+        )}
+      </>
+    ) : (
+      '-'
+    )}
+  </td>
+)
+
+PaidCell.propTypes = {
   item: PropTypes.object.isRequired,
 }
 
@@ -286,6 +332,10 @@ const PaymentsRow = ({
       {MODE_LABELS[item.paymentMode] || item.paymentMode}
     </td>
     <PaymentStatusCell item={item} />
+    <td className='p-2 text-sm text-center md:p-3 md:text-base'>
+      {personName(item.userId) || '-'}
+    </td>
+    <PaidCell item={item} />
     <EmailCell item={item} />
     <ActionsCell
       item={item}
@@ -562,7 +612,7 @@ const StorePayments = () => {
             ))}
             {!loading && filteredItems.length === 0 && (
               <tr>
-                <td colSpan='8' className='p-8 text-center text-gray-500'>
+                <td colSpan='10' className='p-8 text-center text-gray-500'>
                   No store payment requests found.
                 </td>
               </tr>
