@@ -3,6 +3,9 @@ import {
   CANCELLABLE_STATUSES,
   EDITABLE_STATUSES,
   SHADOW,
+  SOURCE,
+  SOURCE_LABELS,
+  SOURCE_STYLES,
   STATUS,
   STATUS_ORDER,
   STATUS_STYLES,
@@ -13,8 +16,29 @@ import {
   formatDimensions,
   formatPrice,
   orDash,
+  sourceOf,
   statusLabel,
 } from './constants'
+
+export const SourceBadge = ({ lead }) => {
+  const source = sourceOf(lead)
+  return (
+    <span
+      className={`inline-block px-2 py-0.5 rounded-full border text-xs font-medium whitespace-nowrap ${SOURCE_STYLES[source]}`}
+      title={
+        source === SOURCE.PAYOUT
+          ? 'Customer already paid via HSBC; sent from Customer Payouts'
+          : 'Raised from the store / pickup flow'
+      }
+    >
+      {SOURCE_LABELS[source]}
+    </span>
+  )
+}
+
+SourceBadge.propTypes = {
+  lead: PropTypes.shape({ source: PropTypes.string }).isRequired,
+}
 
 export const StatusBadge = ({ lead }) => (
   <span
@@ -114,6 +138,7 @@ const COLUMNS = [
   'Store Location',
   'Store Address',
   'Lot No.',
+  'Source',
   'Store Contact No.',
   'Amount',
   'Quantity',
@@ -205,6 +230,12 @@ export const WarehouseTable = ({ leads, onAction, selectedIds, onToggle, onToggl
                 </div>
               </td>
               <td className={`${TD} text-gray-600 whitespace-nowrap`}>{orDash(lead.lotCode)}</td>
+              <td className={TD}>
+                <SourceBadge lead={lead} />
+                {sourceOf(lead) === SOURCE.PAYOUT && lead.paymentReference && (
+                  <div className={`${SUB_TEXT} whitespace-nowrap`}>{lead.paymentReference}</div>
+                )}
+              </td>
               <td className={`${TD} whitespace-nowrap tabular-nums`}>{orDash(lead.storeContact)}</td>
               <td className={`${TD} font-medium text-gray-900 whitespace-nowrap tabular-nums`}>
                 {formatPrice(lead.amount)}
@@ -295,7 +326,10 @@ export const WarehouseCards = ({ leads, onAction, selectedIds, onToggle }) => (
             )}
             {lead.leadCode}
           </label>
-          <StatusBadge lead={lead} />
+          <div className='flex flex-col items-end gap-1'>
+            <StatusBadge lead={lead} />
+            <SourceBadge lead={lead} />
+          </div>
         </div>
         <div className='mt-1 text-sm text-gray-600'>{orDash(describeLead(lead))}</div>
         <dl className='mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm'>

@@ -5,7 +5,7 @@ import { IoRefresh } from 'react-icons/io5'
 import { FaDownload } from 'react-icons/fa6'
 import AdminNavbar from '../../components/Admin_Navbar'
 import SideMenu from '../../components/SideMenu'
-import WarehouseFilters from './WarehouseFilters'
+import WarehouseFilters, { SourceTabs } from './WarehouseFilters'
 import { WarehouseCards, WarehouseTable } from './WarehouseTable'
 import {
   CancelModal,
@@ -34,6 +34,7 @@ const EMPTY_FILTERS = {
   companyIds: [],
   storeId: '',
   status: '',
+  source: '',
   fromDate: '',
   toDate: '',
 }
@@ -47,6 +48,7 @@ const effectiveFilters = (filters) => {
     companyIds: filters.companyIds,
     storeIds: filters.storeId,
     status: filters.status,
+    source: filters.source,
     fromDate: hasRange ? filters.fromDate : '',
     toDate: hasRange ? filters.toDate : '',
   }
@@ -465,6 +467,12 @@ const Logistics = () => {
           exporting={exporting}
           onExport={exportRows}
           onRefresh={refresh}
+        />
+
+        <SourceTabs
+          value={filters.source}
+          total={loading ? undefined : pagination.total}
+          onChange={changeFilters}
         />
 
         <WarehouseFilters

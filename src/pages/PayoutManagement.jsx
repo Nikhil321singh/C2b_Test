@@ -32,6 +32,106 @@ const STATUS_BADGE = 'inline-block px-2.5 py-0.5 rounded text-xs font-semibold'
 const formatPayoutDate = (value) =>
   value ? new Date(value).toLocaleString('en-IN') : ''
 
+const PROVIDER_LABELS = {
+  HSBC_UPI: 'UPI',
+  HSBC_IMPS: 'IMPS',
+  HSBC_NEFT: 'NEFT',
+}
+
+const PROVIDER_BADGES = {
+  HSBC_UPI: 'bg-purple-100 text-purple-800',
+  HSBC_IMPS: 'bg-sky-100 text-sky-800',
+  HSBC_NEFT: 'bg-teal-100 text-teal-800',
+}
+
+const RECEIPT_BADGES = {
+  COMPLETED: 'bg-green-100 text-green-800',
+  PROCESSING: 'bg-indigo-100 text-indigo-800',
+  FAILED: 'bg-red-100 text-red-800',
+  NOT_READY: 'bg-gray-100 text-gray-800',
+}
+
+const RECEIPT_LABELS = {
+  COMPLETED: 'Emailed',
+  PROCESSING: 'Generating',
+  FAILED: 'Failed',
+  NOT_READY: 'Not ready',
+}
+
+const TD_CLASS =
+  'px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'
+const TH_CLASS =
+  'px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'
+const TABLE_HEADERS = [
+  'Lead',
+  'Store / Sales Person',
+  'Amount',
+  'Mode',
+  'Status',
+  'Approval',
+  'Payout to',
+  'Order / RRN',
+  'Paid On',
+  'Receipt',
+  'Logistics',
+  'Actions',
+]
+
+const canSendToLogistics = (item) =>
+  item.status === 'SUCCESS' && !item.logistics?.lotId
+
+const isBankTransfer = (item) =>
+  ['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
+
+const providerLabel = (item) => PROVIDER_LABELS[item.provider] || item.provider || '-'
+
+const userLabel = (user) => user?.name || user?.email || ''
+
+// Ordered lifecycle of a payout, built from the timestamps the API returns.
+// Steps without a timestamp are omitted.
+const buildTimeline = (item) =>
+  [
+    { label: 'Payout created', at: item.createdAt, by: userLabel(item.initiatedBy) },
+    {
+      label: `Payment link ${item.linkNotificationState === 'FAILED' ? 'failed to send' : 'sent to customer'}`,
+      at: item.linkNotificationLastAttemptAt,
+    },
+    {
+      label: isBankTransfer(item)
+        ? 'Customer submitted bank details'
+        : 'Customer submitted UPI ID',
+      at: item.customerLinkSubmittedAt,
+    },
+    { label: 'UPI ID validated', at: item.vpaValidatedAt },
+    {
+      label: `Approval ${String(item.approval?.status || '').toLowerCase()}`,
+      at: item.approval?.decidedAt,
+      by: userLabel(item.approval?.decidedBy),
+      note: item.approval?.remarks,
+    },
+    {
+      label: 'Payment sent to HSBC',
+      at: item.paymentClaimedAt,
+      by: userLabel(item.paymentClaimedBy),
+    },
+    { label: 'Paid (confirmed by HSBC)', at: item.paidAt },
+    { label: 'Payment failed', at: item.failedAt, note: item.statusMessage },
+    { label: 'Receipt generated & emailed', at: item.receiptGeneratedAt },
+    {
+      label: `Success notification ${item.successNotificationState === 'FAILED' ? 'failed' : 'sent'}`,
+      at: item.successNotificationLastAttemptAt,
+    },
+    { label: 'Last HSBC status check', at: item.lastStatusCheckedAt },
+    {
+      label: `Sent to logistics (${item.logistics?.lotCode || 'lot'})`,
+      at: item.logistics?.assignedAt,
+      by: userLabel(item.logistics?.assignedBy),
+      note: item.logistics?.remarks,
+    },
+  ]
+    .filter((step) => step.at)
+    .sort((a, b) => new Date(a.at) - new Date(b.at))
+
 const getResendLinkLabel = (item) => {
   if (item.status === 'FAILED') {
     return ['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
@@ -55,32 +155,97 @@ const toExportRow = (item) => ({
   Store: item.storeId?.storeName || '',
   Amount: Number(item.amount || 0),
   Status: item.status,
-  Provider: item.provider || '',
+  'Status Message': item.statusMessage || '',
+  'Payment Mode': providerLabel(item),
   'Masked UPI': item.beneficiaryVpaMasked || '',
   'Masked Account': item.beneficiaryAccountMasked || '',
+  'Sales Person': userLabel(item.initiatedBy),
+  'Payment Sent By': userLabel(item.paymentClaimedBy),
   'Approval Required': item.approval?.required ? 'Yes' : 'No',
   'Approval Status': item.approval?.status || '',
+  'Approval By': userLabel(item.approval?.decidedBy),
+  'Approval Remarks': item.approval?.remarks || '',
   'Merchant Order Number': item.merchantOrderNo || '',
+  'HSBC Reference': item.providerReferenceNo || '',
   RRN: item.providerTransactionRrn || '',
-  'Provider Message': item.providerMessage || '',
+  'HSBC Code': item.providerResponseCode || '',
+  'HSBC Status': item.providerStatus || '',
+  'HSBC Message': item.providerMessage || '',
   Attempts: item.attempts?.length || 0,
   'Receipt State': item.receiptState || '',
+  'Receipt Generated': formatPayoutDate(item.receiptGeneratedAt),
   Created: formatPayoutDate(item.createdAt),
+  'Payment Sent': formatPayoutDate(item.paymentClaimedAt),
   Paid: formatPayoutDate(item.paidAt),
+  Failed: formatPayoutDate(item.failedAt),
+  'Logistics Lot': item.logistics?.lotCode || '',
+  'Sent To Logistics': formatPayoutDate(item.logistics?.assignedAt),
+  'Sent To Logistics By': userLabel(item.logistics?.assignedBy),
 })
 
-const PayoutRow = ({ item, index, busyId, onAction, onReject }) => (
+const LogisticsCell = ({ item }) => {
+  if (item.logistics?.lotId) {
+    return (
+      <>
+        <span className={`${STATUS_BADGE} bg-green-100 text-green-800`}>
+          In Logistics
+        </span>
+        <p className='mt-1 text-xs font-medium text-gray-700'>
+          {item.logistics.lotCode}
+        </p>
+        <p className='text-xs text-gray-500'>
+          {formatPayoutDate(item.logistics.assignedAt)}
+        </p>
+      </>
+    )
+  }
+  if (item.status === 'SUCCESS') {
+    return (
+      <span className={`${STATUS_BADGE} bg-amber-100 text-amber-800`}>
+        Not sent
+      </span>
+    )
+  }
+  return '-'
+}
+
+LogisticsCell.propTypes = {
+  item: PropTypes.object.isRequired,
+}
+
+const PayoutRow = ({
+  item,
+  index,
+  busyId,
+  onAction,
+  onReject,
+  onView,
+  onSendToLogistics,
+}) => (
   <tr className={index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}>
-    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+    <td className={TD_CLASS}>
       <p className='font-medium'>{item.leadId?.uniqueCode || item.leadId?._id}</p>
+      <p className='text-xs text-gray-500'>{formatPayoutDate(item.createdAt)}</p>
     </td>
-    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-      {item.storeId?.storeName || '-'}
+    <td className={TD_CLASS}>
+      <p>{item.storeId?.storeName || '-'}</p>
+      {item.initiatedBy && (
+        <p className='text-xs text-gray-500'>{userLabel(item.initiatedBy)}</p>
+      )}
     </td>
-    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+    <td className={TD_CLASS}>
       <span className='font-semibold'>₹{Number(item.amount).toFixed(2)}</span>
     </td>
-    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+    <td className={TD_CLASS}>
+      <span
+        className={`${STATUS_BADGE} ${
+          PROVIDER_BADGES[item.provider] || 'bg-gray-100 text-gray-800'
+        }`}
+      >
+        {providerLabel(item)}
+      </span>
+    </td>
+    <td className={TD_CLASS}>
       <span
         className={`${STATUS_BADGE} ${
           STATUS_BADGES[item.status] || 'bg-gray-100 text-gray-800'
@@ -88,10 +253,15 @@ const PayoutRow = ({ item, index, busyId, onAction, onReject }) => (
       >
         {getPayoutDisplayState(item).statusLabel}
       </span>
-      {item.providerStatus && (
+      {(item.providerResponseCode || item.providerStatus) && (
         <p className='mt-1 max-w-52 whitespace-normal text-xs text-gray-600'>
-          HSBC: {item.providerStatus}
+          HSBC: {[item.providerResponseCode, item.providerStatus].filter(Boolean).join(' / ')}
           {item.providerMessage ? ` — ${item.providerMessage}` : ''}
+        </p>
+      )}
+      {item.status === 'FAILED' && item.statusMessage && (
+        <p className='mt-1 max-w-52 whitespace-normal text-xs text-red-700'>
+          {item.statusMessage}
         </p>
       )}
       {item.lastStatusCheckedAt && (
@@ -100,33 +270,61 @@ const PayoutRow = ({ item, index, busyId, onAction, onReject }) => (
         </p>
       )}
     </td>
-    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+    <td className={TD_CLASS}>
       {item.approval?.required ? (
-        <p className='font-medium text-black'>{item.approval?.status || 'PENDING'}</p>
+        <>
+          <p className='font-medium text-black'>{item.approval?.status || 'PENDING'}</p>
+          {item.approval?.decidedBy && (
+            <p className='text-xs text-gray-500'>by {userLabel(item.approval.decidedBy)}</p>
+          )}
+        </>
       ) : (
         'Not required'
       )}
     </td>
-    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-      {['HSBC_IMPS', 'HSBC_NEFT'].includes(item.provider)
+    <td className={TD_CLASS}>
+      {isBankTransfer(item)
         ? item.beneficiaryAccountMasked || '-'
         : item.beneficiaryVpaMasked || '-'}
     </td>
-    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+    <td className={TD_CLASS}>
       <p className='font-medium'>{item.merchantOrderNo || '-'}</p>
       <p className='text-sm text-gray-500'>
         RRN: {item.providerTransactionRrn || '-'}
       </p>
     </td>
-    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
-      {item.receiptState || '-'}
+    <td className={TD_CLASS}>
+      {item.paidAt ? (
+        <>
+          <p>{formatPayoutDate(item.paidAt)}</p>
+          {item.paymentClaimedBy && (
+            <p className='text-xs text-gray-500'>by {userLabel(item.paymentClaimedBy)}</p>
+          )}
+        </>
+      ) : (
+        '-'
+      )}
     </td>
-    <td className='px-4 py-2 text-sm text-center md:px-6 md:py-3 md:text-base whitespace-nowrap'>
+    <td className={TD_CLASS}>
+      <span
+        className={`${STATUS_BADGE} ${
+          RECEIPT_BADGES[item.receiptState] || 'bg-gray-100 text-gray-800'
+        }`}
+      >
+        {RECEIPT_LABELS[item.receiptState] || item.receiptState || '-'}
+      </span>
+    </td>
+    <td className={TD_CLASS}>
+      <LogisticsCell item={item} />
+    </td>
+    <td className={TD_CLASS}>
       <PayoutActions
         item={item}
         busyId={busyId}
         onAction={onAction}
         onReject={onReject}
+        onView={onView}
+        onSendToLogistics={onSendToLogistics}
       />
     </td>
   </tr>
@@ -138,6 +336,189 @@ PayoutRow.propTypes = {
   busyId: PropTypes.string.isRequired,
   onAction: PropTypes.func.isRequired,
   onReject: PropTypes.func.isRequired,
+  onView: PropTypes.func.isRequired,
+  onSendToLogistics: PropTypes.func.isRequired,
+}
+
+const DetailField = ({ label, children }) => (
+  <div>
+    <p className='text-xs uppercase tracking-wide text-gray-500'>{label}</p>
+    <p className='break-words font-medium text-gray-900'>{children || '-'}</p>
+  </div>
+)
+
+DetailField.propTypes = {
+  label: PropTypes.string.isRequired,
+  children: PropTypes.node,
+}
+
+const PayoutDetailsModal = ({ item, onClose }) => {
+  if (!item) {
+    return null
+  }
+  const timeline = buildTimeline(item)
+  const attempts = item.attempts || []
+  return (
+    <div
+      className='fixed inset-0 z-[60] grid place-items-center bg-black/50 px-4'
+      onClick={onClose}
+    >
+      <div
+        className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-5 shadow-xl'
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className='flex items-start justify-between gap-4'>
+          <div>
+            <h2 className='text-xl font-semibold'>
+              Payout {item.leadId?.uniqueCode || ''}
+            </h2>
+            <p className='text-sm text-gray-500'>ID: {item._id}</p>
+          </div>
+          <button
+            type='button'
+            onClick={onClose}
+            className='rounded-md border px-3 py-1 text-sm'
+          >
+            Close
+          </button>
+        </div>
+
+        <h3 className='mt-5 mb-2 font-semibold'>Summary</h3>
+        <div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
+          <DetailField label='Amount'>
+            ₹{Number(item.amount || 0).toFixed(2)} {item.currency || 'INR'}
+          </DetailField>
+          <DetailField label='Payment mode'>{providerLabel(item)} (HSBC)</DetailField>
+          <DetailField label='Status'>
+            {getPayoutDisplayState(item).statusLabel}
+          </DetailField>
+          <DetailField label='Status message'>{item.statusMessage}</DetailField>
+          <DetailField label='Store'>{item.storeId?.storeName}</DetailField>
+          <DetailField label='Sales person'>{userLabel(item.initiatedBy)}</DetailField>
+          <DetailField label={isBankTransfer(item) ? 'Bank account' : 'UPI ID'}>
+            {isBankTransfer(item)
+              ? item.beneficiaryAccountMasked
+              : item.beneficiaryVpaMasked}
+          </DetailField>
+          <DetailField label='Payment sent by'>
+            {userLabel(item.paymentClaimedBy)}
+          </DetailField>
+          <DetailField label='Paid on'>{formatPayoutDate(item.paidAt)}</DetailField>
+        </div>
+
+        <h3 className='mt-5 mb-2 font-semibold'>HSBC references</h3>
+        <div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
+          <DetailField label='Order number'>{item.merchantOrderNo}</DetailField>
+          <DetailField label='RRN / UTR'>{item.providerTransactionRrn}</DetailField>
+          <DetailField label='HSBC reference'>{item.providerReferenceNo}</DetailField>
+          <DetailField label='HSBC transaction ID'>
+            {item.providerTransactionId}
+          </DetailField>
+          <DetailField label='HSBC code / status'>
+            {[item.providerResponseCode, item.providerStatus]
+              .filter(Boolean)
+              .join(' / ')}
+          </DetailField>
+          <DetailField label='HSBC message'>{item.providerMessage}</DetailField>
+        </div>
+
+        <h3 className='mt-5 mb-2 font-semibold'>Approval, receipt &amp; notifications</h3>
+        <div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
+          <DetailField label='Approval'>
+            {item.approval?.required
+              ? item.approval?.status || 'PENDING'
+              : 'Not required'}
+          </DetailField>
+          <DetailField label='Approved / rejected by'>
+            {userLabel(item.approval?.decidedBy)}
+          </DetailField>
+          <DetailField label='Approval remarks'>{item.approval?.remarks}</DetailField>
+          <DetailField label='Receipt'>
+            {RECEIPT_LABELS[item.receiptState] || item.receiptState}
+          </DetailField>
+          <DetailField label='Payment link to customer'>
+            {item.linkNotificationState}
+            {item.linkNotificationError ? ` — ${item.linkNotificationError}` : ''}
+          </DetailField>
+          <DetailField label='Success notification'>
+            {item.successNotificationState}
+          </DetailField>
+          <DetailField label='Logistics'>
+            {item.logistics?.lotCode
+              ? `In logistics · ${item.logistics.lotCode}`
+              : item.status === 'SUCCESS'
+                ? 'Not sent yet'
+                : 'Available after payment succeeds'}
+          </DetailField>
+          <DetailField label='Sent to logistics by'>
+            {userLabel(item.logistics?.assignedBy)}
+          </DetailField>
+          <DetailField label='Sent to logistics on'>
+            {formatPayoutDate(item.logistics?.assignedAt)}
+          </DetailField>
+        </div>
+
+        <h3 className='mt-5 mb-2 font-semibold'>Timeline</h3>
+        {timeline.length === 0 ? (
+          <p className='text-sm text-gray-500'>No events yet.</p>
+        ) : (
+          <ol className='border-l-2 border-gray-300 pl-4'>
+            {timeline.map((step) => (
+              <li key={`${step.label}-${step.at}`} className='mb-3'>
+                <p className='font-medium'>{step.label}</p>
+                <p className='text-xs text-gray-500'>
+                  {formatPayoutDate(step.at)}
+                  {step.by ? ` · ${step.by}` : ''}
+                </p>
+                {step.note && <p className='text-xs text-gray-700'>{step.note}</p>}
+              </li>
+            ))}
+          </ol>
+        )}
+
+        <h3 className='mt-5 mb-2 font-semibold'>HSBC attempts ({attempts.length})</h3>
+        {attempts.length === 0 ? (
+          <p className='text-sm text-gray-500'>No HSBC calls made yet.</p>
+        ) : (
+          <div className='overflow-x-auto rounded-md border'>
+            <table className='w-full text-sm'>
+              <thead className='bg-gray-100'>
+                <tr>
+                  <th className='px-3 py-2 text-left'>Time</th>
+                  <th className='px-3 py-2 text-left'>Outcome</th>
+                  <th className='px-3 py-2 text-left'>HTTP</th>
+                  <th className='px-3 py-2 text-left'>Code</th>
+                  <th className='px-3 py-2 text-left'>Message</th>
+                  <th className='px-3 py-2 text-left'>Reference</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attempts.map((attempt, attemptIndex) => (
+                  <tr key={attempt._id || attemptIndex} className='border-t align-top'>
+                    <td className='px-3 py-2 whitespace-nowrap'>
+                      {formatPayoutDate(attempt.attemptedAt)}
+                    </td>
+                    <td className='px-3 py-2'>{attempt.outcome || '-'}</td>
+                    <td className='px-3 py-2'>{attempt.httpStatus || '-'}</td>
+                    <td className='px-3 py-2'>{attempt.responseCode || '-'}</td>
+                    <td className='px-3 py-2'>{attempt.responseMessage || '-'}</td>
+                    <td className='px-3 py-2 break-all'>
+                      {attempt.requestReference || '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+PayoutDetailsModal.propTypes = {
+  item: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
 }
 
 const getActedRowId = (updated) =>
@@ -156,18 +537,56 @@ const reconcileActedRow = (updated, updatedId, items) =>
             updated.providerTransactionRrn ?? item.providerTransactionRrn,
           providerStatus: updated.providerStatus ?? item.providerStatus,
           providerMessage: updated.providerMessage ?? item.providerMessage,
+          providerResponseCode:
+            updated.providerResponseCode ?? item.providerResponseCode,
           lastStatusCheckedAt:
             updated.lastStatusCheckedAt ?? item.lastStatusCheckedAt,
+          paidAt: updated.paidAt ?? item.paidAt,
+          failedAt: updated.failedAt ?? item.failedAt,
+          paymentClaimedAt: updated.paymentClaimedAt ?? item.paymentClaimedAt,
           receiptState: updated.receiptState ?? item.receiptState,
-          approval: updated.approval ?? item.approval,
+          logistics: updated.logistics ?? item.logistics,
+          // Keep the populated user objects from the list; action responses
+          // carry approval.decidedBy as a bare id.
+          approval: updated.approval
+            ? {
+                ...updated.approval,
+                decidedBy: item.approval?.decidedBy ?? updated.approval.decidedBy,
+              }
+            : item.approval,
         }
       : item
   )
 
-const PayoutActions = ({ item, busyId, onAction, onReject }) => {
+const PayoutActions = ({
+  item,
+  busyId,
+  onAction,
+  onReject,
+  onView,
+  onSendToLogistics,
+}) => {
   const disabled = busyId === item._id
   return (
     <div className='flex justify-center gap-1.5 whitespace-nowrap'>
+      <button
+        type='button'
+        onClick={() => onView(item)}
+        className='border border-gray-500 text-gray-700 px-2 py-1 text-sm font-medium rounded-md'
+      >
+        View
+      </button>
+      {canSendToLogistics(item) && (
+        <button
+          type='button'
+          disabled={disabled}
+          onClick={() => onSendToLogistics(item)}
+          title='Hand this device to the logistics team for pickup'
+          className='bg-emerald-600 text-white px-2 py-1 text-sm font-medium rounded-md disabled:opacity-60'
+        >
+          Send to Logistics
+        </button>
+      )}
       {item.status === 'PENDING_APPROVAL' && (
         <>
           <button
@@ -222,6 +641,63 @@ PayoutActions.propTypes = {
   busyId: PropTypes.string.isRequired,
   onAction: PropTypes.func.isRequired,
   onReject: PropTypes.func.isRequired,
+  onView: PropTypes.func.isRequired,
+  onSendToLogistics: PropTypes.func.isRequired,
+}
+
+const SendToLogisticsModal = ({ item, busy, onClose, onSubmit }) => {
+  if (!item) {
+    return null
+  }
+  return (
+    <div className='fixed inset-0 z-[60] grid place-items-center bg-black/50 px-4'>
+      <div className='w-full max-w-md rounded-lg bg-white p-5 shadow-xl'>
+        <h2 className='text-xl font-semibold'>Send device to logistics</h2>
+        <p className='mt-2 text-sm text-gray-600'>
+          The customer has been paid. This hands the device to the logistics team
+          for pickup from the store. It will appear on the Logistics screen marked
+          as <span className='font-medium'>Customer Payout</span>.
+        </p>
+        <dl className='mt-4 grid grid-cols-2 gap-x-4 gap-y-2 rounded-md bg-gray-50 p-3 text-sm'>
+          <dt className='text-gray-500'>Lead</dt>
+          <dd className='font-medium'>{item.leadId?.uniqueCode || '-'}</dd>
+          <dt className='text-gray-500'>Store</dt>
+          <dd className='font-medium'>{item.storeId?.storeName || '-'}</dd>
+          <dt className='text-gray-500'>Amount paid</dt>
+          <dd className='font-medium'>₹{Number(item.amount || 0).toFixed(2)}</dd>
+          <dt className='text-gray-500'>Paid via</dt>
+          <dd className='font-medium'>
+            {providerLabel(item)} · {formatPayoutDate(item.paidAt) || '-'}
+          </dd>
+        </dl>
+        <div className='mt-4 flex justify-end gap-2'>
+          <button
+            type='button'
+            disabled={busy}
+            onClick={onClose}
+            className='rounded-md border px-4 py-2 disabled:opacity-60'
+          >
+            Cancel
+          </button>
+          <button
+            type='button'
+            disabled={busy}
+            onClick={onSubmit}
+            className='rounded-md bg-emerald-600 px-4 py-2 text-white disabled:opacity-60'
+          >
+            {busy ? 'Sending…' : 'Send to Logistics'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+SendToLogisticsModal.propTypes = {
+  item: PropTypes.object,
+  busy: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 }
 
 const RejectPayoutModal = ({ item, remarks, setRemarks, busy, onClose, onSubmit }) => {
@@ -287,6 +763,12 @@ const PayoutManagement = () => {
   const [search, setSearch] = useState('')
   const [rejectingItem, setRejectingItem] = useState(null)
   const [rejectionRemarks, setRejectionRemarks] = useState('')
+  const [viewingId, setViewingId] = useState('')
+  const [logisticsItem, setLogisticsItem] = useState(null)
+  const viewingItem = useMemo(
+    () => items.find((item) => String(item._id) === viewingId) || null,
+    [items, viewingId]
+  )
   const token = sessionStorage.getItem('authToken')
 
   const filteredItems = useMemo(() => {
@@ -300,8 +782,13 @@ const PayoutManagement = () => {
         item.storeId?.storeName || '',
         item.status || '',
         item.provider || '',
+        providerLabel(item),
         item.merchantOrderNo || '',
         item.providerTransactionRrn || '',
+        item.providerResponseCode || '',
+        userLabel(item.initiatedBy),
+        item.beneficiaryAccountMasked || '',
+        item.beneficiaryVpaMasked || '',
       ]
         .join(' ')
         .toLowerCase()
@@ -391,6 +878,21 @@ const PayoutManagement = () => {
     }
   }
 
+  const openLogisticsModal = (item) => setLogisticsItem(item)
+
+  const closeLogisticsModal = () => {
+    if (!busyId) {
+      setLogisticsItem(null)
+    }
+  }
+
+  const sendToLogistics = async () => {
+    const sent = await action(logisticsItem._id, 'send-to-logistics')
+    if (sent) {
+      setLogisticsItem(null)
+    }
+  }
+
   const exportPayouts = () => {
     const rows = items.map(toExportRow)
     generateExcelFile(rows, 'HSBC_Payouts_UAT')
@@ -455,15 +957,11 @@ const PayoutManagement = () => {
         <table className='w-full'>
           <thead className='bg-primary text-white'>
             <tr className='align-top'>
-              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Lead</th>
-              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Store</th>
-              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Amount</th>
-              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Status</th>
-              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Approve</th>
-              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Payout to</th>
-              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Order / RRN</th>
-              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Receipt</th>
-              <th className='px-4 py-2 text-sm font-medium md:px-6 md:py-3 md:text-base whitespace-nowrap text-center'>Actions</th>
+              {TABLE_HEADERS.map((header) => (
+                <th key={header} className={TH_CLASS}>
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -475,11 +973,13 @@ const PayoutManagement = () => {
                 busyId={busyId}
                 onAction={action}
                 onReject={openRejectModal}
+                onView={(row) => setViewingId(String(row._id))}
+                onSendToLogistics={openLogisticsModal}
               />
             ))}
             {!loading && filteredItems.length === 0 && (
               <tr>
-                <td colSpan='9' className='p-8 text-center text-gray-500'>
+                <td colSpan={TABLE_HEADERS.length} className='p-8 text-center text-gray-500'>
                   No payouts found.
                 </td>
               </tr>
@@ -496,6 +996,13 @@ const PayoutManagement = () => {
         onClose={closeRejectModal}
         onSubmit={rejectPayout}
       />
+      <SendToLogisticsModal
+        item={logisticsItem}
+        busy={Boolean(busyId)}
+        onClose={closeLogisticsModal}
+        onSubmit={sendToLogistics}
+      />
+      <PayoutDetailsModal item={viewingItem} onClose={() => setViewingId('')} />
     </div>
   )
 }

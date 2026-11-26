@@ -1,6 +1,12 @@
 import * as XLSX from 'xlsx'
 import { saveAs } from 'file-saver'
-import { describeLead, formatDimensions, statusLabel } from './constants'
+import {
+  SOURCE_LABELS,
+  describeLead,
+  formatDimensions,
+  sourceOf,
+  statusLabel,
+} from './constants'
 
 const XLSX_TYPE =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
@@ -28,6 +34,8 @@ const COLUMNS = [
   { header: 'Store Location', width: 18, value: (lead) => text(lead.storeRegion) },
   { header: 'Store Address', width: 42, value: (lead) => text(lead.storeAddress) },
   { header: 'Lot No.', width: 18, value: (lead) => text(lead.lotCode) },
+  { header: 'Source', width: 16, value: (lead) => SOURCE_LABELS[sourceOf(lead)] },
+  { header: 'Payment Reference', width: 30, value: (lead) => text(lead.paymentReference) },
   { header: 'Store Contact No.', width: 18, value: (lead) => text(lead.storeContact) },
   {
     header: 'Amount (INR)',
