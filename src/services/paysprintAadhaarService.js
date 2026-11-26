@@ -7,7 +7,7 @@ import {
 const API_BASE_URL = import.meta.env.VITE_REACT_APP_ENDPOINT
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('authToken')
   return {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,

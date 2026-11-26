@@ -4,6 +4,7 @@ import axios from 'axios'
 import { IoClose } from 'react-icons/io5'
 import { toast } from 'react-hot-toast'
 import EmailConfiguration from '../EmailConfiguration/EmailConfiguration'
+import PayoutFieldHelp from '../PayoutFieldHelp/PayoutFieldHelp'
 
 const LoadingSpinner = ({ isLoading }) => {
   if (!isLoading) {
@@ -273,7 +274,7 @@ const PayoutSettingsSection = ({ settings, canConfigurePayout, onChange }) => {
         ].map(([label, field]) => (
           <FormField
             key={field}
-            label={label}
+            label={<PayoutFieldHelp label={label} field={field} />}
             name={field}
             type='number'
             value={settings[field]}

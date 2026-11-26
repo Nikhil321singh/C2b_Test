@@ -7,6 +7,7 @@ import { BeatLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from "react-icons/io";
 import PropTypes from "prop-types";
+import PayoutFieldHelp from "../../components/PayoutFieldHelp/PayoutFieldHelp";
 
 const succTextColor = "text-green-500";
 const failTextColor = "text-primary";
@@ -313,7 +314,9 @@ const PayoutSettingsSection = ({ formData, setFormData }) => {
         Require approval above configured amount
       </label>
       <div className="flex flex-col gap-2">
-        <label className="font-medium">Store payout ceiling (₹)</label>
+        <label className="font-medium">
+          <PayoutFieldHelp label="Store payout ceiling (₹)" field="payoutCeiling" />
+        </label>
         <input
           className="border-2 px-3 py-2 rounded-lg"
           type="number"
@@ -328,7 +331,9 @@ const PayoutSettingsSection = ({ formData, setFormData }) => {
         </p>
       </div>
       <div className="flex flex-col gap-2">
-        <label className="font-medium">Approval amount (₹)</label>
+        <label className="font-medium">
+          <PayoutFieldHelp label="Approval amount (₹)" field="approvalThreshold" />
+        </label>
         <input
           className="border-2 px-3 py-2 rounded-lg"
           type="number"
@@ -344,7 +349,12 @@ const PayoutSettingsSection = ({ formData, setFormData }) => {
         </p>
       </div>
       <div className="flex flex-col gap-2">
-        <label className="font-medium">Customer link expiry (minutes)</label>
+        <label className="font-medium">
+          <PayoutFieldHelp
+            label="Customer link expiry (minutes)"
+            field="customerLinkExpiryMinutes"
+          />
+        </label>
         <input
           className="border-2 px-3 py-2 rounded-lg"
           type="number"

@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CgSpinner } from 'react-icons/cg'
 import axios from 'axios'
@@ -10,223 +9,38 @@ import PriceFormFields from '../components/Price/PriceFormFields'
 import { usePriceForm } from '../hooks/usePriceForm'
 import { usePriceUpload } from '../hooks/usePriceUpload'
 import { IVS_STATUS } from '../services/ivsService'
-import { FILE_KEYS } from '../constants/priceConstants'
-import {
-  getRequiredFiles,
-  isAllUploadsSuccessful,
-} from '../utils/validationUtils'
-import { KYC_TEST_DATA, KYC_TEST_MODE } from '../config/featureFlags'
 
 const pink = 'bg-primary'
-const isDevelopmentMode = true
-
-const computeImeiBlocked = (isMobile, imeiVerificationResult) =>
-  isMobile &&
-  imeiVerificationResult &&
-  (imeiVerificationResult.imei1Status === IVS_STATUS.BLOCKED ||
-    imeiVerificationResult.imei1Status === IVS_STATUS.STOLEN)
-
-const computeImeiVerified = (isMobile, imeiVerificationResult) =>
-  !isMobile ||
-  (imeiVerificationResult &&
-    (imeiVerificationResult.allowTransaction ||
-      imeiVerificationResult.imei1Status === IVS_STATUS.UNKNOWN ||
-      imeiVerificationResult.imei1Status === IVS_STATUS.ERROR))
-
-const getMissingRequirements = ({
-  isMobile,
-  imeinumber,
-  phoneFront,
-  phoneBack,
-  phoneLeft,
-  phoneRight,
-  phoneTop,
-  phoneBottom,
-  signatureFile,
-  customerPhoto,
-  ceirImage,
-  allUploadsSuccessful,
-  imeiVerified,
-  aadharVerificationRequired,
-  isAadharVerified,
-}) => {
-  if (isDevelopmentMode) {
-    return []
-  }
-  const checks = [
-    [isMobile ? imeinumber : true, 'IMEI number'],
-    [phoneFront, 'front photo'],
-    [phoneBack, 'back photo'],
-    [phoneLeft, 'left photo'],
-    [phoneRight, 'right photo'],
-    [phoneTop, 'top photo'],
-    [phoneBottom, 'bottom photo'],
-    [signatureFile, 'signature'],
-    [customerPhoto, 'customer photo'],
-    [ceirImage, 'CEIR image'],
-    [allUploadsSuccessful, 'all uploads to finish successfully'],
-    [imeiVerified, 'IMEI verification'],
-    [
-      aadharVerificationRequired ? isAadharVerified : true,
-      'Aadhaar verification',
-    ],
-  ]
-  return checks.filter(([met]) => !met).map(([, label]) => label)
-}
-
-const UploadNotice = ({ showDevelopmentMode }) => (
-  <div className='mt-3 text-center relative'>
-    <h1 className='text-2xl font-semibold'>Upload Documents</h1>
-    <p className='mt-4 text-gray-600'>
-      Regulations require you to upload a national identity card.
-      Don&apos;t worry, your data will stay safe and private.
-    </p>
-    {showDevelopmentMode && (
-      <p className='mt-2 text-amber-600 font-medium'>
-        Test configuration: KYC verification and document uploads are
-        optional. Do not enable this setting in UAT or production.
-      </p>
-    )}
-    {KYC_TEST_MODE && (
-      <div className='mt-2 rounded border border-blue-300 bg-blue-50 p-2 text-sm text-blue-800'>
-        Required-flow test mode — Aadhaar:{' '}
-        <strong>{KYC_TEST_DATA.aadhaarNumber}</strong>, OTP:{' '}
-        <strong>{KYC_TEST_DATA.aadhaarOtp}</strong>, IMEI:{' '}
-        <strong>{KYC_TEST_DATA.imei}</strong>
-      </div>
-    )}
-  </div>
-)
-
-UploadNotice.propTypes = {
-  showDevelopmentMode: PropTypes.bool.isRequired,
-}
-
-const SubmitWarnings = ({
-  showDevelopmentMode,
-  aadharVerificationRequired,
-  isAadharVerified,
-  isMobile,
-  isImeiBlocked,
-  imeinumber,
-  imeiVerificationResult,
-  otherMissingRequirements,
-}) => (
-  <>
-    {!showDevelopmentMode &&
-      aadharVerificationRequired &&
-      !isAadharVerified && (
-        <p className='text-sm text-center text-red-500'>
-          Please verify your Aadhar number before submitting
-        </p>
-      )}
-    {!showDevelopmentMode && isMobile && isImeiBlocked && (
-      <p className='text-sm text-center text-red-500'>
-        This device IMEI is reported as{' '}
-        {imeiVerificationResult.imei1Status === IVS_STATUS.BLOCKED
-          ? 'blocked'
-          : 'stolen'}
-        . Transaction cannot proceed.
-      </p>
-    )}
-    {!showDevelopmentMode && isMobile && imeinumber && !imeiVerificationResult && (
-      <p className='text-sm text-center text-amber-500'>
-        Please verify IMEI with Sanchar Saathi before submitting
-      </p>
-    )}
-    {!isImeiBlocked && otherMissingRequirements.length > 0 && (
-      <p className='text-sm text-center text-amber-500'>
-        Still needed: {otherMissingRequirements.join(', ')}
-      </p>
-    )}
-  </>
-)
-
-SubmitWarnings.propTypes = {
-  showDevelopmentMode: PropTypes.bool.isRequired,
-  aadharVerificationRequired: PropTypes.bool.isRequired,
-  isAadharVerified: PropTypes.bool.isRequired,
-  isMobile: PropTypes.bool.isRequired,
-  isImeiBlocked: PropTypes.bool.isRequired,
-  imeinumber: PropTypes.string,
-  imeiVerificationResult: PropTypes.object,
-  otherMissingRequirements: PropTypes.array.isRequired,
-}
-
-const SubmitBar = ({ canSubmit, isLoading, onUploadAll, children }) => (
-  <div className='flex-shrink-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2'>
-    {children}
-    <div
-      onClick={() => canSubmit && onUploadAll()}
-      className={`relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
-        canSubmit ? pink : 'cursor-not-allowed bg-gray-400'
-      }`}
-    >
-      {isLoading && (
-        <CgSpinner
-          size={20}
-          className='absolute left-[28%] top-[8px] mt-1 animate-spin'
-        />
-      )}
-      <p className='w-full p-1 text-xl font-medium'>
-        {isLoading ? 'Submitting' : 'Submit'}
-      </p>
-    </div>
-  </div>
-)
-
-SubmitBar.propTypes = {
-  canSubmit: PropTypes.bool.isRequired,
-  isLoading: PropTypes.bool.isRequired,
-  onUploadAll: PropTypes.func.isRequired,
-  children: PropTypes.node,
-}
 
 const Price = () => {
   const navigate = useNavigate()
 
   const formState = usePriceForm()
+  const [aadharVerificationRequired, setAadharVerificationRequired] = useState(true)
   const {
     uploadStatus,
     handleFileChange,
     uploadAllImages,
     isLoading,
     uploadIndividualFile,
-  } = usePriceUpload(formState)
+  } = usePriceUpload(formState, aadharVerificationRequired)
 
   const {
     imeinumber,
-    phoneFront,
-    phoneBack,
-    phoneLeft,
-    phoneRight,
-    phoneTop,
-    phoneBottom,
-    signatureFile,
-    customerPhoto,
-    ceirImage,
     isAadharVerified,
     handleCameraButtonClick,
     prod,
-    isBillRequired,
   } = formState
 
   const isMobile = prod?.[0]?.categoryCode === 'CTG1'
 
+
+
   const [imei2, setImei2] = useState('')
   const [imeiVerificationResult, setImeiVerificationResult] = useState(null)
-  const [aadharVerificationRequired, setAadharVerificationRequired] = useState(true)
 
   useEffect(() => {
     const fetchAadharSetting = async () => {
-      if (KYC_TEST_MODE) {
-        setAadharVerificationRequired(true)
-        return
-      }
-      if (isDevelopmentMode) {
-        setAadharVerificationRequired(false)
-        return
-      }
       try {
         const profile = JSON.parse(sessionStorage.getItem('profile'))
         const companyId = profile?.companyId
@@ -250,46 +64,14 @@ const Price = () => {
     fetchAadharSetting()
   }, [])
 
-  const isImeiBlocked = computeImeiBlocked(isMobile, imeiVerificationResult)
+  const isImeiBlocked =
+    isMobile &&
+    imeiVerificationResult &&
+    (imeiVerificationResult.imei1Status === IVS_STATUS.BLOCKED ||
+      imeiVerificationResult.imei1Status === IVS_STATUS.STOLEN)
 
-  const imeiVerified = computeImeiVerified(isMobile, imeiVerificationResult)
-
-  const requiredFileKeys = getRequiredFiles(isBillRequired)
-  requiredFileKeys.push(
-    FILE_KEYS.SIGNATURE,
-    FILE_KEYS.CEIR,
-    FILE_KEYS.CUSTOMER_PHOTO
-  )
-
-  const allUploadsSuccessful = isAllUploadsSuccessful(
-    requiredFileKeys,
-    uploadStatus
-  )
-
-  const missingRequirements = getMissingRequirements({
-    isMobile,
-    imeinumber,
-    phoneFront,
-    phoneBack,
-    phoneLeft,
-    phoneRight,
-    phoneTop,
-    phoneBottom,
-    signatureFile,
-    customerPhoto,
-    ceirImage,
-    allUploadsSuccessful,
-    imeiVerified,
-    aadharVerificationRequired,
-    isAadharVerified,
-  })
-
+  // KYC and document fields are optional; the Submit button stays enabled.
   const canSubmit = true
-
-  // The Sanchar Saathi prompt below already calls out IMEI verification.
-  const otherMissingRequirements = missingRequirements.filter(
-    (requirement) => requirement !== 'IMEI verification',
-  )
 
   const handleImeiVerificationComplete = (result) => {
     setImeiVerificationResult(result)
@@ -300,9 +82,15 @@ const Price = () => {
       <div className='flex-shrink-0'>
         <PriceHeader navigate={navigate} />
       </div>
-      <div className='flex-1 overflow-y-auto overflow-x-hidden -webkit-overflow-scrolling-touch'>
+      <div className='flex-1 overflow-y-auto overflow-x-hidden' style={{ WebkitOverflowScrolling: 'touch', scrollPaddingBottom: '120px' }}>
         <div className='w-[90%] md:w-[90%] mx-auto pb-4 mb-2'>
-          <UploadNotice showDevelopmentMode={isDevelopmentMode} />
+          <div className='mt-3 text-center relative'>
+            <h1 className='text-2xl font-semibold'>Upload Documents</h1>
+            <p className='mt-4 text-gray-600'>
+              Regulations require you to upload a national identity card. Don't
+              worry, your data will stay safe and private.
+            </p>
+          </div>
           <PriceFormFields
             formState={formState}
             uploadStatus={uploadStatus}
@@ -313,26 +101,46 @@ const Price = () => {
             setImei2={setImei2}
             onImeiVerificationComplete={handleImeiVerificationComplete}
             aadharVerificationRequired={aadharVerificationRequired}
-            isDevelopmentMode={isDevelopmentMode}
           />
         </div>
       </div>
-      <SubmitBar
-        canSubmit={canSubmit}
-        isLoading={isLoading}
-        onUploadAll={() => uploadAllImages(navigate)}
-      >
-        <SubmitWarnings
-          showDevelopmentMode={isDevelopmentMode}
-          aadharVerificationRequired={aadharVerificationRequired}
-          isAadharVerified={isAadharVerified}
-          isMobile={isMobile}
-          isImeiBlocked={isImeiBlocked}
-          imeinumber={imeinumber}
-          imeiVerificationResult={imeiVerificationResult}
-          otherMissingRequirements={otherMissingRequirements}
-        />
-      </SubmitBar>
+      <div className='flex-shrink-0 flex flex-col w-full gap-2 p-4 bg-white border-t-2'>
+        {aadharVerificationRequired && !isAadharVerified && (
+          <p className='text-sm text-center text-red-500'>
+            Please verify your Aadhar number before submitting
+          </p>
+        )}
+        {isMobile && isImeiBlocked && (
+          <p className='text-sm text-center text-red-500'>
+            This device IMEI is reported as{' '}
+            {imeiVerificationResult.imei1Status === IVS_STATUS.BLOCKED
+              ? 'blocked'
+              : 'stolen'}
+            . Transaction cannot proceed.
+          </p>
+        )}
+        {isMobile && imeinumber && !imeiVerificationResult && (
+          <p className='text-sm text-center text-amber-500'>
+            Please verify IMEI with Sanchar Saathi before submitting
+          </p>
+        )}
+        <div
+          onClick={() => canSubmit && uploadAllImages(navigate)}
+          className={`relative text-center py-1 px-2 rounded-lg cursor-pointer flex justify-between text-white items-center ${
+            canSubmit ? pink : 'cursor-not-allowed bg-gray-400'
+          }`}
+        >
+          {isLoading && (
+            <CgSpinner
+              size={20}
+              className='absolute left-[28%] top-[8px] mt-1 animate-spin'
+            />
+          )}
+          <p className='w-full p-1 text-xl font-medium'>
+            {isLoading ? 'Submitting' : 'Submit'}
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

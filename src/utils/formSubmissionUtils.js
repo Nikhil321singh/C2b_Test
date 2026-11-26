@@ -2,7 +2,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 
 export const submitFormData = async (formData, token, navigate) => {
-  const { imeinumber, leadsubmitDATA, savedOtpData, aadharNumber } = formData
+  const { imeinumber, leadsubmitDATA, savedOtpData, aadharNumber, aadharVerificationReason } = formData
 
   const submissionData = new FormData()
   submissionData.append('IMEI', imeinumber)
@@ -11,6 +11,12 @@ export const submitFormData = async (formData, token, navigate) => {
   submissionData.append('name', savedOtpData?.name)
   submissionData.append('phoneNumber', savedOtpData?.phone)
   submissionData.append('aadharNumber', aadharNumber)
+  // Present only when Aadhaar was entered manually (verification off, or a
+  // DigiLocker error) instead of a real DigiLocker verification, so backend
+  // has an audit trail of why it wasn't auto-verified.
+  if (aadharVerificationReason) {
+    submissionData.append('aadharVerificationReason', aadharVerificationReason)
+  }
 
   try {
     await axios.post(

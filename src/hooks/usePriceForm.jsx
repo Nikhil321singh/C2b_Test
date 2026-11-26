@@ -16,6 +16,7 @@ export const usePriceForm = () => {
   const [ceirImage, setCeirImage] = useState(null) // Added new CEIR image state
   const [aadharNumber, setAadharNumber] = useState('')
   const [isAadharVerified, setIsAadharVerified] = useState(false) // Aadhar verification status
+  const [aadharVerificationReason, setAadharVerificationReason] = useState('') // Reason when Aadhar is entered manually (verification off or DigiLocker failed)
   const [imeinumber, setImeiNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBillRequired, setIsBillRequired] = useState(false)
@@ -86,6 +87,8 @@ export const usePriceForm = () => {
     setAadharNumber,
     isAadharVerified, //Added Aadhar verification status
     setIsAadharVerified, //Added Aadhar verification status setter
+    aadharVerificationReason, //Reason for manual Aadhar entry
+    setAadharVerificationReason,
     imeinumber,
     setImeiNumber,
     isLoading,

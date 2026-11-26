@@ -14,8 +14,6 @@ const defaultRoles = [
   "Manager",
   "Store Admin",
   "Accounts User",
-  "Warehouse User",
-  "Logistic User",
   "Super_Admin_Unicorn",
   "Admin_Manager_Unicorn",
 ];
@@ -29,8 +27,6 @@ const role = [
     "Manager",
     "Store Admin",
     "Accounts User",
-    "Warehouse User",
-    "Logistic User",
   ]),
 ];
 
@@ -49,8 +45,6 @@ const getFilteredRoles = (isSuperAdmin, isCompanyAdmin, isAdminManager) => {
         r === USER_ROLES.MANAGER ||
         r === USER_ROLES.STORE_ADMIN ||
         r === USER_ROLES.ACCOUNTS_USER ||
-        r === USER_ROLES.WAREHOUSE_USER ||
-        r === USER_ROLES.LOGISTIC_USER ||
         r === USER_ROLES.TECHNICIAN ||
         r === USER_ROLES.SALE_USER
     );
@@ -219,9 +213,7 @@ const RegisterUserEdit = ({ userData, setEditBoxOpen, setEditSuccess }) => {
     } else if (
       formData.role !== USER_ROLES.SUPER_ADMIN &&
       formData.role !== USER_ROLES.COMPANY_ADMIN &&
-      formData.role !== USER_ROLES.ACCOUNTS_USER &&
-      formData.role !== USER_ROLES.WAREHOUSE_USER &&
-      formData.role !== USER_ROLES.LOGISTIC_USER
+      formData.role !== USER_ROLES.ACCOUNTS_USER
     ) {
       payload.storeId = formData.storeId || "";
       payload.assignedStores = [];
@@ -432,9 +424,7 @@ const StoreFields = ({
     formData.role !== USER_ROLES.TECHNICIAN &&
     formData.role !== USER_ROLES.SUPER_ADMIN &&
     formData.role !== USER_ROLES.COMPANY_ADMIN &&
-    formData.role !== USER_ROLES.ACCOUNTS_USER &&
-    formData.role !== USER_ROLES.WAREHOUSE_USER &&
-    formData.role !== USER_ROLES.LOGISTIC_USER;
+    formData.role !== USER_ROLES.ACCOUNTS_USER;
 
   if (showAssignedStores) {
     return (

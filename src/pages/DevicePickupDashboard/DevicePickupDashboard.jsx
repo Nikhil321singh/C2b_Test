@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import NavigateTable from "../../components/NavigateTable/NavigateTable";
 import { useSelector } from "react-redux";
 import DPFilter from "./DPFilter";
@@ -11,13 +12,18 @@ const DevicePickupDashboard = () => {
   const LoggedInUser = JSON.parse(sessionStorage.getItem("profile"));
 
   const token = sessionStorage.getItem("authToken");
+  const location = useLocation();
   const userProfile = useSelector((state) => state.user);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedData, setSelectedData] = useState([]);
   const [dateValue, setDateValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
-  const [statusValue, setStatusValue] = useState("");
+  const [statusValue, setStatusValue] = useState(() =>
+    new URLSearchParams(location.search).get("status") === "Cancelled"
+      ? "Cancelled"
+      : "",
+  );
   const [selectedStatus, setSelectedStatus] = useState("");
   const [errorMsg, setErrorMsg] = useState("successfully updated status");
   const [errorMsg1, setErrorMsg1] = useState(null);
@@ -80,12 +86,23 @@ const DevicePickupDashboard = () => {
       });
   };
 
+  // Refresh the current view (tab + filters) after a status change instead of
+  // falling back to the unfiltered pending list.
+  const refreshData = () => getDataBySearch(currentPage);
+
   useEffect(() => {
     if (firsttime.current) {
-      getData(0);
+      if (statusValue === "Cancelled") {
+        getDataBySearch(0);
+      } else {
+        getData(0);
+      }
       getStore();
       firsttime.current = false;
     } else {
+      setSelectedIds([]);
+      setSelectedRows([]);
+      setSelectedData([]);
       setCurrentPage(0);
       getDataBySearch(0);
     }
@@ -118,7 +135,7 @@ const DevicePickupDashboard = () => {
         setErrorMsg={setErrorMsg}
         setErrorMsg1={setErrorMsg1}
         setErrorMsg2={setErrorMsg2}
-        getData={getData}
+        getData={refreshData}
         selectedIds={selectedIds}
         pendingTableData={pendingTableData}
         allStore={allStore}
@@ -127,7 +144,12 @@ const DevicePickupDashboard = () => {
         setSelectedData={setSelectedData}
         setSelectedRows={setSelectedRows}
       />
-      <NavigateTable />
+      <NavigateTable
+        showCancelled
+        cancelledActive={statusValue === "Cancelled"}
+        onCancelledClick={() => setStatusValue("Cancelled")}
+        onPendingClick={() => setStatusValue("")}
+      />
       <div className="flex flex-row justify-end items-center py-1 px-2 font-medium text-sm text-primary">
         Total Device : {devicesCount} | Total Amount :{" "}
         {new Intl.NumberFormat("en-IN", {
@@ -174,7 +196,7 @@ const DevicePickupDashboard = () => {
         setSelectedStatus={setSelectedStatus}
         setIsTableLoaded={setIsTableLoaded}
         setSuccessMod={setSuccessMod}
-        getData={getData}
+        getData={refreshData}
         userRole={userRole}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}

@@ -12,7 +12,6 @@ const AdharField = ({
   idProofBack,
   idproofBackRef,
   uploadStatus,
-  isDevelopmentMode = false,
 }) => {
   return (
     <div className='flex flex-col adharcard mt-[10px]'>
@@ -20,14 +19,7 @@ const AdharField = ({
         <p className='text-base font-medium'>3.</p>
         <div className='flex items-center'>
           <p className='text-base font-medium three'>
-            {'Upload your Aadhar Card'}{' '}
-            {isDevelopmentMode ? (
-              <span className='text-gray-400 text-sm'>
-                (optional in development)
-              </span>
-            ) : (
-              <span className='text-red-500'>*</span>
-            )}
+            {'Upload your Aadhar Card'} <span className='text-red-500'>*</span>
           </p>
         </div>
       </div>

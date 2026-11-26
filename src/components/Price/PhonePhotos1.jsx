@@ -26,7 +26,6 @@ const PhonePhotos1 = ({
   setPhoneRight,
   prod,
   uploadStatus,
-  isDevelopmentMode = false,
 }) => {
   const [showHoldModal, setShowHoldModal] = useState(false)
 
@@ -94,13 +93,7 @@ const PhonePhotos1 = ({
         <div className='flex items-center'>
           <p className='text-base font-medium three'>
             {`Upload Your ${prod[0]?.categoryName}'s Images`}{' '}
-            {isDevelopmentMode ? (
-              <span className='text-gray-400 text-sm'>
-                (optional in development)
-              </span>
-            ) : (
-              <span className='text-red-500'>*</span>
-            )}
+            <span className='text-red-500'>*</span>
           </p>
           <FaInfoCircle
             className='ml-2 cursor-pointer'

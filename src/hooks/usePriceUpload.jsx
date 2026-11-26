@@ -5,8 +5,7 @@ import { retryFailedUploads } from '../utils/retryUtils'
 import toast from 'react-hot-toast'
 import { FILE_KEYS } from '../constants/priceConstants'
 
-export const usePriceUpload = (formState) => {
-  const isDevelopmentMode = true
+export const usePriceUpload = (formState, aadharVerificationRequired = true) => {
   const {
     file,
     idProofBack,
@@ -20,6 +19,8 @@ export const usePriceUpload = (formState) => {
     signatureFile,  // new signature state
     ceirImage,  // new CEIR image state
     aadharNumber,
+    aadharVerificationReason,
+    isAadharVerified,
     imeinumber,
     isBillRequired,
     isLoading,
@@ -49,20 +50,24 @@ export const usePriceUpload = (formState) => {
       isBillRequired,
       signatureFile, // add signature state to validation
       ceirImage, // add CEIR image state to validation
+      isAadharRequired: aadharVerificationRequired,
+      isAadharVerified,
     }
 
-    if (!isDevelopmentMode && !validateFormData(formData)) {
+    // KYC and document fields are optional: skip the mandatory-field
+    // validation and do not require any file to be uploaded before submit.
+    const isKycOptional = true
+
+    if (!isKycOptional && !validateFormData(formData)) {
       setIsLoading(false)
       return
     }
 
     // Get required files and check upload status
-    const requiredFiles = isDevelopmentMode
-      ? []
-      : getRequiredFiles(isBillRequired)
-    if (!isDevelopmentMode) {
-      requiredFiles.push(FILE_KEYS.SIGNATURE)
-      requiredFiles.push(FILE_KEYS.CEIR)
+    const requiredFiles = isKycOptional ? [] : getRequiredFiles(isBillRequired)
+    if (!isKycOptional) {
+      requiredFiles.push(FILE_KEYS.SIGNATURE) // Add signature to required files
+      requiredFiles.push(FILE_KEYS.CEIR) // Add CEIR to required files
     }
 
     const failedUploads = getFailedUploads(requiredFiles, uploadStatus)
@@ -119,10 +124,17 @@ export const usePriceUpload = (formState) => {
       imeinumber,
       leadsubmitDATA,
       savedOtpData,
-      aadharNumber
+      aadharNumber,
+      aadharVerificationReason
     }
 
-    await submitFormData(submissionData, token, navigate)
+    const submitted = await submitFormData(submissionData, token, navigate)
+    if (submitted) {
+      // Lead is done - clear the "DigiLocker already attempted" marker so
+      // the next lead's Aadhaar step starts fresh, without the manual
+      // fallback showing up before it's actually needed for that new sale.
+      sessionStorage.removeItem('digilockerAttempted')
+    }
     setIsLoading(false)
   }
 

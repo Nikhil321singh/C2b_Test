@@ -60,16 +60,17 @@ import Categories from './pages/Categories/Categories'
 import Watchqs from './pages/Watch_Exact_qs/Watch_qs'
 import Orders from './pages/Orders/Orders'
 import BulkUploadHistory from './pages/BulkUploadHistory'
+import Logistics from './pages/Logistics/Logistics'
 import QuoteTrackingDashboard from './pages/QuoteTrackingDashboard'
 import ThankYou from './pages/ThankYou'
 import CreateCoupon from './pages/CreateCoupon'
 import CouponDetails from './pages/CouponDetails'
 import SessionTimeoutWarning from './components/SessionTimeoutWarning'
+import BackgroundDownloadStatus from './components/BackgroundDownloadStatus'
 import DeleteMyData from './pages/DeleteMyData'
 import CustomerPayout from './pages/CustomerPayout'
 import PayoutManagement from './pages/PayoutManagement'
 import StorePayments from './pages/StorePayments'
-import Warehouse from './pages/Warehouse'
 import Notifications from './pages/Notifications'
 
 function App() {
@@ -150,7 +151,6 @@ function App() {
                   path='/store-payments'
                   element={<StorePayments />}
                 ></Route>
-                <Route path='/warehouse' element={<Warehouse />}></Route>
                 <Route path='/notifications' element={<Notifications />}></Route>
                 <Route
                   path='/devicepickupdashboard'
@@ -244,6 +244,7 @@ function App() {
                   path='/bulkuploadhistory'
                   element={<BulkUploadHistory />}
                 ></Route>
+                <Route path='/logistics' element={<Logistics />}></Route>
                 <Route
                   path='/quotetrackingdashboard'
                   element={<QuoteTrackingDashboard />}
@@ -255,6 +256,7 @@ function App() {
               </Routes>
               <SessionTimeoutWarning />
             </Router>
+            <BackgroundDownloadStatus />
             <Toaster
               position='top-center'
               toastOptions={{

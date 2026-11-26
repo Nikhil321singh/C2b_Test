@@ -1,12 +1,12 @@
 import React from 'react'
 import ImeiField from './ImeiField'
-import AadharNumberField from './AadharNumberField'
 import AdharField from './AdharField'
 import PhoneBill from './PhoneBill'
 import CeirField from './CeirField'
 import PhonePhotos1 from './PhonePhotos1'
 import DigitalSignatureField from './DigitalSignatureField'
 import CustomerPhotoField from './CustomerPhotoField'
+import DigilockerAadhaarField from './DigilockerAadhaarField'
 
 const PriceFormFields = ({
   formState,
@@ -52,6 +52,8 @@ const PriceFormFields = ({
     isBillRequired,
     isAadharVerified,
     setIsAadharVerified,
+    aadharVerificationReason,
+    setAadharVerificationReason,
     prod,
     fileInputRef,
     idproofBackRef,
@@ -68,22 +70,23 @@ const PriceFormFields = ({
 
   return (
     <div className='flex flex-col'>
-      <ImeiField
+     <ImeiField
         setImeiNumber={setImeiNumber}
         imeinumber={imeinumber}
         prod={prod}
         imei2={imei2}
         setImei2={setImei2}
         onImeiVerificationComplete={onImeiVerificationComplete}
-        isDevelopmentMode={isDevelopmentMode}
       />
-      <AadharNumberField
+     <DigilockerAadhaarField
         setAadharNumber={setAadharNumber}
         aadharNumber={aadharNumber}
         isVerified={isAadharVerified}
         setIsVerified={setIsAadharVerified}
+        aadharVerificationReason={aadharVerificationReason}
+        setAadharVerificationReason={setAadharVerificationReason}
         isVerificationRequired={
-          !isDevelopmentMode && aadharVerificationRequired
+        !isDevelopmentMode && aadharVerificationRequired
         }
         isDevelopmentMode={isDevelopmentMode}
       />
@@ -98,7 +101,6 @@ const PriceFormFields = ({
         idproofBackRef={idproofBackRef}
         prod={prod}
         uploadStatus={uploadStatus}
-        isDevelopmentMode={isDevelopmentMode}
       />
       <div className='grid grid-cols-2 gap-3'>
         <PhoneBill
@@ -111,7 +113,6 @@ const PriceFormFields = ({
           isBillRequired={isBillRequired}
           prod={prod}
           uploadStatus={uploadStatus}
-          isDevelopmentMode={isDevelopmentMode}
         />
         <CeirField
           handleChange={handleFileChange}
@@ -120,7 +121,6 @@ const PriceFormFields = ({
           ceirImageRef={ceirImageRef}
           ceirImage={ceirImage}
           uploadStatus={uploadStatus}
-          isDevelopmentMode={isDevelopmentMode}
         />
       </div>
       <PhonePhotos1
@@ -146,7 +146,6 @@ const PriceFormFields = ({
         phoneLeftRef={phoneLeftRef}
         prod={prod}
         uploadStatus={uploadStatus}
-        isDevelopmentMode={isDevelopmentMode}
       />
       <DigitalSignatureField
         signatureFile={signatureFile}
@@ -155,9 +154,9 @@ const PriceFormFields = ({
         uploadIndividualFile={uploadIndividualFile}
         imeinumber={imeinumber}
         prod={prod}
-        isDevelopmentMode={isDevelopmentMode}
       />
       <CustomerPhotoField
+        handleChange={handleFileChange}
         customerPhoto={customerPhoto}
         setCustomerPhoto={setCustomerPhoto}
         uploadStatus={uploadStatus}
@@ -166,7 +165,6 @@ const PriceFormFields = ({
         prod={prod}
         fileInputRef={customerPhotoRef}
         handleCameraButtonClick={handleCameraButtonClick}
-        isDevelopmentMode={isDevelopmentMode}
       />
     </div>
   )

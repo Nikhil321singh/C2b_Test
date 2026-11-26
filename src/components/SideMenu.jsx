@@ -2,11 +2,6 @@ import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../utils/axiosInterceptor'
 import { USER_ROLES } from '../constants/roleConstants'
 
-const MENU_CLASS =
-  'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in '
-const ADMIN_MENU_CLASS =
-  'menu fixed justify-center left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start overflow-y-auto transition-all duration-950 ease-in '
-
 const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
   const navigate = useNavigate()
 
@@ -28,6 +23,8 @@ const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
       navigate('/customertable')
     } else if (profile.role === USER_ROLES.TECHNICIAN) {
       navigate('/devicepickupdashboard')
+    } else if (profile.role === USER_ROLES.LOGISTICS_ADMIN) {
+      navigate('/logistics')
     }
   }
 
@@ -55,13 +52,13 @@ const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
     handleStoreReport: createNavigationHandler('/storewisereport'),
     adminDashboard: createNavigationHandler('/admindashboard'),
     handlpickup: createNavigationHandler('/devicepickupdashboard'),
+    handleLogistics: createNavigationHandler('/logistics'),
     handleBulkUploadHistory: createNavigationHandler('/bulkuploadhistory'),
     handleQuoteTracking: createNavigationHandler('/quotetrackingdashboard'),
     handleCouponManagement: createNavigationHandler('/coupondetails'),
     handleDynamicPricing: createNavigationHandler('/dynamic-pricing'),
     handlePayoutManagement: createNavigationHandler('/payout-management'),
     handleStorePayments: createNavigationHandler('/store-payments'),
-    handleWarehouse: createNavigationHandler('/warehouse'),
     handleLogout,
   }
 }
@@ -85,21 +82,33 @@ function SideMenu({ setsideMenu, sideMenu }) {
       {profile.role === USER_ROLES.TECHNICIAN && (
         <TechnicianMenu sideMenu={sideMenu} {...handlers} />
       )}
+      {profile.role === USER_ROLES.LOGISTICS_ADMIN && (
+        <WarehouseMenu sideMenu={sideMenu} {...handlers} />
+      )}
       {profile.role === USER_ROLES.ACCOUNTS_USER && (
         <AccountsMenu sideMenu={sideMenu} {...handlers} />
       )}
       {profile.role === USER_ROLES.STORE_ADMIN && (
         <StoreAdminMenu sideMenu={sideMenu} {...handlers} />
       )}
-      {(profile.role === USER_ROLES.WAREHOUSE_USER ||
-        profile.role === USER_ROLES.LOGISTIC_USER) && (
-        <WarehouseMenu sideMenu={sideMenu} {...handlers} />
-      )}
     </>
   )
 }
 
 export default SideMenu
+
+// Slide-in side menu panel; shifted on screen when the menu is open.
+const MENU_PANEL_CLASS =
+  'menu fixed left-[-200px] top-0 w-[200px] h-full bg-slate-300 z-50 flex items-start justify-center overflow-y-auto transition-all duration-950 ease-in '
+
+// Panel and list shared by every role's menu.
+const MenuPanel = ({ sideMenu, children }) => (
+  <div className={MENU_PANEL_CLASS + (sideMenu && 'left-[0]')}>
+    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
+      {children}
+    </ul>
+  </div>
+)
 
 const MenuItem = ({ onClick, children }) => (
   <li className='text-[20px] font-[300] cursor-pointer' onClick={onClick}>
@@ -121,41 +130,42 @@ const AdminManagerMenu = ({
   handleStorePayments,
   handleLogout,
 }) => (
-  <div
-    className={
-      ADMIN_MENU_CLASS +
-      (sideMenu && 'left-[0]')
-    }
-  >
-    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
-      <MenuItem onClick={handleHome}>Home</MenuItem>
-      <MenuItem onClick={handleProfile}>Profile</MenuItem>
-      <MenuItem onClick={handleRegister}>Register User</MenuItem>
-      <MenuItem onClick={handlpickup}>Pickup & Cancel Device</MenuItem>
-      <MenuItem onClick={handleStoreReport}>Store Report</MenuItem>
-      <MenuItem onClick={handleQuoteTracking}>Quote Tracking</MenuItem>
-      <MenuItem onClick={handleTechnician}>Technician Report</MenuItem>
-      <MenuItem onClick={adminDashboard}>Admin Dashboard</MenuItem>
-      <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
-      <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
-    </ul>
-  </div>
+  <MenuPanel sideMenu={sideMenu}>
+    <MenuItem onClick={handleHome}>Home</MenuItem>
+    <MenuItem onClick={handleProfile}>Profile</MenuItem>
+    <MenuItem onClick={handleRegister}>Register User</MenuItem>
+    <MenuItem onClick={handlpickup}>Pickup & Cancel Device</MenuItem>
+    <MenuItem onClick={handleStoreReport}>Store Report</MenuItem>
+    <MenuItem onClick={handleQuoteTracking}>Quote Tracking</MenuItem>
+    <MenuItem onClick={handleTechnician}>Technician Report</MenuItem>
+    <MenuItem onClick={adminDashboard}>Admin Dashboard</MenuItem>
+    <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
+    <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
+    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+  </MenuPanel>
+)
+
+const WarehouseMenu = ({
+  sideMenu,
+  handleHome,
+  handleProfile,
+  handleLogistics,
+  handleLogout,
+}) => (
+  <MenuPanel sideMenu={sideMenu}>
+    <MenuItem onClick={handleHome}>Home</MenuItem>
+    <MenuItem onClick={handleProfile}>Profile</MenuItem>
+    <MenuItem onClick={handleLogistics}>Warehouse</MenuItem>
+    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+  </MenuPanel>
 )
 
 const TechnicianMenu = ({ sideMenu, handleHome, handleProfile, handleLogout }) => (
-  <div
-    className={
-      MENU_CLASS +
-      (sideMenu && 'left-[0]')
-    }
-  >
-    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
-      <MenuItem onClick={handleHome}>Home</MenuItem>
-      <MenuItem onClick={handleProfile}>Profile</MenuItem>
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
-    </ul>
-  </div>
+  <MenuPanel sideMenu={sideMenu}>
+    <MenuItem onClick={handleHome}>Home</MenuItem>
+    <MenuItem onClick={handleProfile}>Profile</MenuItem>
+    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+  </MenuPanel>
 )
 
 const AccountsMenu = ({
@@ -164,18 +174,11 @@ const AccountsMenu = ({
   handleProfile,
   handleLogout,
 }) => (
-  <div
-    className={
-      MENU_CLASS +
-      (sideMenu && 'left-[0]')
-    }
-  >
-    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
-      <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
-      <MenuItem onClick={handleProfile}>Profile</MenuItem>
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
-    </ul>
-  </div>
+  <MenuPanel sideMenu={sideMenu}>
+    <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
+    <MenuItem onClick={handleProfile}>Profile</MenuItem>
+    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+  </MenuPanel>
 )
 
 const StoreAdminMenu = ({
@@ -186,40 +189,13 @@ const StoreAdminMenu = ({
   handleProfile,
   handleLogout,
 }) => (
-  <div
-    className={
-      MENU_CLASS +
-      (sideMenu && 'left-[0]')
-    }
-  >
-    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
-      <MenuItem onClick={handleHome}>Home</MenuItem>
-      <MenuItem onClick={handlpickup}>Pickup & Cancel Device</MenuItem>
-      <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
-      <MenuItem onClick={handleProfile}>Profile</MenuItem>
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
-    </ul>
-  </div>
-)
-
-const WarehouseMenu = ({
-  sideMenu,
-  handleWarehouse,
-  handleProfile,
-  handleLogout,
-}) => (
-  <div
-    className={
-      MENU_CLASS +
-      (sideMenu && 'left-[0]')
-    }
-  >
-    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
-      <MenuItem onClick={handleWarehouse}>Warehouse</MenuItem>
-      <MenuItem onClick={handleProfile}>Profile</MenuItem>
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
-    </ul>
-  </div>
+  <MenuPanel sideMenu={sideMenu}>
+    <MenuItem onClick={handleHome}>Home</MenuItem>
+    <MenuItem onClick={handlpickup}>Pickup & Cancel Device</MenuItem>
+    <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
+    <MenuItem onClick={handleProfile}>Profile</MenuItem>
+    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+  </MenuPanel>
 )
 
 const SuperAdminProfile = ({
@@ -234,6 +210,7 @@ const SuperAdminProfile = ({
   handleTable,
   handleCompanyListing,
   handlpickup,
+  handleLogistics,
   handleTechnician,
   adminDashboard,
   handleLogout,
@@ -243,37 +220,30 @@ const SuperAdminProfile = ({
   handleDynamicPricing,
   handlePayoutManagement,
   handleStorePayments,
-  handleWarehouse,
 }) => {
   const isCompanyAdmin = profile.role === USER_ROLES.COMPANY_ADMIN
+  const isSuperAdmin = profile.role === USER_ROLES.SUPER_ADMIN
   return (
-    <div
-      className={
-        MENU_CLASS +
-        (sideMenu && 'left-[0]')
-      }
-    >
-      <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
-        <MenuItem onClick={handleHome}>Home</MenuItem>
-        <MenuItem onClick={handleProfile}>Profile</MenuItem>
-        {!isCompanyAdmin && <MenuItem onClick={handleGrade}>Grade Pricing</MenuItem>}
-        <MenuItem onClick={handleRegister}>Register User</MenuItem>
-        <MenuItem onClick={handleBulkUploadHistory}>Bulk Upload History</MenuItem>
-        <MenuItem onClick={handleStoreListing}>Store Listing</MenuItem>
-        <MenuItem onClick={handleStoreReport}>Store Report</MenuItem>
-        <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
-        <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
-        <MenuItem onClick={handleWarehouse}>Warehouse</MenuItem>
-        <MenuItem onClick={handleQuoteTracking}>Quote Tracking</MenuItem>
-        {!isCompanyAdmin && <MenuItem onClick={handleCouponManagement}>Coupon Management</MenuItem>}
-        <MenuItem onClick={handleTable}>Customer Table</MenuItem>
-        {!isCompanyAdmin && <MenuItem onClick={handleCompanyListing}>Company Listing</MenuItem>}
-        {!isCompanyAdmin && <MenuItem onClick={handleDynamicPricing}>Dynamic Pricing</MenuItem>}
-        <MenuItem onClick={handlpickup}>Pickup & Cancel Device</MenuItem>
-        <MenuItem onClick={handleTechnician}>Technician Report</MenuItem>
-        <MenuItem onClick={adminDashboard}>Admin Dashboard</MenuItem>
-        <MenuItem onClick={handleLogout}>Logout</MenuItem>
-      </ul>
-    </div>
+    <MenuPanel sideMenu={sideMenu}>
+      <MenuItem onClick={handleHome}>Home</MenuItem>
+      <MenuItem onClick={handleProfile}>Profile</MenuItem>
+      {!isCompanyAdmin && <MenuItem onClick={handleGrade}>Grade Pricing</MenuItem>}
+      <MenuItem onClick={handleRegister}>Register User</MenuItem>
+      <MenuItem onClick={handleBulkUploadHistory}>Bulk Upload History</MenuItem>
+      <MenuItem onClick={handleStoreListing}>Store Listing</MenuItem>
+      <MenuItem onClick={handleStoreReport}>Store Report</MenuItem>
+      <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
+      <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
+      <MenuItem onClick={handleQuoteTracking}>Quote Tracking</MenuItem>
+      {!isCompanyAdmin && <MenuItem onClick={handleCouponManagement}>Coupon Management</MenuItem>}
+      <MenuItem onClick={handleTable}>Customer Table</MenuItem>
+      {!isCompanyAdmin && <MenuItem onClick={handleCompanyListing}>Company Listing</MenuItem>}
+      {!isCompanyAdmin && <MenuItem onClick={handleDynamicPricing}>Dynamic Pricing</MenuItem>}
+      <MenuItem onClick={handlpickup}>Pickup & Cancel Device</MenuItem>
+      {isSuperAdmin && <MenuItem onClick={handleLogistics}>Warehouse & Logistics</MenuItem>}
+      <MenuItem onClick={handleTechnician}>Technician Report</MenuItem>
+      <MenuItem onClick={adminDashboard}>Admin Dashboard</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+    </MenuPanel>
   )
 }

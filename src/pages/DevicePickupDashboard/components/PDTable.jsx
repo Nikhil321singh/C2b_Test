@@ -59,9 +59,18 @@ const PDTable = ({
     handleUpdateError,
   } = useStatusHandlers(token2, statusHandlers);
 
+  const hasCancelledSelection = pendingTableData.some(
+    (row) => selectedIds.includes(row._id) && row.status === "Cancelled",
+  );
+
   const handleStatusUpdate = (event) => {
     if (selectedIds.length === 0) {
       setErrorMsg("No device selected");
+      setFailMode(true);
+      return;
+    }
+    if (hasCancelledSelection) {
+      setErrorMsg("Cancelled leads cannot be updated");
       setFailMode(true);
       return;
     }
@@ -69,9 +78,7 @@ const PDTable = ({
     setSelectedStatus(newStatus);
     setIsTableLoaded(true);
 
-    const LDIds = pendingTableData
-      .filter((obj) => selectedIds.includes(obj._id))
-      .map((obj) => obj._id.toString());
+    const LDIds = selectedIds.map((id) => id.toString());
 
     if (
       showModalForStatus(
@@ -99,6 +106,10 @@ const PDTable = ({
     if (selectedIds.length === 0) {
       setIsTableLoaded(false);
       setErrorMsg("No device selected");
+      setFailMode(true);
+    } else if (hasCancelledSelection) {
+      setIsTableLoaded(false);
+      setErrorMsg("Cancelled leads cannot be updated");
       setFailMode(true);
     } else {
       setConfMod(true);
@@ -129,6 +140,7 @@ const PDTable = ({
         selectedStatus={selectedStatus}
         handleStatusUpdate={handleStatusUpdate}
         confHandler={confHandler}
+        disabled={hasCancelledSelection}
         userRole={userRole}
       />
       <div className="flex justify-center my-4">

@@ -39,8 +39,6 @@ export const notificationTargetPath = (item) => {
       return '/store-payments'
     case 'buybackPayout':
       return '/payout-management'
-    case 'lead':
-      return '/warehouse'
     default:
       return null
   }

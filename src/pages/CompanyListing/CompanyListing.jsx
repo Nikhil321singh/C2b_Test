@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AdminNavbar from "../../components/Admin_Navbar";
 import SideMenu from "../../components/SideMenu";
 import { AiOutlineFile } from "react-icons/ai";
+import PayoutFieldHelp from "../../components/PayoutFieldHelp/PayoutFieldHelp";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -558,7 +559,7 @@ const PayoutSettingsSection = ({ settings, onChange, canConfigurePayout }) => (
       ].map(([label, field]) => (
         <div key={field} className="flex flex-col gap-1.5">
           <span className="font-medium text-sm text-gray-700 min-h-10 flex items-end">
-            {label}
+            <PayoutFieldHelp label={label} field={field} />
           </span>
           <input
             type="number"

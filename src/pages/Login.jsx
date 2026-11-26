@@ -119,12 +119,11 @@ const redirectUser = (role, navigate) => {
     case 'Accounts User':
       navigate('/store-payments')
       break
-    case 'Warehouse User':
-    case 'Logistic User':
-      navigate('/warehouse')
-      break
     case 'Technician':
       navigate('/devicepickupdashboard')
+      break
+    case 'Logistics Admin':
+      navigate('/logistics')
       break
     case 'Sale User':
     default:
