@@ -6,8 +6,6 @@ export const USER_ROLES = {
   MANAGER: 'Manager',
   STORE_ADMIN: 'Store Admin',
   ACCOUNTS_USER: 'Accounts User',
-  WAREHOUSE_USER: 'Warehouse User',
-  LOGISTIC_USER: 'Logistic User',
   TECHNICIAN: 'Technician',
   SALE_USER: 'Sale User',
   SUPER_ADMIN_UNICORN: 'Super_Admin_Unicorn',

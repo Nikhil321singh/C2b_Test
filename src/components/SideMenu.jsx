@@ -61,7 +61,6 @@ const useNavigationHandlers = (setsideMenu, sideMenu, profile) => {
     handleDynamicPricing: createNavigationHandler('/dynamic-pricing'),
     handlePayoutManagement: createNavigationHandler('/payout-management'),
     handleStorePayments: createNavigationHandler('/store-payments'),
-    handleWarehouse: createNavigationHandler('/warehouse'),
     handleLogout,
   }
 }
@@ -90,10 +89,6 @@ function SideMenu({ setsideMenu, sideMenu }) {
       )}
       {profile.role === USER_ROLES.STORE_ADMIN && (
         <StoreAdminMenu sideMenu={sideMenu} {...handlers} />
-      )}
-      {(profile.role === USER_ROLES.WAREHOUSE_USER ||
-        profile.role === USER_ROLES.LOGISTIC_USER) && (
-        <WarehouseMenu sideMenu={sideMenu} {...handlers} />
       )}
     </>
   )
@@ -202,26 +197,6 @@ const StoreAdminMenu = ({
   </div>
 )
 
-const WarehouseMenu = ({
-  sideMenu,
-  handleWarehouse,
-  handleProfile,
-  handleLogout,
-}) => (
-  <div
-    className={
-      MENU_CLASS +
-      (sideMenu && 'left-[0]')
-    }
-  >
-    <ul className='list-none flex flex-col pl-[6%] pt-[10%] pb-10 justify-start gap-[2vh] w-full'>
-      <MenuItem onClick={handleWarehouse}>Warehouse</MenuItem>
-      <MenuItem onClick={handleProfile}>Profile</MenuItem>
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
-    </ul>
-  </div>
-)
-
 const SuperAdminProfile = ({
   sideMenu,
   profile,
@@ -243,7 +218,6 @@ const SuperAdminProfile = ({
   handleDynamicPricing,
   handlePayoutManagement,
   handleStorePayments,
-  handleWarehouse,
 }) => {
   const isCompanyAdmin = profile.role === USER_ROLES.COMPANY_ADMIN
   return (
@@ -263,7 +237,6 @@ const SuperAdminProfile = ({
         <MenuItem onClick={handleStoreReport}>Store Report</MenuItem>
         <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
         <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
-        <MenuItem onClick={handleWarehouse}>Warehouse</MenuItem>
         <MenuItem onClick={handleQuoteTracking}>Quote Tracking</MenuItem>
         {!isCompanyAdmin && <MenuItem onClick={handleCouponManagement}>Coupon Management</MenuItem>}
         <MenuItem onClick={handleTable}>Customer Table</MenuItem>

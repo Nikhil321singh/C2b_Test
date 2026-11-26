@@ -12,8 +12,6 @@ const defaultRoles = [
   'Manager',
   'Store Admin',
   'Accounts User',
-  'Warehouse User',
-  'Logistic User',
   'Super_Admin_Unicorn',
   'Admin_Manager_Unicorn',
 ]
@@ -27,8 +25,6 @@ const role = [
     'Manager',
     'Store Admin',
     'Accounts User',
-    'Warehouse User',
-    'Logistic User',
   ]),
 ]
 
@@ -43,8 +39,6 @@ const getFilteredRoles = (isSuperAdmin, isCompanyAdmin, isAdminManager) => {
         r === USER_ROLES.MANAGER ||
         r === USER_ROLES.STORE_ADMIN ||
         r === USER_ROLES.ACCOUNTS_USER ||
-        r === USER_ROLES.WAREHOUSE_USER ||
-        r === USER_ROLES.LOGISTIC_USER ||
         r === USER_ROLES.TECHNICIAN ||
         r === USER_ROLES.SALE_USER
     )
@@ -310,9 +304,7 @@ const shouldShowSingleStore = (userRole, formDataRole) =>
   formDataRole !== USER_ROLES.TECHNICIAN &&
   formDataRole !== USER_ROLES.SUPER_ADMIN &&
   formDataRole !== USER_ROLES.COMPANY_ADMIN &&
-  formDataRole !== USER_ROLES.ACCOUNTS_USER &&
-  formDataRole !== USER_ROLES.WAREHOUSE_USER &&
-  formDataRole !== USER_ROLES.LOGISTIC_USER
+  formDataRole !== USER_ROLES.ACCOUNTS_USER
 
 const StoreSelectionFields = ({
   formData,

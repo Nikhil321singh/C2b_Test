@@ -42,11 +42,6 @@ const PAYMENT_STATUS_BADGES = {
   PAYMENT_DONE: BADGE_GREEN,
 }
 
-const WAREHOUSE_BADGES = {
-  IN_WAREHOUSE: BADGE_GREEN,
-  NOT_READY: BADGE_AMBER,
-}
-
 const EMAIL_BADGES = {
   DELIVERED: BADGE_GREEN,
   FAILED: BADGE_RED,
@@ -135,7 +130,6 @@ const PaymentsTableHeader = () => (
       <th className='p-2 min-w-[110px] text-sm md:p-3 md:text-base'>Amount</th>
       <th className='p-2 min-w-[170px] text-sm md:p-3 md:text-base'>Mode</th>
       <th className='p-2 min-w-[160px] text-sm md:p-3 md:text-base'>Status</th>
-      <th className='p-2 min-w-[130px] text-sm md:p-3 md:text-base'>Warehouse</th>
       <th className='p-2 min-w-[110px] text-sm md:p-3 md:text-base'>Email</th>
       <th className='p-2 min-w-[300px] text-sm md:p-3 md:text-base'>Actions</th>
     </tr>
@@ -158,26 +152,6 @@ const PaymentStatusCell = ({ item }) => (
 )
 
 PaymentStatusCell.propTypes = {
-  item: PropTypes.object.isRequired,
-}
-
-const WarehouseCell = ({ item }) => (
-  <td className='p-2 text-sm text-center md:p-3 md:text-base'>
-    <span
-      className={`${BADGE} ${
-        item.warehouseStatus === 'IN_WAREHOUSE'
-          ? WAREHOUSE_BADGES.IN_WAREHOUSE
-          : WAREHOUSE_BADGES.NOT_READY
-      }`}
-    >
-      {item.warehouseStatus === 'IN_WAREHOUSE'
-        ? 'In Warehouse'
-        : 'Not ready'}
-    </span>
-  </td>
-)
-
-WarehouseCell.propTypes = {
   item: PropTypes.object.isRequired,
 }
 
@@ -311,7 +285,6 @@ const PaymentsRow = ({
       {MODE_LABELS[item.paymentMode] || item.paymentMode}
     </td>
     <PaymentStatusCell item={item} />
-    <WarehouseCell item={item} />
     <EmailCell item={item} />
     <ActionsCell
       item={item}
@@ -529,7 +502,7 @@ const StorePayments = () => {
       <div className='pt-1 pb-2 px-4 md:pt-2 md:px-8'>
         <h1 className='text-3xl font-semibold'>Store Payments</h1>
         <p className='text-gray-600'>
-          Accounts queue, payment confirmation and Warehouse handoff.
+          Accounts queue and payment confirmation.
         </p>
       </div>
 
@@ -576,7 +549,7 @@ const StorePayments = () => {
             ))}
             {!loading && filteredItems.length === 0 && (
               <tr>
-                <td colSpan='9' className='p-8 text-center text-gray-500'>
+                <td colSpan='8' className='p-8 text-center text-gray-500'>
                   No store payment requests found.
                 </td>
               </tr>
