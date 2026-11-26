@@ -9,6 +9,9 @@ import { generateExcelFile } from '../utils/excelHelper'
 import { FaDownload } from 'react-icons/fa'
 import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
+import { useSearchParams } from 'react-router-dom'
+import StoreRequestsTab from './StoreRequests/StoreRequestsTab'
+import { STORE_REQUEST_ROLES } from './StoreRequests/storeRequestRoles'
 import styles from './CompanyListingDetails/CompanyListingDetails.module.css'
 import {
   formatStatusCheckedAt,
@@ -754,7 +757,51 @@ RejectPayoutModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
 }
 
+const TAB_PAYOUTS = 'payouts'
+const TAB_STORE_REQUESTS = 'store-requests'
+
+const PageTabs = ({ active, onChange }) => (
+  <div
+    role='tablist'
+    aria-label='Payout type'
+    className='mx-4 mt-1 inline-flex gap-1 rounded-lg border border-gray-300 bg-white p-1 md:mx-8'
+  >
+    {[
+      { id: TAB_PAYOUTS, label: 'Customer Payouts (HSBC)' },
+      { id: TAB_STORE_REQUESTS, label: 'Store Requests' },
+    ].map((tab) => (
+      <button
+        key={tab.id}
+        type='button'
+        role='tab'
+        aria-selected={active === tab.id}
+        onClick={() => onChange(tab.id)}
+        className={`rounded-md px-4 py-2 text-sm font-medium ${
+          active === tab.id ? 'bg-primary text-white' : 'text-gray-700 hover:bg-gray-100'
+        }`}
+      >
+        {tab.label}
+      </button>
+    ))}
+  </div>
+)
+
+PageTabs.propTypes = {
+  active: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+}
+
 const PayoutManagement = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const profileRole = JSON.parse(sessionStorage.getItem('profile') || '{}').role
+  const canSeeStoreRequests = STORE_REQUEST_ROLES.includes(profileRole)
+  const activeTab =
+    canSeeStoreRequests && searchParams.get('tab') === TAB_STORE_REQUESTS
+      ? TAB_STORE_REQUESTS
+      : TAB_PAYOUTS
+  const createdCode = searchParams.get('created') || ''
+  const changeTab = (tab) =>
+    setSearchParams(tab === TAB_STORE_REQUESTS ? { tab } : {}, { replace: true })
   const [sideMenu, setSideMenu] = useState(false)
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -905,7 +952,7 @@ const PayoutManagement = () => {
 
   return (
     <div>
-      {loading && (
+      {loading && activeTab === TAB_PAYOUTS && (
         <div className='fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50'>
           <BeatLoader color='var(--primary-color)' size={15} />
         </div>
@@ -917,10 +964,18 @@ const PayoutManagement = () => {
       <div className='pt-1 pb-2 px-4 md:pt-2 md:px-8'>
         <h1 className='text-3xl font-semibold'>Customer Payouts</h1>
         <p className='text-gray-600'>
-          Approve, initiate and reconcile HSBC payouts (UPI, IMPS &amp; NEFT).
+          {activeTab === TAB_STORE_REQUESTS
+            ? 'Store payment requests from Pickup & Cancel. Confirm payment to send the devices to Logistics.'
+            : 'Approve, initiate and reconcile HSBC payouts (UPI, IMPS & NEFT).'}
         </p>
       </div>
 
+      {canSeeStoreRequests && <PageTabs active={activeTab} onChange={changeTab} />}
+
+      {activeTab === TAB_STORE_REQUESTS ? (
+        <StoreRequestsTab highlightCode={createdCode} />
+      ) : (
+      <>
       {/* TOP FILTER BAR */}
       <div className='flex flex-wrap gap-2 items-center justify-center mt-2'>
         <div className={styles.search_bar_wrap}>
@@ -1003,6 +1058,8 @@ const PayoutManagement = () => {
         onSubmit={sendToLogistics}
       />
       <PayoutDetailsModal item={viewingItem} onClose={() => setViewingId('')} />
+      </>
+      )}
     </div>
   )
 }

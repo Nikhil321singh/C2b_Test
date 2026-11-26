@@ -42,14 +42,9 @@ const NavigateTable = () => {
       >
         Pending
       </button>
-      <button
-        onClick={() => handleTable("pickedup")}
-        className={`${
-          selected === "pickedup" ? styles.button_sel : styles.button_unsel
-        }`}
-      >
-        Picked Up
-      </button>
+      {/* "Picked Up" is hidden: payment requests are now handled on
+          Customer Payouts > Store Requests. /pickedupdevices still opens by
+          its link for older pickup lots. */}
       <button
         onClick={() => handleTable("pickupHistory")}
         className={`${
