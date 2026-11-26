@@ -84,12 +84,10 @@ const ExtComps = ({
         setSelectedData([])
         setSelectedRows([])
         setIsTableLoaded(false)
-        // The request is handled on Customer Payouts > Store Requests.
+        // The request is handled on Store Payments.
         const code = response.data?.data?.uniqueCode || ''
         navigate(
-          `/payout-management?tab=store-requests${
-            code ? `&created=${encodeURIComponent(code)}` : ''
-          }`
+          `/store-payments${code ? `?created=${encodeURIComponent(code)}` : ''}`
         )
       })
       .catch((error) => {
