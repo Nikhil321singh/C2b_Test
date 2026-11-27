@@ -12,7 +12,7 @@ import { IoRefresh } from 'react-icons/io5'
 import styles from './CompanyListingDetails/CompanyListingDetails.module.css'
 import ListPagination from '../components/ListPagination/ListPagination'
 import {
-  PAGE_SIZES,
+  PAGE_SIZE,
   useDebouncedValue,
 } from '../components/ListPagination/listPaging'
 import {
@@ -767,7 +767,7 @@ const PayoutManagement = () => {
   const [busyId, setBusyId] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(PAGE_SIZES[0])
+  const limit = PAGE_SIZE
   const [total, setTotal] = useState(0)
   const debouncedSearch = useDebouncedValue(search.trim())
   // Only the newest list request may update the table.
@@ -1036,14 +1036,10 @@ const PayoutManagement = () => {
       </div>
       <ListPagination
         page={page}
-        limit={limit}
+        pageSize={limit}
         total={total}
         disabled={loading}
         onPageChange={setPage}
-        onLimitChange={(size) => {
-          setLimit(size)
-          setPage(1)
-        }}
       />
       <RejectPayoutModal
         item={rejectingItem}
