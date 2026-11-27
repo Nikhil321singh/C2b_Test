@@ -171,11 +171,13 @@ const TechnicianMenu = ({ sideMenu, handleHome, handleProfile, handleLogout }) =
 const AccountsMenu = ({
   sideMenu,
   handleStorePayments,
+  handlePayoutManagement,
   handleProfile,
   handleLogout,
 }) => (
   <MenuPanel sideMenu={sideMenu}>
     <MenuItem onClick={handleStorePayments}>Store Payments</MenuItem>
+    <MenuItem onClick={handlePayoutManagement}>Customer Payouts</MenuItem>
     <MenuItem onClick={handleProfile}>Profile</MenuItem>
     <MenuItem onClick={handleLogout}>Logout</MenuItem>
   </MenuPanel>
