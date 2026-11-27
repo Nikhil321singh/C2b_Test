@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { BeatLoader } from 'react-spinners'
@@ -11,6 +11,11 @@ import { IoRefresh } from 'react-icons/io5'
 import styles from './CompanyListingDetails/CompanyListingDetails.module.css'
 import styless from './QuotesCreatedAdmin/QuotesCreatedAdmin.module.css'
 import ConfirmPaymentModal from './StoreRequests/ConfirmPaymentModal'
+import ListPagination from '../components/ListPagination/ListPagination'
+import {
+  PAGE_SIZES,
+  useDebouncedValue,
+} from '../components/ListPagination/listPaging'
 
 const STATUS_LABELS = {
   PAYMENT_REQUESTED: 'Payment Requested',
@@ -78,7 +83,7 @@ const FilterBar = ({
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         className='text-sm'
-        placeholder='Search...'
+        placeholder='Search lot code, store or amount...'
       />
       <IoMdSearch size={25} />
     </div>
@@ -424,49 +429,67 @@ const StorePayments = () => {
   const [confirming, setConfirming] = useState(null)
   const [confirmError, setConfirmError] = useState('')
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(PAGE_SIZES[0])
+  const [total, setTotal] = useState(0)
+  const debouncedSearch = useDebouncedValue(search.trim())
+  // Only the newest list request may update the table.
+  const latestRequest = useRef(0)
   const token = sessionStorage.getItem('authToken')
   const profile = JSON.parse(sessionStorage.getItem('profile') || '{}')
 
-  const filteredItems = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    if (!q) {
-      return items
-    }
-    return items.filter((item) => {
-      const haystack = [
-        item.uniqueCode || '',
-        item.storeId?.storeName || '',
-        MODE_LABELS[item.paymentMode] || item.paymentMode || '',
-        STATUS_LABELS[item.paymentStatus] || item.paymentStatus || '',
-        String(item.totalAmount || ''),
-      ]
-        .join(' ')
-        .toLowerCase()
-      return haystack.includes(q)
-    })
-  }, [items, search])
-
+  // Search and paging run on the server, over every request the user may see.
+  // The API counts pages from 0; the pager shows them from 1.
   const load = useCallback(async () => {
+    const requestId = latestRequest.current + 1
+    latestRequest.current = requestId
+    const isStale = () => requestId !== latestRequest.current
     setLoading(true)
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/store-payments`,
         {
           headers: { Authorization: token },
-          params: status ? { status } : {},
+          params: {
+            page: page - 1,
+            limit,
+            ...(status ? { status } : {}),
+            ...(debouncedSearch ? { search: debouncedSearch } : {}),
+          },
         }
       )
-      setItems(response.data.data.items || [])
+      if (isStale()) {
+        return
+      }
+      const data = response.data.data
+      const count = data.total || 0
+      const lastPage = Math.max(Math.ceil(count / limit), 1)
+      // The last row of the last page left the list (e.g. after Mark Paid).
+      if (page > lastPage) {
+        setPage(lastPage)
+        return
+      }
+      setItems(data.items || [])
+      setTotal(count)
       setError('')
     } catch (requestError) {
-      setError(
-        requestError.response?.data?.message ||
-          'Unable to load store payment requests'
-      )
+      if (!isStale()) {
+        setError(
+          requestError.response?.data?.message ||
+            'Unable to load store payment requests'
+        )
+      }
     } finally {
-      setLoading(false)
+      if (!isStale()) {
+        setLoading(false)
+      }
     }
-  }, [status, token])
+  }, [status, token, page, limit, debouncedSearch])
+
+  // A new search starts again from the first page.
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch])
 
   useEffect(() => {
     load()
@@ -511,7 +534,7 @@ const StorePayments = () => {
   }
 
   // Mark Paid opens the Confirm Payment form (receipt file + reference +
-  // remarks), the same form as Customer Payouts > Store Requests.
+  // remarks).
   const markPaid = (item) => {
     setConfirmError('')
     setConfirming(item)
@@ -576,6 +599,7 @@ const StorePayments = () => {
         onSelectStatus={(value) => {
           setStatus(value)
           setStatusDrop(false)
+          setPage(1)
         }}
         statusDrop={statusDrop}
         onToggleStatusDrop={() => setStatusDrop((previous) => !previous)}
@@ -596,7 +620,7 @@ const StorePayments = () => {
         <table className='w-full border border-primary'>
           <PaymentsTableHeader />
           <tbody>
-            {filteredItems.map((item, index) => (
+            {items.map((item, index) => (
               <PaymentsRow
                 key={item._id}
                 item={item}
@@ -610,7 +634,7 @@ const StorePayments = () => {
                 onMarkPaid={markPaid}
               />
             ))}
-            {!loading && filteredItems.length === 0 && (
+            {!loading && items.length === 0 && (
               <tr>
                 <td colSpan='10' className='p-8 text-center text-gray-500'>
                   No store payment requests found.
@@ -620,6 +644,17 @@ const StorePayments = () => {
           </tbody>
         </table>
       </div>
+      <ListPagination
+        page={page}
+        limit={limit}
+        total={total}
+        disabled={loading}
+        onPageChange={setPage}
+        onLimitChange={(size) => {
+          setLimit(size)
+          setPage(1)
+        }}
+      />
 
       <PaymentDetailModal
         selected={selected}
