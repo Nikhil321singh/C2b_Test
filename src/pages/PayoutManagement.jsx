@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -10,6 +10,11 @@ import { FaDownload } from 'react-icons/fa'
 import { IoMdSearch } from 'react-icons/io'
 import { IoRefresh } from 'react-icons/io5'
 import styles from './CompanyListingDetails/CompanyListingDetails.module.css'
+import ListPagination from '../components/ListPagination/ListPagination'
+import {
+  PAGE_SIZES,
+  useDebouncedValue,
+} from '../components/ListPagination/listPaging'
 import {
   formatStatusCheckedAt,
   getPayoutDisplayState,
@@ -761,6 +766,12 @@ const PayoutManagement = () => {
   const [error, setError] = useState('')
   const [busyId, setBusyId] = useState('')
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(PAGE_SIZES[0])
+  const [total, setTotal] = useState(0)
+  const debouncedSearch = useDebouncedValue(search.trim())
+  // Only the newest list request may update the table.
+  const latestRequest = useRef(0)
   const [rejectingItem, setRejectingItem] = useState(null)
   const [rejectionRemarks, setRejectionRemarks] = useState('')
   const [viewingId, setViewingId] = useState('')
@@ -771,46 +782,55 @@ const PayoutManagement = () => {
   )
   const token = sessionStorage.getItem('authToken')
 
-  const filteredItems = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    if (!q) {
-      return items
-    }
-    return items.filter((item) => {
-      const haystack = [
-        item.leadId?.uniqueCode || item.leadId?._id || '',
-        item.storeId?.storeName || '',
-        item.status || '',
-        item.provider || '',
-        providerLabel(item),
-        item.merchantOrderNo || '',
-        item.providerTransactionRrn || '',
-        item.providerResponseCode || '',
-        userLabel(item.initiatedBy),
-        item.beneficiaryAccountMasked || '',
-        item.beneficiaryVpaMasked || '',
-      ]
-        .join(' ')
-        .toLowerCase()
-      return haystack.includes(q)
-    })
-  }, [items, search])
+  // Search and paging run on the server, over every payout the user may see.
+  const listParams = useCallback(
+    (pageNumber, pageSize) => ({
+      page: pageNumber,
+      limit: pageSize,
+      ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    }),
+    [debouncedSearch]
+  )
 
   const load = useCallback(async () => {
+    const requestId = latestRequest.current + 1
+    latestRequest.current = requestId
+    const isStale = () => requestId !== latestRequest.current
     setLoading(true)
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/buyback-payouts`,
-        { headers: { Authorization: token } }
+        { headers: { Authorization: token }, params: listParams(page, limit) }
       )
-      setItems(response.data.data.items)
+      if (isStale()) {
+        return
+      }
+      const data = response.data.data
+      const count = data.total || 0
+      const lastPage = Math.max(Math.ceil(count / limit), 1)
+      // The last row of the last page left the list (e.g. after an action).
+      if (page > lastPage) {
+        setPage(lastPage)
+        return
+      }
+      setItems(data.items)
+      setTotal(count)
       setError('')
     } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Unable to load payouts')
+      if (!isStale()) {
+        setError(requestError.response?.data?.message || 'Unable to load payouts')
+      }
     } finally {
-      setLoading(false)
+      if (!isStale()) {
+        setLoading(false)
+      }
     }
-  }, [token])
+  }, [token, listParams, page, limit])
+
+  // A new search starts again from the first page.
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch])
 
   useEffect(() => {
     load()
@@ -893,9 +913,35 @@ const PayoutManagement = () => {
     }
   }
 
-  const exportPayouts = () => {
-    const rows = items.map(toExportRow)
-    generateExcelFile(rows, 'HSBC_Payouts_UAT')
+  // Export every payout matching the search, not only the page on screen.
+  const EXPORT_PAGE_SIZE = 100
+  const EXPORT_MAX_PAGES = 50
+  const exportPayouts = async () => {
+    setLoading(true)
+    try {
+      const rows = []
+      for (let pageNumber = 1; pageNumber <= EXPORT_MAX_PAGES; pageNumber += 1) {
+        // Pages are fetched one after another on purpose (the next depends on the total).
+        // eslint-disable-next-line no-await-in-loop
+        const response = await axios.get(
+          `${import.meta.env.VITE_REACT_APP_ENDPOINT}/api/buyback-payouts`,
+          {
+            headers: { Authorization: token },
+            params: listParams(pageNumber, EXPORT_PAGE_SIZE),
+          }
+        )
+        const { items: batch = [], total: count = 0 } = response.data.data
+        rows.push(...batch.map(toExportRow))
+        if (batch.length === 0 || rows.length >= count) {
+          break
+        }
+      }
+      generateExcelFile(rows, 'HSBC_Payouts_UAT')
+    } catch (requestError) {
+      toast.error(requestError.response?.data?.message || 'Unable to export payouts')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleRefresh = async () => {
@@ -928,7 +974,7 @@ const PayoutManagement = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className='text-sm'
-            placeholder='Search...'
+            placeholder='Search lead, store, order no, status...'
           />
           <IoMdSearch size={25} />
         </div>
@@ -943,7 +989,7 @@ const PayoutManagement = () => {
         <button
           type='button'
           onClick={exportPayouts}
-          disabled={items.length === 0}
+          disabled={total === 0}
           className={`${styles.bulkdown_button} disabled:opacity-50`}
         >
           <FaDownload /> Export
@@ -965,7 +1011,7 @@ const PayoutManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredItems.map((item, index) => (
+            {items.map((item, index) => (
               <PayoutRow
                 key={item._id}
                 item={item}
@@ -977,7 +1023,7 @@ const PayoutManagement = () => {
                 onSendToLogistics={openLogisticsModal}
               />
             ))}
-            {!loading && filteredItems.length === 0 && (
+            {!loading && items.length === 0 && (
               <tr>
                 <td colSpan={TABLE_HEADERS.length} className='p-8 text-center text-gray-500'>
                   No payouts found.
@@ -988,6 +1034,17 @@ const PayoutManagement = () => {
         </table>
         </div>
       </div>
+      <ListPagination
+        page={page}
+        limit={limit}
+        total={total}
+        disabled={loading}
+        onPageChange={setPage}
+        onLimitChange={(size) => {
+          setLimit(size)
+          setPage(1)
+        }}
+      />
       <RejectPayoutModal
         item={rejectingItem}
         remarks={rejectionRemarks}
