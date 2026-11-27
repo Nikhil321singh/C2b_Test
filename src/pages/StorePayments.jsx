@@ -13,7 +13,7 @@ import styless from './QuotesCreatedAdmin/QuotesCreatedAdmin.module.css'
 import ConfirmPaymentModal from './StoreRequests/ConfirmPaymentModal'
 import ListPagination from '../components/ListPagination/ListPagination'
 import {
-  PAGE_SIZES,
+  PAGE_SIZE,
   useDebouncedValue,
 } from '../components/ListPagination/listPaging'
 
@@ -430,7 +430,7 @@ const StorePayments = () => {
   const [confirmError, setConfirmError] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(PAGE_SIZES[0])
+  const limit = PAGE_SIZE
   const [total, setTotal] = useState(0)
   const debouncedSearch = useDebouncedValue(search.trim())
   // Only the newest list request may update the table.
@@ -646,14 +646,10 @@ const StorePayments = () => {
       </div>
       <ListPagination
         page={page}
-        limit={limit}
+        pageSize={limit}
         total={total}
         disabled={loading}
         onPageChange={setPage}
-        onLimitChange={(size) => {
-          setLimit(size)
-          setPage(1)
-        }}
       />
 
       <PaymentDetailModal

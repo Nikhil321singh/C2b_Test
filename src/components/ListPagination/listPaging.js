@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
-export const PAGE_SIZES = [20, 50, 100]
+// Rows per page, the same as the other tables.
+export const PAGE_SIZE = 10
 
 // Delays a value (e.g. search text) so the list reloads once typing pauses.
 export const useDebouncedValue = (value, delayMs = 400) => {
